@@ -84,7 +84,7 @@ body {
 .screen {
     width: 100%;
     height: 100%;
-    display: flex;
+    display: none; /* JS इसे active क्लास के साथ flex बनाएगा */
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
@@ -94,37 +94,27 @@ body {
     transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
     padding: 20px;
     box-sizing: border-box;
-    opacity: 0;
-    pointer-events: none;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     transform-origin: center center;
     background-color: transparent;
 }
 
-#splash-screen, #information-screen {
-    background-color: var(--background);
-    z-index: 11;
+.screen.active {
+    display: flex; /* Active स्क्रीन को दिखाने के लिए */
+    z-index: 10;
 }
 
-.screen.active {
-    opacity: 1;
-    pointer-events: auto;
-    z-index: 10;
-    transform: none;
-}
 
 #splash-screen {
-    display: flex;
-    flex-direction: column;
     justify-content: space-between;
-    align-items: center;
     padding: 40px 20px 20px 20px;
     background: linear-gradient(to bottom, #87CEEB, #FFD700, #FFA500, #FF69B4, #F44336, #4CAF50);
     box-sizing: border-box;
     text-align: center;
     overflow: hidden;
     position: relative;
+    z-index: 11; /* यह सुनिश्चित करने के लिए कि यह सबसे ऊपर हो */
 }
 
 @keyframes bokeh {
@@ -346,6 +336,11 @@ body {
     margin: 0;
 }
 
+#information-screen {
+    z-index: 11;
+    background-color: var(--background);
+}
+
 #information-screen h2 {
     font-size: 1.8em;
     margin-bottom: 20px;
@@ -454,8 +449,6 @@ body {
 #home-screen {
     padding: 0;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
     height: 100%;
 }
 
@@ -480,7 +473,7 @@ body {
 }
 
 .video-slide .player-container,
-.video-slide .html5-player { /* Added html5-player */
+.video-slide .html5-player {
     width: 100%;
     height: 100%;
     max-width: 420px;
@@ -488,7 +481,7 @@ body {
     top: 0;
     left: 0;
     z-index: 1;
-    object-fit: cover; /* Added for HTML5 video */
+    object-fit: cover;
 }
 
 .video-slide iframe {
@@ -525,18 +518,21 @@ body {
     transform: translate(-50%, -50%);
 }
 
+/* ============== सबसे ज़रूरी बदलाव यहाँ है ============== */
 .bottom-nav {
-    display: flex;
+    display: none; /* JS इसे flex में बदलेगा जब ज़रूरी होगा */
     justify-content: space-around;
     align-items: center;
     width: 100%;
+    max-width: 420px; /* यह app-container की चौड़ाई से मैच करेगा */
     height: 60px;
     background-color: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(10px);
-    position: absolute;
+    position: fixed; /* इसे स्क्रीन पर चिपकाए रखने के लिए */
     bottom: 0;
-    left: 0;
-    z-index: 100;
+    left: 50%; /* सेंटर करने के लिए */
+    transform: translateX(-50%); /* सेंटर करने के लिए */
+    z-index: 500; /* यह सुनिश्चित करने के लिए कि यह हमेशा ऊपर रहे */
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -577,6 +573,8 @@ body {
 .nav-item:not(.active)[data-nav="wallet"] i { color: #2196F3; }
 .nav-item:not(.active)[data-nav="friends"] i { color: #00BCD4; }
 .nav-item:not(.active)[data-nav="profile"] i { color: #9C27B0; }
+/* ================================================== */
+
 
 #upload-screen {
     justify-content: flex-start;
@@ -610,19 +608,19 @@ body {
 }
 
 .upload-action-button {
-    display: flex; /* Changed to flex for icon alignment */
+    display: flex; 
     align-items: center;
     justify-content: center;
-    color: #ffffff; /* Changed to white for better contrast */
+    color: #ffffff;
     padding: 15px 30px;
     border-radius: 10px;
-    font-size: 1.1em; /* Slightly adjusted */
+    font-size: 1.1em;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
     border: none;
-    width: 90%; /* Adjusted width */
-    max-width: 320px; /* Adjusted max-width */
+    width: 90%;
+    max-width: 320px;
     text-align: center;
     background-color: var(--success-green);
 }
@@ -1186,14 +1184,14 @@ body {
 }
 
 .modal-content .input-group,
-#premium-upload-screen .input-group { /* Added premium screen selector */
+#premium-upload-screen .input-group { 
     margin-bottom: 20px;
     text-align: left;
     width: 100%;
 }
 
 .modal-content label,
-#premium-upload-screen label { /* Added premium screen selector */
+#premium-upload-screen label {
     display: block;
     font-size: 1.1em;
     margin-bottom: 8px;
@@ -1204,8 +1202,8 @@ body {
 .modal-content input[type="email"],
 .modal-content input[type="url"],
 .modal-content textarea,
-#premium-upload-screen input[type="text"], /* Added premium screen selector */
-#premium-upload-screen textarea { /* Added premium screen selector */
+#premium-upload-screen input[type="text"],
+#premium-upload-screen textarea {
     width: 100%;
     padding: 12px 15px;
     border: none;
@@ -1218,8 +1216,8 @@ body {
 }
 .modal-content input::placeholder,
 .modal-content textarea::placeholder,
-#premium-upload-screen input::placeholder, /* Added premium screen selector */
-#premium-upload-screen textarea::placeholder { /* Added premium screen selector */
+#premium-upload-screen input::placeholder,
+#premium-upload-screen textarea::placeholder {
     color: rgba(255, 255, 255, 0.5);
 }
 
@@ -1369,7 +1367,7 @@ input:checked + .slider:before {
 }
 
 .modal-content .save-button,
-#premium-upload-screen .save-button { /* Added premium screen selector */
+#premium-upload-screen .save-button {
     background-color: var(--success-green);
     color: var(--background);
     padding: 12px 25px;
@@ -1382,7 +1380,7 @@ input:checked + .slider:before {
     width: 100%;
 }
 .modal-content .save-button:hover,
-#premium-upload-screen .save-button:hover { /* Added premium screen selector */
+#premium-upload-screen .save-button:hover {
     background-color: #388e3c;
 }
 
