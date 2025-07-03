@@ -20,8 +20,11 @@ if (!firebase.apps.length) {
 
 const auth = firebase.auth();
 const db = firebase.firestore();
-const storage = firebase.storage();
+const storage = firebase.storage(); // इसे अभी भी रखा गया है अगर भविष्य में ज़रूरत पड़े
 const analytics = firebase.analytics();
+
+// --- नया Backend URL ---
+const RENDER_BACKEND_URL = 'https://shubhzone.onrender.com/upload'; // <-- यहाँ आपका नया URL है
 
 let appState = {
     currentUser: {
@@ -208,9 +211,11 @@ function showHome() { navigateTo('home-screen'); }
 function showWalletScreen() { navigateTo('wallet-screen'); }
 function checkCustom(select, inputId) { document.getElementById(inputId).style.display = select.value === 'custom' ? 'block' : 'none'; }
 
+// ============== FUNCTION #1: saveAndContinue() - बदला हुआ ==============
 async function saveAndContinue() {
     saveContinueBtn.disabled = true;
     saveContinueBtn.textContent = 'Saving...';
+    
     const name = document.getElementById('info-name').value.trim();
     if (!name) {
         alert('Please enter your name.');
@@ -218,27 +223,59 @@ async function saveAndContinue() {
         saveContinueBtn.textContent = 'Continue';
         return;
     }
-    const userData = { name, mobile: document.getElementById('info-mobile').value, email: document.getElementById('info-email').value, address: document.getElementById('info-address').value, hobby: document.getElementById('info-hobby').value, state: document.getElementById('info-state').value, country: document.getElementById('info-country').value };
+
+    const userData = { 
+        name, 
+        mobile: document.getElementById('info-mobile').value, 
+        email: document.getElementById('info-email').value, 
+        address: document.getElementById('info-address').value, 
+        hobby: document.getElementById('info-hobby').value, 
+        state: document.getElementById('info-state').value, 
+        country: document.getElementById('info-country').value 
+    };
+
     const file = profileImageInput.files[0];
+
     if (file) {
         try {
-            const storageRef = storage.ref(`avatars/${appState.currentUser.uid}/${file.name}`);
-            const snapshot = await storageRef.put(file);
-            userData.avatar = await snapshot.ref.getDownloadURL();
+            // नया कोड: फाइल को Render सर्वर पर भेजने के लिए FormData बनाएं
+            const formData = new FormData();
+            formData.append('media', file); // 'media' key का इस्तेमाल करें
+
+            // Render Backend को कॉल करें
+            const response = await fetch(RENDER_BACKEND_URL, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                // अगर सर्वर से एरर आए
+                throw new Error(`Server error: ${response.statusText}`);
+            }
+
+            const result = await response.json(); // सर्वर से मिला जवाब
+            userData.avatar = result.downloadURL; // Wasabi से मिला URL
+
         } catch (error) {
             console.error("Avatar upload error:", error);
-            alert("Failed to upload profile picture.");
+            alert("Failed to upload profile picture. Please try again.");
+            saveContinueBtn.disabled = false;
+            saveContinueBtn.textContent = 'Continue';
+            return; // अगर अपलोड फेल हो तो आगे न बढ़ें
         }
     }
+
     try {
         await db.collection('users').doc(appState.currentUser.uid).set(userData, { merge: true });
         appState.currentUser = { ...appState.currentUser, ...userData };
         updateProfileUI();
         await startAppLogic();
-
     } catch (error) {
         console.error("Profile save error:", error);
         alert("Failed to save profile.");
+    } finally {
+        saveContinueBtn.disabled = false;
+        saveContinueBtn.textContent = 'Continue';
     }
 }
 
@@ -270,10 +307,8 @@ function selectCategory(category) {
     appState.uploadDetails.category = category;
     selectedCategoryText.textContent = category;
     categorySelectorDisplay.classList.remove('open');
-    // --- NEW ---: Also set category for premium upload if that screen is active
     if (appState.currentScreen === 'premium-upload-screen') {
         // You'll need a similar category display on the premium screen
-        // For now, we just store it.
     }
 }
 
@@ -326,10 +361,8 @@ async function saveNewVideo() {
 
 function renderCategories() {
     categoryOptionsContainer.innerHTML = categories.map(cat => `<div class="category-option" onclick="selectCategory('${cat}')">${cat}</div>`).join('');
-    // --- NEW ---: You would also populate the category selector on the premium page here if it exists
 }
 
-// --- MODIFIED ---: Main rendering function updated for both video types
 function renderVideoSwiper() {
     videoSwiper.innerHTML = '';
     players = {};
@@ -351,12 +384,9 @@ function renderVideoSwiper() {
             slide.addEventListener('dblclick', () => { handleLikeAction(video.id); });
 
             let playerHtml = '';
-            // --- MODIFIED ---: Conditional player rendering
             if (video.videoType === 'premium') {
-                // HTML5 Video Player for premium content
                 playerHtml = `<video class="html5-player" id="player-${video.id}" src="${video.videoUrl}" loop muted playsinline></video>`;
             } else {
-                // YouTube Iframe Player (default)
                 playerHtml = `<div class="player-container" id="player-${video.id}"></div>`;
             }
 
@@ -389,9 +419,8 @@ function onYouTubeIframeAPIReady() {
     }
 }
 
-// --- MODIFIED ---: This function now initializes both YT and HTML5 players
 function initializePlayers() {
-    if (!isYouTubeApiReady) return; // Still need this for YouTube part
+    if (!isYouTubeApiReady) return;
 
     appState.allVideos.forEach((video) => {
         const playerId = `player-${video.id}`;
@@ -399,15 +428,12 @@ function initializePlayers() {
 
         if (playerElement && !players[video.id]) {
             if (video.videoType === 'premium') {
-                // For premium videos, the element is the <video> tag itself.
-                // We just store a reference to it.
                 players[video.id] = playerElement;
                 playerElement.addEventListener('canplay', () => {
                     const preloader = playerElement.closest('.video-slide').querySelector('.video-preloader');
                     if(preloader) preloader.style.display = 'none';
                 });
             } else {
-                // For YouTube, we create a new YT.Player instance.
                 players[video.id] = new YT.Player(playerId, {
                     height: '100%',
                     width: '100%',
@@ -435,7 +461,6 @@ function onPlayerStateChange(event) {
     }
 }
 
-// --- MODIFIED ---: Unified play/pause toggle function
 function togglePlayPause(videoId) {
     const player = players[videoId];
     if (!player) return;
@@ -456,7 +481,6 @@ function togglePlayPause(videoId) {
     }
 }
 
-// --- NEW --- Helper functions for unified player control
 function playActivePlayer(videoId) {
     const player = players[videoId];
     if (!player) return;
@@ -494,7 +518,6 @@ function setupVideoObserver() {
             if (!videoId || !players[videoId]) return;
 
             if (entry.isIntersecting) {
-                // Pause the previously active player
                 if (activePlayerId && activePlayerId !== videoId) {
                     pauseActivePlayer(activePlayerId);
                 }
@@ -502,7 +525,6 @@ function setupVideoObserver() {
                 playActivePlayer(videoId);
 
             } else {
-                // This video is scrolling out of view, pause it
                 if(videoId === activePlayerId) {
                      pauseActivePlayer(videoId);
                      activePlayerId = null;
@@ -587,82 +609,87 @@ function showDeleteMessageOptions() {
 }
 
 // --- NEW ---: Functions for Premium Video Upload
-function handlePremiumFileUpload() {
+
+// ============== FUNCTION #2: handlePremiumFileUpload() - बदला हुआ ==============
+async function handlePremiumFileUpload() {
     if (!premiumUploadBtn) return;
     premiumUploadBtn.disabled = true;
     premiumUploadBtn.textContent = 'Uploading...';
 
     const file = premiumVideoFileInput.files[0];
     const title = premiumVideoTitle.value.trim();
-    const category = appState.uploadDetails.category; // Make sure category is selected
+    // श्रेणी (Category) पहले ही `selectCategory` फंक्शन द्वारा `appState.uploadDetails.category` में सेट हो चुकी है
+    const category = appState.uploadDetails.category; 
 
     if (!file || !title || !category) {
-        alert("Please select a video file and enter a title and category.");
+        alert("Please select a video file, enter a title, and select a category.");
         premiumUploadBtn.disabled = false;
         premiumUploadBtn.textContent = 'Upload Video';
         return;
     }
 
-    if(premiumUploadProgress) premiumUploadProgress.style.display = 'block';
+    if (premiumUploadProgress) premiumUploadProgress.style.display = 'block';
+    if (premiumUploadProgressText) premiumUploadProgressText.textContent = `Uploading... (Please wait)`;
 
-    const storageRef = storage.ref(`premium_videos/${auth.currentUser.uid}/${Date.now()}-${file.name}`);
-    const uploadTask = storageRef.put(file);
+    try {
+        // नया कोड: फाइल और अन्य डेटा को Render सर्वर पर भेजने के लिए FormData बनाएं
+        const formData = new FormData();
+        formData.append('media', file); // 'media' key का इस्तेमाल करें
+        formData.append('title', title);
+        formData.append('description', premiumVideoDescription.value.trim());
+        formData.append('hashtags', premiumVideoHashtags.value.trim());
+        formData.append('category', category);
+        // आप यहाँ और भी डेटा भेज सकते हैं, जैसे uploaderUid
+        formData.append('uploaderUid', auth.currentUser.uid);
 
-    uploadTask.on('state_changed',
-        (snapshot) => {
-            // Progress function
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            if(premiumUploadProgressText) premiumUploadProgressText.textContent = `Uploading: ${Math.round(progress)}%`;
-        },
-        (error) => {
-            // Error function
-            console.error("Upload failed:", error);
-            alert("Upload failed. Please try again.");
-            if(premiumUploadProgress) premiumUploadProgress.style.display = 'none';
-            premiumUploadBtn.disabled = false;
-            premiumUploadBtn.textContent = 'Upload Video';
-        },
-        async () => {
-            // Complete function
-            if(premiumUploadProgressText) premiumUploadProgressText.textContent = 'Processing...';
-            try {
-                const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
-                const videoData = {
-                    uploaderUid: auth.currentUser.uid,
-                    uploaderUsername: appState.currentUser.name || appState.currentUser.username,
-                    uploaderAvatar: appState.currentUser.avatar,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    title: title,
-                    description: premiumVideoDescription.value.trim(),
-                    hashtags: premiumVideoHashtags.value.trim(),
-                    videoUrl: downloadURL,
-                    // NOTE: Thumbnail generation from video is complex on the client-side.
-                    // We're using a placeholder. A server-side function would be ideal.
-                    thumbnailUrl: 'https://via.placeholder.com/420x740/111/fff?text=Video',
-                    videoType: 'premium', // Important for the player
-                    category: category,
-                    audience: appState.uploadDetails.audience || 'all',
-                    commentsEnabled: true, // or get from a toggle
-                    likes: 0,
-                    commentCount: 0
-                };
+        // Render Backend को कॉल करें
+        const response = await fetch(RENDER_BACKEND_URL, {
+            method: 'POST',
+            body: formData
+        });
 
-                await db.collection("videos").add(videoData);
-                alert("Premium video uploaded successfully!");
-                await loadAllVideosFromFirebase();
-                navigateTo('home-screen');
-
-            } catch (error) {
-                console.error("Error saving video data:", error);
-                alert("Could not save video details. Error: " + error.message);
-            } finally {
-                 if(premiumUploadProgress) premiumUploadProgress.style.display = 'none';
-                 premiumUploadBtn.disabled = false;
-                 premiumUploadBtn.textContent = 'Upload Video';
-            }
+        if (!response.ok) {
+            throw new Error(`Upload failed with status: ${response.status}`);
         }
-    );
+
+        const result = await response.json(); // सर्वर से मिला जवाब { downloadURL, thumbnailUrl }
+
+        if (premiumUploadProgressText) premiumUploadProgressText.textContent = 'Processing...';
+
+        // अब वीडियो की डिटेल्स Firebase Firestore में सेव करें
+        const videoData = {
+            uploaderUid: auth.currentUser.uid,
+            uploaderUsername: appState.currentUser.name || appState.currentUser.username,
+            uploaderAvatar: appState.currentUser.avatar,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            title: title,
+            description: premiumVideoDescription.value.trim(),
+            hashtags: premiumVideoHashtags.value.trim(),
+            videoUrl: result.downloadURL, // <-- Wasabi से मिला URL
+            thumbnailUrl: result.thumbnailUrl || 'https://via.placeholder.com/420x740/111/fff?text=Video', // <-- Wasabi से मिला थंबनेल URL
+            videoType: 'premium',
+            category: category,
+            audience: appState.uploadDetails.audience || 'all',
+            commentsEnabled: true,
+            likes: 0,
+            commentCount: 0
+        };
+
+        await db.collection("videos").add(videoData);
+        alert("Premium video uploaded successfully!");
+        await loadAllVideosFromFirebase();
+        navigateTo('home-screen');
+
+    } catch (error) {
+        console.error("Error during premium upload:", error);
+        alert("Upload failed. Please try again. Error: " + error.message);
+    } finally {
+        if (premiumUploadProgress) premiumUploadProgress.style.display = 'none';
+        premiumUploadBtn.disabled = false;
+        premiumUploadBtn.textContent = 'Upload Video';
+    }
 }
+
 
 const startAppLogic = async () => {
     const firstPlayerReadyPromise = new Promise(resolve => { window.resolveFirstPlayerReady = resolve; });
@@ -695,13 +722,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('#theme-settings-screen .theme-btn').forEach(button => { button.addEventListener('click', () => { document.documentElement.classList.toggle('light-theme', button.dataset.theme !== 'dark'); }); });
     document.querySelectorAll('#theme-settings-screen .color-swatch').forEach(swatch => { swatch.addEventListener('click', () => { document.documentElement.style.setProperty('--primary-neon', swatch.dataset.color); }); });
 
-    // --- MODIFIED ---: The `upload-action-button` now has specific IDs you will add to your HTML
-    // This button will now open the YouTube modal
     const openYouTubeBtn = document.getElementById('open-youtube-modal-btn');
     if (openYouTubeBtn) {
         openYouTubeBtn.addEventListener('click', openUploadDetailsModal);
     }
-    // This button will navigate to the new premium upload screen
     const openPremiumBtn = document.getElementById('open-premium-upload-btn');
     if (openPremiumBtn) {
         openPremiumBtn.addEventListener('click', () => navigateTo('premium-upload-screen'));
@@ -710,7 +734,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('navigate-to-editor-btn').addEventListener('click', () => navigateTo('image-editor-screen'));
     document.getElementById('back-from-editor-btn').addEventListener('click', () => document.querySelector('.nav-item[data-nav="upload"]').click());
 
-    // --- NEW ---: Event listeners for the new premium upload screen
     if (premiumUploadBtn) {
         premiumUploadBtn.addEventListener('click', handlePremiumFileUpload);
     }
@@ -728,7 +751,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // === NEW EVENT LISTENERS FOR FRIENDS SCREEN (Placeholder) ===
     const friendsNavMessages = document.getElementById('friends-nav-messages');
     const friendsNavStatus = document.getElementById('friends-nav-status');
     const friendsNavStory = document.getElementById('friends-nav-story');
@@ -745,7 +767,7 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ======================================================= */
 /* === AI Photo Editor Script (Code 1) - START === */
 /* ======================================================= */
-// ... (Photo editor code remains unchanged) ...
+
 const photoEditor = (() => {
     let isInitialized = false;
 
@@ -822,7 +844,115 @@ const photoEditor = (() => {
     function startCrop() { if (isCropping) return; isCropping = true; cropOverlay.style.display = 'block'; deactivateAllElements(); const i = mainImage.getBoundingClientRect(); const s = Math.min(i.width, i.height) * 0.8; cropBox = document.createElement('div'); cropBox.className = 'crop-box'; cropBox.style.width = `${s}px`; cropBox.style.height = `${s}px`; cropBox.style.left = `${(i.width - s) / 2}px`; cropBox.style.top = `${(i.height - s) / 2}px`; cropBox.innerHTML = `<div class="crop-handle tl"></div><div class="crop-handle tr"></div><div class="crop-handle bl"></div><div class="crop-handle br"></div>`; cropOverlay.appendChild(cropBox); setCropAspectRatio(); let t, a, l, e, o, d, n, h; const r = (c) => { c.preventDefault(); c.stopPropagation(); h = c.target.closest('.crop-handle'); n = h ? 'resize' : 'move'; t = c.touches ? c.touches[0].clientX : c.clientX; a = c.touches ? c.touches[0].clientY : c.clientY; l = cropBox.offsetLeft; e = cropBox.offsetTop; o = cropBox.offsetWidth; d = cropBox.offsetHeight; document.addEventListener('mousemove', p); document.addEventListener('touchmove', p, { passive: false }); document.addEventListener('mouseup', u); document.addEventListener('touchend', u); }; const p = (c) => { const x = c.touches ? c.touches[0].clientX : c.clientX; const y = c.touches ? c.touches[0].clientY : c.clientY; let g = x - t; let f = y - a; if (n === 'move') { cropBox.style.left = Math.min(i.width - o, Math.max(0, l + g)) + 'px'; cropBox.style.top = Math.min(i.height - d, Math.max(0, e + f)) + 'px'; } else { let L = l, T = e, W = o, H = d; if (h.classList.contains('br')) { W += g; H += f; } else if (h.classList.contains('bl')) { W -= g; H += f; L += g; } else if (h.classList.contains('tr')) { W += g; H -= f; T += f; } else if (h.classList.contains('tl')) { W -= g; H -= f; L += g; T += f; } if (W > 50 && L >= 0 && L + W <= i.width) { cropBox.style.left = `${L}px`; cropBox.style.width = `${W}px`; } if (H > 50 && T >= 0 && T + H <= i.height) { cropBox.style.top = `${T}px`; cropBox.style.height = `${H}px`; } if (currentCropRatio !== 'free' && currentCropRatio !== 'circle') { const [w, R] = currentCropRatio.split(':').map(Number); const A = R / w; if (h.classList.contains('br') || h.classList.contains('tl')) { cropBox.style.height = `${cropBox.offsetWidth * A}px`; } else { cropBox.style.width = `${cropBox.offsetHeight / A}px`; } } } }; const u = () => { document.removeEventListener('mousemove', p); document.removeEventListener('mouseup', u); document.removeEventListener('touchmove', p); document.removeEventListener('touchend', u); }; cropBox.addEventListener('mousedown', r); cropBox.addEventListener('touchstart', r, { passive: false }); }
     function endCrop() { if (!isCropping) return; isCropping = false; cropOverlay.style.display = 'none'; if (cropBox) cropBox.remove(); cropBox = null; document.querySelector('#image-editor-screen .shape-btn.active').classList.remove('active'); document.querySelector('#image-editor-screen .shape-btn[data-ratio="free"]').classList.add('active'); currentCropRatio = 'free'; }
     function applyCrop() { if (!cropBox) return; const i = mainImage; const sX = i.naturalWidth / i.width; const sY = i.naturalHeight / i.height; const cX = cropBox.offsetLeft * sX, cY = cropBox.offsetTop * sY; const cW = cropBox.offsetWidth * sX, cH = cropBox.offsetHeight * sY; const canvas = document.createElement('canvas'); canvas.width = cW; canvas.height = cH; const ctx = canvas.getContext('2d'); if (cropBox.classList.contains('is-circle')) { ctx.beginPath(); ctx.arc(cW / 2, cH / 2, Math.min(cW, cH) / 2, 0, Math.PI * 2, true); ctx.clip(); } ctx.drawImage(i, cX, cY, cW, cH, 0, 0, cW, cH); mainImage.src = canvas.toDataURL('image/png', 1.0); mainImage.onload = () => { resizeDrawingCanvas(); resetForNewImage(); }; endCrop(); document.querySelector('#image-editor-screen .tool-btn[data-tool="crop"]').click(); }
-    function downloadImage() { deactivateAllElements(); endCrop(); const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); const baseImage = new Image(); baseImage.crossOrigin = "anonymous"; baseImage.onload = () => { canvas.width = baseImage.naturalWidth; canvas.height = baseImage.naturalHeight; ctx.filter = generateFilterString(); ctx.drawImage(baseImage, 0, 0); ctx.drawImage(drawingCanvas, 0, 0, canvas.width, canvas.height); const elements = imageWrapper.querySelectorAll('.interactive-wrapper'); const promises = Array.from(elements).map(el => { const content = el.querySelector('.element-content'); const scaleX = baseImage.naturalWidth / mainImage.width; const scaleY = baseImage.naturalHeight / mainImage.height; const left = el.offsetLeft * scaleX; const top = el.offsetTop * scaleY; const width = el.offsetWidth * scaleX; const height = el.offsetHeight * scaleY; const el_matrix = new DOMMatrix(window.getComputedStyle(el).transform); const rotation = Math.atan2(el_matrix.b, el_matrix.a); ctx.save(); ctx.translate(left + width / 2, top + height / 2); ctx.rotate(rotation); if (el.dataset.type === 'sticker') { return new Promise(resolve => { const img = new Image(); img.crossOrigin = "anonymous"; img.src = content.src; img.onload = () => { ctx.drawImage(img, -width / 2, -height / 2, width, height); ctx.restore(); resolve(); } }); } else { const content_matrix = new DOMMatrix(window.getComputedStyle(content).transform); ctx.scale(content_matrix.a, content_matrix.d); ctx.fillStyle = content.style.color; ctx.font = `${parseFloat(content.style.fontSize) * scaleX}px ${content.style.fontFamily}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(content.textContent, 0, 0); ctx.restore(); return Promise.resolve(); } }); Promise.all(promises).then(() => { const link = document.createElement('a'); link.download = 'edited-image.png'; link.href = canvas.toDataURL('image/png', 1.0); link.click(); }); }; baseImage.src = mainImage.src; }
+
+    // ============== FUNCTION #3: downloadImage() - बदला हुआ ==============
+    // इस फंक्शन को अब इमेज डाउनलोड करने के बजाय सर्वर पर अपलोड करने के लिए बदल दिया गया है।
+    function downloadImage() { 
+        deactivateAllElements(); 
+        endCrop();
+        
+        // एक लोडिंग इंडिकेटर दिखाएँ
+        alert("Preparing image for upload... Please wait.");
+        
+        const finalCanvas = document.createElement('canvas');
+        const ctx = finalCanvas.getContext('2d');
+        const baseImage = new Image();
+        baseImage.crossOrigin = "anonymous";
+        
+        baseImage.onload = () => {
+            finalCanvas.width = baseImage.naturalWidth;
+            finalCanvas.height = baseImage.naturalHeight;
+            
+            ctx.filter = generateFilterString();
+            ctx.drawImage(baseImage, 0, 0);
+            
+            // ड्राइंग कैनवास को अंतिम इमेज पर बनाएं
+            ctx.drawImage(drawingCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
+            
+            const elements = imageWrapper.querySelectorAll('.interactive-wrapper');
+            
+            const promises = Array.from(elements).map(el => {
+                const content = el.querySelector('.element-content');
+                const scaleX = baseImage.naturalWidth / mainImage.width;
+                const scaleY = baseImage.naturalHeight / mainImage.height;
+                const left = el.offsetLeft * scaleX;
+                const top = el.offsetTop * scaleY;
+                const width = el.offsetWidth * scaleX;
+                const height = el.offsetHeight * scaleY;
+                const el_matrix = new DOMMatrix(window.getComputedStyle(el).transform);
+                const rotation = Math.atan2(el_matrix.b, el_matrix.a);
+                
+                ctx.save();
+                ctx.translate(left + width / 2, top + height / 2);
+                ctx.rotate(rotation);
+                
+                if (el.dataset.type === 'sticker') {
+                    return new Promise(resolve => {
+                        const img = new Image();
+                        img.crossOrigin = "anonymous";
+                        img.src = content.src;
+                        img.onload = () => {
+                            ctx.drawImage(img, -width / 2, -height / 2, width, height);
+                            ctx.restore();
+                            resolve();
+                        }
+                    });
+                } else { // Text element
+                    const content_matrix = new DOMMatrix(window.getComputedStyle(content).transform);
+                    ctx.scale(content_matrix.a, content_matrix.d);
+                    ctx.fillStyle = content.style.color;
+                    ctx.font = `${parseFloat(content.style.fontSize) * scaleX}px ${content.style.fontFamily}`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(content.textContent.trim(), 0, 0);
+                    ctx.restore();
+                    return Promise.resolve();
+                }
+            });
+            
+            Promise.all(promises).then(() => {
+                // नया कोड: कैनवास को Blob में बदलें और अपलोड करें
+                finalCanvas.toBlob(async (blob) => {
+                    if (!blob) {
+                        alert("Error creating image file for upload.");
+                        return;
+                    }
+                    
+                    try {
+                        const formData = new FormData();
+                        // blob को फाइल की तरह भेजें, तीसरा आर्गुमेंट फाइल का नाम है
+                        formData.append('media', blob, 'edited-image.png');
+                        
+                        // Render Backend को कॉल करें
+                        const response = await fetch(RENDER_BACKEND_URL, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`Server error: ${response.statusText}`);
+                        }
+                        
+                        const result = await response.json();
+                        
+                        alert(`Image uploaded successfully!\nURL: ${result.downloadURL}`);
+                        // आप यहाँ यूजर को दूसरी स्क्रीन पर भेज सकते हैं या कुछ और कर सकते हैं
+                        
+                    } catch (error) {
+                        console.error("Edited image upload error:", error);
+                        alert("Failed to upload edited image. Please try again.");
+                    }
+
+                }, 'image/png', 1.0); // 1.0 मतलब highest quality
+            });
+        };
+        
+        baseImage.onerror = () => {
+             alert("Could not load the base image for processing. Please try another image.");
+        };
+        
+        baseImage.src = mainImage.src; 
+    }
 
     return {
         start: () => {
@@ -830,12 +960,11 @@ const photoEditor = (() => {
                 initialize();
                 isInitialized = true;
             } else {
-                // Re-initialize state if it's already been opened
                 initializeState();
                 resetForNewImage();
             }
         },
-        downloadImage: downloadImage
+        downloadImage: downloadImage // यह अब "uploadImage" जैसा काम करेगा
     };
 })();
 /* ======================================================= */
