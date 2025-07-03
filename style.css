@@ -1,6 +1,3 @@
-style.css
-
-
 /* ================================================= */
 /* === Shubhzone App Styles (Code 2) - START === */
 /* ================================================= */
@@ -83,7 +80,7 @@ body {
     }
 }
 
-/* ============== यहाँ सबसे ज़रूरी बदलाव है ============== */
+/* Default styles for all screens */
 .screen {
     width: 100%;
     height: 100%;
@@ -94,50 +91,46 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    padding: 20px; /* Default padding for screens */
+    padding: 20px; /* Default padding */
     box-sizing: border-box;
     overflow-y: auto; /* Allow vertical scrolling within the screen */
     -webkit-overflow-scrolling: touch;
     background-color: var(--background); /* Ensure screen has a background */
 
-    /* यह छिपी हुई स्क्रीन्स को पूरी तरह से गायब कर देगा */
+    /* Hide screens by default */
     opacity: 0;
-    pointer-events: none; /* यह सुनिश्चित करेगा कि छिपे हुए पेज पर क्लिक न हो */
+    pointer-events: none;
     transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
     visibility: hidden;
 }
 
+/* Active screen styles */
 .screen.active {
-    /* यह एक्टिव स्क्रीन को दिखाएगा */
     opacity: 1;
-    pointer-events: auto; /* यह सुनिश्चित करेगा कि सिर्फ एक्टिव पेज पर ही क्लिक हो */
+    pointer-events: auto;
     visibility: visible;
-    z-index: 10; /* यह एक्टिव स्क्रीन को बाकी सबसे ऊपर रखेगा */
+    z-index: 10;
 }
-/* ======================================================== */
 
-
+/* Specific z-index for splash and information screens if needed on top initially */
 #splash-screen, #information-screen {
     z-index: 11;
-    /* Splash screen and Information screen content fills height differently */
-    /* Remove padding for splash screen as its layout is specific */
 }
 
+/* Splash screen specific overrides */
 #splash-screen {
-     padding: 0; /* Remove default padding */
-     /* Ensure flex properties for its specific layout */
-    display: flex;
+    padding: 0; /* Remove default 20px padding */
+    display: flex; /* Ensure flex layout */
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
     padding: 40px 20px 20px 20px; /* Add specific padding */
-    background: linear-gradient(to bottom, #87CEEB, #FFD700, #FFA500, #FF69B4, #F44336, #4CAF50); /* Specific background */
+    background: linear-gradient(to bottom, #87CEEB, #FFD700, #FFA500, #FF69B4, #F44336, #4CAF50);
     box-sizing: border-box;
     text-align: center;
-    overflow: hidden; /* Keep content within bounds */
+    overflow: hidden;
     position: relative;
 }
-
 
 @keyframes bokeh {
     0% { transform: scale(0.5) translateY(0); opacity: 0; }
@@ -358,30 +351,24 @@ body {
     margin: 0;
 }
 
+/* Information screen specific overrides */
 #information-screen {
-    /* Information screen content needs margin-top to clear header */
-    /* Its inner div handles padding and overflow */
-    padding: 0; /* Remove default padding */
-    /* Ensure it's a flex column to center content block vertically if needed, but inner div handles scroll */
+     padding: 0; /* Remove default 20px padding */
+     padding-bottom: 80px; /* ADDED: Padding for fixed bottom nav */
+}
+
+/* Information screen inner scrollable container */
+#information-screen > div {
+    margin-top: 60px; /* Space for fixed header */
+    width: 100%;
+    overflow-y: auto; /* Enable scrolling */
+    padding: 20px; /* Add padding inside this container */
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    /* padding-bottom is on the screen itself now */
 }
-
-/* Inner scrollable container for information screen */
-#information-screen > div {
-    margin-top: 60px; /* Space for header */
-    width: 100%;
-    overflow-y: auto; /* Enable scrolling for its content */
-    padding: 20px; /* Add padding inside this container */
-    padding-bottom: 80px; /* Add padding for bottom nav */
-    box-sizing: border-box;
-    display: flex; /* Use flex to lay out inner content */
-    flex-direction: column;
-    align-items: center;
-}
-
 
 #information-screen h2 {
     font-size: 1.8em;
@@ -488,20 +475,22 @@ body {
     background-color: rgb(255, 69, 58);
 }
 
+/* Home screen specific overrides */
 #home-screen {
-    padding: 0; /* Remove default padding */
+    padding: 0; /* Remove default 20px padding */
     overflow: hidden; /* Content scrolling handled by #video-swiper */
     height: 100%;
-    display: flex; /* Make home screen a flex container */
-    flex-direction: column; /* Stack top bar and swiper vertically */
-    justify-content: flex-start; /* Align items to the start */
+    display: flex; /* ADDED: Make home screen a flex container */
+    flex-direction: column; /* ADDED: Stack top bar and swiper vertically */
+    justify-content: flex-start;
 }
 
+/* Video swiper (scrolling area for videos) */
 #video-swiper {
-    flex-grow: 1; /* Make swiper fill remaining vertical space */
+    flex-grow: 1; /* ADDED: Make swiper fill remaining vertical space */
     width: 100%;
-    /* height: 100%; /* Removed, flex-grow handles height */ */
-    overflow-y: scroll; /* Enable vertical scrolling */
+    /* height: 100%; /* Removed height, flex-grow handles it */ */
+    overflow-y: scroll; /* ADDED: Enable vertical scrolling */
     scroll-snap-type: y mandatory;
     -webkit-overflow-scrolling: touch;
 }
@@ -521,12 +510,12 @@ body {
 .video-slide .html5-player {
     width: 100%;
     height: 100%;
-    max-width: 420px; /* Limit player width if app-container is wider */
-    position: absolute; /* Cover the slide area */
+    max-width: 420px;
+    position: absolute;
     top: 0;
     left: 0;
     z-index: 1;
-    object-fit: cover; /* Ensure video covers area without distortion */
+    object-fit: cover;
 }
 
 .video-slide iframe {
@@ -557,31 +546,29 @@ body {
     padding: 20px;
     background-color: rgba(0,0,0,0.3);
     border-radius: 8px;
-    position: absolute; /* Position relative to swiper/slide container */
+    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 3; /* Ensure it's above preloader */
+    z-index: 3;
 }
 
-
-/* --- IMPORTANT CHANGE: Bottom Nav is fixed --- */
+/* Bottom Navigation Bar */
 .bottom-nav {
     display: flex;
     justify-content: space-around;
     align-items: center;
     width: 100%;
-    max-width: 420px; /* Match app-container max-width */
+    max-width: 420px;
     height: 60px;
     background-color: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(10px);
-    position: fixed; /* Fixed at the bottom of the viewport */
+    position: fixed; /* Fixed at the bottom */
     bottom: 0;
     left: 50%;
-    transform: translateX(-50%); /* Center the fixed element */
-    z-index: 500; /* High z-index to be on top */
+    transform: translateX(-50%);
+    z-index: 500;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    /* display: none; /* Managed by JS */ */
 }
 
 .nav-item {
@@ -622,10 +609,11 @@ body {
 .nav-item:not(.active)[data-nav="friends"] i { color: #00BCD4; }
 .nav-item:not(.active)[data-nav="profile"] i { color: #9C27B0; }
 
+/* Upload screen specific overrides */
 #upload-screen {
     justify-content: flex-start;
-    padding-top: 20px;
-     padding-bottom: 80px; /* ADDED: Padding for bottom nav */
+    /* padding-top: 20px; /* Default */ */
+    padding-bottom: 80px; /* ADDED: Padding for fixed bottom nav */
 }
 
 #upload-screen .upload-header {
@@ -676,8 +664,10 @@ body {
     transform: scale(1.02);
 }
 
+/* Wallet screen specific overrides */
 #wallet-screen {
-     padding-bottom: 80px; /* ADDED: Padding for bottom nav */
+     /* padding: 20px; /* Default */ */
+     padding-bottom: 80px; /* ADDED: Padding for fixed bottom nav */
 }
 
 #wallet-screen .wallet-card {
@@ -723,7 +713,7 @@ body {
 }
 
 #wallet-screen .action-section input[type="text"] {
-    width: calc(100% - 100px); /* Adjust width to fit button */
+    width: calc(100% - 100px);
     padding: 12px 15px;
     border: none;
     border-radius: 8px;
@@ -775,12 +765,13 @@ body {
     font-weight: bold;
 }
 
+/* Friends screen specific overrides */
 #friends-screen {
-    padding: 0; /* Remove default padding */
+    padding: 0; /* Remove default 20px padding */
     display: flex;
     flex-direction: column;
-    height: 100%; /* Ensure screen takes full height for flex layout */
-     padding-bottom: 60px; /* Padding for bottom nav - adjust if needed */
+    height: 100%;
+    padding-bottom: 80px; /* ADDED: Padding for fixed bottom nav */
 }
 
 .friends-top-nav {
@@ -789,13 +780,13 @@ body {
     align-items: center;
     width: 100%;
     padding: 10px 0;
-    background-color: rgba(15, 15, 15, 0.7); /* Semi-transparent background */
+    background-color: rgba(15, 15, 15, 0.7);
     backdrop-filter: blur(5px);
     border-bottom: 1px solid var(--light-grey);
-    flex-shrink: 0; /* Prevent shrinking */
+    flex-shrink: 0;
     z-index: 20;
     position: sticky; /* Sticky positioning */
-    top: 0; /* Stick to the top */
+    top: 0;
 }
 
 .friends-nav-icon {
@@ -807,7 +798,7 @@ body {
     cursor: pointer;
     font-size: 0.8em;
     transition: color 0.3s ease;
-    flex-grow: 1; /* Distribute space evenly */
+    flex-grow: 1;
 }
 
 .friends-nav-icon i {
@@ -820,11 +811,11 @@ body {
 }
 
 .user-list-container {
-    flex-grow: 1; /* Fill remaining space */
+    flex-grow: 1;
     width: 100%;
-    overflow-y: auto; /* Enable scrolling for the list */
-    padding: 15px; /* Add padding around the list */
-    /* Adjust padding-bottom if friends-screen itself has padding-bottom */
+    overflow-y: auto; /* Enable scrolling */
+    padding: 15px;
+    /* Adjust padding-bottom if friends-screen has padding-bottom */
 }
 
 .user-card {
@@ -904,7 +895,6 @@ body {
     padding: 8px;
     border-radius: 50%;
     transition: color 0.2s, background-color 0.2s;
-    flex-shrink: 0; /* Prevent shrinking */
 }
 
 .user-card .add-member-btn:hover {
@@ -966,7 +956,6 @@ body {
     color: var(--primary-neon);
     width: 30px;
     text-align: center;
-    flex-shrink: 0; /* Prevent shrinking */
 }
 
 .leaderboard-item .rank.gold { background-color: #FFD700; color: var(--background); border-radius: 3px; padding: 0 3px; }
@@ -979,19 +968,14 @@ body {
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--primary-neon);
-    flex-shrink: 0; /* Prevent shrinking */
 }
 
 .leaderboard-item .user-info {
-    flex-grow: 1; /* Fill available space */
-    overflow: hidden; /* Hide overflowing text */
-    white-space: nowrap; /* Prevent wrapping */
-    text-overflow: ellipsis; /* Show ellipsis for overflow */
+    flex-grow: 1;
 }
 
 .leaderboard-item .username {
     font-weight: bold;
-    /* No overflow styles needed here as parent .user-info handles it */
 }
 
 .leaderboard-item .coins {
@@ -1000,12 +984,13 @@ body {
     display: flex;
     align-items: center;
     gap: 3px;
-    flex-shrink: 0; /* Prevent shrinking */
 }
 
+/* Profile screen specific overrides */
 #profile-screen {
     justify-content: flex-start;
-    padding-bottom: 80px; /* ADDED: Padding for bottom nav (already existed, keeping) */
+    /* padding: 20px; /* Default */ */
+    padding-bottom: 80px; /* ADDED: Padding for fixed bottom nav */
 }
 
 #profile-screen .profile-header {
@@ -1045,10 +1030,8 @@ body {
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
-    flex-basis: 130px; /* Give buttons a base width */
-    flex-grow: 0; /* Prevent growing */
-    flex-shrink: 1; /* Allow shrinking if needed */
-    text-align: center;
+    flex-basis: 130px;
+    flex-grow: 0;
 }
 
 #profile-screen .profile-action-btn.edit {
@@ -1115,7 +1098,6 @@ body {
     padding: 8px;
     opacity: 0;
     transition: opacity 0.3s ease;
-    z-index: 5; /* Ensure actions are above thumbnail */
 }
 
 .video-card:hover .video-card-actions {
@@ -1136,11 +1118,16 @@ body {
     color: #F44336;
 }
 
+/* Withdraw Success screen */
 #withdraw-success-screen {
     flex-direction: column;
     justify-content: center;
     text-align: center;
+    /* It does not have a fixed header or bottom nav */
+    /* Keep default padding or adjust if needed */
+    /* padding: 20px; /* Default */ */
 }
+
 
 #withdraw-success-screen .success-icon {
     font-size: 6em;
@@ -1174,7 +1161,7 @@ body {
 }
 
 #withdraw-success-screen .back-to-wallet-button:hover {
-    background-color: #00c2cb; /* Slightly different hover color */
+    background-color: #00c2cb;
 }
 
 @keyframes scale-up {
@@ -1182,6 +1169,7 @@ body {
     to { transform: scale(1); opacity: 1; }
 }
 
+/* Modal Overlay */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -1189,7 +1177,7 @@ body {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.8);
-    display: none; /* Hidden by default */
+    display: none;
     justify-content: center;
     align-items: center;
     z-index: 1000;
@@ -1198,10 +1186,11 @@ body {
 }
 
 .modal-overlay.active {
-    display: flex; /* Show when active */
+    display: flex;
     opacity: 1;
 }
 
+/* Modal Content */
 .modal-content {
     background-color: var(--dark-grey);
     padding: 30px;
@@ -1211,19 +1200,19 @@ body {
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
     text-align: center;
     position: relative;
-    transform: translateY(-50px); /* Start slightly above final position */
+    transform: translateY(-50px);
     opacity: 0;
     transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    overflow-y: auto; /* Allow content to scroll within the modal */
-    max-height: 85vh; /* Limit modal height */
+    overflow-y: auto;
+    max-height: 85vh;
 }
 
 .modal-overlay.active .modal-content {
-    transform: translateY(0); /* Move to final position */
+    transform: translateY(0);
     opacity: 1;
 }
 
@@ -1247,7 +1236,6 @@ body {
     width: 100%;
 }
 
-/* Styles for input groups used in modals and premium upload */
 .modal-content .input-group,
 #premium-upload-screen .input-group {
     margin-bottom: 20px;
@@ -1277,7 +1265,7 @@ body {
     color: var(--text-color);
     font-size: 1em;
     box-sizing: border-box;
-    resize: vertical; /* Allow vertical resizing for textareas */
+    resize: vertical;
 }
 .modal-content input::placeholder,
 .modal-content textarea::placeholder,
@@ -1286,7 +1274,6 @@ body {
     color: rgba(255, 255, 255, 0.5);
 }
 
-/* Category Selector Styles (shared between modal and premium upload) */
 .category-selector-wrapper {
     width: 100%;
     margin-bottom: 20px;
@@ -1297,7 +1284,7 @@ body {
     width: 100%;
     border-radius: 8px;
     background-color: rgba(255, 255, 255, 0.1);
-    z-index: 20; /* Ensure dropdown is above other inputs */
+    z-index: 20;
 }
 .category-selector-display {
     padding: 12px 15px;
@@ -1307,7 +1294,7 @@ body {
     align-items: center;
     color: var(--text-color);
     font-size: 1em;
-    border-radius: 8px; /* Match parent border-radius */
+    border-radius: 8px;
 }
 .category-selector-display i {
     transition: transform 0.3s ease;
@@ -1317,18 +1304,18 @@ body {
 }
 .category-options {
     position: absolute;
-    top: 100%; /* Position below the display */
+    top: 100%;
     left: 0;
     width: 100%;
     background-color: var(--dark-grey);
-    border-radius: 0 0 8px 8px; /* Round bottom corners */
+    border-radius: 0 0 8px 8px;
     max-height: 200px;
     overflow-y: auto;
-    opacity: 0; /* Hidden by default */
+    opacity: 0;
     visibility: hidden;
-    transform: translateY(-10px); /* Start slightly above */
+    transform: translateY(-10px);
     transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
-    z-index: 1001; /* Above modal overlay */
+    z-index: 1001;
     box-shadow: 0 5px 15px rgba(0,0,0,0.5);
 }
 .category-selector-display.open + .category-options {
@@ -1345,7 +1332,6 @@ body {
     background-color: var(--light-grey);
 }
 
-/* Audience Selector Styles (used in modal) */
 .audience-selector {
     width: 100%;
     margin-bottom: 20px;
@@ -1375,14 +1361,13 @@ body {
 }
 .audience-option.selected {
     border-color: var(--primary-neon);
-    background-color: rgba(0, 255, 229, 0.2); /* Accent color with opacity */
+    background-color: rgba(0, 255, 229, 0.2);
 }
 .audience-option i {
     font-size: 1.2em;
-    color: var(--primary-neon); /* Primary color for icons */
+    color: var(--primary-neon);
 }
 
-/* Comments Toggle Styles (used in modal) */
 .comments-toggle {
     width: 100%;
     display: flex;
@@ -1436,7 +1421,6 @@ input:checked + .slider:before {
     transform: translateX(26px);
 }
 
-/* Save Button Styles (used in modal and premium upload) */
 .modal-content .save-button,
 #premium-upload-screen .save-button {
     background-color: var(--success-green);
@@ -1452,7 +1436,7 @@ input:checked + .slider:before {
 }
 .modal-content .save-button:hover,
 #premium-upload-screen .save-button:hover {
-    background-color: #388e3c; /* Darker green on hover */
+    background-color: #388e3c;
 }
 
 /* Scrollbar hiding */
@@ -1468,7 +1452,7 @@ input:checked + .slider:before {
 
 /* Screen Header Styles */
 .screen-header {
-    position: absolute; /* Position relative to the screen */
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
@@ -1477,10 +1461,10 @@ input:checked + .slider:before {
     align-items: center;
     justify-content: center;
     padding: 0 20px;
-    background-color: rgba(15, 15, 15, 0.5); /* Semi-transparent dark background */
+    background-color: rgba(15, 15, 15, 0.5);
     backdrop-filter: blur(5px);
-    z-index: 50; /* Ensure it's above screen content but below modal/sidebar */
-    box-sizing: border-box; /* Include padding in width */
+    z-index: 50;
+    box-sizing: border-box;
 }
 
 .screen-header .header-title {
@@ -1496,7 +1480,7 @@ input:checked + .slider:before {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    padding: 5px; /* Add padding for easier clicking */
+    padding: 5px;
 }
 .header-icon-left { left: 20px; }
 .header-icon-right { right: 20px; }
@@ -1504,9 +1488,9 @@ input:checked + .slider:before {
 /* Video Actions Overlay Styles */
 .video-actions-overlay {
     position: absolute;
-    bottom: 75px; /* Position above bottom nav */
+    bottom: 75px;
     right: 10px;
-    z-index: 15; /* Above player/meta */
+    z-index: 15;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1519,7 +1503,7 @@ input:checked + .slider:before {
     cursor: pointer;
     color: white;
     text-align: center;
-    pointer-events: auto; /* Allow clicks on icons */
+    pointer-events: auto;
 }
 .action-icon-container .icon {
     font-size: 2.2em;
@@ -1527,14 +1511,14 @@ input:checked + .slider:before {
     transition: transform 0.2s ease, color 0.2s ease;
 }
 
-.action-icon-container[data-action="like"] .icon { color: #ffffff; } /* Default like icon color */
-.action-icon-container[data-action="comment"] .icon { color: #2196F3; /* Blue comment icon */ }
+.action-icon-container[data-action="like"] .icon { color: #ffffff; }
+.action-icon-container[data-action="comment"] .icon { color: #2196F3; }
 
 .action-icon-container:hover .icon {
     transform: scale(1.1);
 }
 .action-icon-container .icon.liked {
-     color: #E91E63; /* Pink/Red for liked icon */
+     color: #E91E63;
 }
 .action-icon-container .count {
     font-size: 0.9em;
@@ -1542,11 +1526,11 @@ input:checked + .slider:before {
     margin-top: 4px;
 }
 .action-icon-container.disabled {
-    pointer-events: none; /* Disable clicks */
-    opacity: 0.7; /* Slightly dim disabled items */
+     pointer-events: none;
+     opacity: 0.7;
 }
 .action-icon-container.disabled .icon {
-    color: #888; /* Grey color for disabled icons */
+    color: #888;
     cursor: not-allowed;
 }
 
@@ -1558,10 +1542,10 @@ input:checked + .slider:before {
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
     font-size: 8em;
-    color: rgba(233, 30, 99, 0.8); /* Semi-transparent pink */
-    z-index: 20; /* Above actions overlay */
+    color: rgba(233, 30, 99, 0.8);
+    z-index: 20;
     opacity: 0;
-    pointer-events: none; /* Cannot be clicked */
+    pointer-events: none;
     text-shadow: 0 0 15px rgba(0,0,0,0.4);
 }
 
@@ -1583,8 +1567,8 @@ input:checked + .slider:before {
     display: flex;
     align-items: center;
     padding: 0 10px;
-    z-index: 50; /* Above video swiper */
-    flex-shrink: 0; /* Prevent shrinking */
+    z-index: 50;
+    flex-shrink: 0;
     border-bottom: 1px solid var(--light-grey);
     box-sizing: border-box;
 }
@@ -1593,21 +1577,20 @@ input:checked + .slider:before {
     font-size: 1.6em;
     padding: 0 10px;
     cursor: pointer;
-    flex-shrink: 0; /* Prevent shrinking */
+    flex-shrink: 0;
     color: var(--text-color);
 }
 
 /* Category Scroller Styles */
 .category-scroller {
-    flex-grow: 1; /* Fill space */
+    flex-grow: 1;
     display: flex;
     gap: 10px;
-    overflow-x: auto; /* Enable horizontal scrolling */
+    overflow-x: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
-    padding: 0 10px; /* Add some padding */
+    padding: 0 10px;
 }
-/* Hide scrollbar for Webkit browsers */
 .category-scroller::-webkit-scrollbar {
     display: none;
 }
@@ -1621,8 +1604,8 @@ input:checked + .slider:before {
     font-size: 0.9em;
     cursor: pointer;
     transition: all 0.2s ease;
-    white-space: nowrap; /* Prevent text wrapping */
-    flex-shrink: 0; /* Prevent shrinking */
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .category-chip.active {
@@ -1635,14 +1618,14 @@ input:checked + .slider:before {
 /* Video Meta Overlay Styles */
 .video-meta-overlay {
     position: absolute;
-    bottom: 60px; /* Position above bottom nav (adjust if nav height changes) */
+    bottom: 60px;
     left: 0;
     width: 100%;
     padding: 15px;
     box-sizing: border-box;
     background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
-    z-index: 10; /* Above player, below actions */
-    pointer-events: none; /* Don't block clicks by default */
+    z-index: 10;
+    pointer-events: none;
     color: white;
     display: flex;
     flex-direction: column;
@@ -1655,7 +1638,7 @@ input:checked + .slider:before {
     align-items: center;
     gap: 10px;
     margin-bottom: 10px;
-    pointer-events: auto; /* Allow clicks on uploader info */
+    pointer-events: auto;
     cursor: pointer;
 }
 
@@ -1677,10 +1660,10 @@ input:checked + .slider:before {
     font-size: 0.9em;
     margin: 0;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
-    white-space: nowrap; /* Prevent wrapping */
-    overflow: hidden; /* Hide overflow */
-    text-overflow: ellipsis; /* Show ellipsis */
-    max-width: 100%; /* Ensure ellipsis works */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }
 
 /* Comments Modal Styles */
@@ -1691,42 +1674,42 @@ input:checked + .slider:before {
     width: 100%;
     height: 100%;
     background-color: rgba(0,0,0,0.5);
-    z-index: 1100; /* Above regular modals */
+    z-index: 1100;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease;
-    display: flex; /* Use flexbox to position content */
+    display: flex;
     justify-content: center;
-    align-items: flex-end; /* Align content to the bottom */
+    align-items: flex-end;
 }
 .comments-modal-overlay.active {
     opacity: 1;
     visibility: visible;
 }
 .comments-modal-content {
-    position: absolute; /* Position relative to overlay */
+    position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
     height: 60%;
     max-height: 70vh;
     background-color: #181818;
-    border-radius: 15px 15px 0 0; /* Round top corners */
+    border-radius: 15px 15px 0 0;
     box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
     display: flex;
     flex-direction: column;
-    transform: translateY(100%); /* Start off-screen at the bottom */
+    transform: translateY(100%);
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .comments-modal-overlay.active .comments-modal-content {
-    transform: translateY(0); /* Slide in */
+    transform: translateY(0);
 }
 .comments-header {
     padding: 15px;
     text-align: center;
     border-bottom: 1px solid var(--light-grey);
     position: relative;
-    flex-shrink: 0; /* Prevent shrinking */
+    flex-shrink: 0;
 }
 .comments-header h4 {
     margin: 0;
@@ -1739,11 +1722,11 @@ input:checked + .slider:before {
     transform: translateY(-50%);
     font-size: 1.5em;
     cursor: pointer;
-    padding: 5px; /* Add padding for easier clicking */
+    padding: 5px;
 }
 #comments-list {
-    flex-grow: 1; /* Fill vertical space */
-    overflow-y: auto; /* Enable scrolling for comments */
+    flex-grow: 1;
+    overflow-y: auto;
     padding: 15px;
     list-style: none;
     margin: 0;
@@ -1758,19 +1741,19 @@ input:checked + .slider:before {
     height: 35px;
     border-radius: 50%;
     object-fit: cover;
-    flex-shrink: 0; /* Prevent shrinking */
+    flex-shrink: 0;
 }
 .comment-item .comment-body {
     flex-grow: 1;
-    overflow: hidden; /* Hide overflow */
+    overflow: hidden;
 }
 .comment-body .username {
     font-weight: bold;
     font-size: 0.9em;
     margin-bottom: 3px;
-    white-space: nowrap; /* Prevent wrapping */
-    overflow: hidden; /* Hide overflow */
-    text-overflow: ellipsis; /* Show ellipsis */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .comment-body .username .timestamp {
     font-size: 0.8em;
@@ -1781,7 +1764,7 @@ input:checked + .slider:before {
 .comment-body .text {
     font-size: 1em;
     line-height: 1.4;
-    word-wrap: break-word; /* Break long words */
+    word-wrap: break-word;
 }
 .comment-item .delete-comment-btn {
     color: #aaa;
@@ -1789,7 +1772,7 @@ input:checked + .slider:before {
     font-size: 0.9em;
     margin-left: auto;
     padding: 5px;
-    flex-shrink: 0; /* Prevent shrinking */
+    flex-shrink: 0;
 }
 .comment-item .delete-comment-btn:hover {
     color: var(--primary-neon);
@@ -1799,7 +1782,7 @@ input:checked + .slider:before {
     padding: 10px 15px;
     border-top: 1px solid var(--light-grey);
     gap: 10px;
-    flex-shrink: 0; /* Prevent shrinking */
+    flex-shrink: 0;
 }
 #comment-input {
     flex-grow: 1;
@@ -1817,12 +1800,12 @@ input:checked + .slider:before {
     color: var(--primary-neon);
     font-size: 1.8em;
     cursor: pointer;
-    flex-shrink: 0; /* Prevent shrinking */
-    padding: 0 10px; /* Add some horizontal padding */
+    flex-shrink: 0;
+    padding: 0 10px;
 }
 #send-comment-btn:disabled {
-    color: #888;
-    cursor: not-allowed;
+     color: #888;
+     cursor: not-allowed;
 }
 
 
@@ -1834,8 +1817,8 @@ input:checked + .slider:before {
     width: 280px;
     height: 100%;
     background-color: #1a1a1a;
-    z-index: 1001; /* Above modals */
-    transform: translateX(-100%); /* Start off-screen to the left */
+    z-index: 1001;
+    transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
     display: flex;
     flex-direction: column;
@@ -1846,7 +1829,7 @@ input:checked + .slider:before {
 }
 
 .main-sidebar.open {
-    transform: translateX(0); /* Slide in */
+    transform: translateX(0);
 }
 
 .sidebar-overlay {
@@ -1856,7 +1839,7 @@ input:checked + .slider:before {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.6);
-    z-index: 1000; /* Below sidebar, above other content */
+    z-index: 1000;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease-in-out;
@@ -1874,7 +1857,7 @@ input:checked + .slider:before {
     margin-bottom: 20px;
     padding-bottom: 10px;
     border-bottom: 1px solid var(--light-grey);
-    flex-shrink: 0; /* Prevent shrinking */
+    flex-shrink: 0;
 }
 
 .sidebar-header h3 {
@@ -1886,7 +1869,7 @@ input:checked + .slider:before {
     font-size: 2em;
     cursor: pointer;
     line-height: 1;
-    padding: 5px; /* Add padding for easier clicking */
+    padding: 5px;
 }
 
 .sidebar-option {
@@ -1900,9 +1883,9 @@ input:checked + .slider:before {
     border-radius: 8px;
     font-size: 1.1em;
     transition: background-color 0.2s ease, border-color 0.2s ease;
-    display: flex; /* Allow icon and text alignment */
+    display: flex;
     align-items: center;
-    margin-bottom: 10px; /* Add margin between options */
+    margin-bottom: 10px;
 }
 .sidebar-option:last-child {
     margin-bottom: 0;
@@ -1915,8 +1898,8 @@ input:checked + .slider:before {
 /* Theme Settings Screen Styles */
 #theme-settings-screen {
     justify-content: flex-start;
-    padding-top: 80px; /* Space for header */
-    padding-bottom: 80px; /* ADDED: Padding for bottom nav */
+    padding-top: 80px; /* Space for fixed header */
+    padding-bottom: 80px; /* ADDED: Padding for fixed bottom nav */
 }
 
 #theme-settings-screen .theme-settings-container {
@@ -1953,19 +1936,19 @@ input:checked + .slider:before {
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: 1em; /* Ensure readable font size */
+    font-size: 1em;
 }
 
 .theme-btn.active {
     background-color: var(--primary-neon);
-    color: #000; /* Dark text on neon background */
+    color: #000;
 }
 
 .color-palette-container {
     display: flex;
     gap: 20px;
     width: 100%;
-    flex-wrap: wrap; /* Allow columns to wrap on smaller screens */
+    flex-wrap: wrap;
 }
 
 .color-column {
@@ -1973,7 +1956,7 @@ input:checked + .slider:before {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 130px; /* Ensure columns don't get too narrow */
+    min-width: 130px;
 }
 
 .color-column h4 {
@@ -2002,12 +1985,11 @@ input:checked + .slider:before {
 }
 
 .color-swatch.active {
-    border-color: #fff; /* White border for active swatch */
+    border-color: #fff;
     transform: scale(1.1);
 }
 .color-swatch.neon {
-     /* Neon swatches might need additional box-shadow defined inline or here */
-     /* Box-shadow was defined inline in HTML, which is fine. */
+    /* Styles were inline in HTML, keeping them there is fine */
 }
 
 
@@ -2022,13 +2004,13 @@ input:checked + .slider:before {
     text-align: center;
     color: var(--text-color);
     border: 1px solid var(--primary-neon);
-    transform: scale(0.9); /* Start slightly smaller */
+    transform: scale(0.9);
     opacity: 0;
     transition: transform 0.3s ease-out, opacity 0.3s ease-out;
 }
 
 #audio-issue-popup.active .popup-content {
-    transform: scale(1); /* Scale up */
+    transform: scale(1);
     opacity: 1;
 }
 
@@ -2047,7 +2029,7 @@ input:checked + .slider:before {
 
 #audio-issue-popup .popup-content button {
     background-color: var(--primary-neon);
-    color: var(--background, #0f0f0f); /* Use background variable, fallback to #0f0f0f */
+    color: var(--background, #0f0f0f);
     padding: 12px 45px;
     border-radius: 8px;
     font-size: 1.1em;
@@ -2062,7 +2044,7 @@ input:checked + .slider:before {
     transform: scale(1.05);
 }
 
-/* Light Theme Styles */
+/* Light Theme Styles (These were present in your original code) */
 html.light-theme {
     --background: #f7f7f7;
     --text-color: #111111;
@@ -2071,12 +2053,11 @@ html.light-theme {
 }
 html.light-theme body,
 html.light-theme #image-editor-screen,
-html.light-theme .screen { /* Apply background to screens in light mode */
+html.light-theme .screen {
      background-color: var(--background);
      color: var(--text-color);
 }
-html.light-theme .app-container::before { opacity: 0.05; } /* Softer background effect */
-
+html.light-theme .app-container::before { opacity: 0.05; }
 html.light-theme .sub-message,
 html.light-theme .wallet-card .balance-label,
 html.light-theme .theme-section h4,
@@ -2096,14 +2077,14 @@ html.light-theme input[type="tel"],
 html.light-theme input[type="email"],
 html.light-theme select,
 html.light-theme input[type="url"],
-html.light-theme textarea { /* Also include textarea and url inputs */
+html.light-theme textarea {
     background-color: #ffffff;
     border: 1px solid #cccccc;
     color: var(--text-color);
 }
 html.light-theme .category-selector {
-     background-color: #ffffff; /* Match input style */
-     border: 1px solid #cccccc; /* Match input style */
+     background-color: #ffffff;
+     border: 1px solid #cccccc;
 }
 
 /* Placeholder color for light theme */
@@ -2117,28 +2098,23 @@ html.light-theme .bottom-nav {
     background-color: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border-top: 1px solid var(--light-grey);
-    color: rgba(0, 0, 0, 0.7); /* Darker color for non-active icons */
-}
-/* Specific active color for nav items in light theme */
-html.light-theme .nav-item.active {
-    /* Uses the same gradient as dark theme, but var(--primary-neon) changes */
-    /* May need adjustment if specific colors are desired for light theme active */
+    color: rgba(0, 0, 0, 0.7);
 }
 html.light-theme .nav-item:not(.active) {
-    color: rgba(0, 0, 0, 0.7); /* Non-active icons dark in light mode */
+    color: rgba(0, 0, 0, 0.7);
 }
 
 
 html.light-theme .screen-header,
 html.light-theme .home-top-bar,
 html.light-theme .main-sidebar {
-    background-color: #f0f0f0; /* Lighter background */
+    background-color: #f0f0f0;
 }
-html.light-theme .main-sidebar { box-shadow: 4px 0 15px rgba(0,0,0,0.1); } /* Softer shadow */
+html.light-theme .main-sidebar { box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
 
 html.light-theme .static-message {
-     background-color: rgba(0,0,0,0.05); /* Very subtle dark background */
-     color: var(--text-color); /* Dark text */
+     background-color: rgba(0,0,0,0.05);
+     color: var(--text-color);
 }
 
 html.light-theme .category-chip {
@@ -2146,12 +2122,11 @@ html.light-theme .category-chip {
      border: 1px solid #ccc;
      color: var(--text-color);
 }
-html.light-theme .category-chip.active {
-     /* Uses var(--primary-neon) which changes in light theme */
-}
+/* Active category chip uses primary-neon, which changes */
+
 
 html.light-theme .user-card {
-    background-color: rgba(0, 0, 0, 0.03); /* Subtle dark background */
+    background-color: rgba(0, 0, 0, 0.03);
 }
 html.light-theme .user-card:hover {
     background-color: rgba(0, 0, 0, 0.06);
@@ -2160,22 +2135,20 @@ html.light-theme .user-card .add-member-btn {
     background-color: var(--light-grey);
     color: var(--text-color);
 }
-html.light-theme .status-indicator.online { background-color: var(--success-green); } /* Green remains green */
-html.light-theme .status-indicator.offline { background-color: #aaa; } /* Slightly lighter grey */
-html.light-theme .status-indicator { border-color: var(--background); } /* Border matches light background */
+html.light-theme .status-indicator { border-color: var(--background); }
 
 
 html.light-theme .modal-content {
-    background-color: #f0f0f0; /* Lighter modal background */
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2); /* Softer shadow */
+    background-color: #f0f0f0;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
 }
 html.light-theme .modal-content .close-button { color: rgba(0, 0, 0, 0.6); }
 html.light-theme .modal-content .close-button:hover { color: var(--primary-neon); }
 
 
 html.light-theme .comments-modal-content {
-     background-color: #f0f0f0; /* Lighter background */
-     box-shadow: 0 -5px 20px rgba(0,0,0,0.2); /* Softer shadow */
+     background-color: #f0f0f0;
+     box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
 }
 html.light-theme .comments-header { border-bottom-color: #ccc; }
 html.light-theme .comment-item { border-bottom-color: #ccc; }
@@ -2204,33 +2177,32 @@ html.light-theme #send-comment-btn:disabled { color: #bbb; }
 
 /* Photo editor screen styles */
 #image-editor-screen {
-    padding: 0; /* Remove default screen padding */
-    display: block; /* Ensure it's a block element */
+    padding: 0;
+    display: block;
     font-family: 'Roboto Flex', sans-serif;
-    background: var(--background); /* Use theme background */
-    color: var(--text-color); /* Use theme text color */
-    /* This screen uses a flex column layout internally, height: 100% is important */
-    display: flex; /* Make it a flex container */
-    flex-direction: column; /* Stack header, main, footer */
-    height: 100%; /* Take full screen height */
-    overflow: hidden; /* Prevent overflow on the screen itself, children will manage */
+    background: var(--background);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
 }
 
 /* Fixed editor header */
 #image-editor-screen .editor-header {
-    position: fixed; /* Fixed at the top of the viewport */
+    position: fixed;
     top: 0;
-    left: 50%; /* Center horizontally */
+    left: 50%;
     transform: translateX(-50%);
     width: 100%;
-    max-width: 420px; /* Match app-container width */
+    max-width: 420px;
     padding: 10px;
-    background: var(--dark-grey); /* Use theme dark-grey */
-    z-index: 100; /* High z-index */
-    border-bottom: 1px solid var(--light-grey); /* Use theme light-grey */
+    background: var(--dark-grey);
+    z-index: 100;
+    border-bottom: 1px solid var(--light-grey);
     box-sizing: border-box;
-    display: flex; /* Use flex for header content */
-    justify-content: flex-start; /* Align items to the start */
+    display: flex;
+    justify-content: flex-start;
     align-items: center;
 }
 
@@ -2245,13 +2217,15 @@ html.light-theme #send-comment-btn:disabled { color: #bbb; }
     font-size: 14px;
     font-weight: 500;
     transition: all 0.2s ease;
-    display: flex; /* Align icon and text */
+    display: flex;
     align-items: center;
     gap: 8px;
 }
 #image-editor-screen #back-from-editor-btn:hover {
      background-color: var(--light-grey);
 }
+html.light-theme #image-editor-screen #back-from-editor-btn { background: #fff; border-color: #ccc; }
+html.light-theme #image-editor-screen #back-from-editor-btn:hover { background-color: #eee; }
 
 
 /* Editor app header (below fixed header) */
@@ -2259,26 +2233,29 @@ html.light-theme #send-comment-btn:disabled { color: #bbb; }
     display: flex; justify-content: space-between; align-items: center; padding: 12px 18px;
     background: var(--dark-grey); flex-shrink: 0; z-index: 20;
     border-bottom: 1px solid var(--light-grey);
-    margin-top: 50px; /* Space for the fixed editor-header */
+    margin-top: 50px;
 }
 /* Editor header buttons */
-#image-editor-screen .header-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--light-grey); color: var(--text-color); border: 1px solid var(--light-grey); border-radius: 10px; font-size: 14px; cursor: pointer; font-weight: 500; transition: all 0.2s ease; }
-#image-editor-screen .header-btn:hover { background-color: #333; color: var(--primary-neon); } /* Darker hover color */
-html.light-theme #image-editor-screen .header-btn:hover { background-color: #ccc; color: var(--primary-neon); } /* Lighter hover color */
+#image-editor-screen .header-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--light-grey); color: var(--text-color); border: 1px solid var(--light-grey); border-radius: 10px; font-size: 14px; cursor: pointer; font-weight: 500; transition: all 0.2s ease; flex-shrink: 0; }
+html.light-theme #image-editor-screen .header-btn { background: #fff; border-color: #ccc; color: var(--text-color); }
+
+#image-editor-screen .header-btn:hover { background-color: #333; color: var(--primary-neon); }
+html.light-theme #image-editor-screen .header-btn:hover { background-color: #eee; color: var(--primary-neon); }
+
 
 #image-editor-screen .header-btn:active { transform: scale(0.96); }
 #image-editor-screen .header-btn i { font-size: 16px; }
-#image-editor-screen #upload { display: none; } /* Hide file input */
+#image-editor-screen #upload { display: none; }
 
 /* Image display area */
 #image-editor-screen .image-container {
-    flex-grow: 1; /* Fill space between header and toolbar */
+    flex-grow: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 15px;
-    overflow: hidden; /* Hide overflow */
-    position: relative; /* For positioning image-wrapper */
+    overflow: hidden;
+    position: relative;
 }
 
 /* Image wrapper with border/shadow */
@@ -2286,14 +2263,14 @@ html.light-theme #image-editor-screen .header-btn:hover { background-color: #ccc
     width: 100%;
     max-width: 380px;
     aspect-ratio: 9 / 16;
-    background: #1e1e1e; /* Dark background */
+    background: #1e1e1e;
     border-radius: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
     box-shadow: 0 8px 30px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.4);
-    position: relative; /* For positioning image, canvas, etc. inside */
+    position: relative;
 }
 
 /* Frame overlay */
@@ -2301,13 +2278,13 @@ html.light-theme #image-editor-screen .header-btn:hover { background-color: #ccc
 
 /* Main image and video feed */
 #image-editor-screen #mainImage, #image-editor-screen #video-feed { max-width: 100%; max-height: 100%; display: block; transition: filter 0.3s ease; object-fit: contain; }
-#image-editor-screen #video-feed { display: none; } /* Video feed is hidden by default */
+#image-editor-screen #video-feed { display: none; }
 
 /* Drawing canvas */
-#image-editor-screen #drawing-canvas { position: absolute; top: 0; left: 0; z-index: 8; touch-action: none; } /* Z-index below crop */
+#image-editor-screen #drawing-canvas { position: absolute; top: 0; left: 0; z-index: 8; touch-action: none; }
 
 /* Crop overlay */
-#image-editor-screen .crop-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9; display: none; } /* Z-index above drawing */
+#image-editor-screen .crop-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9; display: none; }
 
 /* Crop box */
 #image-editor-screen .crop-box { position: absolute; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7); border: 2px dashed var(--primary-neon); cursor: move; touch-action: none; pointer-events: auto; transition: border-radius 0.2s ease-in-out; }
@@ -2330,7 +2307,7 @@ html.light-theme #image-editor-screen .header-btn:hover { background-color: #ccc
 
 /* Individual tool panels */
 #image-editor-screen .panel { display: none; align-items: center; overflow-x: auto; padding: 0 15px; -ms-overflow-style: none; scrollbar-width: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; transition: opacity 0.3s ease; opacity: 0; }
-#image-editor-screen .panel.active { display: flex; opacity: 1; position: relative; } /* Active panel is shown and positioned relatively within container */
+#image-editor-screen .panel.active { display: flex; opacity: 1; position: relative; }
 #image-editor-screen .panel::-webkit-scrollbar { display: none; }
 
 /* Toolbar navigation buttons */
@@ -2342,7 +2319,7 @@ html.light-theme #image-editor-screen .header-btn:hover { background-color: #ccc
 html.light-theme #image-editor-screen .tool-btn { color: rgba(0, 0, 0, 0.6); }
 
 #image-editor-screen .tool-btn i { font-size: 20px; }
-#image-editor-screen .tool-btn.active { color: var(--primary-neon); background: rgba(0, 230, 118, 0.1); } /* Greenish background for active */
+#image-editor-screen .tool-btn.active { color: var(--primary-neon); background: rgba(0, 230, 118, 0.1); }
 html.light-theme #image-editor-screen .tool-btn.active { color: var(--primary-neon); background: rgba(0, 230, 118, 0.05); }
 
 
@@ -2351,7 +2328,7 @@ html.light-theme #image-editor-screen .tool-btn:hover:not(.active) { color: var(
 
 
 /* Filters panel */
-#image-editor-screen #filtersPanel { padding: 0 8px; /* Adjust padding */ }
+#image-editor-screen #filtersPanel { padding: 0 8px; }
 #image-editor-screen .filter-card { flex: 0 0 auto; margin: 0 8px; text-align: center; cursor: pointer; }
 #image-editor-screen .filter-preview { width: 60px; height: 60px; border-radius: 12px; margin-bottom: 8px; border: 2px solid transparent; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.3); background-size: cover; background-position: center; }
 #image-editor-screen .filter-card.active .filter-preview { border-color: var(--primary-neon); transform: scale(1.1); }
@@ -2360,7 +2337,7 @@ html.light-theme #image-editor-screen .filter-name { color: rgba(0, 0, 0, 0.6); 
 
 
 /* Adjust panel */
-#image-editor-screen #adjustPanel { flex-direction: column; padding: 0 25px; gap: 15px; /* Adjusted padding */ }
+#image-editor-screen #adjustPanel { flex-direction: column; padding: 0 25px; gap: 15px; }
 #image-editor-screen .adjust-slider { display: flex; flex-direction: column; width: 100%; }
 #image-editor-screen .adjust-slider label { font-size: 13px; color: rgba(255, 255, 255, 0.7); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: baseline; }
 html.light-theme #image-editor-screen .adjust-slider label { color: rgba(0, 0, 0, 0.6); }
@@ -2371,7 +2348,7 @@ html.light-theme #image-editor-screen .adjust-slider label { color: rgba(0, 0, 0
 html.light-theme #image-editor-screen input[type="range"] { background: #ccc; }
 
 #image-editor-screen input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; background: var(--primary-neon); border-radius: 50%; cursor: pointer; }
-#image-editor-screen input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; background: var(--primary-neon); border-radius: 50%; cursor: pointer; border: none; /* Added for Firefox */ }
+#image-editor-screen input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; background: var(--primary-neon); border-radius: 50%; cursor: pointer; border: none; }
 
 
 /* Draw panel */
@@ -2381,7 +2358,7 @@ html.light-theme #image-editor-screen input[type="range"] { background: #ccc; }
 html.light-theme #image-editor-screen .draw-tool-btn, html.light-theme #image-editor-screen .draw-actions button { background: #fff; border-color: #ccc; color: var(--text-color); }
 
 #image-editor-screen .draw-tool-btn.active { background: var(--primary-neon); color: var(--background); border-color: var(--primary-neon); }
-html.light-theme #image-editor-screen .draw-tool-btn.active { color: #fff; /* White text on neon */ }
+html.light-theme #image-editor-screen .draw-tool-btn.active { color: #fff; }
 
 
 #image-editor-screen .draw-actions { display: flex; justify-content: space-around; gap: 10px; }
@@ -2404,13 +2381,13 @@ html.light-theme #image-editor-screen #font-select-btn { background: #fff; borde
 
 
 #image-editor-screen .add-text-btn { background: var(--primary-neon); color: var(--background); border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-html.light-theme #image-editor-screen .add-text-btn { color: #fff; /* White text */ }
+html.light-theme #image-editor-screen .add-text-btn { color: #fff; }
 
 /* Color picker input */
 #image-editor-screen input[type="color"] { -webkit-appearance: none; -moz-appearance: none; appearance: none; width: 40px; height: 40px; background-color: transparent; border: none; cursor: pointer; padding: 0; border-radius: 50%; }
 #image-editor-screen input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
 #image-editor-screen input[type="color"]::-webkit-color-swatch { border-radius: 50%; border: 3px solid #555; }
-#image-editor-screen input[type="color"]::-moz-color-swatch { border-radius: 50%; border: 3px solid #555; } /* Added for Firefox */
+#image-editor-screen input[type="color"]::-moz-color-swatch { border-radius: 50%; border: 3px solid #555; }
 html.light-theme #image-editor-screen input[type="color"]::-webkit-color-swatch,
 html.light-theme #image-editor-screen input[type="color"]::-moz-color-swatch { border-color: #ccc; }
 
@@ -2470,19 +2447,19 @@ html.light-theme #image-editor-screen .sticker-item { background: rgba(0,0,0,0.0
 #image-editor-screen .interactive-wrapper .element-content { width: 100%; height: 100%; object-fit: contain; pointer-events: none; transform-origin: center center; }
 
 /* Element controls (border, handles) */
-#image-editor-screen .element-controls { position: absolute; top: 15px; left: 15px; width: calc(100% - 30px); height: calc(100% - 30px); border: 2px dashed var(--primary-neon); pointer-events: none; display: none; } /* Hide controls by default */
-#image-editor-screen .interactive-wrapper.active .element-controls { display: block; } /* Show controls when wrapper is active */
+#image-editor-screen .element-controls { position: absolute; top: 15px; left: 15px; width: calc(100% - 30px); height: calc(100% - 30px); border: 2px dashed var(--primary-neon); pointer-events: none; display: none; }
+#image-editor-screen .interactive-wrapper.active .element-controls { display: block; }
 
 /* Control handles */
 #image-editor-screen .control-handle { position: absolute; width: 24px; height: 24px; background: var(--primary-neon); border: 2px solid var(--background); border-radius: 50%; pointer-events: auto; box-shadow: 0 0 8px rgba(0,0,0,0.7); z-index: 11; display: none; align-items: center; justify-content: center; color: var(--background); font-size: 12px;}
-html.light-theme #image-editor-screen .control-handle { border-color: var(--background); color: #fff; /* White text on neon */ }
+html.light-theme #image-editor-screen .control-handle { border-color: var(--background); color: #fff; }
 
-#image-editor-screen .interactive-wrapper.active .control-handle { display: flex; } /* Show handles when wrapper is active */
+#image-editor-screen .interactive-wrapper.active .control-handle { display: flex; }
 #image-editor-screen .rotate-handle { top: -12px; left: -12px; cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23F44336" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>') 10 10, auto; }
-html.light-theme #image-editor-screen .rotate-handle { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23E91E63" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>') 10 10, auto; /* Use a color visible on light background */ }
+html.light-theme #image-editor-screen .rotate-handle { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23E91E63" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>') 10 10, auto; }
 
 
-#image-editor-screen .delete-handle { top: -12px; right: -12px; background: #ff4757; cursor: pointer; color: white; } /* Red delete handle */
+#image-editor-screen .delete-handle { top: -12px; right: -12px; background: #ff4757; cursor: pointer; color: white; }
 #image-editor-screen .handle-br { bottom: -12px; right: -12px; cursor: nwse-resize; }
 #image-editor-screen .handle-mr { top: 50%; right: -12px; transform: translateY(-50%); cursor: ew-resize; }
 #image-editor-screen .handle-mb { bottom: -12px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
@@ -2508,23 +2485,22 @@ html.light-theme #image-editor-screen .shape-btn { background: #f0f0f0; border-c
 
 /* Premium Upload Screen Styles */
 #premium-upload-screen {
-     /* It gets default .screen styles (padding: 20px, overflow-y: auto) */
-     /* It also has a fixed header, so its content needs margin-top */
-     padding-top: 0; /* Remove default screen padding top */
-     padding-bottom: 80px; /* ADDED: Padding for bottom nav */
+     /* padding: 20px; /* Default */ */
+     padding-top: 0; /* Remove default padding top as content handles margin-top */
+     padding-bottom: 80px; /* ADDED: Padding for fixed bottom nav */
 }
 
-/* Inner scrollable container for Premium Upload screen */
+/* Premium Upload screen inner scrollable container */
 #premium-upload-screen .premium-upload-container {
-    margin-top: 60px; /* Space for the fixed header */
+    margin-top: 60px; /* Space for fixed header */
     width: 100%;
-    overflow-y: auto; /* Enable scrolling for its content */
+    overflow-y: auto; /* Enable scrolling */
     padding: 20px; /* Add padding inside this container */
     box-sizing: border-box;
-    display: flex; /* Use flex to lay out inner content */
+    display: flex;
     flex-direction: column;
     gap: 15px;
-     /* Remove padding-bottom from here as the screen itself has it now */
+    /* padding-bottom is on the screen itself now */
 }
 
 
@@ -2532,16 +2508,21 @@ html.light-theme #image-editor-screen .shape-btn { background: #f0f0f0; border-c
 #premium-upload-screen .file-upload-label { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed var(--light-grey); border-radius: 10px; padding: 30px; cursor: pointer; text-align: center; margin-bottom: 10px; transition: border-color 0.3s, background-color 0.3s; }
 html.light-theme #premium-upload-screen .file-upload-label { border-color: #ccc; }
 
-#premium-upload-screen .file-upload-label:hover { border-color: var(--accent-color); background-color: rgba(127, 90, 240, 0.1); } /* Hover effect */
-html.light-theme #premium-upload-screen .file-upload-label:hover { background-color: rgba(127, 90, 240, 0.05); } /* Lighter hover effect */
+#premium-upload-screen .file-upload-label:hover { border-color: var(--accent-color); background-color: rgba(127, 90, 240, 0.1); }
+html.light-theme #premium-upload-screen .file-upload-label:hover { background-color: rgba(127, 90, 240, 0.05); }
 
 
 #premium-upload-screen .file-upload-label i { font-size: 3em; margin-bottom: 10px; color: var(--accent-color); }
 #premium-upload-screen .file-upload-label span { font-size: 1.1em; font-weight: 500; }
 
-#premium-upload-screen #premium-video-preview { width: 100%; max-height: 200px; border-radius: 8px; margin-top: 5px; background-color: #000; display: none; object-fit: contain; /* Ensure video fits */ }
+#premium-upload-screen #premium-video-preview { width: 100%; max-height: 200px; border-radius: 8px; margin-top: 5px; background-color: #000; display: none; object-fit: contain; }
 
 #premium-upload-screen #premium-upload-progress { display: none; width: 100%; text-align: center; margin-top: 15px; font-size: 1em; color: var(--success-green); }
 #premium-upload-screen #premium-upload-progress-text {
-    margin: 0; /* Remove default paragraph margin */
+    margin: 0;
 }
+
+
+/* ======================================================= */
+/* === AI Photo Editor Styles (Code 1) - END === */
+/* ======================================================= */
