@@ -95,25 +95,27 @@ body {
     box-sizing: border-box;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    
+    background-color: var(--background);
+
     /* यह छिपी हुई स्क्रीन्स को पूरी तरह से गायब कर देगा */
     opacity: 0;
     pointer-events: none; /* यह सुनिश्चित करेगा कि छिपे हुए पेज पर क्लिक न हो */
-    transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    visibility: hidden;
 }
 
 .screen.active {
     /* यह एक्टिव स्क्रीन को दिखाएगा */
     opacity: 1;
     pointer-events: auto; /* यह सुनिश्चित करेगा कि सिर्फ एक्टिव पेज पर ही क्लिक हो */
+    visibility: visible;
     z-index: 10; /* यह एक्टिव स्क्रीन को बाकी सबसे ऊपर रखेगा */
 }
 /* ======================================================== */
 
 
 #splash-screen, #information-screen {
-    background-color: var(--background);
-    z-index: 11; /* यह सुनिश्चित करेगा कि ये दोनों स्क्रीन हमेशा ऊपर रहें */
+    z-index: 11;
 }
 
 #splash-screen {
@@ -122,7 +124,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 40px 20px 20px 20px;
-    background: linear-gradient(to bottom, #87ceeb, #FFD700, #FFA500, #FF69B4, #F44336, #4CAF50);
+    background: linear-gradient(to bottom, #87CEEB, #FFD700, #FFA500, #FF69B4, #F44336, #4CAF50);
     box-sizing: border-box;
     text-align: center;
     overflow: hidden;
