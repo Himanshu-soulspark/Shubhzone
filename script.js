@@ -705,7 +705,7 @@ function renderVideoSwiper() {
 
 function onYouTubeIframeAPIReady() {
     isYouTubeApiReady = true;
-    console.log("YouTube Iframe API is ready (Global Callback).");
+    console.log("Global onYouTubeIframeAPIReady called by YouTube API script.");
     // The first onReady call from any player created *after* this point will resolve window.resolveFirstPlayerReady
     // No need to directly resolve a pendingAppStart promise here anymore.
 }
@@ -817,15 +817,15 @@ function togglePlayPause(videoId) {
 
     // Ensure user interaction is marked if they click to play/pause
     if (!userHasInteracted) {
-        console.log("First user interaction detected via togglePlayPause.");
-        userHasInteracted = true;
-        // Attempt to unmute all players (though only the currently active one matters)
-        // Loop through players to unmute is better here after user interaction
-         for (const id in players) {
-              const p = players[id];
-              if (p instanceof YT.Player && typeof p.unMute === 'function') p.unMute();
-              else if (p instanceof HTMLVideoElement) p.muted = false;
-         }
+             console.log("First user interaction detected via togglePlayPause.");
+             userHasInteracted = true;
+             // Attempt to unmute all players (though only the currently active one matters)
+             // Loop through players to unmute is better here after user interaction
+             for (const id in players) {
+                  const p = players[id];
+                  if (p instanceof YT.Player && typeof p.unMute === 'function') p.unMute();
+                  else if (p instanceof HTMLVideoElement) p.muted = false;
+             }
          // Hide audio issue popup if visible
          hideAudioIssuePopup();
     }
@@ -1460,7 +1460,7 @@ const startAppLogic = async () => {
     });
 
     // Set up a timeout for the player readiness waiting part
-    const playerReadyTimeout = new Promise((_, reject) =>
+    const playerReadyTimeout = new Promise((resolve, reject) => // <-- FIX: Changed from (_, reject) to (resolve, reject) to make `resolve` available
         setTimeout(() => {
             console.warn("Player readiness timed out after 15 seconds.");
              // We don't necessarily need to reject the whole app init here.
@@ -1468,7 +1468,7 @@ const startAppLogic = async () => {
              // without waiting for players if they are taking too long.
              // If no players are created successfully, the "No videos" message will show, or HTML5 might try to play.
              // Resolving it gracefully allows the app to proceed.
-             resolve(); // Resolve, don't reject on timeout, to allow the app to continue loading other things.
+             resolve(); // This will now call the `resolve` defined in the promise's executor function.
         }, 15000) // 15 seconds timeout for player readiness
     );
 
