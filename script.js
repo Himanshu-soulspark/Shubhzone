@@ -145,7 +145,7 @@ function navigateTo(nextScreenId) {
     });
 
     if (nextScreenId === 'profile-screen') {
-        // renderUserVideos(); // यह फंक्शन अभी मौजूद नहीं है, इसे अनकमेंट न करें
+        // renderUserVideos(); // यह फंक्शन अभी मौजूद नहीं है, इसे अनcomment न करें
         loadUserVideosFromFirebase(); // सुनिश्चित करें कि डेटा लोड हो रहा है
     }
     if (nextScreenId === 'image-editor-screen') {
@@ -342,7 +342,7 @@ async function saveAndContinue() {
         updateProfileUI();
         // यदि उपयोगकर्ता पहली बार प्रोफाइल सहेज रहा है, तो startAppLogic यहाँ से कॉल करें
         if (appState.currentScreen === 'information-screen') {
-             await startAppLogic();
+             await startAppLogic(); // <--- यहां startAppLogic कॉल हो रहा है
         } else {
              // यदि उपयोगकर्ता मौजूदा प्रोफाइल को अपडेट कर रहा है
              navigateTo('profile-screen'); // या जहाँ भी आप जाना चाहें
@@ -1476,9 +1476,9 @@ const startAppLogic = async () => {
 
 
     // Navigate to the home screen only after initial data load and render setup
-    navigateTo('home-screen');
+    // console.log("App logic started. Navigating to home screen."); // आप यह लॉग जोड़ सकते हैं
+    navigateTo('home-screen'); // <--- यह लाइन जोड़ी गई है
 
-    // console.log("App logic started. Navigated to home screen.");
 };
 
 
