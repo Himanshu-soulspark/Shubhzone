@@ -122,7 +122,7 @@ function activateScreen(screenId) {
         bottomNav.style.display = showBottomNav ? 'flex' : 'none';
     }
 
-    // जब स्क्रीन बदलती है, तो सुनिश्चित करें कि कैटेगरी ड्रॉपडाउन बंद हो
+    // जब स्क्रीन बदलती है, तो सुनिश्चित करें कि कैटेगरी ड्रॉपdown बंद हो
      const openDisplay = document.querySelector('.category-selector-display.open');
      if(openDisplay) {
          openDisplay.classList.remove('open');
@@ -428,7 +428,7 @@ function closeUploadDetailsModal() { uploadDetailsModal.classList.remove('active
 
 // ============== बदलाव: toggleCategoryOptions() को सही डिस्प्ले एलिमेंट चुनने के लिए अपडेट किया गया ==============
 function toggleCategoryOptions() {
-     // पहले सभी ओपन ड्रॉपडाउन बंद करें
+     // पहले सभी ओपन ड्रॉपdown बंद करें
      document.querySelectorAll('.category-selector-display.open').forEach(display => display.classList.remove('open'));
 
      // सक्रिय स्क्रीन के आधार पर सही डिस्प्ले एलिमेंट चुनें
@@ -481,7 +481,7 @@ async function handleSave() {
     }
 }
 
-async function saveNewVideo() { // यह YouTube वीडियो अपलोड के लिए है
+async function saveNewVideo() { // यह YouTube video upload के लिए है
     modalSaveButton.disabled = true;
     modalSaveButton.textContent = 'Uploading...';
     const videoUrlValue = modalVideoUrlInput.value.trim();
@@ -705,17 +705,9 @@ function renderVideoSwiper() {
 
 function onYouTubeIframeAPIReady() {
     isYouTubeApiReady = true;
-    // console.log("YouTube Iframe API is ready.");
-    if (window.pendingAppStart) {
-        // console.log("Resolving pending app start.");
-        window.pendingAppStart(); // Resolve the promise waiting for the API
-        delete window.pendingAppStart;
-    }
-    // If videos are already loaded and rendered, initialize players now
-    if (appState.allVideos.length > 0) {
-        // console.log("Videos already loaded. Initializing players now.");
-        initializePlayers();
-    }
+    console.log("YouTube Iframe API is ready (Global Callback).");
+    // The first onReady call from any player created *after* this point will resolve window.resolveFirstPlayerReady
+    // No need to directly resolve a pendingAppStart promise here anymore.
 }
 
 function initializePlayers() {
@@ -738,6 +730,13 @@ function initializePlayers() {
                     // console.log("Premium video canplay:", video.id);
                     const preloader = playerElement.closest('.video-slide').querySelector('.video-preloader');
                     if(preloader) preloader.style.display = 'none';
+                    // Resolve the firstPlayerReadyPromise here if this is the first premium video ready
+                    if (!window._firstPlayerReadyResolved) { // Use a flag to ensure it only resolves once
+                         if (window.resolveFirstPlayerReady) {
+                              window.resolveFirstPlayerReady();
+                              window._firstPlayerReadyResolved = true;
+                         }
+                    }
                 });
                  playerElement.addEventListener('error', (e) => {
                      console.error("Premium video error:", video.id, e);
@@ -746,6 +745,8 @@ function initializePlayers() {
                           preloader.style.display = 'flex';
                           preloader.innerHTML = '<p style="color: red; text-align: center;">Video failed to load.</p>';
                      }
+                     // If premium video fails, the firstPlayerReadyPromise might not resolve.
+                     // The overall timeout in startAppLogic will handle this.
                  });
             } else {
                 // YouTube Player
@@ -754,7 +755,19 @@ function initializePlayers() {
                     width: '100%',
                     videoId: videoIdentifier, // Use YouTube video ID here
                     playerVars: { 'autoplay': 0, 'controls': 0, 'mute': 1, 'rel': 0, 'showinfo': 0, 'modestbranding': 1, 'loop': 1, 'playlist': videoIdentifier, 'fs': 0, 'iv_load_policy': 3, 'origin': window.location.origin },
-                    events: { 'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange }
+                    events: {
+                        'onReady': (event) => {
+                            onPlayerReady(event);
+                            // Resolve the firstPlayerReadyPromise here if this is the first YT video ready
+                            if (!window._firstPlayerReadyResolved) { // Use a flag to ensure it only resolves once
+                                 if (window.resolveFirstPlayerReady) {
+                                      window.resolveFirstPlayerReady();
+                                      window._firstPlayerReadyResolved = true;
+                                 }
+                            }
+                        },
+                        'onStateChange': onPlayerStateChange
+                    }
                 });
             }
         }
@@ -768,25 +781,7 @@ function onPlayerReady(event) {
     const preloader = event.target.getIframe().closest('.video-slide').querySelector('.video-preloader');
      if(preloader) preloader.style.display = 'none';
 
-    if (window.resolveFirstPlayerReady) {
-        // console.log("Resolving first player ready promise.");
-        window.resolveFirstPlayerReady();
-        delete window.resolveFirstPlayerReady;
-    }
-
-    // Check if this is the currently active video slide and play it
-    const videoId = Object.keys(players).find(key => players[key] === event.target);
-    const activeSlide = document.querySelector('.video-slide[data-video-id="' + videoId + '"]');
-    if (activeSlide && activeSlide.parentElement === videoSwiper) {
-        const slideRect = activeSlide.getBoundingClientRect();
-        const swiperRect = videoSwiper.getBoundingClientRect();
-        // Check if the slide is mostly visible
-        if (slideRect.top >= swiperRect.top && slideRect.bottom <= swiperRect.bottom + slideRect.height * 0.25) { // Adjust threshold as needed
-             // console.log("Player ready for visible slide. Attempting to play:", videoId);
-             // Use playActivePlayer which handles mute/unmute based on interaction
-             // playActivePlayer(videoId); // IntersectionObserver will handle this on scroll
-        }
-    }
+    // window.resolveFirstPlayerReady is resolved in initializePlayers now for the first ready player (YT or HTML5)
 }
 
 
@@ -797,18 +792,19 @@ function onPlayerStateChange(event) {
     // If state is not UNSTARTED, the video has at least started buffering/loading
     // For YouTube, 1 (PLAYING), 2 (PAUSED), 3 (BUFFERING), 5 (CUED) mean preloader can hide.
     // For HTML5, 'playing', 'paused', 'stalled', 'waiting' might happen after canplay. Preloader hid on canplay.
-    if (event.data !== YT.PlayerState.UNSTARTED) {
+    if (event.data !== YT.PlayerState.UNSTARTED) { // Also check for HTML5 video event types if necessary
         if(preloader) preloader.style.display = 'none';
     }
+     // For HTML5 video: check event.type === 'playing', etc. For simplicity, canplay is used in initializePlayers.
 
     // Handle potential audio issue popup on first play attempt
-    if (event.data === YT.PlayerState.PLAYING && !userHasInteracted && !hasShownAudioPopup) {
-        // console.log("YouTube video started playing before user interaction. Showing audio popup.");
-        showAudioIssuePopup();
-        hasShownAudioPopup = true;
-    }
-     if (event.type === 'play' && !userHasInteracted && !hasShownAudioPopup) { // HTML5 video play event
-        // console.log("HTML5 video started playing before user interaction. Showing audio popup.");
+    // This logic is slightly complex with different player types and timing.
+    // Simplified check: if any player starts playing AND user hasn't interacted and popup not shown
+    const isPlaying = (event instanceof YT.Player && event.data === YT.PlayerState.PLAYING) ||
+                      (event instanceof HTMLVideoElement && event.type === 'play'); // Added HTML5 check
+
+    if (isPlaying && !userHasInteracted && !hasShownAudioPopup) {
+        console.log("Video started playing before user interaction. Showing audio popup.");
         showAudioIssuePopup();
         hasShownAudioPopup = true;
     }
@@ -821,13 +817,15 @@ function togglePlayPause(videoId) {
 
     // Ensure user interaction is marked if they click to play/pause
     if (!userHasInteracted) {
+        console.log("First user interaction detected via togglePlayPause.");
         userHasInteracted = true;
         // Attempt to unmute all players (though only the currently active one matters)
-        for (const id in players) {
-             const p = players[id];
-             if (p instanceof YT.Player && typeof p.unMute === 'function') p.unMute();
-             else if (p instanceof HTMLVideoElement) p.muted = false;
-        }
+        // Loop through players to unmute is better here after user interaction
+         for (const id in players) {
+              const p = players[id];
+              if (p instanceof YT.Player && typeof p.unMute === 'function') p.unMute();
+              else if (p instanceof HTMLVideoElement) p.muted = false;
+         }
          // Hide audio issue popup if visible
          hideAudioIssuePopup();
     }
@@ -860,24 +858,23 @@ function playActivePlayer(videoId) {
     // console.log("Attempting to play video:", videoId);
 
     if (player instanceof YT.Player) {
-        if (typeof player.playVideo === 'function') player.playVideo();
-        // Only unmute if user has interacted
-        if (userHasInteracted && typeof player.unMute === 'function') {
-            // console.log("Unmuting YouTube video:", videoId);
-             player.unMute();
-        } else if (!userHasInteracted && typeof player.mute === 'function') {
-             // Ensure it's muted if no interaction yet
-             player.mute();
+        if (typeof player.playVideo === 'function') {
+             player.playVideo();
+              // Only unmute if user has interacted
+             if (userHasInteracted && typeof player.unMute === 'function') {
+                 // console.log("Unmuting YouTube video:", videoId);
+                  player.unMute();
+             } else if (!userHasInteracted && typeof player.mute === 'function') {
+                  // Ensure it's muted if no interaction yet
+                  player.mute();
+             }
         }
     } else { // HTML5 VideoElement
         player.play().catch(e => {
              console.error("HTML5 Play interrupted:", videoId, e);
              // Handle potential autoplay restrictions by showing popup if it hasn't been shown
-             if (!userHasInteracted && !hasShownAudioPopup) {
-                console.log("Play interrupted before user interaction. Showing audio popup.");
-                showAudioIssuePopup();
-                hasShownAudioPopup = true;
-             }
+             // Autoplay can fail even *with* mute, but often fails *without* user interaction.
+             // The `userHasInteracted` check in the stateChange/play event handler is better for showing the popup.
         });
         // Mute/unmute based on user interaction
         player.muted = !userHasInteracted;
@@ -944,15 +941,18 @@ function setupVideoObserver() {
     document.querySelectorAll('.video-slide').forEach(slide => {
         // Use the correct player ID logic to check if a player exists
         const videoId = slide.dataset.videoId;
-        if (players[videoId]) {
+        if (players[videoId]) { // Check if a player *object* exists for this video ID
              // console.log("Observing slide for video:", videoId);
              videoObserver.observe(slide);
         } else {
-            // console.log("No player found for video ID:", videoId, "Skipping observation.");
+            // console.log("No player object found for video ID:", videoId, "Skipping observation.");
+            // This might happen if YT API failed to load, or if a premium video failed to load.
+            // The overall init timeout should handle cases where NO players can be created.
         }
     });
 
      // Manually trigger check for the first video on load if needed
+     // This helps ensure the first video plays without requiring user scroll
      if (appState.allVideos.length > 0) {
          const firstSlide = document.querySelector('.video-slide');
          if (firstSlide) {
@@ -1284,16 +1284,17 @@ if (audioIssueOkBtn) {
         hideAudioIssuePopup();
          // Once user clicks OK on the popup, mark interaction as true
         if (!userHasInteracted) {
+             console.log("First user interaction detected via audio popup OK button.");
             userHasInteracted = true;
              // Attempt to unmute the active player if it's still playing
              if (activePlayerId && players[activePlayerId]) {
                  const player = players[activePlayerId];
                  if (player instanceof YT.Player && typeof player.unMute === 'function') {
-                     // console.log("User interacted via popup, attempting to unmute active YouTube player.");
-                     player.unMute();
+                      console.log("Attempting to unmute active YouTube player after popup interaction.");
+                      player.unMute();
                  } else if (player instanceof HTMLVideoElement) {
-                     // console.log("User interacted via popup, attempting to unmute active HTML5 player.");
-                     player.muted = false;
+                      console.log("Attempting to unmute active HTML5 player after popup interaction.");
+                      player.muted = false;
                  }
              }
         }
@@ -1448,37 +1449,82 @@ async function handlePremiumFileUpload() {
 
 
 const startAppLogic = async () => {
-    // console.log("Starting app logic...");
-    const firstPlayerReadyPromise = new Promise(resolve => { window.pendingAppStart = resolve; });
+    console.log("Starting app logic...");
 
-    // Load videos first
-    await loadAllVideosFromFirebase(); // यह fullVideoList और appState.allVideos को पॉपुलेट करेगा
+    // Define the promise that resolves when the first YouTube or HTML5 player is ready.
+    // This promise's resolve function (window.resolveFirstPlayerReady) is called
+    // inside the onReady event handler for YT players or the canplay event for HTML5 players.
+    const firstPlayerReadyPromise = new Promise(resolve => {
+        window.resolveFirstPlayerReady = resolve; // Store resolve globally
+        window._firstPlayerReadyResolved = false; // Flag to ensure it only resolves once
+    });
 
-    // Render the video swiper with the initial list (all videos)
-    // renderVideoSwiper() is called implicitly by filterVideosByCategory('all') now.
+    // Set up a timeout for the player readiness waiting part
+    const playerReadyTimeout = new Promise((_, reject) =>
+        setTimeout(() => {
+            console.warn("Player readiness timed out after 15 seconds.");
+             // We don't necessarily need to reject the whole app init here.
+             // Just letting this promise "lose" the race means the app will proceed
+             // without waiting for players if they are taking too long.
+             // If no players are created successfully, the "No videos" message will show, or HTML5 might try to play.
+             // Resolving it gracefully allows the app to proceed.
+             resolve(); // Resolve, don't reject on timeout, to allow the app to continue loading other things.
+        }, 15000) // 15 seconds timeout for player readiness
+    );
 
-    // Wait for YouTube API if needed and there are videos
-    if (appState.allVideos.length > 0 && isYouTubeApiReady) {
-        // console.log("Waiting for first player ready...");
-        await firstPlayerReadyPromise; // Wait for at least one YT player to be ready
-        // console.log("First player ready.");
-    } else if (appState.allVideos.length > 0 && !isYouTubeApiReady) {
-         // console.log("Videos loaded, but YT API not ready yet.");
-         // We don't wait explicitly here, initializePlayers will be called when API is ready
-    } else {
-         // console.log("No videos loaded.");
-         // If no videos, no players will be initialized, no need to wait for API
-         delete window.pendingAppStart; // Clear the promise resolve function
+    try {
+        // Load videos from Firebase first (this is independent of the player API)
+        console.log("Loading all videos...");
+        await loadAllVideosFromFirebase(); // Populates fullVideoList and appState.allVideos
+
+        // Now, if there are videos, wait for the first player to be ready OR the player readiness timeout
+        // We only await the player readiness if there are videos to play.
+        if (appState.allVideos.length > 0) {
+             console.log(`Loaded ${appState.allVideos.length} videos. Waiting for first player ready or player readiness timeout.`);
+             // Use Promise.race to wait for the first player ready OR the specific player readiness timeout
+             await Promise.race([firstPlayerReadyPromise, playerReadyTimeout]);
+             console.log("First player ready or player readiness timeout reached. Proceeding.");
+        } else {
+             console.log("No videos loaded. Skipping player readiness wait.");
+             // No videos, no players to wait for. The app can proceed directly.
+             // Ensure any pending playerReadyPromise is potentially resolved if it exists,
+             // though in this branch, it won't be awaited anyway.
+             if (window.resolveFirstPlayerReady && !window._firstPlayerReadyResolved) {
+                 window.resolveFirstPlayerReady();
+                 window._firstPlayerReadyResolved = true;
+             }
+        }
+
+
+        // Initialize players (will only create YT players if isYouTubeApiReady is true)
+        // and setup observer. This happens implicitly when filterVideosByCategory calls renderVideoSwiper.
+        console.log("Filtering videos and rendering swiper...");
+        filterVideosByCategory('all'); // This calls renderVideoSwiper and setupVideoObserver
+
+
+        // Navigate to the home screen only after initial data load and rendering setup attempt
+        console.log("App logic finished loading. Navigating to home screen.");
+        navigateTo('home-screen');
+
+    } catch (error) {
+        // This catch block will only run for critical errors *before* the timeout,
+        // or if the timeout itself was set up to reject (which we changed to resolve).
+        // So, critical errors in loadAllVideosFromFirebase would land here.
+        console.error("App initialization critical error:", error);
+        alert("Failed to load the application: " + error.message + ". Please check your internet connection and try again.");
+        // Ensure loading indicator is hidden on critical error
+        document.getElementById('loading-container').style.display = 'none';
+        document.getElementById('get-started-btn').style.display = 'block'; // Show button again
     }
+};
 
-     // Filter videos by 'all' category initially. This also calls renderVideoSwiper and setupVideoObserver.
-     filterVideosByCategory('all');
-
-
-    // Navigate to the home screen only after initial data load and render setup
-    // console.log("App logic started. Navigating to home screen."); // आप यह लॉग जोड़ सकते हैं
-    navigateTo('home-screen'); // <--- यह लाइन जोड़ी गई है
-
+// Keep the global function for the YouTube API script to call
+window.onYouTubeIframeAPIReady = () => {
+    isYouTubeApiReady = true;
+    console.log("Global onYouTubeIframeAPIReady called by YouTube API script.");
+    // initializePlayers will be called by filterVideosByCategory (which is called by startAppLogic)
+    // initializePlayers will then create YT players if isYouTubeApiReady is true,
+    // and the onReady of the *first* player will resolve window.resolveFirstPlayerReady.
 };
 
 
@@ -1504,7 +1550,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // This listener ensures userHasInteracted is true after the very first click on the app container
     appContainer.addEventListener('click', () => {
         if (!userHasInteracted) {
-             // console.log("First user interaction detected.");
+             console.log("First user interaction detected via app container click.");
              userHasInteracted = true;
              // Hide audio issue popup immediately on first interaction
              hideAudioIssuePopup();
@@ -1512,10 +1558,10 @@ document.addEventListener('DOMContentLoaded', () => {
              if (activePlayerId && players[activePlayerId]) {
                   const player = players[activePlayerId];
                    if (player instanceof YT.Player && typeof player.unMute === 'function') {
-                        // console.log("Attempting to unmute active YouTube player after first interaction.");
+                        console.log("Attempting to unmute active YouTube player after first interaction.");
                        player.unMute();
                    } else if (player instanceof HTMLVideoElement) {
-                        // console.log("Attempting to unmute active HTML5 player after first interaction.");
+                        console.log("Attempting to unmute active HTML5 player after first interaction.");
                        player.muted = false;
                    }
              }
