@@ -13,7 +13,6 @@
     --light-grey: #444;
 }
 
-/* MODIFIED: Reverted the aggressive global rule and used a standard box-sizing setup */
 html {
     box-sizing: border-box;
 }
@@ -25,10 +24,10 @@ html {
 html, body {
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Prevent overall body scroll and zoom issues */
-    height: 100%; /* Ensure html and body take full height */
-    overscroll-behavior-y: none; /* Prevent pull-to-refresh/scroll conflicts */
-    zoom: 1; /* Attempt to normalize zoom level */
+    overflow: hidden; 
+    height: 100%; 
+    overscroll-behavior-y: none; 
+    zoom: 1;
 }
 
 body {
@@ -38,24 +37,24 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh; /* Full viewport height */
+    min-height: 100vh;
     position: relative;
-    overflow: hidden; /* Ensure no scroll on body itself */
-    transform-origin: center center; /* Set transform origin for potential scaling */
-    touch-action: pan-y; /* Allow vertical scrolling but prevent horizontal */
+    overflow: hidden;
+    transform-origin: center center;
+    touch-action: pan-y;
 }
 
 .app-container {
     width: 100%;
-    max-width: 420px; /* Typical mobile width */
+    max-width: 420px;
     height: 100vh;
     display: flex;
     flex-direction: column;
     position: relative;
     overflow: hidden;
-    background-color: var(--background); /* Solid base background */
+    background-color: var(--background);
     transform-origin: center center;
-    isolation: isolate; /* Create a stacking context */
+    isolation: isolate;
 }
 
 .app-container::before {
@@ -107,7 +106,6 @@ body {
 }
 
 #splash-screen {
-    /* Splash screen has its own intentional gradient background */
     background: linear-gradient(to bottom, #87CEEB, #FFD700, #FFA500, #FF69B4, #F44336, #4CAF50);
     z-index: 11;
     display: flex;
@@ -427,7 +425,6 @@ body {
     transition: background-color 0.3s ease;
     width: 100%;
     padding: 12px 15px;
-    border: none;
     border-radius: 8px;
     font-size: 1.1em;
 }
@@ -443,7 +440,6 @@ body {
     transition: background-color 0.3s ease;
     width: 100%;
     padding: 12px 15px;
-    border: none;
     border-radius: 8px;
     font-size: 1.1em;
 }
@@ -527,7 +523,6 @@ body {
     z-index: 10;
 }
 
-/* === MODIFIED / परिवर्तित === */
 .bottom-nav {
     display: flex;
     justify-content: space-around;
@@ -540,9 +535,7 @@ body {
     bottom: 0;
     left: 0;
     z-index: 100;
-    /* The problematic border-top is removed from here to fix the line issue. */
-    /* समस्याग्रस्त बॉर्डर-टॉप को लाइन की समस्या को ठीक करने के लिए यहाँ से हटा दिया गया है। */
-    border-top: none; 
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .nav-item {
@@ -579,7 +572,7 @@ body {
 
 #upload-screen {
     justify-content: flex-start;
-    padding: 0; /* Let inner container handle padding */
+    padding: 0;
 }
 
 #upload-screen .upload-header {
@@ -587,7 +580,7 @@ body {
     text-align: center;
     color: var(--text-color);
     margin-bottom: 20px;
-    padding: 20px 20px 0 20px; /* Add padding to header */
+    padding: 20px 20px 0 20px;
 }
 #upload-screen .upload-header h2 {
     margin: 0 0 5px 0;
@@ -608,7 +601,7 @@ body {
     gap: 20px;
     padding: 20px;
     overflow-y: auto;
-    padding-bottom: 80px; /* 60px nav + 20px padding */
+    padding-bottom: 80px;
 }
 
 .upload-action-button {
@@ -635,7 +628,7 @@ body {
 
 #wallet-screen {
     padding: 20px;
-    padding-bottom: 80px; /* 60px nav + 20px padding */
+    padding-bottom: 80px;
 }
 
 #wallet-screen .wallet-card {
@@ -1320,7 +1313,7 @@ body {
 }
 .audience-option.selected {
     border-color: var(--primary-neon);
-    background-color: rgba(244, 67, 54, 0.15); /* Use primary neon with opacity */
+    background-color: rgba(244, 67, 54, 0.15);
 }
 .audience-option i {
     font-size: 1.2em;
@@ -1948,7 +1941,6 @@ html {
     transform: scale(1.05);
 }
 
-/* === MODIFIED: Force Day Theme by overwriting light theme variables === */
 html.light-theme {
     --background: #0f0f0f;
     --text-color: #ffffff;
@@ -1990,9 +1982,7 @@ html.light-theme ::placeholder {
 
 html.light-theme .bottom-nav {
     background-color: rgba(0, 0, 0, 0.7);
-    /* The problematic border-top is removed from here to fix the line issue. */
-    /* समस्याग्रस्त बॉर्डर-टॉप को लाइन की समस्या को ठीक करने के लिए यहाँ से हटा दिया गया है। */
-    border-top: none; 
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 html.light-theme .screen-header,
 html.light-theme .home-top-bar,
@@ -2003,7 +1993,6 @@ html.light-theme .friends-top-nav {
 html.light-theme .main-sidebar { box-shadow: 4px 0 15px rgba(0,0,0,0.5); }
 html.light-theme .static-message { background-color: rgba(0,0,0,0.3); color: rgba(255, 255, 255, 0.7); }
 html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
-/* ======================================================================= */
 
 /* =============================================== */
 /* === Shubhzone App Styles (Code 2) - END === */
@@ -2015,20 +2004,19 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 /* ======================================================= */
 
 /* === MODIFIED / परिवर्तित === */
+/* The main screen container for the editor is now a flex column to ensure all parts fit. */
+/* एडिटर का मुख्य स्क्रीन कंटेनर अब यह सुनिश्चित करने के लिए एक फ्लेक्स कॉलम है कि सभी हिस्से फिट हों। */
 #image-editor-screen {
     padding: 0;
-    /* This flexbox layout ensures all components (headers, image, toolbar) fit correctly on the screen. */
-    /* यह फ्लेक्सबॉक्स लेआउट सुनिश्चित करता है कि सभी कंपोनेंट (हेडर, इमेज, टूलबार) स्क्रीन पर सही ढंग से फिट हों। */
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 100vh; /* Use full viewport height */
     font-family: 'Roboto Flex', sans-serif;
 }
 
 #image-editor-screen .editor-header {
-    position: fixed;
-    top: 0;
-    left: 0;
+    position: static; /* Changed from fixed to flow with the layout */
+    flex-shrink: 0; /* Prevent header from shrinking */
     width: 100%;
     padding: 10px;
     background: var(--dark-grey);
@@ -2055,7 +2043,6 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
     flex-shrink: 0; 
     z-index: 20;
     border-bottom: 1px solid var(--light-grey);
-    margin-top: 50px;
     color: var(--text-color);
 }
 #image-editor-screen .header-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--light-grey); color: var(--text-color); border: 1px solid var(--light-grey); border-radius: 10px; font-size: 14px; cursor: pointer; font-weight: 500; transition: all 0.2s ease; }
@@ -2064,11 +2051,11 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 #image-editor-screen #upload { display: none; }
 
 /* === MODIFIED / परिवर्तित === */
+/* The image container now takes up the remaining flexible space. */
+/* इमेज कंटेनर अब बची हुई लचीली जगह लेता है। */
 #image-editor-screen .image-container { 
-    /* This makes the image container flexible to take available space, fixing the layout issue. */
-    /* यह इमेज कंटेनर को उपलब्ध जगह लेने के लिए लचीला बनाता है, जिससे लेआउट की समस्या ठीक हो जाती है। */
     flex: 1;
-    min-height: 0;
+    min-height: 0; /* Allows the container to shrink if needed */
     display: flex; 
     justify-content: center; 
     align-items: center; 
@@ -2081,7 +2068,17 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 #image-editor-screen #mainImage, #image-editor-screen #video-feed { max-width: 100%; max-height: 100%; display: block; transition: filter 0.3s ease; object-fit: contain; }
 #image-editor-screen #video-feed { display: none; }
 #image-editor-screen #drawing-canvas { position: absolute; top: 0; left: 0; z-index: 8; touch-action: none; }
-#image-editor-screen .toolbar { background: var(--dark-grey); border-top: 1px solid var(--light-grey); flex-shrink: 0; z-index: 20; padding-bottom: env(safe-area-inset-bottom); }
+
+/* === MODIFIED / परिवर्तित === */
+/* The toolbar is set to not shrink, ensuring it is always visible at the bottom. */
+/* टूलबार को सिकुड़ने से रोका गया है, जिससे यह सुनिश्चित होता है कि यह हमेशा नीचे दिखाई दे। */
+#image-editor-screen .toolbar { 
+    background: var(--dark-grey); 
+    border-top: 1px solid var(--light-grey); 
+    flex-shrink: 0; 
+    z-index: 20; 
+    padding-bottom: env(safe-area-inset-bottom); 
+}
 #image-editor-screen .panel-container { min-height: 140px; padding: 15px 0; position: relative; overflow: hidden; display: none; }
 #image-editor-screen .panel-container.visible { display: block; }
 #image-editor-screen .panel { display: none; align-items: center; overflow-x: auto; padding: 0 15px; -ms-overflow-style: none; scrollbar-width: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; transition: opacity 0.3s ease; opacity: 0; }
@@ -2187,7 +2184,7 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
     display: flex;
     flex-direction: column;
     gap: 15px;
-    padding-bottom: 80px; /* 60px nav + 20px padding */
+    padding-bottom: 80px;
 }
 
 #premium-upload-screen .file-upload-label {
