@@ -404,7 +404,6 @@ body {
     background-color: rgba(255, 255, 255, 0.1);
     color: var(--text-color);
     font-size: 1.1em;
-    box-sizing: border-box;
 }
 #information-screen .custom-input {
     display: none;
@@ -676,7 +675,6 @@ body {
 #wallet-screen .action-section input[type="text"] {
     width: calc(100% - 100px);
     padding: 12px 15px;
-    border: none;
     border-radius: 8px;
     background-color: rgba(255, 255, 255, 0.1);
     color: var(--text-color);
@@ -979,7 +977,6 @@ body {
 
 #profile-screen .profile-action-btn {
     padding: 10px 20px;
-    border: none;
     border-radius: 8px;
     font-size: 1em;
     font-weight: bold;
@@ -1213,7 +1210,6 @@ body {
 #premium-upload-screen textarea {
     width: 100%;
     padding: 12px 15px;
-    border: none;
     border-radius: 8px;
     background-color: rgba(255, 255, 255, 0.1);
     color: var(--text-color);
@@ -2004,19 +2000,16 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 /* ======================================================= */
 
 /* === MODIFIED / परिवर्तित === */
-/* The main screen container for the editor is now a flex column to ensure all parts fit. */
-/* एडिटर का मुख्य स्क्रीन कंटेनर अब यह सुनिश्चित करने के लिए एक फ्लेक्स कॉलम है कि सभी हिस्से फिट हों। */
+/* Reverted to a simpler block layout to avoid flexbox calculation issues. */
+/* फ्लेक्सबॉक्स गणना की समस्याओं से बचने के लिए एक सरल ब्लॉक लेआउट पर वापस लाया गया। */
 #image-editor-screen {
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    height: 100vh; /* Use full viewport height */
+    display: block; /* Changed back to block */
     font-family: 'Roboto Flex', sans-serif;
 }
 
 #image-editor-screen .editor-header {
-    position: static; /* Changed from fixed to flow with the layout */
-    flex-shrink: 0; /* Prevent header from shrinking */
+    position: static;
     width: 100%;
     padding: 10px;
     background: var(--dark-grey);
@@ -2040,8 +2033,6 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
     align-items: center; 
     padding: 12px 18px;
     background: var(--dark-grey); 
-    flex-shrink: 0; 
-    z-index: 20;
     border-bottom: 1px solid var(--light-grey);
     color: var(--text-color);
 }
@@ -2050,12 +2041,8 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 #image-editor-screen .header-btn:active { transform: scale(0.96); }
 #image-editor-screen #upload { display: none; }
 
-/* === MODIFIED / परिवर्तित === */
-/* The image container now takes up the remaining flexible space. */
-/* इमेज कंटेनर अब बची हुई लचीली जगह लेता है। */
 #image-editor-screen .image-container { 
-    flex: 1;
-    min-height: 0; /* Allows the container to shrink if needed */
+    height: calc(100vh - 280px); /* Adjusted height to leave space for toolbars */
     display: flex; 
     justify-content: center; 
     align-items: center; 
@@ -2069,13 +2056,9 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 #image-editor-screen #video-feed { display: none; }
 #image-editor-screen #drawing-canvas { position: absolute; top: 0; left: 0; z-index: 8; touch-action: none; }
 
-/* === MODIFIED / परिवर्तित === */
-/* The toolbar is set to not shrink, ensuring it is always visible at the bottom. */
-/* टूलबार को सिकुड़ने से रोका गया है, जिससे यह सुनिश्चित होता है कि यह हमेशा नीचे दिखाई दे। */
 #image-editor-screen .toolbar { 
     background: var(--dark-grey); 
     border-top: 1px solid var(--light-grey); 
-    flex-shrink: 0; 
     z-index: 20; 
     padding-bottom: env(safe-area-inset-bottom); 
 }
