@@ -23,8 +23,6 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const analytics = firebase.analytics();
 
-const RENDER_BACKEND_URL = 'https://shubhzone.onrender.com/upload';
-
 let appState = {
     currentUser: {
         uid: null,
@@ -39,7 +37,7 @@ let appState = {
         country: "",
     },
     currentScreen: 'splash-screen',
-    allVideos: [], // यह फ़िल्टर किए गए वीडियो के लिए होगा जो दिखेंगे
+    allVideos: [],
     userUploadedVideos: [],
     uploadDetails: {},
     activeComments: {
@@ -49,9 +47,9 @@ let appState = {
 };
 
 let isYouTubeApiReady = false;
-let players = {};
+let players = {}; // --- MODIFIED ---: This will now hold both YouTube players and HTML5 video elements.
 let videoObserver;
-let fullVideoList = []; // यह डेटाबेस से लोड किए गए सभी वीडियो की पूरी सूची रखेगा
+let fullVideoList = [];
 let activePlayerId = null;
 let userHasInteracted = false;
 let hasShownAudioPopup = false;
@@ -59,7 +57,6 @@ let hasShownAudioPopup = false;
 const appContainer = document.getElementById('app-container');
 const screens = document.querySelectorAll('.screen');
 const navItems = document.querySelectorAll('.nav-item');
-const bottomNav = document.querySelector('.bottom-nav'); // <<<--- पहला बदलाव: बॉटम नेविगेशन बार को सेलेक्ट किया
 const profileAvatarElement = document.getElementById('profile-avatar');
 const profileUsernameElement = document.getElementById('profile-username');
 const profileImageInput = document.getElementById('profile-image-input');
@@ -69,15 +66,11 @@ const modalVideoTitle = document.getElementById('modal-video-title');
 const modalVideoDescription = document.getElementById('modal-video-description');
 const modalVideoHashtags = document.getElementById('modal-video-hashtags');
 const modalVideoUrlInput = document.getElementById('modal-video-url');
-const selectedCategoryText = document.getElementById('selected-category-text'); // YouTube Modal के लिए
-// प्रीमियम अपलोड स्क्रीन के लिए नया स्पैन ID जोड़ें (HTML में भी जोड़ें)
-const selectedCategoryTextPremium = document.getElementById('selected-category-text-premium'); // प्रीमियम के लिए
-const categoryOptionsContainer = document.getElementById('category-options'); // यह modal और premium screen दोनों के लिए share होगा
+const selectedCategoryText = document.getElementById('selected-category-text');
+const categoryOptionsContainer = document.getElementById('category-options');
 const commentsToggleInput = document.getElementById('comments-toggle-input');
 const audienceOptions = document.querySelectorAll('.audience-option');
-const categorySelectorDisplay = document.querySelector('.category-selector-display'); // YouTube Modal के लिए
-const categorySelectorDisplayPremium = document.querySelector('#premium-upload-screen .category-selector-display'); // प्रीमियम के लिए
-
+const categorySelectorDisplay = document.querySelector('.category-selector-display');
 const videoSwiper = document.getElementById('video-swiper');
 const homeStaticMessageContainer = document.getElementById('home-static-message-container');
 const userVideoGrid = document.getElementById('user-video-grid');
@@ -90,6 +83,8 @@ const commentsModal = document.getElementById('comments-modal');
 const commentsList = document.getElementById('comments-list');
 const commentInput = document.getElementById('comment-input');
 const sendCommentBtn = document.getElementById('send-comment-btn');
+
+// --- NEW ---: Elements for the Premium Upload Screen (You will need to add these to your HTML)
 const premiumUploadScreen = document.getElementById('premium-upload-screen');
 const premiumVideoFileInput = document.getElementById('premium-video-file-input');
 const premiumVideoPreview = document.getElementById('premium-video-preview');
@@ -100,67 +95,33 @@ const premiumUploadBtn = document.getElementById('premium-upload-btn');
 const premiumUploadProgress = document.getElementById('premium-upload-progress');
 const premiumUploadProgressText = document.getElementById('premium-upload-progress-text');
 const backFromPremiumBtn = document.getElementById('back-from-premium-btn');
-const categoryScroller = document.getElementById('category-scroller'); // होम स्क्रीन कैटेगरी बार के लिए
+
 
 const categories = [
     "Entertainment", "Comedy", "Music", "Dance", "Education",
-    "Travel", "Food", "DIY", "Sports", "Gaming", "News", "Lifestyle",
-    "Art", "Technology", "Science", "Nature", "Fitness", "Other" // कुल 16 कैटेगरी, आप अपनी 15+ कैटेगरी यहाँ डाल सकते हैं
+    "Travel", "Food", "DIY", "Sports", "Gaming", "News", "Lifestyle"
 ];
 
-// ============== दूसरा बदलाव: activateScreen() फंक्शन को सुधारा गया ==============
 function activateScreen(screenId) {
     screens.forEach(screen => {
         const isActive = screen.id === screenId;
         screen.classList.toggle('active', isActive);
     });
     appState.currentScreen = screenId;
-
-    // यह तय करेगा कि बॉटम नेविगेशन बार को दिखाना है या नहीं।
-    const showBottomNav = (screenId !== 'splash-screen' && screenId !== 'information-screen' && screenId !== 'image-editor-screen' && screenId !== 'withdraw-success-screen');
-    if (bottomNav) {
-        bottomNav.style.display = showBottomNav ? 'flex' : 'none';
-    }
-
-    // जब स्क्रीन बदलती है, तो सुनिश्चित करें कि कैटेगरी ड्रॉपdown बंद हो
-     const openDisplay = document.querySelector('.category-selector-display.open');
-     if(openDisplay) {
-         openDisplay.classList.remove('open');
-     }
 }
 
 function navigateTo(nextScreenId) {
+    // --- MODIFIED ---: Updated to handle both player types
     if (appState.currentScreen === 'home-screen' && activePlayerId && players[activePlayerId]) {
-         pauseActivePlayer();
+         pauseActivePlayer(); // Use a helper function for pausing
     }
-    // activePlayerId = null; // इसे यहां रीसेट न करें, IntersectionObserver इसे मैनेज करेगा
+    activePlayerId = null;
     activateScreen(nextScreenId);
+    if (nextScreenId === 'profile-screen') loadUserVideosFromFirebase();
 
-    // यह नेविगेशन आइकॉन पर 'active' क्लास को अपडेट करेगा
-    navItems.forEach(nav => {
-        const navTarget = nav.getAttribute('data-nav');
-        // स्क्रीन ID से "-screen" हटाकर nav target से तुलना करें
-        const isCurrentNav = (nextScreenId.replace('-screen', '') === navTarget);
-        nav.classList.toggle('active', isCurrentNav);
-    });
-
-    if (nextScreenId === 'profile-screen') {
-        // renderUserVideos(); // यह फंक्शन अभी मौजूद नहीं है, इसे अनcomment न करें
-        loadUserVideosFromFirebase(); // सुनिश्चित करें कि डेटा लोड हो रहा है
-    }
+    // If navigating to editor, initialize it.
     if (nextScreenId === 'image-editor-screen') {
-        // photoEditor.start(); // photoEditor लॉजिक यहां कॉल करें यदि यह यहां से शुरू होता है
-    }
-    if (nextScreenId === 'wallet-screen') {
-        // Wallet screen specific logic
-    }
-    if (nextScreenId === 'friends-screen') {
-         // Friends screen specific logic
-    }
-    // Home screen पर वापस आने पर वीडियो observer को फिर से अटैच करें
-    if (nextScreenId === 'home-screen' && appState.allVideos.length > 0) {
-         // छोटा डिले दें ताकि DOM रेंडर हो जाए
-         setTimeout(setupVideoObserver, 100);
+        photoEditor.start();
     }
 }
 
@@ -172,104 +133,65 @@ async function checkUserProfileAndProceed(user) {
     const doc = await userRef.get();
 
     if (doc.exists && doc.data().name) {
+        // User has filled info, go to home
         appState.currentUser = { ...appState.currentUser, ...doc.data() };
         updateProfileUI();
-        await startAppLogic(); // प्रोफाइल मिलने पर ऐप लॉजिक शुरू करें
+        await startAppLogic();
     } else {
+        // User is new or hasn't filled info
         if (doc.exists) {
             appState.currentUser = { ...appState.currentUser, ...doc.data() };
         }
         updateProfileUI();
         navigateTo('information-screen');
-        // यदि प्रोफाइल मौजूद नहीं है, तो यहीं रुकें और startAppLogic को कॉल न करें
     }
 }
-
 
 function initializeApp() {
     auth.onAuthStateChanged(user => {
         if (user) {
-            // यदि पहले से ही ऑथेंटिकेटेड है, तो सीधे चेक प्रोफाइल पर जाएं
             checkUserProfileAndProceed(user);
         } else {
-            // यदि ऑथेंटिकेटेड नहीं है, तो एनोनिमस साइन-इन का प्रयास करें
-            auth.signInAnonymously().catch(error => {
-                console.error("Anonymous sign-in failed:", error);
-                // यदि एनोनिमस साइन-इन भी विफल हो जाता है, तो यूजर को बताएं या कुछ और करें
-                alert("Failed to sign in. Please check your connection.");
-                // लोडिंग इंडिकेटर छिपाएं यदि यह दिख रहा है
-                document.getElementById('get-started-btn').style.display = 'block';
-                document.getElementById('loading-container').style.display = 'none';
-            });
+            auth.signInAnonymously().catch(error => console.error("Anonymous sign-in failed:", error));
         }
     });
     activateScreen('splash-screen');
-    // renderCategories() और renderCategoriesInBar() DOMContentLoaded में कॉल होंगे
 }
 
-
 async function loadUserVideosFromFirebase() {
-    // console.log("Loading user videos for UID:", appState.currentUser.uid);
-    if (!appState.currentUser.uid) {
-        // console.log("User UID not available for loading user videos.");
-        return;
-    }
+    if (!appState.currentUser.uid) return;
     try {
         const videosRef = db.collection('videos').where('uploaderUid', '==', appState.currentUser.uid).orderBy('createdAt', 'desc');
         const snapshot = await videosRef.get();
         appState.userUploadedVideos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        // console.log("Loaded user videos:", appState.userUploadedVideos);
-        // renderUserVideos(); // This function does not exist in your provided code, keep commented
+        renderUserVideos();
     } catch (error) {
         console.error("Error loading user videos:", error);
     }
 }
 
-
 async function loadAllVideosFromFirebase() {
-    // console.log("Loading all videos from Firebase...");
     const videosRef = db.collection('videos').orderBy('createdAt', 'desc').limit(20);
     const snapshot = await videosRef.get();
     const loadedVideos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    fullVideoList = [...loadedVideos]; // पूरी लिस्ट को fullVideoList में स्टोर करें
-    appState.allVideos = [...loadedVideos]; // शुरुआत में सभी वीडियो दिखाएं
+    fullVideoList = [...loadedVideos];
+    appState.allVideos = [...loadedVideos];
 
-    // console.log("Loaded all videos:", fullVideoList);
-    // console.log("Initial appState.allVideos:", appState.allVideos);
-
-    // renderVideoSwiper() अब filterVideosByCategory द्वारा कॉल किया जाएगा
-
-    // categoryScroller को इनिशियलाइज़ करें और 'All' को एक्टिव करें
     document.querySelectorAll('.category-chip').forEach(chip => chip.classList.remove('active'));
-    const allChip = document.querySelector('.category-chip[data-category="all"]'); // 'All' चिप को डेटा एट्रिब्यूट से सेलेक्ट करें
-    if (allChip) {
-        allChip.classList.add('active');
-    } else {
-        // अगर किसी कारण से 'All' चिप रेंडर नहीं हुआ है (जो renderCategoriesInBar में होता है),
-        // तो बस renderVideoSwiper को सीधे कॉल करें
-        // console.warn("'All' category chip not found. Skipping initial filter.");
-        renderVideoSwiper();
-         if (appState.allVideos.length > 0 && isYouTubeApiReady) {
-              setTimeout(setupVideoObserver, 100); // यदि वीडियो हैं तो Observer सेटअप करें
-         } else if (appState.allVideos.length === 0) {
-             // यदि कोई वीडियो नहीं है, तो भी Observer सेटअप करें (हालांकि यह कुछ भी observe नहीं करेगा)
-              setupVideoObserver();
-         }
-    }
+    const allChip = document.querySelector('.category-chip');
+    if (allChip) allChip.classList.add('active');
 
-
-    // initial render and setup observer for 'all' category
-    // filterVideosByCategory('all'); // startAppLogic में इसे कॉल करना बेहतर है
+    renderVideoSwiper();
 }
 
-// ============== तीसरा बदलाव: navItems Event Listener को सुधारा गया ==============
 navItems.forEach(item => {
     item.addEventListener('click', () => {
         const targetScreen = `${item.getAttribute('data-nav')}-screen`;
-        // यहाँ से active क्लास हटाने वाला कोड हटा दिया गया है क्योंकि navigateTo अब यह काम करेगा।
         if (appState.currentScreen !== targetScreen) {
             navigateTo(targetScreen);
+            navItems.forEach(nav => nav.classList.remove('active'));
+            item.classList.add('active');
         }
     });
 });
@@ -296,175 +218,64 @@ async function saveAndContinue() {
         saveContinueBtn.textContent = 'Continue';
         return;
     }
-    const userData = {
-        name: name,
-        mobile: document.getElementById('info-mobile').value.trim(),
-        email: document.getElementById('info-email').value.trim(),
-        address: document.getElementById('info-address').value.trim(),
-        hobby: document.getElementById('info-hobby').value.trim(),
-        state: document.getElementById('info-state').value === 'custom' ? document.getElementById('custom-state-input').value.trim() : document.getElementById('info-state').value,
-        country: document.getElementById('info-country').value === 'custom' ? document.getElementById('custom-country-input').value.trim() : document.getElementById('info-country').value,
-    };
+    const userData = { name, mobile: document.getElementById('info-mobile').value, email: document.getElementById('info-email').value, address: document.getElementById('info-address').value, hobby: document.getElementById('info-hobby').value, state: document.getElementById('info-state').value, country: document.getElementById('info-country').value };
     const file = profileImageInput.files[0];
     if (file) {
         try {
-            const formData = new FormData();
-            formData.append('media', file);
-            // Add other fields if your backend expects them for avatar upload context
-            // formData.append('uid', appState.currentUser.uid);
-
-            const response = await fetch(RENDER_BACKEND_URL + '/upload-avatar', { // Make sure your backend has a specific endpoint for avatar
-                method: 'POST',
-                body: formData
-            });
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Server error: ${response.statusText} - ${errorText}`);
-            }
-            const result = await response.json();
-            if (result.downloadURL) {
-                 userData.avatar = result.downloadURL;
-            } else {
-                 throw new Error("Avatar upload succeeded but no downloadURL received.");
-            }
-
+            const storageRef = storage.ref(`avatars/${appState.currentUser.uid}/${file.name}`);
+            const snapshot = await storageRef.put(file);
+            userData.avatar = await snapshot.ref.getDownloadURL();
         } catch (error) {
             console.error("Avatar upload error:", error);
-            alert("Failed to upload profile picture: " + error.message);
-            saveAndContinue.disabled = false; // Ensure button is enabled on error
-            saveAndContinue.textContent = 'Continue';
-            return; // Stop the process if avatar upload fails
+            alert("Failed to upload profile picture.");
         }
     }
     try {
         await db.collection('users').doc(appState.currentUser.uid).set(userData, { merge: true });
         appState.currentUser = { ...appState.currentUser, ...userData };
         updateProfileUI();
-        // यदि उपयोगकर्ता पहली बार प्रोफाइल सहेज रहा है, तो startAppLogic यहाँ से कॉल करें
-        if (appState.currentScreen === 'information-screen') {
-             await startAppLogic(); // <--- यहां startAppLogic कॉल हो रहा है
-        } else {
-             // यदि उपयोगकर्ता मौजूदा प्रोफाइल को अपडेट कर रहा है
-             navigateTo('profile-screen'); // या जहाँ भी आप जाना चाहें
-        }
+        await startAppLogic();
 
     } catch (error) {
         console.error("Profile save error:", error);
-        alert("Failed to save profile: " + error.message);
-    } finally {
-        saveContinueBtn.disabled = false;
-        saveContinueBtn.textContent = 'Continue';
+        alert("Failed to save profile.");
     }
 }
-
 
 function updateProfileUI() {
     profileUsernameElement.textContent = appState.currentUser.name || `@${appState.currentUser.username || 'new_user'}`;
-    const avatarUrl = appState.currentUser.avatar || "https://via.placeholder.com/120/222/FFFFFF?text=++"; // Placeholders are often tricky, added extra +
+    const avatarUrl = appState.currentUser.avatar || "https://via.placeholder.com/120/222/FFFFFF?text=+";
     profileAvatarElement.src = avatarUrl;
     profileImagePreview.src = avatarUrl;
-
-    // Ensure input fields are updated only if the user is on the information screen
-    if (appState.currentScreen === 'information-screen') {
-        document.getElementById('info-name').value = appState.currentUser.name || '';
-        document.getElementById('info-mobile').value = appState.currentUser.mobile || '';
-        document.getElementById('info-email').value = appState.currentUser.email || '';
-        document.getElementById('info-address').value = appState.currentUser.address || '';
-        document.getElementById('info-hobby').value = appState.currentUser.hobby || '';
-
-        const stateSelect = document.getElementById('info-state');
-        const stateInput = document.getElementById('custom-state-input');
-        const countrySelect = document.getElementById('info-country');
-        const countryInput = document.getElementById('custom-country-input');
-
-        // Set state
-        if (appState.currentUser.state && Array.from(stateSelect.options).some(opt => opt.value === appState.currentUser.state)) {
-            stateSelect.value = appState.currentUser.state;
-            stateInput.style.display = 'none';
-        } else if (appState.currentUser.state) {
-            stateSelect.value = 'custom';
-            stateInput.value = appState.currentUser.state;
-            stateInput.style.display = 'block';
-        } else {
-             stateSelect.value = ''; // Default or prompt
-             stateInput.value = '';
-             stateInput.style.display = 'none';
-        }
-
-        // Set country
-        if (appState.currentUser.country && Array.from(countrySelect.options).some(opt => opt.value === appState.currentUser.country)) {
-            countrySelect.value = appState.currentUser.country;
-            countryInput.style.display = 'none';
-        } else if (appState.currentUser.country) {
-            countrySelect.value = 'custom';
-            countryInput.value = appState.currentUser.country;
-            countryInput.style.display = 'block';
-        } else {
-            countrySelect.value = 'India'; // Default
-            countryInput.value = '';
-            countryInput.style.display = 'none';
-        }
-    }
+    document.getElementById('info-name').value = appState.currentUser.name || '';
+    document.getElementById('info-mobile').value = appState.currentUser.mobile || '';
+    document.getElementById('info-email').value = appState.currentUser.email || '';
+    document.getElementById('info-address').value = appState.currentUser.address || '';
+    document.getElementById('info-hobby').value = appState.currentUser.hobby || '';
+    document.getElementById('info-state').value = appState.currentUser.state || '';
+    document.getElementById('info-country').value = appState.currentUser.country || 'India';
 }
 
-
 function openUploadDetailsModal() {
-    modalTitle.textContent = "Upload Details (YouTube)";
+    modalTitle.textContent = "Upload Details";
     modalSaveButton.textContent = "Upload Video";
     editingVideoIdInput.value = "";
-    // modal inputs को खाली करें
-    modalVideoTitle.value = '';
-    modalVideoDescription.value = '';
-    modalVideoHashtags.value = '';
-    modalVideoUrlInput.value = '';
-    selectedCategoryText.textContent = 'Select Category';
-    selectAudience('all'); // Default audience
-    commentsToggleInput.checked = true; // Default comments to on
-
     uploadDetailsModal.classList.add('active');
 }
 
 function closeUploadDetailsModal() { uploadDetailsModal.classList.remove('active'); }
+function toggleCategoryOptions() { categorySelectorDisplay.classList.toggle('open'); }
 
-// ============== बदलाव: toggleCategoryOptions() को सही डिस्प्ले एलिमेंट चुनने के लिए अपडेट किया गया ==============
-function toggleCategoryOptions() {
-     // पहले सभी ओपन ड्रॉपdown बंद करें
-     document.querySelectorAll('.category-selector-display.open').forEach(display => display.classList.remove('open'));
-
-     // सक्रिय स्क्रीन के आधार पर सही डिस्प्ले एलिमेंट चुनें
-     let displayElement = null;
-     // हम modal के अंदर या premium-upload-screen के अंदर हो सकते हैं
-     if (uploadDetailsModal.classList.contains('active')) {
-         displayElement = document.querySelector('#upload-details-modal .category-selector-display');
-     } else if (appState.currentScreen === 'premium-upload-screen') {
-         displayElement = document.querySelector('#premium-upload-screen .category-selector-display');
-     }
-
-     // यदि एलिमेंट मिला, तो क्लास टॉगल करें
-     if (displayElement) {
-         displayElement.classList.toggle('open');
-     }
-}
-
-
-// ============== बदलाव: selectCategory() को सही टेक्स्ट स्पैन अपडेट करने के लिए अपडेट किया गया ==============
 function selectCategory(category) {
     appState.uploadDetails.category = category;
-
-    // जांचें कि कौन सी स्क्रीन सक्रिय है और सही स्पैन को अपडेट करें
-    if (uploadDetailsModal.classList.contains('active')) { // यदि modal खुला है
-         if(selectedCategoryText) selectedCategoryText.textContent = category;
-    } else if (appState.currentScreen === 'premium-upload-screen') { // यदि प्रीमियम अपलोड स्क्रीन सक्रिय है
-         if(selectedCategoryTextPremium) selectedCategoryTextPremium.textContent = category;
-    }
-
-    // विकल्पों को बंद करें
-    const openDisplay = document.querySelector('.category-selector-display.open');
-    if(openDisplay) {
-        openDisplay.classList.remove('open');
+    selectedCategoryText.textContent = category;
+    categorySelectorDisplay.classList.remove('open');
+    // --- NEW ---: Also set category for premium upload if that screen is active
+    if (appState.currentScreen === 'premium-upload-screen') {
+        // You'll need a similar category display on the premium screen
+        // For now, we just store it.
     }
 }
-
 
 function selectAudience(audienceType) {
     appState.uploadDetails.audience = audienceType;
@@ -474,58 +285,38 @@ function selectAudience(audienceType) {
 
 async function handleSave() {
     const videoId = editingVideoIdInput.value;
-    if (videoId) {
-        // await saveVideoEdits(videoId); // यह फ़ंक्शन अभी मौजूद नहीं है
-    } else {
-        await saveNewVideo(); // यह YouTube वीडियो के लिए है
-    }
+    if (videoId) await saveVideoEdits(videoId);
+    else await saveNewVideo(); // This is for YouTube videos
 }
 
-async function saveNewVideo() { // यह YouTube video upload के लिए है
+async function saveNewVideo() {
     modalSaveButton.disabled = true;
     modalSaveButton.textContent = 'Uploading...';
     const videoUrlValue = modalVideoUrlInput.value.trim();
     const title = modalVideoTitle.value.trim();
-    const category = appState.uploadDetails.category; // appState से कैटेगरी लें
-    if (!videoUrlValue || !title || !category || category === 'Select Category') { // 'Select Category' चेक भी जोड़ें
-        alert("Please fill all required fields (Title, YouTube ID, Category).");
+    const category = appState.uploadDetails.category;
+    if (!videoUrlValue || !title || !category) {
+        alert("Please fill all required fields.");
         modalSaveButton.disabled = false;
         modalSaveButton.textContent = 'Upload Video';
         return;
     }
-    // YouTube ID से वीडियो ID निकालें यदि पूरा URL पेस्ट किया गया है
-    let youtubeId = videoUrlValue;
-    const urlMatch = videoUrlValue.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&\n\?#]+)/);
-    if (urlMatch && urlMatch[1]) {
-        youtubeId = urlMatch[1];
-    }
-
     const videoData = {
-        uploaderUid: auth.currentUser.uid,
-        uploaderUsername: appState.currentUser.name || appState.currentUser.username || 'User',
-        uploaderAvatar: appState.currentUser.avatar || 'https://via.placeholder.com/40',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        title,
-        description: modalVideoDescription.value.trim(),
-        hashtags: modalVideoHashtags.value.trim(),
-        videoUrl: youtubeId, // सिर्फ ID स्टोर करें
-        thumbnailUrl: `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`,
-        videoType: 'youtube',
-        category,
-        audience: appState.uploadDetails.audience || 'all',
-        commentsEnabled: commentsToggleInput.checked,
-        likes: 0,
-        commentCount: 0
+        uploaderUid: auth.currentUser.uid, uploaderUsername: appState.currentUser.name || appState.currentUser.username, uploaderAvatar: appState.currentUser.avatar, createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        title, description: modalVideoDescription.value.trim(), hashtags: modalVideoHashtags.value.trim(),
+        videoUrl: videoUrlValue,
+        thumbnailUrl: `https://img.youtube.com/vi/${videoUrlValue}/hqdefault.jpg`,
+        videoType: 'youtube', // --- MODIFIED ---: Explicitly set type
+        category, audience: appState.uploadDetails.audience || 'all', commentsEnabled: commentsToggleInput.checked, likes: 0, commentCount: 0
     };
     try {
         await db.collection("videos").add(videoData);
-        alert("YouTube video added!");
+        alert("Video uploaded!");
         closeUploadDetailsModal();
-        await loadAllVideosFromFirebase(); // सभी वीडियो फिर से लोड करें जिसमें नया भी शामिल है
-        // navigateTo('home-screen'); // Home Screen पर नेविगेट करें
-        filterVideosByCategory('all'); // 'All' कैटेगरी फिल्टर के साथ Home दिखाएं
+        await loadAllVideosFromFirebase(); // Reload videos
+        navigateTo('home-screen');
     } catch (error) {
-        console.error("Error uploading YouTube video:", error);
+        console.error("Error uploading video:", error);
         alert("Upload failed. Error: " + error.message);
     } finally {
         modalSaveButton.disabled = false;
@@ -534,141 +325,39 @@ async function saveNewVideo() { // यह YouTube video upload के लिए 
 }
 
 function renderCategories() {
-    // यह फ़ंक्शन modal और premium screen दोनों के `#category-options` div को पॉपुलेट करता है
-    // क्योंकि HTML में वे share हो रहे हैं।
-    if (!categoryOptionsContainer) return; // सुनिश्चित करें कि तत्व मौजूद है
-
     categoryOptionsContainer.innerHTML = categories.map(cat => `<div class="category-option" onclick="selectCategory('${cat}')">${cat}</div>`).join('');
+    // --- NEW ---: You would also populate the category selector on the premium page here if it exists
 }
 
-
-// ============== बदलाव: renderCategoriesInBar() को लागू किया गया ==============
-function renderCategoriesInBar() {
-    const categoryScroller = document.getElementById('category-scroller');
-    if (!categoryScroller) return;
-
-    categoryScroller.innerHTML = ''; // Clear existing chips
-
-    // Add 'All' chip first
-    const allChip = document.createElement('div');
-    allChip.className = 'category-chip active'; // 'All' is active by default
-    allChip.textContent = 'All';
-    allChip.dataset.category = 'all';
-    allChip.addEventListener('click', () => filterVideosByCategory('all', allChip));
-    categoryScroller.appendChild(allChip);
-
-    // Add other category chips
-    categories.forEach(cat => {
-        const chip = document.createElement('div');
-        chip.className = 'category-chip';
-        chip.textContent = cat;
-        chip.dataset.category = cat;
-        chip.addEventListener('click', () => filterVideosByCategory(cat, chip));
-        categoryScroller.appendChild(chip);
-    });
-}
-
-// ============== बदलाव: filterVideosByCategory() को लागू किया गया ==============
-function filterVideosByCategory(category, activeElement) {
-    // Remove active class from all chips
-    document.querySelectorAll('#category-scroller .category-chip').forEach(chip => {
-        chip.classList.remove('active');
-    });
-
-    // Add active class to the clicked chip, if provided
-    if (activeElement) {
-        activeElement.classList.add('active');
-    } else {
-         // यदि activeElement प्रदान नहीं किया गया है (जैसे पेज लोड पर),
-         // तो 'All' चिप को सक्रिय करें
-         const defaultAllChip = document.querySelector('#category-scroller .category-chip[data-category="all"]');
-         if(defaultAllChip) defaultAllChip.classList.add('active');
-    }
-
-
-    // Filter the videos from the full list
-    if (category === 'all') {
-        appState.allVideos = [...fullVideoList]; // Show all videos
-    } else {
-        appState.allVideos = fullVideoList.filter(video => video.category === category);
-    }
-
-    // console.log(`Filtering by category: ${category}`, appState.allVideos);
-
-    // Re-render the video swiper with filtered videos
-    renderVideoSwiper();
-
-    // Ensure player observes the new DOM elements. Call after render.
-    // setupVideoObserver() is called at the end of renderVideoSwiper() now.
-
-    // Scroll the category bar to show the active chip (optional, but good UX)
-     if (activeElement && categoryScroller && activeElement.parentElement === categoryScroller) {
-        activeElement.scrollIntoView({ behavior: 'smooth', inline: 'center' });
-    }
-}
-
-
+// --- MODIFIED ---: Main rendering function updated for both video types
 function renderVideoSwiper() {
-    // console.log("Rendering video swiper with", appState.allVideos.length, "videos.");
     videoSwiper.innerHTML = '';
-    // Dispose of old players if they exist
-    for (const videoId in players) {
-        if (players[videoId] && typeof players[videoId].destroy === 'function') {
-            players[videoId].destroy();
-        } else if (players[videoId] instanceof HTMLVideoElement) {
-             players[videoId].pause();
-             players[videoId].removeAttribute('src'); // Free up resource
-             players[videoId].load();
-        }
-    }
-    players = {}; // Reset players object
-
-    if (videoObserver) videoObserver.disconnect(); // Disconnect old observer
-
+    players = {};
+    if (videoObserver) videoObserver.disconnect();
     if (appState.allVideos.length === 0) {
-        // Ensure static message is visible if no videos
-        if (homeStaticMessageContainer) {
-             videoSwiper.appendChild(homeStaticMessageContainer);
-             homeStaticMessageContainer.style.display = 'flex';
-        }
+        videoSwiper.appendChild(homeStaticMessageContainer);
+        homeStaticMessageContainer.style.display = 'flex';
     } else {
-        // Hide static message if videos exist
-         if (homeStaticMessageContainer) {
-             homeStaticMessageContainer.style.display = 'none';
-             // Ensure it's removed from swiper if it was added
-             if (homeStaticMessageContainer.parentElement === videoSwiper) {
-                 videoSwiper.removeChild(homeStaticMessageContainer);
-             }
-         }
-
+        homeStaticMessageContainer.style.display = 'none';
         appState.allVideos.forEach(video => {
             const slide = document.createElement('div');
             slide.className = 'video-slide';
             slide.dataset.videoId = video.id;
-            slide.dataset.videoType = video.videoType || 'youtube';
+            slide.dataset.videoType = video.videoType || 'youtube'; // Store type for easy access
             slide.addEventListener('click', (e) => {
-                // Prevent toggling play/pause if clicking on action icons or uploader info
-                if (e.target.closest('.video-actions-overlay') || e.target.closest('.uploader-info')) {
-                    return;
-                }
+                if (e.target.closest('.video-actions-overlay') || e.target.closest('.uploader-info')) return;
                 togglePlayPause(video.id);
             });
-            slide.addEventListener('dblclick', (e) => {
-                 // Prevent like popup if double-clicking on action icons or uploader info
-                if (e.target.closest('.video-actions-overlay') || e.target.closest('.uploader-info')) {
-                    return;
-                }
-                handleLikeAction(video.id);
-            });
+            slide.addEventListener('dblclick', () => { handleLikeAction(video.id); });
 
             let playerHtml = '';
-            // Use the correct video ID for YouTube player init
-            const videoIdentifier = video.videoType === 'youtube' ? video.videoUrl : video.id;
-
+            // --- MODIFIED ---: Conditional player rendering
             if (video.videoType === 'premium') {
-                playerHtml = `<video class="html5-player" id="player-${videoIdentifier}" src="${video.videoUrl}" loop muted playsinline preload="metadata"></video>`; // Added preload
+                // HTML5 Video Player for premium content
+                playerHtml = `<video class="html5-player" id="player-${video.id}" src="${video.videoUrl}" loop muted playsinline></video>`;
             } else {
-                playerHtml = `<div class="player-container" id="player-${videoIdentifier}"></div>`;
+                // YouTube Iframe Player (default)
+                playerHtml = `<div class="player-container" id="player-${video.id}"></div>`;
             }
 
             const thumbnailUrl = video.thumbnailUrl || 'https://via.placeholder.com/420x740/000000/FFFFFF?text=Video';
@@ -677,211 +366,109 @@ function renderVideoSwiper() {
                 ${playerHtml}
                 <i class="fas fa-heart like-heart-popup"></i>
                 <div class="video-meta-overlay">
-                    <div class="uploader-info"><img src="${video.uploaderAvatar || 'https://via.placeholder.com/40'}" alt="Uploader Avatar" class="uploader-avatar"><span class="uploader-name">${video.uploaderUsername || 'User'}</span></div>
+                    <div class="uploader-info"><img src="${video.uploaderAvatar || 'https://via.placeholder.com/40'}" class="uploader-avatar"><span class="uploader-name">${video.uploaderUsername || 'User'}</span></div>
                     <p class="video-title">${video.title}</p>
                 </div>
                 <div class="video-actions-overlay">
-                    <div class="action-icon-container" data-action="like" onclick="handleLikeAction('${video.id}')"><i class="far fa-heart icon"></i><span class="count" data-likes="${video.likes || 0}">${video.likes || 0}</span></div>
-                    <div class="action-icon-container ${!video.commentsEnabled ? 'disabled' : ''}" data-action="comment" onclick="${video.commentsEnabled ? `openCommentsModal('${video.id}', '${video.uploaderUid}')` : ''}"><i class="fas fa-comment-dots icon"></i><span class="count" data-comments="${video.commentCount || 0}">${video.commentCount || 0}</span></div>
+                    <div class="action-icon-container" data-action="like" onclick="handleLikeAction('${video.id}')"><i class="far fa-heart icon"></i><span class="count">${video.likes || 0}</span></div>
+                    <div class="action-icon-container ${!video.commentsEnabled ? 'disabled' : ''}" data-action="comment" onclick="${video.commentsEnabled ? `openCommentsModal('${video.id}', '${video.uploaderUid}')` : ''}"><i class="fas fa-comment-dots icon"></i><span class="count">${video.commentCount || 0}</span></div>
                 </div>`;
             videoSwiper.appendChild(slide);
         });
 
-        // Initialize players and setup observer *after* slides are added to DOM
         if (isYouTubeApiReady) {
-            // console.log("YouTube API Ready. Initializing players.");
             initializePlayers();
-        } else {
-             // console.log("YouTube API not yet ready. Players will be initialized later.");
         }
-         // Always setup observer after rendering, regardless of API readiness
-         // setupVideoObserver(); // Called at the end of initializePlayers or after loadAllVideosFromFirebase if no videos
     }
-     // Always setup observer *after* rendering the slides
-    setupVideoObserver();
-
 }
-
 
 function onYouTubeIframeAPIReady() {
     isYouTubeApiReady = true;
-    console.log("Global onYouTubeIframeAPIReady called by YouTube API script.");
-    // The first onReady call from any player created *after* this point will resolve window.resolveFirstPlayerReady
-    // No need to directly resolve a pendingAppStart promise here anymore.
+    if (window.pendingAppStart) {
+        window.pendingAppStart();
+    }
 }
 
+// --- MODIFIED ---: This function now initializes both YT and HTML5 players
 function initializePlayers() {
-    if (!isYouTubeApiReady) {
-        // console.log("Attempted to initialize players, but API not ready.");
-        return;
-    }
-    // console.log("Initializing players for", appState.allVideos.length, "videos.");
+    if (!isYouTubeApiReady) return; // Still need this for YouTube part
 
     appState.allVideos.forEach((video) => {
-        // Use the correct video ID for player initialization
-        const videoIdentifier = video.videoType === 'youtube' ? video.videoUrl : video.id;
-        const playerId = `player-${videoIdentifier}`;
+        const playerId = `player-${video.id}`;
         const playerElement = document.getElementById(playerId);
 
-        if (playerElement && !players[video.id]) { // Check if player for THIS video ID already exists
+        if (playerElement && !players[video.id]) {
             if (video.videoType === 'premium') {
-                players[video.id] = playerElement; // Store the HTMLVideoElement
+                // For premium videos, the element is the <video> tag itself.
+                // We just store a reference to it.
+                players[video.id] = playerElement;
                 playerElement.addEventListener('canplay', () => {
-                    // console.log("Premium video canplay:", video.id);
                     const preloader = playerElement.closest('.video-slide').querySelector('.video-preloader');
                     if(preloader) preloader.style.display = 'none';
-                    // Resolve the firstPlayerReadyPromise here if this is the first premium video ready
-                    if (!window._firstPlayerReadyResolved) { // Use a flag to ensure it only resolves once
-                         if (window.resolveFirstPlayerReady) {
-                              window.resolveFirstPlayerReady();
-                              window._firstPlayerReadyResolved = true;
-                         }
-                    }
                 });
-                 playerElement.addEventListener('error', (e) => {
-                     console.error("Premium video error:", video.id, e);
-                     const preloader = playerElement.closest('.video-slide').querySelector('.video-preloader');
-                     if(preloader) {
-                          preloader.style.display = 'flex';
-                          preloader.innerHTML = '<p style="color: red; text-align: center;">Video failed to load.</p>';
-                     }
-                     // If premium video fails, the firstPlayerReadyPromise might not resolve.
-                     // The overall timeout in startAppLogic will handle this.
-                 });
             } else {
-                // YouTube Player
+                // For YouTube, we create a new YT.Player instance.
                 players[video.id] = new YT.Player(playerId, {
                     height: '100%',
                     width: '100%',
-                    videoId: videoIdentifier, // Use YouTube video ID here
-                    playerVars: { 'autoplay': 0, 'controls': 0, 'mute': 1, 'rel': 0, 'showinfo': 0, 'modestbranding': 1, 'loop': 1, 'playlist': videoIdentifier, 'fs': 0, 'iv_load_policy': 3, 'origin': window.location.origin },
-                    events: {
-                        'onReady': (event) => {
-                            onPlayerReady(event);
-                            // Resolve the firstPlayerReadyPromise here if this is the first YT video ready
-                            if (!window._firstPlayerReadyResolved) { // Use a flag to ensure it only resolves once
-                                 if (window.resolveFirstPlayerReady) {
-                                      window.resolveFirstPlayerReady();
-                                      window._firstPlayerReadyResolved = true;
-                                 }
-                            }
-                        },
-                        'onStateChange': onPlayerStateChange
-                    }
+                    videoId: video.videoUrl,
+                    playerVars: { 'autoplay': 0, 'controls': 0, 'mute': 1, 'rel': 0, 'showinfo': 0, 'modestbranding': 1, 'loop': 1, 'playlist': video.videoUrl, 'fs': 0, 'iv_load_policy': 3, 'origin': window.location.origin },
+                    events: { 'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange }
                 });
             }
         }
     });
-
-    // setupVideoObserver(); // Now called at the end of renderVideoSwiper
+    setupVideoObserver();
 }
 
 function onPlayerReady(event) {
-    // console.log("YouTube Player ready:", event.target.getVideoData().video_id);
-    const preloader = event.target.getIframe().closest('.video-slide').querySelector('.video-preloader');
-     if(preloader) preloader.style.display = 'none';
-
-    // window.resolveFirstPlayerReady is resolved in initializePlayers now for the first ready player (YT or HTML5)
+    if (window.resolveFirstPlayerReady) {
+        window.resolveFirstPlayerReady();
+        delete window.resolveFirstPlayerReady;
+    }
 }
-
 
 function onPlayerStateChange(event) {
-    // console.log(`Player state changed for ${event.target.getVideoData ? event.target.getVideoData().video_id : 'HTML5 Video'}: ${event.data}`);
-    const preloader = event.target.getIframe ? event.target.getIframe().closest('.video-slide').querySelector('.video-preloader') : event.target.closest('.video-slide').querySelector('.video-preloader');
-
-    // If state is not UNSTARTED, the video has at least started buffering/loading
-    // For YouTube, 1 (PLAYING), 2 (PAUSED), 3 (BUFFERING), 5 (CUED) mean preloader can hide.
-    // For HTML5, 'playing', 'paused', 'stalled', 'waiting' might happen after canplay. Preloader hid on canplay.
-    if (event.data !== YT.PlayerState.UNSTARTED) { // Also check for HTML5 video event types if necessary
+    const preloader = event.target.getIframe().closest('.video-slide').querySelector('.video-preloader');
+    if (event.data !== YT.PlayerState.UNSTARTED) {
         if(preloader) preloader.style.display = 'none';
-    }
-     // For HTML5 video: check event.type === 'playing', etc. For simplicity, canplay is used in initializePlayers.
-
-    // Handle potential audio issue popup on first play attempt
-    // This logic is slightly complex with different player types and timing.
-    // Simplified check: if any player starts playing AND user hasn't interacted and popup not shown
-    const isPlaying = (event instanceof YT.Player && event.data === YT.PlayerState.PLAYING) ||
-                      (event instanceof HTMLVideoElement && event.type === 'play'); // Added HTML5 check
-
-    if (isPlaying && !userHasInteracted && !hasShownAudioPopup) {
-        console.log("Video started playing before user interaction. Showing audio popup.");
-        showAudioIssuePopup();
-        hasShownAudioPopup = true;
     }
 }
 
-
+// --- MODIFIED ---: Unified play/pause toggle function
 function togglePlayPause(videoId) {
     const player = players[videoId];
     if (!player) return;
 
-    // Ensure user interaction is marked if they click to play/pause
-    if (!userHasInteracted) {
-             console.log("First user interaction detected via togglePlayPause.");
-             userHasInteracted = true;
-             // Attempt to unmute all players (though only the currently active one matters)
-             // Loop through players to unmute is better here after user interaction
-             for (const id in players) {
-                  const p = players[id];
-                  if (p instanceof YT.Player && typeof p.unMute === 'function') p.unMute();
-                  else if (p instanceof HTMLVideoElement) p.muted = false;
-             }
-         // Hide audio issue popup if visible
-         hideAudioIssuePopup();
-    }
-
-
-    if (player instanceof YT.Player) {
+    if (player instanceof YT.Player) { // It's a YouTube player
         const state = player.getPlayerState();
         if (state === YT.PlayerState.PLAYING) {
             player.pauseVideo();
-            // console.log("Paused YouTube video:", videoId);
         } else {
             player.playVideo();
-             // console.log("Played YouTube video:", videoId);
         }
-    } else { // HTML5 VideoElement
+    } else { // It's an HTML5 video element
         if (player.paused) {
-            player.play().catch(e => console.error("HTML5 Play failed:", e));
-            // console.log("Played HTML5 video:", videoId);
+            player.play();
         } else {
             player.pause();
-            // console.log("Paused HTML5 video:", videoId);
         }
     }
 }
 
+// --- NEW --- Helper functions for unified player control
 function playActivePlayer(videoId) {
     const player = players[videoId];
     if (!player) return;
 
-    // console.log("Attempting to play video:", videoId);
-
     if (player instanceof YT.Player) {
-        if (typeof player.playVideo === 'function') {
-             player.playVideo();
-              // Only unmute if user has interacted
-             if (userHasInteracted && typeof player.unMute === 'function') {
-                 // console.log("Unmuting YouTube video:", videoId);
-                  player.unMute();
-             } else if (!userHasInteracted && typeof player.mute === 'function') {
-                  // Ensure it's muted if no interaction yet
-                  player.mute();
-             }
-        }
-    } else { // HTML5 VideoElement
-        player.play().catch(e => {
-             console.error("HTML5 Play interrupted:", videoId, e);
-             // Handle potential autoplay restrictions by showing popup if it hasn't been shown
-             // Autoplay can fail even *with* mute, but often fails *without* user interaction.
-             // The `userHasInteracted` check in the stateChange/play event handler is better for showing the popup.
-        });
-        // Mute/unmute based on user interaction
+        if (typeof player.playVideo === 'function') player.playVideo();
+        if (userHasInteracted && typeof player.unMute === 'function') player.unMute();
+    } else {
+        player.play().catch(e => console.log("Play interrupted"));
         player.muted = !userHasInteracted;
-         // console.log(`Played HTML5 video: ${videoId}, Muted: ${player.muted}`);
     }
 }
-
 
 function pauseActivePlayer(videoId) {
     const videoIdToPause = videoId || activePlayerId;
@@ -890,793 +477,240 @@ function pauseActivePlayer(videoId) {
     const player = players[videoIdToPause];
     if (!player) return;
 
-    // console.log("Attempting to pause video:", videoIdToPause);
-
     if (player instanceof YT.Player) {
-        if (typeof player.pauseVideo === 'function') {
-            player.pauseVideo();
-            // console.log("Paused YouTube video:", videoIdToPause);
-        }
-    } else { // HTML5 VideoElement
+        if (typeof player.pauseVideo === 'function') player.pauseVideo();
+    } else {
         player.pause();
-         // console.log("Paused HTML5 video:", videoIdToPause);
     }
 }
 
+
 function setupVideoObserver() {
-    // console.log("Setting up IntersectionObserver...");
-    if (videoObserver) videoObserver.disconnect(); // Disconnect previous observer
-    const options = { root: videoSwiper, threshold: 0.75 }; // 75% visibility threshold
+    if (videoObserver) videoObserver.disconnect();
+    const options = { root: videoSwiper, threshold: 0.75 };
     const handleIntersection = (entries) => {
         entries.forEach(entry => {
             const videoId = entry.target.dataset.videoId;
-            if (!videoId || !players[videoId]) return; // Ensure we have a videoId and a corresponding player
+            if (!videoId || !players[videoId]) return;
 
             if (entry.isIntersecting) {
-                // console.log(`Slide ${videoId} is intersecting. Active: ${activePlayerId}`);
-                // Pause the currently active player if it's different
+                // Pause the previously active player
                 if (activePlayerId && activePlayerId !== videoId) {
-                    // console.log(`Pausing previous active player: ${activePlayerId}`);
                     pauseActivePlayer(activePlayerId);
                 }
-                // Set the new active player and attempt to play
                 activePlayerId = videoId;
-                // console.log(`Setting active player to: ${activePlayerId}`);
                 playActivePlayer(videoId);
 
             } else {
-                // If a slide is no longer intersecting AND it was the active one, pause it
+                // This video is scrolling out of view, pause it
                 if(videoId === activePlayerId) {
-                    // console.log(`Slide ${videoId} is NOT intersecting and was active. Pausing.`);
                      pauseActivePlayer(videoId);
-                    // Do NOT set activePlayerId to null here. Another slide might become active immediately.
-                    // The next intersection event will set the new activePlayerId.
+                     activePlayerId = null;
                 }
             }
         });
     };
     videoObserver = new IntersectionObserver(handleIntersection, options);
-
-    // Observe each video slide that has a player associated with it
     document.querySelectorAll('.video-slide').forEach(slide => {
-        // Use the correct player ID logic to check if a player exists
-        const videoId = slide.dataset.videoId;
-        if (players[videoId]) { // Check if a player *object* exists for this video ID
-             // console.log("Observing slide for video:", videoId);
-             videoObserver.observe(slide);
-        } else {
-            // console.log("No player object found for video ID:", videoId, "Skipping observation.");
-            // This might happen if YT API failed to load, or if a premium video failed to load.
-            // The overall init timeout should handle cases where NO players can be created.
-        }
+        if (players[slide.dataset.videoId]) videoObserver.observe(slide);
     });
-
-     // Manually trigger check for the first video on load if needed
-     // This helps ensure the first video plays without requiring user scroll
-     if (appState.allVideos.length > 0) {
-         const firstSlide = document.querySelector('.video-slide');
-         if (firstSlide) {
-              // console.log("Manually checking intersection for first slide.");
-              // Create a synthetic entry to trigger the handler for the first slide
-              const firstEntry = [{
-                  target: firstSlide,
-                  isIntersecting: true, // Assume the first slide is initially visible
-                  intersectionRatio: 1 // Assume it's fully visible
-              }];
-              handleIntersection(firstEntry);
-         }
-     }
 }
-
-
-// Liking logic
-async function handleLikeAction(videoId) {
-    if (!auth.currentUser || !auth.currentUser.uid) {
-        alert("Please log in to like videos."); // Or redirect to login/signup
-        return;
-    }
-    // console.log(`User ${auth.currentUser.uid} attempting to like video ${videoId}`);
-
-    const videoRef = db.collection('videos').doc(videoId);
-    const likeRef = videoRef.collection('likes').doc(auth.currentUser.uid); // Use user ID as like document ID
-
-    try {
-        const likeDoc = await likeRef.get();
-
-        await db.runTransaction(async (transaction) => {
-            const videoDoc = await transaction.get(videoRef);
-            if (!videoDoc.exists) {
-                throw "Video does not exist!";
-            }
-
-            const currentLikes = videoDoc.data().likes || 0;
-            const likeIcon = document.querySelector(`.video-slide[data-video-id="${videoId}"] .action-icon-container[data-action="like"] .icon`);
-             const likeCountSpan = document.querySelector(`.video-slide[data-video-id="${videoId}"] .action-icon-container[data-action="like"] .count`);
-             const likeHeartPopup = document.querySelector(`.video-slide[data-video-id="${videoId}"] .like-heart-popup`);
-
-
-            if (likeDoc.exists) {
-                // User has already liked, unlike it
-                transaction.delete(likeRef);
-                transaction.update(videoRef, { likes: Math.max(0, currentLikes - 1) }); // Ensure likes don't go below 0
-                // Update UI immediately
-                 if(likeIcon) likeIcon.classList.remove('liked', 'fas');
-                 if(likeIcon) likeIcon.classList.add('far'); // Use empty heart icon
-                 if(likeCountSpan) likeCountSpan.textContent = Math.max(0, currentLikes - 1);
-                 if(likeCountSpan) likeCountSpan.dataset.likes = Math.max(0, currentLikes - 1); // Update data attribute
-                // console.log(`User unliked video ${videoId}`);
-            } else {
-                // User has not liked, like it
-                transaction.set(likeRef, { userId: auth.currentUser.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-                transaction.update(videoRef, { likes: currentLikes + 1 });
-                // Update UI immediately
-                 if(likeIcon) likeIcon.classList.add('liked', 'fas');
-                 if(likeIcon) likeIcon.classList.remove('far'); // Use filled heart icon
-                 if(likeCountSpan) likeCountSpan.textContent = currentLikes + 1;
-                 if(likeCountSpan) likeCountSpan.dataset.likes = currentLikes + 1; // Update data attribute
-
-                 // Show like heart popup on double-click or icon click
-                 if(likeHeartPopup) {
-                     likeHeartPopup.classList.remove('show'); // Reset animation
-                     void likeHeartPopup.offsetWidth; // Trigger reflow
-                     likeHeartPopup.classList.add('show');
-                      // Remove the 'show' class after animation
-                     likeHeartPopup.addEventListener('animationend', () => {
-                          likeHeartPopup.classList.remove('show');
-                     }, { once: true });
-                 }
-                // console.log(`User liked video ${videoId}`);
-            }
-        });
-
-        // Optional: Listen to real-time updates on the video document's like count
-        // to ensure the UI count is always accurate, especially if multiple users are liking.
-        // This would require setting up a listener when the video slide is in view.
-
-    } catch (error) {
-        console.error("Error handling like action:", error);
-        // alert("Could not process like action.");
-    }
-}
-
 
 async function openCommentsModal(videoId, videoOwnerUid) {
-    // console.log(`Opening comments for video ${videoId} by ${videoOwnerUid}`);
-    if (!auth.currentUser || !auth.currentUser.uid) {
-        alert("Please log in to view or post comments.");
-        return;
-    }
-    appState.activeComments = { videoId, videoOwnerUid };
-    commentsModal.classList.add('active');
-    commentsList.innerHTML = '<li>Loading comments...</li>'; // Show loading state
-    commentInput.value = ''; // Clear input
-    sendCommentBtn.disabled = true; // Disable send button while loading/empty
-
+    appState.activeComments = { videoId, videoOwnerUid }; commentsModal.classList.add('active'); commentsList.innerHTML = '<li>Loading comments...</li>';
     try {
-        const commentsRef = db.collection('videos').doc(videoId).collection('comments').orderBy('createdAt', 'asc'); // Order by ascending for chat-like view
+        const commentsRef = db.collection('videos').doc(videoId).collection('comments').orderBy('createdAt', 'desc');
         const snapshot = await commentsRef.get();
-
-        commentsList.innerHTML = ''; // Clear loading state
-        if (snapshot.empty) {
-             commentsList.innerHTML = '<li style="text-align:center; color: #888;">Be the first to comment!</li>';
-        } else {
-            snapshot.docs.forEach(doc => {
+        if (snapshot.empty) { commentsList.innerHTML = '<li style="text-align:center; color: #888;">Be the first to comment!</li>'; }
+        else {
+            commentsList.innerHTML = snapshot.docs.map(doc => {
                 const comment = { id: doc.id, ...doc.data() };
                 const canDelete = appState.currentUser.uid === comment.uploaderUid || appState.currentUser.uid === videoOwnerUid;
-                const timestamp = comment.createdAt ? new Date(comment.createdAt.toDate()).toLocaleString() : 'just now'; // Format timestamp
-
-                const commentItem = document.createElement('li');
-                commentItem.className = 'comment-item';
-                commentItem.innerHTML = `
-                    <img src="${comment.uploaderAvatar || 'https://via.placeholder.com/35/222/FFFFFF?text=+'}" alt="avatar" class="avatar">
-                    <div class="comment-body">
-                        <div class="username">${comment.uploaderUsername || 'User'} <span class="timestamp">${timestamp}</span></div>
-                        <div class="text">${comment.text}</div>
-                    </div>
-                    ${canDelete ? `<i class="fas fa-trash delete-comment-btn" data-comment-id="${comment.id}" onclick="deleteComment('${videoId}', '${comment.id}')"></i>` : ''}
-                `;
-                commentsList.appendChild(commentItem);
-            });
-             // Scroll to bottom of comments list
-            commentsList.scrollTop = commentsList.scrollHeight;
+                return `<li class="comment-item">
+                            <img src="${comment.uploaderAvatar || 'https://via.placeholder.com/120/222/FFFFFF?text=+'}" alt="avatar" class="avatar">
+                            <div class="comment-body"><div class="username">${comment.uploaderUsername}</div><div class="text">${comment.text}</div></div>
+                            ${canDelete ? `<i class="fas fa-trash delete-comment-btn" onclick="deleteComment('${comment.id}')"></i>` : ''}
+                        </li>`;
+            }).join('');
         }
-
-    } catch (error) {
-        console.error("Error loading comments:", error);
-        commentsList.innerHTML = '<li style="text-align:center; color: red;">Could not load comments.</li>';
-    } finally {
-        // Enable send button only if there is text
-         sendCommentBtn.disabled = commentInput.value.trim() === '';
-    }
+    } catch (error) { console.error("Error loading comments:", error); commentsList.innerHTML = '<li>Could not load comments.</li>'; }
 }
 
-// Add input event listener to comment input to enable/disable send button
-if(commentInput) {
-    commentInput.addEventListener('input', () => {
-        if (sendCommentBtn) {
-            sendCommentBtn.disabled = commentInput.value.trim() === '';
-        }
-    });
-}
-
-
-function closeCommentsModal() {
-     // console.log("Closing comments modal.");
-     commentsModal.classList.remove('active');
-     appState.activeComments = { videoId: null, videoOwnerUid: null }; // Reset active comments state
-     commentsList.innerHTML = ''; // Clear list when closing
-     commentInput.value = ''; // Clear input
-     if (sendCommentBtn) sendCommentBtn.disabled = true; // Disable send button
-}
+function closeCommentsModal() { commentsModal.classList.remove('active'); }
 
 async function postComment() {
-    // console.log("Attempting to post comment.");
-    const { videoId, videoOwnerUid } = appState.activeComments;
-    const text = commentInput.value.trim();
-
-    if (!text || !videoId || !auth.currentUser || !auth.currentUser.uid) {
-        // console.log("Comment text or video ID missing, or user not logged in.");
-        return; // Don't post empty comment or if no video/user
-    }
-
-    sendCommentBtn.disabled = true; // Disable button to prevent double posts
-
-    const newComment = {
-        text: text,
-        uploaderUid: appState.currentUser.uid,
-        uploaderUsername: appState.currentUser.name || appState.currentUser.username || 'User',
-        uploaderAvatar: appState.currentUser.avatar || 'https://via.placeholder.com/35/222/FFFFFF?text=+',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    const videoRef = db.collection('videos').doc(videoId);
-    const commentsCollectionRef = videoRef.collection('comments');
-
+    const { videoId } = appState.activeComments; const text = commentInput.value.trim(); if (!text || !videoId) return; sendCommentBtn.disabled = true;
+    const newComment = { text, uploaderUid: appState.currentUser.uid, uploaderUsername: appState.currentUser.name, uploaderAvatar: appState.currentUser.avatar, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+    const videoRef = db.collection('videos').doc(videoId); const commentRef = videoRef.collection('comments').doc();
     try {
-        // Add the comment and update comment count in a transaction
-        await db.runTransaction(async (transaction) => {
-             // Get the current video document to ensure it exists
-             const videoDoc = await transaction.get(videoRef);
-             if (!videoDoc.exists) {
-                 throw new Error("Video document does not exist.");
-             }
-
-             // Add the new comment
-             const newCommentRef = commentsCollectionRef.doc(); // Firestore generates a unique ID
-             transaction.set(newCommentRef, newComment);
-
-             // Increment the comment count on the video document
-             const currentCommentCount = videoDoc.data().commentCount || 0;
-             transaction.update(videoRef, { commentCount: currentCommentCount + 1 });
-        });
-
-        // console.log("Comment posted successfully and count incremented.");
-        commentInput.value = ''; // Clear the input field
-        // Refresh the comments list after posting
-        openCommentsModal(videoId, videoOwnerUid); // Re-open modal to show new comment and updated count
-
-         // Optionally update the comment count display on the video slide directly
-         const commentCountSpan = document.querySelector(`.video-slide[data-video-id="${videoId}"] .action-icon-container[data-action="comment"] .count`);
-         if(commentCountSpan) {
-              const currentCount = parseInt(commentCountSpan.dataset.comments || '0', 10);
-              commentCountSpan.textContent = currentCount + 1;
-              commentCountSpan.dataset.comments = currentCount + 1;
-         }
-
-
-    } catch (error) {
-        console.error("Error posting comment: ", error);
-        alert("Could not post comment. Please check Firestore Security Rules and your connection.");
-    } finally {
-        sendCommentBtn.disabled = commentInput.value.trim() === ''; // Re-enable button based on input value
-    }
+        await db.runTransaction(async (transaction) => { transaction.set(commentRef, newComment); transaction.update(videoRef, { commentCount: firebase.firestore.FieldValue.increment(1) }); });
+        commentInput.value = ''; openCommentsModal(videoId, appState.activeComments.videoOwnerUid);
+    } catch (error) { console.error("Error posting comment: ", error); alert("Could not post comment. Please check Firestore Rules."); }
+    finally { sendCommentBtn.disabled = false; }
 }
 
-
-// Function to delete a comment
-async function deleteComment(videoId, commentId) {
-    // console.log(`Attempting to delete comment ${commentId} from video ${videoId}`);
-    if (!auth.currentUser || !auth.currentUser.uid || !videoId || !commentId || !appState.activeComments.videoOwnerUid) {
-        console.log("Cannot delete: Missing user, videoId, commentId, or videoOwnerUid.");
-        return;
-    }
-
-    const commentRef = db.collection('videos').doc(videoId).collection('comments').doc(commentId);
-    const videoRef = db.collection('videos').doc(videoId);
-
-    try {
-        const commentDoc = await commentRef.get();
-        if (!commentDoc.exists) {
-             console.log("Comment does not exist.");
-             return;
-        }
-
-        const commentData = commentDoc.data();
-        const isOwner = auth.currentUser.uid === commentData.uploaderUid;
-        const isVideoOwner = auth.currentUser.uid === appState.activeComments.videoOwnerUid;
-
-        // Check if the current user is either the comment owner or the video owner
-        if (!isOwner && !isVideoOwner) {
-             console.log("User is not authorized to delete this comment.");
-             alert("You do not have permission to delete this comment.");
-             return;
-        }
-
-        // Proceed with deletion using a transaction to also decrement the count
-        await db.runTransaction(async (transaction) => {
-            const videoDoc = await transaction.get(videoRef);
-            if (!videoDoc.exists) {
-                throw new Error("Video document does not exist during comment deletion.");
-            }
-
-            // Delete the comment document
-            transaction.delete(commentRef);
-
-            // Decrement the comment count on the video document
-            const currentCommentCount = videoDoc.data().commentCount || 0;
-            transaction.update(videoRef, { commentCount: Math.max(0, currentCommentCount - 1) }); // Ensure count doesn't go below 0
-        });
-
-        // console.log("Comment deleted successfully and count decremented.");
-        // Refresh the comments list after deletion
-        openCommentsModal(videoId, appState.activeComments.videoOwnerUid);
-
-         // Optionally update the comment count display on the video slide directly
-         const commentCountSpan = document.querySelector(`.video-slide[data-video-id="${videoId}"] .action-icon-container[data-action="comment"] .count`);
-         if(commentCountSpan) {
-              const currentCount = parseInt(commentCountSpan.dataset.comments || '0', 10);
-              commentCountSpan.textContent = Math.max(0, currentCount - 1);
-              commentCountSpan.dataset.comments = Math.max(0, currentCount - 1);
-         }
-
-    } catch (error) {
-        console.error("Error deleting comment: ", error);
-        alert("Could not delete comment. Please check Firestore Security Rules and your connection.");
-    }
-}
+function handleLikeAction(videoId) { /* Liking logic... */ }
+function logoutUser() { if (confirm("Log out?")) auth.signOut().then(() => window.location.reload()); }
+function initiateWithdrawal() { navigateTo('withdraw-success-screen'); }
+function renderCategoriesInBar() { /* Category rendering logic... */ }
+function filterVideosByCategory(category, element) { /* Filtering logic... */ }
 
 
-function logoutUser() {
-    if (confirm("Are you sure you want to log out?")) {
-        auth.signOut().then(() => {
-            // console.log("User logged out.");
-            // Clear app state or reload the page
-            window.location.reload(); // Reloading is the simplest way to reset state
-        }).catch((error) => {
-            console.error("Logout failed:", error);
-            alert("Logout failed: " + error.message);
-        });
-    }
-}
-
-function initiateWithdrawal() {
-    // console.log("Initiating withdrawal...");
-    // Add actual withdrawal logic here (e.g., sending data to backend)
-    // For now, just simulate success and navigate
-    const upiId = document.getElementById('upi-id').value.trim();
-    if (!upiId) {
-        alert("Please enter your UPI ID.");
-        return;
-    }
-    // Simulated withdrawal success
-    alert(`Withdrawal initiated for UPI ID: ${upiId}. This is a simulation.`);
-    navigateTo('withdraw-success-screen'); // Navigate to success screen
-}
-
-// Audio Issue Popup Logic
-const audioIssuePopup = document.getElementById('audio-issue-popup');
-const audioIssueOkBtn = document.getElementById('audio-issue-ok-btn');
-
-function showAudioIssuePopup() {
-    if (audioIssuePopup) {
-        audioIssuePopup.classList.add('active');
-    }
-}
-
-function hideAudioIssuePopup() {
-    if (audioIssuePopup) {
-        audioIssuePopup.classList.remove('active');
-    }
-}
-
-if (audioIssueOkBtn) {
-    audioIssueOkBtn.addEventListener('click', () => {
-        hideAudioIssuePopup();
-         // Once user clicks OK on the popup, mark interaction as true
-        if (!userHasInteracted) {
-             console.log("First user interaction detected via audio popup OK button.");
-            userHasInteracted = true;
-             // Attempt to unmute the active player if it's still playing
-             if (activePlayerId && players[activePlayerId]) {
-                 const player = players[activePlayerId];
-                 if (player instanceof YT.Player && typeof player.unMute === 'function') {
-                      console.log("Attempting to unmute active YouTube player after popup interaction.");
-                      player.unMute();
-                 } else if (player instanceof HTMLVideoElement) {
-                      console.log("Attempting to unmute active HTML5 player after popup interaction.");
-                      player.muted = false;
-                 }
-             }
-        }
-    });
-}
-
+// =======================================================================
+// === NEW: Friends/Chat Screen Functions (Inspired by your prompt) ===
+// =======================================================================
 
 function openChatWindow(userId, username) {
-    console.log(`Attempting to open chat with ${username} (ID: ${userId}).`);
-    alert(`Opening chat with ${username}.\nThis feature is under development.`);
-    // In a real app, you would navigate to a chat screen, likely passing userId
-    // navigateTo('chat-screen', { userId: userId });
+    alert(`Opening chat with ${username} (ID: ${userId}).\nThis will navigate to a full chat screen in a future update.`);
 }
 
 function showFriendsSubView(viewName) {
-     console.log(`Switching friends sub-view to: ${viewName}`);
-    // Logic to switch between Messages, Status, Story, Content, AI Friend views
-    // This likely involves showing/hiding different sections within the #friends-screen
     alert(`Switching to ${viewName} view.\nThis section is under development.`);
-
-    // Example: Update active class on sub-nav icons (assuming you have elements with these IDs)
-     document.querySelectorAll('.friends-nav-icon').forEach(icon => icon.classList.remove('active'));
-     const targetIcon = document.getElementById(`friends-nav-${viewName.toLowerCase().replace(' ', '')}`);
-     if (targetIcon) targetIcon.classList.add('active');
-
-     // Example: Hide all content sections and show the relevant one
-     // (Requires corresponding HTML structure for sub-views like #messages-view, #status-view etc.)
-     // document.querySelectorAll('.friends-content-view').forEach(view => view.style.display = 'none');
-     // const targetView = document.getElementById(`${viewName.toLowerCase().replace(' ', '')}-view`);
-     // if (targetView) targetView.style.display = 'block';
 }
 
+function openChatMenu() {
+    const options = [
+        "Block User", "Unblock User", "Clear Chat History", "Mute Notifications",
+        "Report User", "Pin Chat", "Archive Chat", "Add to Close Friends",
+        "View Profile", "Translate Messages"
+    ];
+    alert("Chat Menu Options (for future implementation):\n\n" + options.join("\n"));
+}
 
-async function handlePremiumFileUpload() {
+function showDeleteMessageOptions() {
+    const choice = confirm("Long press detected!\n\nChoose an option:\n'OK' for 'Delete for Everyone'\n'Cancel' for 'Delete for Me'");
+    if (choice) {
+        alert("Message will be deleted for everyone.");
+    } else {
+        alert("Message will be deleted for you only.");
+    }
+}
+
+// --- NEW ---: Functions for Premium Video Upload
+function handlePremiumFileUpload() {
     if (!premiumUploadBtn) return;
-
     premiumUploadBtn.disabled = true;
     premiumUploadBtn.textContent = 'Uploading...';
 
     const file = premiumVideoFileInput.files[0];
     const title = premiumVideoTitle.value.trim();
-    const category = appState.uploadDetails.category; // appState से कैटेगरी लें
+    const category = appState.uploadDetails.category; // Make sure category is selected
 
-    // Check if a category was selected (not the default placeholder text)
-    const selectedCategoryTextElement = document.getElementById('selected-category-text-premium');
-    const isCategorySelected = category && selectedCategoryTextElement && selectedCategoryTextElement.textContent !== 'Select Category';
-
-
-    if (!file || !title || !isCategorySelected) {
-        alert("Please select a video file, enter a title, and select a category.");
+    if (!file || !title || !category) {
+        alert("Please select a video file and enter a title and category.");
         premiumUploadBtn.disabled = false;
         premiumUploadBtn.textContent = 'Upload Video';
         return;
     }
 
-    // Optional: File size validation
-    const maxFileSizeMB = 100; // Example limit
-    if (file.size > maxFileSizeMB * 1024 * 1024) {
-        alert(`File size exceeds the limit of ${maxFileSizeMB}MB.`);
-        premiumUploadBtn.disabled = false;
-        premiumUploadBtn.textContent = 'Upload Video';
-        return;
-    }
+    if(premiumUploadProgress) premiumUploadProgress.style.display = 'block';
 
-    if (premiumUploadProgress) premiumUploadProgress.style.display = 'block';
-    if (premiumUploadProgressText) premiumUploadProgressText.textContent = `Uploading... (Please wait)`;
+    const storageRef = storage.ref(`premium_videos/${auth.currentUser.uid}/${Date.now()}-${file.name}`);
+    const uploadTask = storageRef.put(file);
 
-    try {
-        const formData = new FormData();
-        formData.append('media', file);
-        formData.append('title', title);
-        formData.append('description', premiumVideoDescription.value.trim());
-        formData.append('hashtags', premiumVideoHashtags.value.trim());
-        formData.append('category', category); // Use the category from appState
-        formData.append('uploaderUid', auth.currentUser.uid);
-        formData.append('uploaderUsername', appState.currentUser.name || appState.currentUser.username || 'User');
-        formData.append('uploaderAvatar', appState.currentUser.avatar || 'https://via.placeholder.com/40');
-        formData.append('videoType', 'premium'); // Specify video type
+    uploadTask.on('state_changed',
+        (snapshot) => {
+            // Progress function
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            if(premiumUploadProgressText) premiumUploadProgressText.textContent = `Uploading: ${Math.round(progress)}%`;
+        },
+        (error) => {
+            // Error function
+            console.error("Upload failed:", error);
+            alert("Upload failed. Please try again.");
+            if(premiumUploadProgress) premiumUploadProgress.style.display = 'none';
+            premiumUploadBtn.disabled = false;
+            premiumUploadBtn.textContent = 'Upload Video';
+        },
+        async () => {
+            // Complete function
+            if(premiumUploadProgressText) premiumUploadProgressText.textContent = 'Processing...';
+            try {
+                const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                const videoData = {
+                    uploaderUid: auth.currentUser.uid,
+                    uploaderUsername: appState.currentUser.name || appState.currentUser.username,
+                    uploaderAvatar: appState.currentUser.avatar,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    title: title,
+                    description: premiumVideoDescription.value.trim(),
+                    hashtags: premiumVideoHashtags.value.trim(),
+                    videoUrl: downloadURL,
+                    // NOTE: Thumbnail generation from video is complex on the client-side.
+                    // We're using a placeholder. A server-side function would be ideal.
+                    thumbnailUrl: 'https://via.placeholder.com/420x740/111/fff?text=Video',
+                    videoType: 'premium', // Important for the player
+                    category: category,
+                    audience: appState.uploadDetails.audience || 'all',
+                    commentsEnabled: true, // or get from a toggle
+                    likes: 0,
+                    commentCount: 0
+                };
 
-        // You might need to add progress tracking here if your backend supports it
-        // e.g., using XMLHttpRequest or Fetch API with a custom Uploader class
+                await db.collection("videos").add(videoData);
+                alert("Premium video uploaded successfully!");
+                await loadAllVideosFromFirebase();
+                navigateTo('home-screen');
 
-        const response = await fetch(RENDER_BACKEND_URL, { // Use the main upload endpoint
-            method: 'POST',
-            body: formData
-            // headers: { 'Content-Type': '...' } // Do NOT set Content-Type for FormData, browser does it
-        });
-
-        if (!response.ok) {
-             const errorData = await response.json().catch(() => null); // Try to parse error JSON
-             const errorMessage = errorData && errorData.error ? errorData.error : response.statusText;
-            throw new Error(`Upload failed with status: ${response.status} - ${errorMessage}`);
+            } catch (error) {
+                console.error("Error saving video data:", error);
+                alert("Could not save video details. Error: " + error.message);
+            } finally {
+                 if(premiumUploadProgress) premiumUploadProgress.style.display = 'none';
+                 premiumUploadBtn.disabled = false;
+                 premiumUploadBtn.textContent = 'Upload Video';
+            }
         }
-
-        const result = await response.json();
-         if (!result.downloadURL) {
-              throw new Error("Upload succeeded but no downloadURL received from backend.");
-         }
-
-        if (premiumUploadProgressText) premiumUploadProgressText.textContent = 'Processing and Saving...';
-
-        // Save video metadata to Firestore after successful file upload
-        const videoData = {
-            uploaderUid: auth.currentUser.uid,
-            uploaderUsername: appState.currentUser.name || appState.currentUser.username || 'User',
-            uploaderAvatar: appState.currentUser.avatar || 'https://via.placeholder.com/40',
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            title: title,
-            description: premiumVideoDescription.value.trim(),
-            hashtags: premiumVideoHashtags.value.trim(),
-            videoUrl: result.downloadURL, // Use the URL from the backend response
-            thumbnailUrl: result.thumbnailUrl || 'https://via.placeholder.com/420x740/111/fff?text=Video', // Use thumbnail URL from backend if provided
-            videoType: 'premium',
-            category: category, // Use the selected category
-            audience: appState.uploadDetails.audience || 'all', // Use selected audience
-            commentsEnabled: true, // Or get from a toggle if you add one
-            likes: 0,
-            commentCount: 0
-        };
-
-        await db.collection("videos").add(videoData);
-
-        alert("Premium video uploaded successfully!");
-
-        // Reset form fields
-        if (premiumVideoFileInput) premiumVideoFileInput.value = '';
-        if (premiumVideoPreview) {
-            premiumVideoPreview.removeAttribute('src');
-            premiumVideoPreview.style.display = 'none';
-        }
-        if (premiumVideoTitle) premiumVideoTitle.value = '';
-        if (premiumVideoDescription) premiumVideoDescription.value = '';
-        if (premiumVideoHashtags) premiumVideoHashtags.value = '';
-        if (selectedCategoryTextPremium) selectedCategoryTextPremium.textContent = 'Select Category'; // Reset category text
-        appState.uploadDetails.category = null; // Clear selected category in state
-
-        await loadAllVideosFromFirebase(); // सभी वीडियो फिर से लोड करें जिसमें नया भी शामिल है
-        // navigateTo('home-screen'); // Home Screen पर नेविगेट करें
-        filterVideosByCategory('all'); // 'All' कैटेगरी फिल्टर के साथ Home दिखाएं
-
-
-    } catch (error) {
-        console.error("Error during premium upload:", error);
-        alert("Upload failed. Please try again. Error: " + error.message);
-        if (premiumUploadProgressText) premiumUploadProgressText.textContent = 'Upload Failed';
-    } finally {
-        if (premiumUploadProgress) premiumUploadProgress.style.display = 'none';
-        premiumUploadBtn.disabled = false;
-        premiumUploadBtn.textContent = 'Upload Video';
-    }
+    );
 }
 
-
 const startAppLogic = async () => {
-    console.log("Starting app logic...");
-
-    // Define the promise that resolves when the first YouTube or HTML5 player is ready.
-    // This promise's resolve function (window.resolveFirstPlayerReady) is called
-    // inside the onReady event handler for YT players or the canplay event for HTML5 players.
-    const firstPlayerReadyPromise = new Promise(resolve => {
-        window.resolveFirstPlayerReady = resolve; // Store resolve globally
-        window._firstPlayerReadyResolved = false; // Flag to ensure it only resolves once
-    });
-
-    // Set up a timeout for the player readiness waiting part
-    const playerReadyTimeout = new Promise((resolve, reject) => // <-- FIX: Changed from (_, reject) to (resolve, reject) to make `resolve` available
-        setTimeout(() => {
-            console.warn("Player readiness timed out after 15 seconds.");
-             // We don't necessarily need to reject the whole app init here.
-             // Just letting this promise "lose" the race means the app will proceed
-             // without waiting for players if they are taking too long.
-             // If no players are created successfully, the "No videos" message will show, or HTML5 might try to play.
-             // Resolving it gracefully allows the app to proceed.
-             resolve(); // This will now call the `resolve` defined in the promise's executor function.
-        }, 15000) // 15 seconds timeout for player readiness
-    );
-
-    try {
-        // Load videos from Firebase first (this is independent of the player API)
-        console.log("Loading all videos...");
-        await loadAllVideosFromFirebase(); // Populates fullVideoList and appState.allVideos
-
-        // Now, if there are videos, wait for the first player to be ready OR the player readiness timeout
-        // We only await the player readiness if there are videos to play.
-        if (appState.allVideos.length > 0) {
-             console.log(`Loaded ${appState.allVideos.length} videos. Waiting for first player ready or player readiness timeout.`);
-             // Use Promise.race to wait for the first player ready OR the specific player readiness timeout
-             await Promise.race([firstPlayerReadyPromise, playerReadyTimeout]);
-             console.log("First player ready or player readiness timeout reached. Proceeding.");
-        } else {
-             console.log("No videos loaded. Skipping player readiness wait.");
-             // No videos, no players to wait for. The app can proceed directly.
-             // Ensure any pending playerReadyPromise is potentially resolved if it exists,
-             // though in this branch, it won't be awaited anyway.
-             if (window.resolveFirstPlayerReady && !window._firstPlayerReadyResolved) {
-                 window.resolveFirstPlayerReady();
-                 window._firstPlayerReadyResolved = true;
-             }
-        }
-
-
-        // Initialize players (will only create YT players if isYouTubeApiReady is true)
-        // and setup observer. This happens implicitly when filterVideosByCategory calls renderVideoSwiper.
-        console.log("Filtering videos and rendering swiper...");
-        filterVideosByCategory('all'); // This calls renderVideoSwiper and setupVideoObserver
-
-
-        // Navigate to the home screen only after initial data load and rendering setup attempt
-        console.log("App logic finished loading. Navigating to home screen.");
-        navigateTo('home-screen');
-
-    } catch (error) {
-        // This catch block will only run for critical errors *before* the timeout,
-        // or if the timeout itself was set up to reject (which we changed to resolve).
-        // So, critical errors in loadAllVideosFromFirebase would land here.
-        console.error("App initialization critical error:", error);
-        alert("Failed to load the application: " + error.message + ". Please check your internet connection and try again.");
-        // Ensure loading indicator is hidden on critical error
-        document.getElementById('loading-container').style.display = 'none';
-        document.getElementById('get-started-btn').style.display = 'block'; // Show button again
-    }
+    const firstPlayerReadyPromise = new Promise(resolve => { window.resolveFirstPlayerReady = resolve; });
+    await loadAllVideosFromFirebase();
+    if (appState.allVideos.length > 0 && isYouTubeApiReady) { await firstPlayerReadyPromise; }
+    else { delete window.resolveFirstPlayerReady; }
+    navigateTo('home-screen');
 };
-
-// Keep the global function for the YouTube API script to call
-window.onYouTubeIframeAPIReady = () => {
-    isYouTubeApiReady = true;
-    console.log("Global onYouTubeIframeAPIReady called by YouTube API script.");
-    // initializePlayers will be called by filterVideosByCategory (which is called by startAppLogic)
-    // initializePlayers will then create YT players if isYouTubeApiReady is true,
-    // and the onReady of the *first* player will resolve window.resolveFirstPlayerReady.
-};
-
 
 document.addEventListener('DOMContentLoaded', () => {
-    // console.log("DOM Content Loaded. Initializing App...");
-
-    initializeApp(); // यह ऑथेंटिकेशन चेक शुरू करता है
-
-    // Category options for modals/upload screens
+    initializeApp();
     renderCategories();
-
-    // Category chips for the home screen bar
     renderCategoriesInBar();
-
 
     document.getElementById('get-started-btn').addEventListener('click', async () => {
         document.getElementById('get-started-btn').style.display = 'none';
         document.getElementById('loading-container').style.display = 'flex';
-        // InitialApp() में onAuthStateChanged() इसे संभालेगा।
-        // checkUserProfileAndProceed() को यहां सीधे कॉल करने की आवश्यकता नहीं है
+        await checkUserProfileAndProceed(auth.currentUser);
     });
 
-    // This listener ensures userHasInteracted is true after the very first click on the app container
-    appContainer.addEventListener('click', () => {
-        if (!userHasInteracted) {
-             console.log("First user interaction detected via app container click.");
-             userHasInteracted = true;
-             // Hide audio issue popup immediately on first interaction
-             hideAudioIssuePopup();
-             // Attempt to unmute the currently active player
-             if (activePlayerId && players[activePlayerId]) {
-                  const player = players[activePlayerId];
-                   if (player instanceof YT.Player && typeof player.unMute === 'function') {
-                        console.log("Attempting to unmute active YouTube player after first interaction.");
-                       player.unMute();
-                   } else if (player instanceof HTMLVideoElement) {
-                        console.log("Attempting to unmute active HTML5 player after first interaction.");
-                       player.muted = false;
-                   }
-             }
-        }
-    }, { once: true }); // This listener will only run once
-
+    appContainer.addEventListener('click', () => { if (!userHasInteracted) userHasInteracted = true; }, { once: true });
 
     document.getElementById('home-menu-icon').addEventListener('click', () => { document.getElementById('main-sidebar').classList.add('open'); document.getElementById('sidebar-overlay').classList.add('open'); });
     document.getElementById('close-sidebar-btn').addEventListener('click', () => { document.getElementById('main-sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('open'); });
     document.getElementById('sidebar-overlay').addEventListener('click', () => { document.getElementById('main-sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('open'); });
+    sendCommentBtn.addEventListener('click', postComment);
+    commentInput.addEventListener('keypress', (e) => e.key === 'Enter' && postComment());
+    document.getElementById('navigate-to-theme-btn').addEventListener('click', () => { document.getElementById('main-sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('open'); navigateTo('theme-settings-screen'); });
+    document.getElementById('back-from-theme-btn').addEventListener('click', () => navigateTo('home-screen'));
+    document.querySelectorAll('#theme-settings-screen .theme-btn').forEach(button => { button.addEventListener('click', () => { document.documentElement.classList.toggle('light-theme', button.dataset.theme !== 'dark'); }); });
+    document.querySelectorAll('#theme-settings-screen .color-swatch').forEach(swatch => { swatch.addEventListener('click', () => { document.documentElement.style.setProperty('--primary-neon', swatch.dataset.color); }); });
 
-    // Comment functionality event listeners
-    if(sendCommentBtn) sendCommentBtn.addEventListener('click', postComment);
-    if(commentInput) commentInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !sendCommentBtn.disabled) postComment(); }); // Check if button is not disabled
-
-
-    document.getElementById('navigate-to-theme-btn').addEventListener('click', () => {
-        document.getElementById('main-sidebar').classList.remove('open');
-        document.getElementById('sidebar-overlay').classList.remove('open');
-        navigateTo('theme-settings-screen');
-    });
-    document.getElementById('back-from-theme-btn').addEventListener('click', () => navigateTo('home-screen')); // Theme screen back button
-
-    document.querySelectorAll('#theme-settings-screen .theme-btn').forEach(button => {
-        button.addEventListener('click', () => {
-            // Update active class visually
-            document.querySelectorAll('#theme-settings-screen .theme-btn').forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            // Apply theme class to html element
-            document.documentElement.classList.toggle('light-theme', button.dataset.theme === 'default');
-            // Save theme preference (optional, requires more code)
-            // localStorage.setItem('shubhzoneTheme', button.dataset.theme);
-        });
-    });
-
-    document.querySelectorAll('#theme-settings-screen .color-swatch').forEach(swatch => {
-        swatch.addEventListener('click', () => {
-            // Update active class visually
-             document.querySelectorAll('#theme-settings-screen .color-swatch').forEach(sw => sw.classList.remove('active'));
-             swatch.classList.add('active');
-            // Apply primary color variable
-            document.documentElement.style.setProperty('--primary-neon', swatch.dataset.color);
-            // Save color preference (optional, requires more code)
-            // localStorage.setItem('shubhzonePrimaryColor', swatch.dataset.color);
-        });
-    });
-
-    // Set initial theme and color on load (optional, requires localStorage)
-    // const savedTheme = localStorage.getItem('shubhzoneTheme') || 'dark';
-    // const initialThemeBtn = document.querySelector(`#theme-settings-screen .theme-btn[data-theme="${savedTheme}"]`);
-    // if (initialThemeBtn) initialThemeBtn.click(); // Simulate click to apply theme/active class
-
-    // const savedColor = localStorage.getItem('shubhzonePrimaryColor');
-    // const initialColorSwatch = document.querySelector(`#theme-settings-screen .color-swatch[data-color="${savedColor}"]`);
-    // if (savedColor && initialColorSwatch) {
-    //      initialColorSwatch.click(); // Simulate click to apply color/active class
-    // } else {
-        // Ensure a default color swatch is active on load if no preference is saved
-        const defaultColorSwatch = document.querySelector('#theme-settings-screen .color-swatch.active');
-         if (!defaultColorSwatch) {
-             const firstSwatch = document.querySelector('#theme-settings-screen .color-swatch');
-             if (firstSwatch) firstSwatch.classList.add('active');
-         }
-    // }
-
-
+    // --- MODIFIED ---: The `upload-action-button` now has specific IDs you will add to your HTML
+    // This button will now open the YouTube modal
     const openYouTubeBtn = document.getElementById('open-youtube-modal-btn');
     if (openYouTubeBtn) {
         openYouTubeBtn.addEventListener('click', openUploadDetailsModal);
     }
+    // This button will navigate to the new premium upload screen
     const openPremiumBtn = document.getElementById('open-premium-upload-btn');
     if (openPremiumBtn) {
-        openPremiumBtn.addEventListener('click', () => {
-            // Reset premium upload form state before navigating
-            if (premiumVideoFileInput) premiumVideoFileInput.value = '';
-            if (premiumVideoPreview) { premiumVideoPreview.removeAttribute('src'); premiumVideoPreview.style.display = 'none'; }
-            if (premiumVideoTitle) premiumVideoTitle.value = '';
-            if (premiumVideoDescription) premiumVideoDescription.value = '';
-            if (premiumVideoHashtags) premiumVideoHashtags.value = '';
-            // Reset category selection UI and state for premium upload
-            if (selectedCategoryTextPremium) selectedCategoryTextPremium.textContent = 'Select Category';
-            appState.uploadDetails.category = null; // Clear selected category in state
-            if(premiumUploadProgress) premiumUploadProgress.style.display = 'none';
-             if(premiumUploadProgressText) premiumUploadProgressText.textContent = '';
-
-
-            navigateTo('premium-upload-screen');
-        });
+        openPremiumBtn.addEventListener('click', () => navigateTo('premium-upload-screen'));
     }
+    
+    document.getElementById('navigate-to-editor-btn').addEventListener('click', () => navigateTo('image-editor-screen'));
+    document.getElementById('back-from-editor-btn').addEventListener('click', () => document.querySelector('.nav-item[data-nav="upload"]').click());
 
-    // Image Editor Navigation
-    const navigateToEditorBtn = document.getElementById('navigate-to-editor-btn');
-    if(navigateToEditorBtn) {
-        navigateToEditorBtn.addEventListener('click', () => {
-            navigateTo('image-editor-screen');
-             // Call photo editor start logic here if it depends on screen navigation
-             if (typeof photoEditor !== 'undefined' && typeof photoEditor.start === 'function') {
-                  photoEditor.start();
-             } else {
-                  console.warn("Photo Editor start function not found.");
-             }
-        });
-    }
-     const backFromEditorBtn = document.getElementById('back-from-editor-btn');
-     if(backFromEditorBtn) {
-         backFromEditorBtn.addEventListener('click', () => {
-              navigateTo('upload-screen');
-              // Call photo editor stop/cleanup logic here if needed
-              if (typeof photoEditor !== 'undefined' && typeof photoEditor.stop === 'function') {
-                   photoEditor.stop();
-              }
-         });
-     }
-
-
+    // --- NEW ---: Event listeners for the new premium upload screen
     if (premiumUploadBtn) {
         premiumUploadBtn.addEventListener('click', handlePremiumFileUpload);
     }
@@ -1690,78 +724,120 @@ document.addEventListener('DOMContentLoaded', () => {
                 const fileURL = URL.createObjectURL(file);
                 premiumVideoPreview.src = fileURL;
                 premiumVideoPreview.style.display = 'block';
-                // Optional: Revoke old URL object to free memory
-                 if(premiumVideoPreview.dataset.oldUrl) {
-                     URL.revokeObjectURL(premiumVideoPreview.dataset.oldUrl);
-                 }
-                 premiumVideoPreview.dataset.oldUrl = fileURL;
             }
         });
     }
 
-    // Friends Sub-navigation listeners
+    // === NEW EVENT LISTENERS FOR FRIENDS SCREEN (Placeholder) ===
     const friendsNavMessages = document.getElementById('friends-nav-messages');
     const friendsNavStatus = document.getElementById('friends-nav-status');
     const friendsNavStory = document.getElementById('friends-nav-story');
     const friendsNavContent = document.getElementById('friends-nav-content');
-    const friendsNavAI = document.getElementById('friends-nav-ai');
+    const friendsNavAi = document.getElementById('friends-nav-ai');
 
     if (friendsNavMessages) friendsNavMessages.addEventListener('click', () => showFriendsSubView('Messages'));
     if (friendsNavStatus) friendsNavStatus.addEventListener('click', () => showFriendsSubView('Status'));
     if (friendsNavStory) friendsNavStory.addEventListener('click', () => showFriendsSubView('Story'));
     if (friendsNavContent) friendsNavContent.addEventListener('click', () => showFriendsSubView('Content'));
-    if (friendsNavAI) friendsNavAI.addEventListener('click', () => showFriendsSubView('AI Friend'));
-
-    // Withdrawal button listener
-    const withdrawButton = document.querySelector('#wallet-screen .button-withdraw');
-    if(withdrawButton) {
-        withdrawButton.addEventListener('click', initiateWithdrawal);
-    }
-
-    // Back button from withdraw success screen
-    const backToWalletButton = document.querySelector('#withdraw-success-screen .back-to-wallet-button');
-    if(backToWalletButton) {
-        backToWalletButton.addEventListener('click', () => navigateTo('wallet-screen'));
-    }
-
-    // Initialize custom input visibility on info screen load
-    // This is handled within updateProfileUI if coming from auth check
-    // but might be needed if navigating directly or on page load
-    // Add event listeners for select changes if needed
-    const infoStateSelect = document.getElementById('info-state');
-    const infoCountrySelect = document.getElementById('info-country');
-    if(infoStateSelect) infoStateSelect.addEventListener('change', () => checkCustom(infoStateSelect, 'custom-state-input'));
-    if(infoCountrySelect) infoCountrySelect.addEventListener('change', () => checkCustom(infoCountrySelect, 'custom-country-input'));
-
-
+    if (friendsNavAi) friendsNavAi.addEventListener('click', () => showFriendsSubView('AI Friend'));
 });
-
 
 /* ======================================================= */
 /* === AI Photo Editor Script (Code 1) - START === */
 /* ======================================================= */
-// NOTE: The photoEditor variable should be defined globally or accessible here.
-// Assuming photoEditor is defined elsewhere (e.g., in the original file or a separate file)
-// and its public methods like .start(), .stop(), .downloadImage() are accessible.
-// If the photo editor code is IN THIS SAME FILE, ensure it's wrapped correctly,
-// like in the commented-out IIFE below.
-//
-// const photoEditor = (() => {
-//     // ... all of your AI Photo Editor code here ...
-//     // Make sure public methods like start, stop, downloadImage are returned
-//     return {
-//         start: () => { console.log("Photo Editor Started"); /*...*/ },
-//         stop: () => { console.log("Photo Editor Stopped"); /*...*/ },
-//         downloadImage: () => { console.log("Photo Editor Download"); /*...*/ }
-//         // ... other public methods ...
-//     };
-// })();
+// ... (Photo editor code remains unchanged) ...
+const photoEditor = (() => {
+    let isInitialized = false;
 
-// If photoEditor is defined externally or further down in this file,
-// the calls navigateTo('image-editor-screen') and navigateTo('upload-screen')
-// in the DOMContentLoaded listener assume photoEditor is available when those clicks happen.
+    // --- DOM Elements ---
+    const getEl = (id) => document.getElementById(id);
+    let mainImage, imageWrapper, uploadInput, cameraBtn, videoFeed, captureBtn, toolbarNav, panelContainer, imageContainer, drawingCanvas, drawCtx, brushBtn, eraserBtn, colorPicker, brushSizeSlider, brushSizeVal, brushPreview, undoDrawBtn, redoDrawBtn, clearDrawBtn, textInput, textColorPicker, textSizeSlider, textSizeVal, textPreview, fontSelectBtn, fontPickerModal, addTextBtn, cropOverlay, applyCropBtn, cancelCropBtn, cropShapesContainer;
 
+    // --- DATA ---
+    const filters = { 'Original': 'none', 'Clarendon': 'contrast(1.2) saturate(1.35)', 'Gingham': 'brightness(1.05) hue-rotate(-10deg)', 'Moon': 'grayscale(1) contrast(1.1) brightness(1.1)', 'Lark': 'contrast(.9) brightness(1.1) saturate(1.1)', 'Reyes': 'sepia(.22) brightness(1.1) contrast(.85) saturate(.75)', 'Juno': 'contrast(1.1) brightness(1.05) saturate(1.4)', 'Slumber': 'saturate(0.66) brightness(1.05)', 'Crema': 'sepia(.3) contrast(1.1) brightness(1.1) saturate(1.2)', 'Ludwig': 'brightness(1.05) saturate(1.5) contrast(0.95)', 'Aden': 'hue-rotate(-20deg) contrast(0.9) saturate(0.85) brightness(1.2)', 'Perpetua': 'contrast(1.1) saturate(1.2) brightness(1.05)', 'Amaro': 'hue-rotate(-10deg) contrast(0.9) brightness(1.1) saturate(1.5)', 'Mayfair': 'contrast(1.1) saturate(1.1)', 'Rise': 'brightness(1.05) sepia(0.2) contrast(0.9) saturate(0.9)', 'Hudson': 'brightness(1.2) contrast(0.9) saturate(1.1)', 'Valencia': 'contrast(1.08) brightness(1.08) sepia(0.08)', 'X-Pro II': 'sepia(0.3) contrast(1.5) brightness(0.9) saturate(1.3)', 'Sierra': 'contrast(0.85) saturate(1.2) brightness(1.1) sepia(0.15)', 'Willow': 'grayscale(0.5) contrast(0.95) brightness(0.9)', 'Lo-Fi': 'saturate(1.1) contrast(1.5)', 'Inkwell': 'sepia(0.3) contrast(1.1) brightness(1.1) grayscale(1)', 'Hefe': 'contrast(1.2) saturate(1.2) sepia(0.2)', 'Nashville': 'sepia(0.2) contrast(1.2) brightness(1.05) saturate(1.2)', 'Sutro': 'brightness(0.8) contrast(1.2) saturate(1.2) sepia(0.4)', 'Toaster': 'contrast(1.5) brightness(0.9)', 'Brannan': 'sepia(0.5) contrast(1.4)', '1977': 'contrast(1.1) brightness(1.1) saturate(1.3) sepia(0.4)', 'Kelvin': 'sepia(0.35) brightness(1.1) contrast(1.2)', 'Maven': 'sepia(.35) contrast(1.05) brightness(1.05) saturate(1.75)', 'Ginza': 'sepia(.05) contrast(1.15) brightness(1.1) saturate(1.35)', 'Skyline': 'saturate(1.2) contrast(1.15)', 'Dogpatch': 'contrast(1.3) brightness(1.1)', 'Brooklyn': 'contrast(1.1) brightness(1.1) sepia(0.2)', 'Helena': 'contrast(1.05) saturate(1.1) sepia(0.15)', 'Ashby': 'brightness(1.1) sepia(0.4)', 'Charmes': 'sepia(0.25) contrast(1.25) saturate(1.35)', 'Stinson': 'contrast(0.8) brightness(1.15) saturate(0.9)', 'Vesper': 'contrast(1.05) sepia(0.25) brightness(1.05)', 'Earlybird': 'sepia(0.3) contrast(1.1) brightness(1.1)', 'B&W': 'grayscale(100%)', 'Sepia': 'sepia(100%)', 'Vintage': 'sepia(0.5) contrast(1.2) brightness(1.1)', 'Cool': 'hue-rotate(180deg)', 'Warm': 'sepia(0.3) brightness(1.1)', 'Poprocket': 'sepia(0.15) brightness(1.2) contrast(1.2)', 'Invert': 'invert(100%)' };
+    const stickers = ['https://i.ibb.co/L5rC3x7/sticker1.png','https://i.ibb.co/hLqj6nL/sticker2.png','https://i.ibb.co/m0fWMPJ/sticker3.png'];
+    const frameCategories = { 'flower': {name: 'Flower', icon: 'https://i.ibb.co/6RKCR5MF/IMG-20250701-WA0001.jpg', frames: ['https://i.ibb.co/0yKnRbvS/1000147965-removebg-preview.png', 'https://i.ibb.co/Q3hQ3kkk/1000147958-removebg-preview.png', 'https://i.ibb.co/Cs2t8PWb/1000147957-removebg-preview.png', 'https://i.ibb.co/yDCLCyW/1000147956-removebg-preview.png', 'https://i.ibb.co/SX91vZWC/1000147942-removebg-preview.png', 'https://i.ibb.co/j9X9ZdBT/1000147943-removebg-preview.png']}, 'geometric': {name: 'Geometric', icon: 'https://i.ibb.co/k2c50c1/frame-geo-thumb.jpg', frames: ['https://i.ibb.co/H26h6mN/frame-geo-1.png', 'https://i.ibb.co/3F0x0x5/frame-geo-2.png']} };
+    const fonts = [ { name: 'Roboto', value: "'Roboto Flex', sans-serif" }, { name: 'Pacifico', value: "'Pacifico', cursive" }, { name: 'Dancing Script', value: "'Dancing Script', cursive" }, { name: 'Marker', value: "'Permanent Marker', cursive" }, { name: 'Lobster', value: "'Lobster', cursive" }, { name: 'Oswald', value: "'Oswald', sans-serif" }, { name: 'Bebas Neue', value: "'Bebas Neue', cursive" }, { name: 'Caveat', value: "'Caveat', cursive" }, { name: 'Shadows', value: "'Shadows Into Light', cursive" }, { name: 'Raleway', value: "'Raleway', sans-serif" }, { name: 'Montserrat', value: "'Montserrat', sans-serif" }, { name: 'Lato', value: "'Lato', sans-serif" }, { name: 'Poppins', value: "'Poppins', sans-serif" }, { name: 'Nunito', value: "'Nunito', sans-serif" }, { name: 'Cormorant', value: "'Cormorant Garamond', serif" }, { name: 'Josefin Sans', value: "'Josefin Sans', sans-serif" }, { name: 'Comfortaa', value: "'Comfortaa', cursive" }, { name: 'Indie Flower', value: "'Indie Flower', cursive" }, { name: 'Amatic SC', value: "'Amatic SC', cursive" }, ];
 
+    let currentFilter, currentStream, isDrawing, lastX, lastY, brushColor, brushSize, currentDrawTool, drawingHistory, historyIndex, activeElement, isCropping, currentFont, adjustments, cropBox, currentCropRatio;
+
+    function initializeState() {
+        currentFilter = 'none'; currentStream = null; isDrawing = false; lastX = 0; lastY = 0;
+        const rootStyle = getComputedStyle(document.documentElement);
+        brushColor = rootStyle.getPropertyValue('--primary-neon').trim() || '#F44336';
+        brushSize = 8; currentDrawTool = 'brush';
+        drawingHistory = []; historyIndex = -1; activeElement = null; isCropping = false;
+        currentFont = fonts[0];
+        adjustments = { brightness: 100, contrast: 100, saturate: 100, 'hue-rotate': 0, grayscale: 0, blur: 0 };
+        cropBox = null; currentCropRatio = 'free';
+    }
+
+    function initialize() {
+        mainImage = getEl('mainImage'); imageWrapper = getEl('image-wrapper'); uploadInput = getEl('upload'); cameraBtn = getEl('camera-btn'); videoFeed = getEl('video-feed'); captureBtn = getEl('capture-btn'); toolbarNav = getEl('toolbar-nav'); panelContainer = getEl('panel-container'); imageContainer = getEl('image-container'); drawingCanvas = getEl('drawing-canvas'); drawCtx = drawingCanvas.getContext('2d'); brushBtn = getEl('brush-btn'); eraserBtn = getEl('eraser-btn'); colorPicker = getEl('color-picker'); brushSizeSlider = getEl('brush-size'); brushSizeVal = getEl('brush-size-val'); brushPreview = getEl('brush-preview'); undoDrawBtn = getEl('undo-draw-btn'); redoDrawBtn = getEl('redo-draw-btn'); clearDrawBtn = getEl('clear-draw-btn'); textInput = getEl('text-input'); textColorPicker = getEl('text-color-picker'); textSizeSlider = getEl('text-size-slider'); textSizeVal = getEl('text-size-val'); textPreview = getEl('text-preview'); fontSelectBtn = getEl('font-select-btn'); fontPickerModal = getEl('font-picker-modal'); addTextBtn = getEl('add-text-btn'); cropOverlay = getEl('crop-overlay'); applyCropBtn = getEl('apply-crop-btn'); cancelCropBtn = getEl('cancel-crop-btn'); cropShapesContainer = getEl('crop-shapes');
+
+        initializeState();
+
+        populateFilters(); populateStickers(); populateFrameCategories(); populateFontModal(); setupEventListeners(); setupDrawingCanvas(); setupTextPanel();
+        mainImage.src = 'data:image/svg+xml;charset=UTF-8,%3Csvg width="380" height="675" xmlns="http://www.w3.org/2000/svg"%3E%3Crect width="100%25" height="100%25" fill="%231e1e1e"/%3E%3Ctext x="50%25" y="50%25" font-family="Roboto Flex, sans-serif" font-size="18" fill="%23a0a0a0" text-anchor="middle" dominant-baseline="middle"%3EPlease Upload an Image%3C/text%3E%3C/svg%3E';
+        drawingCanvas.style.display = 'block'; document.querySelector('#image-editor-screen .tool-btn[data-tool="filters"]').click();
+        window.addEventListener('resize', () => { if(isInitialized) { resizeDrawingCanvas(); if(isCropping) endCrop(); } });
+        imageContainer.addEventListener('click', (e) => { if (e.target === imageContainer || e.target === imageWrapper) deactivateAllElements(); });
+    }
+    function populateFilters() { const c = getEl('filtersPanel');c.innerHTML = '';Object.keys(filters).forEach((n, i) => { const a = document.createElement('div');a.className = 'filter-card';if(i===0)a.classList.add('active');a.innerHTML = `<div class="filter-preview"></div><span class="filter-name">${n}</span>`;a.querySelector('.filter-preview').style.filter = filters[n];a.onclick = () => { currentFilter = filters[n];applyAllEffects();document.querySelector('#image-editor-screen #filtersPanel .filter-card.active').classList.remove('active');a.classList.add('active'); };c.appendChild(a); }); }
+    function populateStickers() { const c = getEl('stickersPanel');c.innerHTML='';stickers.forEach(s => { const i = document.createElement('img');i.className = 'sticker-item';i.src = s;i.onclick = () => addSticker(s);c.appendChild(i); }); }
+    function populateFrameCategories() { const c = getEl('framesCategoryPanel');c.innerHTML = '';const n = document.createElement('div');n.className = 'frame-option active';n.dataset.frame = 'none';n.innerHTML = '<i class="fa-solid fa-ban"></i>';n.onclick = () => applyFrame('none');c.appendChild(n);Object.keys(frameCategories).forEach(k => { const y = frameCategories[k];const i = document.createElement('div');i.className = 'frame-category-item';i.style.backgroundImage = `url(${y.icon})`;i.innerHTML = `<span class="category-name">${y.name}</span>`;i.onclick = () => showFramesForCategory(k);c.appendChild(i); }); }
+    function showFramesForCategory(k) { const a = frameCategories[k];const c = getEl('framesDetailPanel');c.innerHTML = '';const b = document.createElement('div');b.className = 'frame-option';b.id = 'frame-back-btn';b.innerHTML = '<i class="fa-solid fa-arrow-left"></i>';b.onclick = () => { getEl('framesDetailPanel').classList.remove('active');getEl('framesCategoryPanel').classList.add('active'); };c.appendChild(b);a.frames.forEach(u => { const o = document.createElement('div');o.className = 'frame-option';o.style.backgroundImage = `url(${u})`;o.onclick = () => applyFrame(u);c.appendChild(o); });getEl('framesCategoryPanel').classList.remove('active');getEl('framesDetailPanel').classList.add('active'); }
+    function populateFontModal() { const c = fontPickerModal.querySelector('.font-picker-content');c.innerHTML = '';fonts.forEach((f, i) => { const l = document.createElement('label');l.className = 'font-option';l.innerHTML = `<span style="font-family: ${f.value}">${f.name}</span> <input type="radio" name="font" value="${i}" ${i === 0 ? 'checked' : ''}> <div class="radio-custom"></div>`;c.appendChild(l); }); }
+    function setupEventListeners() {
+        uploadInput.addEventListener('change', handleUpload); cameraBtn.addEventListener('click', toggleCamera); captureBtn.addEventListener('click', captureImage); toolbarNav.addEventListener('click', handleToolbarClick); fontSelectBtn.addEventListener('click', () => fontPickerModal.style.display = 'flex');
+        fontPickerModal.addEventListener('click', (e) => { if (e.target === fontPickerModal || e.target.closest('.font-option')) { const r = e.target.closest('.font-option')?.querySelector('input[type="radio"]'); if (r) { currentFont = fonts[r.value]; fontSelectBtn.textContent = currentFont.name; fontSelectBtn.style.fontFamily = currentFont.value; } fontPickerModal.style.display = 'none'; } });
+        document.querySelectorAll('#image-editor-screen .adjust-slider-input').forEach(s => s.addEventListener('input', handleAdjustSlider));
+        applyCropBtn.addEventListener('click', applyCrop); cancelCropBtn.addEventListener('click', endCrop); cropShapesContainer.addEventListener('click', handleCropShapeChange);
+    }
+    function setupDrawingCanvas() { const u = () => { brushSize = brushSizeSlider.value;brushColor = colorPicker.value;brushSizeVal.textContent = `${brushSize}px`;const p = Math.max(4, Math.min(brushSize, 30));brushPreview.style.width = `${p}px`;brushPreview.style.height = `${p}px`;brushPreview.style.background = brushColor; };brushBtn.onclick = () => { currentDrawTool = 'brush';brushBtn.classList.add('active');eraserBtn.classList.remove('active'); };eraserBtn.onclick = () => { currentDrawTool = 'eraser';eraserBtn.classList.add('active');brushBtn.classList.remove('active'); };colorPicker.oninput = u;brushSizeSlider.oninput = u;const g = (e) => { const r = drawingCanvas.getBoundingClientRect();const x = e.touches ? e.touches[0].clientX : e.clientX;const y = e.touches ? e.touches[0].clientY : e.clientY;return { x: x - r.left, y: y - r.top }; };const s = (e) => { isDrawing = true;[lastX, lastY] = [g(e).x, g(e).y]; };const d = (e) => { if (!isDrawing) return;e.preventDefault();const {x,y} = g(e);drawCtx.beginPath();drawCtx.moveTo(lastX, lastY);drawCtx.lineTo(x, y);drawCtx.strokeStyle = brushColor;drawCtx.lineWidth = brushSize;drawCtx.lineCap = 'round';drawCtx.lineJoin = 'round';drawCtx.globalCompositeOperation = currentDrawTool === 'eraser' ? 'destination-out' : 'source-over';drawCtx.stroke();[lastX, lastY] = [x,y]; };const o = () => { if(isDrawing) { isDrawing = false;addDrawingToHistory(); }};drawingCanvas.addEventListener('mousedown', s);drawingCanvas.addEventListener('mousemove', d);document.addEventListener('mouseup', o);drawingCanvas.addEventListener('touchstart', s, { passive: false });drawingCanvas.addEventListener('touchmove', d, { passive: false });document.addEventListener('touchend', o);undoDrawBtn.onclick = undoDrawing;redoDrawBtn.onclick = redoDrawing;clearDrawBtn.onclick = () => clearDrawing(true);u(); }
+    function setupTextPanel() { const u=()=>{const s=textSizeSlider.value;textSizeVal.textContent=`${s}px`;const p=Math.max(10,Math.min(s,30));textPreview.style.width=`${p}px`;textPreview.style.height=`${p}px`;textPreview.style.background=textColorPicker.value;};textSizeSlider.oninput=u;textColorPicker.oninput=u;addTextBtn.onclick=()=>{const t=textInput.value.trim();if(t)addTextToImage(t,textColorPicker.value,textSizeSlider.value,currentFont.value);};u(); }
+    function handleUpload(e) { if (e.target.files && e.target.files[0]) { const r = new FileReader(); r.onload = (ev) => { mainImage.src = ev.target.result;stopCamera();mainImage.style.display = 'block';videoFeed.style.display = 'none';captureBtn.style.display = 'none'; mainImage.onload = () => { resizeDrawingCanvas(); resetForNewImage(); document.querySelectorAll('#image-editor-screen .filter-preview').forEach(p => p.style.backgroundImage = `url(${mainImage.src})`); }; }; r.readAsDataURL(e.target.files[0]); } }
+    async function toggleCamera() { if (currentStream) { stopCamera(); } else { try { currentStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); videoFeed.srcObject = currentStream; videoFeed.style.display = 'block'; mainImage.style.display = 'none'; captureBtn.style.display = 'block'; panelContainer.classList.remove('visible'); document.querySelector('#image-editor-screen .tool-btn.active')?.classList.remove('active'); } catch (err) { alert('Camera on nahi ho saka.'); } } }
+    function captureImage() { const c = document.createElement('canvas'); c.width = videoFeed.videoWidth; c.height = videoFeed.videoHeight; c.getContext('2d').drawImage(videoFeed, 0, 0); mainImage.src = c.toDataURL('image/png'); stopCamera(); mainImage.style.display = 'block'; videoFeed.style.display = 'none'; captureBtn.style.display = 'none'; mainImage.onload = () => { resizeDrawingCanvas(); resetForNewImage(); document.querySelectorAll('#image-editor-screen .filter-preview').forEach(p => p.style.backgroundImage = `url(${mainImage.src})`); }; }
+    function stopCamera() { if (currentStream) currentStream.getTracks().forEach(t => t.stop()); currentStream = null; videoFeed.srcObject = null; }
+    function applyFrame(url) { imageWrapper.style.setProperty('--frame-image', url === 'none' ? 'none' : `url(${url})`); }
+    function resetForNewImage() { clearDrawing(false); drawingHistory = []; historyIndex = -1; addDrawingToHistory(); imageWrapper.querySelectorAll('.interactive-wrapper').forEach(el => el.remove()); resetAdjustments(); document.querySelectorAll('#image-editor-screen .filter-card.active').forEach(c=>c.classList.remove('active')); if(document.querySelector('#image-editor-screen .filter-card')) document.querySelector('#image-editor-screen .filter-card').classList.add('active'); currentFilter = 'none'; applyAllEffects(); }
+    function handleAdjustSlider(e) { const s = e.target;const f = s.dataset.filter;const v = s.value;const l = getEl(`${f}-val`);adjustments[f] = v;const u = (f === 'hue-rotate') ? '°' : (f === 'blur' ? 'px' : '%');l.textContent = v;applyAllEffects(); }
+    function generateFilterString() { let s = '';s += `brightness(${adjustments.brightness}%) `;s += `contrast(${adjustments.contrast}%) `;s += `saturate(${adjustments.saturate}%) `;s += `grayscale(${adjustments.grayscale}%) `;s += `hue-rotate(${adjustments['hue-rotate']}deg) `;s += `blur(${adjustments.blur}px) `;if (currentFilter !== 'none') { s += currentFilter; } return s.trim(); }
+    function applyAllEffects() { mainImage.style.filter = generateFilterString(); }
+    function resetAdjustments() { Object.keys(adjustments).forEach(k => { const d = (k === 'brightness' || k === 'contrast' || k === 'saturate') ? 100 : 0;adjustments[k] = d;const s = document.querySelector(`#image-editor-screen .adjust-slider-input[data-filter="${k}"]`);if (s) s.value = d;const v = getEl(`${k}-val`);if (v) v.textContent = d; });applyAllEffects(); }
+    function handleToolbarClick(e) { const t = e.target.closest('.tool-btn'); if (!t) return; const o = t.dataset.tool; const l = getEl(`${o}Panel`); const i = t.classList.contains('active'); deactivateAllElements(); endCrop(); drawingCanvas.style.pointerEvents = (o === 'draw') ? 'auto' : 'none'; if (i) { t.classList.remove('active'); if(l) l.classList.remove('active'); panelContainer.classList.remove('visible'); return; } document.querySelector('#image-editor-screen .tool-btn.active')?.classList.remove('active'); document.querySelectorAll('#image-editor-screen .panel.active').forEach(p => p.classList.remove('active')); t.classList.add('active'); if (l) { l.classList.add('active'); panelContainer.classList.add('visible'); if (o === 'frames') { getEl('framesDetailPanel').classList.remove('active'); getEl('framesCategoryPanel').classList.add('active'); } if (o === 'crop') startCrop(); } else { panelContainer.classList.remove('visible'); } }
+    function resizeDrawingCanvas() { const r = mainImage.getBoundingClientRect();drawingCanvas.width = r.width;drawingCanvas.height = r.height;drawingCanvas.style.top = r.top + 'px';drawingCanvas.style.left = r.left + 'px';restoreDrawing(); }
+    function addDrawingToHistory() { if (historyIndex < drawingHistory.length - 1) drawingHistory.splice(historyIndex + 1); drawingHistory.push(drawCtx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height)); historyIndex++; }
+    function restoreDrawing() { if (historyIndex > -1 && drawingHistory[historyIndex]) { drawCtx.putImageData(drawingHistory[historyIndex], 0, 0); } }
+    function undoDrawing() { if (historyIndex > 0) { historyIndex--; restoreDrawing(); } }
+    function redoDrawing() { if (historyIndex < drawingHistory.length - 1) { historyIndex++; restoreDrawing(); } }
+    function clearDrawing(addToHist) { drawCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height); if (addToHist) addDrawingToHistory(); }
+    function deactivateAllElements() { if (activeElement) activeElement.classList.remove('active'); activeElement = null; }
+    function addTextToImage(text, color, size, font) { const wrapper = document.createElement('div'); wrapper.className = 'interactive-wrapper'; wrapper.dataset.type = 'text'; wrapper.style.left = '50%'; wrapper.style.top = '50%'; wrapper.style.transform = 'translate(-50%, -50%)'; wrapper.innerHTML = ` <div class="element-content" style="color:${color}; font-family:${font}; font-size:${size}px; white-space:nowrap; transform: scale(1, 1);"> ${text} </div> <div class="element-controls"> <div class="control-handle rotate-handle"><i class="fa-solid fa-rotate-left"></i></div> <div class="control-handle delete-handle"><i class="fa-solid fa-times"></i></div> <div class="control-handle handle-br"><i class="fa-solid fa-expand"></i></div> <div class="control-handle handle-mr"><i class="fa-solid fa-arrows-left-right"></i></div> <div class="control-handle handle-mb"><i class="fa-solid fa-arrows-up-down"></i></div> </div>`; imageWrapper.appendChild(wrapper); setTimeout(() => { const rect = wrapper.getBoundingClientRect(); wrapper.style.width = rect.width + 'px'; wrapper.style.height = rect.height + 'px'; makeElementInteractive(wrapper); }, 0); }
+    function addSticker(src) { const wrapper = document.createElement('div'); wrapper.className = 'interactive-wrapper'; wrapper.dataset.type = 'sticker'; wrapper.style.left = '50%'; wrapper.style.top = '50%'; wrapper.style.transform = 'translate(-50%, -50%)'; wrapper.style.width = '120px'; wrapper.style.height = '120px'; wrapper.innerHTML = ` <img src="${src}" class="element-content" draggable="false" style="width:100%; height:100%;"> <div class="element-controls"> <div class="control-handle rotate-handle"><i class="fa-solid fa-rotate-left"></i></div> <div class="control-handle delete-handle"><i class="fa-solid fa-times"></i></div> <div class="control-handle handle-br"><i class="fa-solid fa-expand"></i></div> <div class="control-handle handle-mr"><i class="fa-solid fa-arrows-left-right"></i></div> <div class="control-handle handle-mb"><i class="fa-solid fa-arrows-up-down"></i></div> </div>`; imageWrapper.appendChild(wrapper); makeElementInteractive(wrapper); }
+    function makeElementInteractive(element) { deactivateAllElements(); element.classList.add('active'); activeElement = element; const content = element.querySelector('.element-content'); const isText = element.dataset.type === 'text'; let state = { action: null, startX: 0, startY: 0, startLeft: 0, startTop: 0, startWidth: 0, startHeight: 0, startAngle: 0, startScaleX: 1, startScaleY: 1, startFontSize: 40 }; const onPointerDown = (e) => { e.preventDefault(); e.stopPropagation(); deactivateAllElements(); element.classList.add('active'); activeElement = element; const handle = e.target.closest('.control-handle'); if (!handle && e.target !== element) state.action = 'drag'; else if (handle) { if (handle.classList.contains('rotate-handle')) state.action = 'rotate'; else if (handle.classList.contains('delete-handle')) { element.remove(); deactivateAllElements(); return; } else if (handle.classList.contains('handle-br')) state.action = 'resize-br'; else if (handle.classList.contains('handle-mr')) state.action = 'resize-mr'; else if (handle.classList.contains('handle-mb')) state.action = 'resize-mb'; } else { state.action = 'drag'; } const clientX = e.touches ? e.touches[0].clientX : e.clientX; const clientY = e.touches ? e.touches[0].clientY : e.clientY; state.startX = clientX; state.startY = clientY; const rect = element.getBoundingClientRect(); state.startLeft = element.offsetLeft; state.startTop = element.offsetTop; state.startWidth = element.offsetWidth; state.startHeight = element.offsetHeight; const matrix = new DOMMatrix(window.getComputedStyle(element).transform); state.startAngle = Math.atan2(matrix.b, matrix.a) * (180 / Math.PI); if (isText) { const contentMatrix = new DOMMatrix(window.getComputedStyle(content).transform); state.startScaleX = contentMatrix.a; state.startScaleY = contentMatrix.d; state.startFontSize = parseFloat(window.getComputedStyle(content).fontSize); } document.addEventListener('mousemove', onPointerMove); document.addEventListener('touchmove', onPointerMove, { passive: false }); document.addEventListener('mouseup', onPointerUp); document.addEventListener('touchend', onPointerUp); }; const onPointerMove = (e) => { e.preventDefault(); const clientX = e.touches ? e.touches[0].clientX : e.clientX; const clientY = e.touches ? e.touches[0].clientY : e.clientY; const dx = clientX - state.startX; const dy = clientY - state.startY; if (state.action === 'drag') { element.style.left = `${state.startLeft + dx}px`; element.style.top = `${state.startTop + dy}px`; } else if (state.action === 'rotate') { const center = { x: element.getBoundingClientRect().left + element.offsetWidth / 2, y: element.getBoundingClientRect().top + element.offsetHeight / 2 }; const angle = Math.atan2(clientY - center.y, clientX - center.x) * (180 / Math.PI); const startAngle = Math.atan2(state.startY - center.y, state.startX - center.x) * (180 / Math.PI); element.style.transform = `rotate(${state.startAngle + angle - startAngle}deg)`; } else if (state.action && state.action.startsWith('resize')) { if (isText) { if (state.action === 'resize-br') { const newSize = Math.max(10, state.startFontSize + dx * 0.5); content.style.fontSize = `${newSize}px`; element.style.width = 'auto'; element.style.height = 'auto'; setTimeout(() => { element.style.width = element.offsetWidth + 'px'; element.style.height = element.offsetHeight + 'px'; }, 0); } else { let newScaleX = state.startScaleX; let newScaleY = state.startScaleY; if (state.action === 'resize-mr') newScaleX = Math.max(0.1, state.startScaleX + (dx / state.startWidth)); if (state.action === 'resize-mb') newScaleY = Math.max(0.1, state.startScaleY + (dy / state.startHeight)); content.style.transform = `scale(${newScaleX}, ${newScaleY})`; } } else { let newWidth = state.startWidth; let newHeight = state.startHeight; if (state.action === 'resize-br') { newWidth = Math.max(30, state.startWidth + dx); newHeight = state.startHeight * (newWidth / state.startWidth); } else if (state.action === 'resize-mr') { newWidth = Math.max(30, state.startWidth + dx); } else if (state.action === 'resize-mb') { newHeight = Math.max(20, state.startHeight + dy); } element.style.width = `${newWidth}px`; element.style.height = `${newHeight}px`; } } }; const onPointerUp = () => { document.removeEventListener('mousemove', onPointerMove); document.removeEventListener('touchmove', onPointerMove); document.removeEventListener('mouseup', onPointerUp); document.removeEventListener('touchend', onPointerUp); }; element.addEventListener('mousedown', onPointerDown); element.addEventListener('touchstart', onPointerDown, { passive: false }); }
+    function handleCropShapeChange(e){ const b=e.target.closest('.shape-btn');if(!b||!isCropping)return;document.querySelector('#image-editor-screen .shape-btn.active').classList.remove('active');b.classList.add('active');currentCropRatio=b.dataset.ratio;setCropAspectRatio(); }
+    function setCropAspectRatio() { if (!cropBox) return; cropBox.classList.toggle('is-circle', currentCropRatio === 'circle'); if (currentCropRatio === 'free' || currentCropRatio === 'circle') return; const [w, h] = currentCropRatio.split(':').map(Number); const ratio = h / w; const newHeight = cropBox.offsetWidth * ratio; if (cropBox.offsetTop + newHeight > mainImage.height) { cropBox.style.width = `${cropBox.offsetHeight / ratio}px`; } else { cropBox.style.height = `${newHeight}px`; } }
+    function startCrop() { if (isCropping) return; isCropping = true; cropOverlay.style.display = 'block'; deactivateAllElements(); const i = mainImage.getBoundingClientRect(); const s = Math.min(i.width, i.height) * 0.8; cropBox = document.createElement('div'); cropBox.className = 'crop-box'; cropBox.style.width = `${s}px`; cropBox.style.height = `${s}px`; cropBox.style.left = `${(i.width - s) / 2}px`; cropBox.style.top = `${(i.height - s) / 2}px`; cropBox.innerHTML = `<div class="crop-handle tl"></div><div class="crop-handle tr"></div><div class="crop-handle bl"></div><div class="crop-handle br"></div>`; cropOverlay.appendChild(cropBox); setCropAspectRatio(); let t, a, l, e, o, d, n, h; const r = (c) => { c.preventDefault(); c.stopPropagation(); h = c.target.closest('.crop-handle'); n = h ? 'resize' : 'move'; t = c.touches ? c.touches[0].clientX : c.clientX; a = c.touches ? c.touches[0].clientY : c.clientY; l = cropBox.offsetLeft; e = cropBox.offsetTop; o = cropBox.offsetWidth; d = cropBox.offsetHeight; document.addEventListener('mousemove', p); document.addEventListener('touchmove', p, { passive: false }); document.addEventListener('mouseup', u); document.addEventListener('touchend', u); }; const p = (c) => { const x = c.touches ? c.touches[0].clientX : c.clientX; const y = c.touches ? c.touches[0].clientY : c.clientY; let g = x - t; let f = y - a; if (n === 'move') { cropBox.style.left = Math.min(i.width - o, Math.max(0, l + g)) + 'px'; cropBox.style.top = Math.min(i.height - d, Math.max(0, e + f)) + 'px'; } else { let L = l, T = e, W = o, H = d; if (h.classList.contains('br')) { W += g; H += f; } else if (h.classList.contains('bl')) { W -= g; H += f; L += g; } else if (h.classList.contains('tr')) { W += g; H -= f; T += f; } else if (h.classList.contains('tl')) { W -= g; H -= f; L += g; T += f; } if (W > 50 && L >= 0 && L + W <= i.width) { cropBox.style.left = `${L}px`; cropBox.style.width = `${W}px`; } if (H > 50 && T >= 0 && T + H <= i.height) { cropBox.style.top = `${T}px`; cropBox.style.height = `${H}px`; } if (currentCropRatio !== 'free' && currentCropRatio !== 'circle') { const [w, R] = currentCropRatio.split(':').map(Number); const A = R / w; if (h.classList.contains('br') || h.classList.contains('tl')) { cropBox.style.height = `${cropBox.offsetWidth * A}px`; } else { cropBox.style.width = `${cropBox.offsetHeight / A}px`; } } } }; const u = () => { document.removeEventListener('mousemove', p); document.removeEventListener('mouseup', u); document.removeEventListener('touchmove', p); document.removeEventListener('touchend', u); }; cropBox.addEventListener('mousedown', r); cropBox.addEventListener('touchstart', r, { passive: false }); }
+    function endCrop() { if (!isCropping) return; isCropping = false; cropOverlay.style.display = 'none'; if (cropBox) cropBox.remove(); cropBox = null; document.querySelector('#image-editor-screen .shape-btn.active').classList.remove('active'); document.querySelector('#image-editor-screen .shape-btn[data-ratio="free"]').classList.add('active'); currentCropRatio = 'free'; }
+    function applyCrop() { if (!cropBox) return; const i = mainImage; const sX = i.naturalWidth / i.width; const sY = i.naturalHeight / i.height; const cX = cropBox.offsetLeft * sX, cY = cropBox.offsetTop * sY; const cW = cropBox.offsetWidth * sX, cH = cropBox.offsetHeight * sY; const canvas = document.createElement('canvas'); canvas.width = cW; canvas.height = cH; const ctx = canvas.getContext('2d'); if (cropBox.classList.contains('is-circle')) { ctx.beginPath(); ctx.arc(cW / 2, cH / 2, Math.min(cW, cH) / 2, 0, Math.PI * 2, true); ctx.clip(); } ctx.drawImage(i, cX, cY, cW, cH, 0, 0, cW, cH); mainImage.src = canvas.toDataURL('image/png', 1.0); mainImage.onload = () => { resizeDrawingCanvas(); resetForNewImage(); }; endCrop(); document.querySelector('#image-editor-screen .tool-btn[data-tool="crop"]').click(); }
+    function downloadImage() { deactivateAllElements(); endCrop(); const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); const baseImage = new Image(); baseImage.crossOrigin = "anonymous"; baseImage.onload = () => { canvas.width = baseImage.naturalWidth; canvas.height = baseImage.naturalHeight; ctx.filter = generateFilterString(); ctx.drawImage(baseImage, 0, 0); ctx.drawImage(drawingCanvas, 0, 0, canvas.width, canvas.height); const elements = imageWrapper.querySelectorAll('.interactive-wrapper'); const promises = Array.from(elements).map(el => { const content = el.querySelector('.element-content'); const scaleX = baseImage.naturalWidth / mainImage.width; const scaleY = baseImage.naturalHeight / mainImage.height; const left = el.offsetLeft * scaleX; const top = el.offsetTop * scaleY; const width = el.offsetWidth * scaleX; const height = el.offsetHeight * scaleY; const el_matrix = new DOMMatrix(window.getComputedStyle(el).transform); const rotation = Math.atan2(el_matrix.b, el_matrix.a); ctx.save(); ctx.translate(left + width / 2, top + height / 2); ctx.rotate(rotation); if (el.dataset.type === 'sticker') { return new Promise(resolve => { const img = new Image(); img.crossOrigin = "anonymous"; img.src = content.src; img.onload = () => { ctx.drawImage(img, -width / 2, -height / 2, width, height); ctx.restore(); resolve(); } }); } else { const content_matrix = new DOMMatrix(window.getComputedStyle(content).transform); ctx.scale(content_matrix.a, content_matrix.d); ctx.fillStyle = content.style.color; ctx.font = `${parseFloat(content.style.fontSize) * scaleX}px ${content.style.fontFamily}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(content.textContent, 0, 0); ctx.restore(); return Promise.resolve(); } }); Promise.all(promises).then(() => { const link = document.createElement('a'); link.download = 'edited-image.png'; link.href = canvas.toDataURL('image/png', 1.0); link.click(); }); }; baseImage.src = mainImage.src; }
+
+    return {
+        start: () => {
+            if (!isInitialized) {
+                initialize();
+                isInitialized = true;
+            } else {
+                // Re-initialize state if it's already been opened
+                initializeState();
+                resetForNewImage();
+            }
+        },
+        downloadImage: downloadImage
+    };
+})();
 /* ======================================================= */
 /* === AI Photo Editor Script (Code 1) - END === */
 /* ======================================================= */
