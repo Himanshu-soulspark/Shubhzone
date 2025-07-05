@@ -1999,15 +1999,16 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 /* === AI Photo Editor Styles (Code 1) - START === */
 /* ======================================================= */
 
-/* === MODIFIED / परिवर्तित: Main screen layout using Flexbox for a stable structure === */
+/* === Main screen layout using Flexbox for a stable structure === */
 #image-editor-screen {
     padding: 0;
     display: flex;
-    flex-direction: column; /* Vertical layout: Top bar, Main content, Bottom bar */
-    height: 100vh; /* Full screen height */
+    flex-direction: column;
+    height: 100vh;
     font-family: 'Roboto Flex', sans-serif;
     background: var(--background);
-    overflow: hidden; /* Prevent the entire page from scrolling */
+    position: relative; /* Crucial for positioning the sidebar and bottom panel */
+    overflow: hidden;
 }
 
 /* === Top control bar (Unchanged) === */
@@ -2017,7 +2018,7 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
     align-items: center;
     padding: 10px 15px;
     background: var(--dark-grey);
-    flex-shrink: 0; /* Prevent this bar from shrinking */
+    flex-shrink: 0;
     width: 100%;
     z-index: 30;
 }
@@ -2040,10 +2041,9 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 .top-bar-btn[data-action="camera"] i { color: var(--primary-neon); }
 .top-bar-btn[data-action="save"] i { color: var(--success-green); }
 
-
-/* === MODIFIED / परिवर्तित: Main Image Display Area, ensuring it takes up available space === */
+/* === Main Image Display Area, ensuring it takes up available space === */
 #image-editor-screen .image-container { 
-    flex: 1; /* This is the key: it takes all remaining vertical space */
+    flex-grow: 1; /* This makes the image area take all available vertical space */
     min-height: 0; /* A flexbox fix to prevent overflow issues */
     display: flex; 
     justify-content: center; 
@@ -2052,10 +2052,12 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
     position: relative; 
     overflow: hidden;
 }
+
+/* === MODIFIED / परिवर्तित: Image card size is now controlled === */
 #image-editor-screen .image-wrapper { 
     width: 100%; 
     max-width: 380px; 
-    aspect-ratio: 9 / 16;
+    aspect-ratio: 9 / 16; /* Your requested 9:16 ratio */
     background: #1e1e1e; 
     border-radius: 20px; 
     display: flex; 
@@ -2067,67 +2069,52 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 }
 #image-editor-screen #mainImage, #image-editor-screen #video-feed { max-width: 100%; max-height: 100%; display: block; transition: filter 0.3s ease; object-fit: contain; }
 
-/* === MODIFIED / परिवर्तित: Bottom Toolbar Wrapper === */
-#image-editor-screen .editor-toolbar {
-    background: var(--dark-grey); 
-    flex-shrink: 0; /* Prevent the toolbar from shrinking */
-    z-index: 20;
+/* === NEW / नया: Toggle button for the sidebar (Eye Icon) === */
+#image-editor-screen #toggle-sidebar-btn {
+    position: absolute;
+    top: 80px; /* Position it below the top bar */
+    left: 15px;
+    width: 44px;
+    height: 44px;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    border: 1px solid var(--light-grey);
+    color: var(--text-color);
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 40;
     display: flex;
-    flex-direction: column; /* Panels will appear above the nav bar */
+    justify-content: center;
+    align-items: center;
 }
 
-/* Container for tool options (sliders, filters, etc.) */
-#image-editor-screen .panel-container { 
-    min-height: 140px; /* Adjust height as needed */
-    padding: 15px 0; 
-    position: relative; 
-    overflow: hidden; 
-    display: none; /* Hidden by default */
-    background: var(--dark-grey);
-    border-bottom: 1px solid var(--light-grey);
-}
-#image-editor-screen .panel-container.visible { display: block; }
-
-/* Styles for individual panels (e.g., #filtersPanel, #adjustPanel) */
-#image-editor-screen .panel { 
-    display: none;
-    align-items: center; 
-    overflow-x: auto; /* ALLOWS HORIZONTAL SCROLLING INSIDE THE PANEL */
-    padding: 0 15px; 
-    -ms-overflow-style: none; 
-    scrollbar-width: none; 
-    width: 100%; 
-    height: 100%; 
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    transition: opacity 0.3s ease; 
-    opacity: 0;
-    white-space: nowrap; /* Prevents items from wrapping to the next line */
-}
-#image-editor-screen .panel::-webkit-scrollbar { display: none; }
-
-#image-editor-screen .panel.active { 
-    display: flex; 
-    opacity: 1; 
+/* === NEW / नया: Vertical Tool Sidebar === */
+#image-editor-screen #editor-sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80px; /* Width of the vertical bar */
+    height: 100%;
+    background: #1c1c1c;
+    border-right: 1px solid var(--light-grey);
+    display: flex;
+    flex-direction: column; /* Top to bottom layout */
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 15px 0;
+    z-index: 35;
+    transform: translateX(-100%); /* Hide it off-screen to the left */
+    transition: transform 0.3s ease-in-out;
 }
 
-/* === MODIFIED / परिवर्तित: Scrollable Bottom Navigation Bar === */
-#image-editor-screen .toolbar-nav { 
-    display: flex; 
-    justify-content: flex-start; /* Align icons to the left */
-    padding: 8px 10px; 
-    overflow-x: auto; /* THIS IS THE FIX: Allows horizontal scrolling */
-    -ms-overflow-style: none; 
-    scrollbar-width: none;
-    white-space: nowrap; /* Ensures all buttons stay in a single line */
-}
-#image-editor-screen .toolbar-nav::-webkit-scrollbar { 
-    display: none; /* Hide scrollbar for a cleaner look */
+#image-editor-screen #editor-sidebar.visible {
+    transform: translateX(0); /* Show the sidebar */
 }
 
-/* Tool buttons inside the scrollable nav */
-#image-editor-screen .tool-btn { 
+/* === Tool buttons inside the new sidebar === */
+#image-editor-screen #editor-sidebar .tool-btn { 
     display: flex; 
     flex-direction: column; 
     align-items: center; 
@@ -2137,15 +2124,62 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
     color: rgba(255, 255, 255, 0.7); 
     font-size: 12px; 
     cursor: pointer; 
-    padding: 8px 12px; 
+    padding: 8px; 
     border-radius: 8px; 
-    transition: all 0.2s ease; 
-    flex-shrink: 0; /* Important for horizontal scrolling */
+    transition: all 0.2s ease;
+    width: 100%;
 }
-#image-editor-screen .tool-btn i { font-size: 20px; }
-#image-editor-screen .tool-btn.active, #image-editor-screen .tool-btn:hover { color: var(--primary-neon); }
+#image-editor-screen #editor-sidebar .tool-btn i { font-size: 20px; }
+#image-editor-screen #editor-sidebar .tool-btn.active, 
+#image-editor-screen #editor-sidebar .tool-btn:hover { color: var(--primary-neon); }
 
-/* All other specific panel styles remain the same as they were correct */
+/* === NEW / नया: Bottom Panel for tool options === */
+#image-editor-screen #editor-bottom-panel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--dark-grey); 
+    flex-shrink: 0; 
+    z-index: 25; /* Sits above the main content but below the sidebar */
+    display: none;
+    border-top: 1px solid var(--light-grey);
+}
+#image-editor-screen #editor-bottom-panel.visible {
+    display: block;
+}
+
+#image-editor-screen .panel-container { 
+    height: 140px;
+    padding: 15px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+/* === Panel styles are now for the bottom panel === */
+#image-editor-screen .panel { 
+    display: none; 
+    align-items: center; 
+    width: 100%; 
+    height: 100%; 
+    position: absolute; 
+    top: 0; left: 0; 
+    transition: opacity 0.3s ease; 
+    opacity: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 15px; 
+    -ms-overflow-style: none; scrollbar-width: none;
+    flex-wrap: nowrap;
+}
+#image-editor-screen .panel::-webkit-scrollbar { display: none; }
+
+#image-editor-screen .panel.active { 
+    display: flex; 
+    opacity: 1; 
+}
+
+/* --- Unchanged styles for panel contents below this line --- */
 #image-editor-screen .filter-card { flex: 0 0 auto; margin: 0 8px; text-align: center; cursor: pointer; }
 #image-editor-screen .filter-preview { width: 60px; height: 60px; border-radius: 12px; margin-bottom: 8px; border: 2px solid transparent; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.3); background-size: cover; background-position: center; }
 #image-editor-screen .filter-card.active .filter-preview { border-color: var(--primary-neon); transform: scale(1.1); }
@@ -2192,7 +2226,6 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 #image-editor-screen #capture-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 50; padding: 18px; border-radius: 50%; border: 4px solid white; background-color: #ff4757; display: none; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.5); }
 #image-editor-screen .sticker-item { flex-shrink: 0; width: 65px; height: 65px; object-fit: contain; cursor: pointer; margin: 0 10px; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 8px; }
 #image-editor-screen #stickerPanel .panel-view { padding-left: 15px; padding-right: 15px; }
-
 #image-editor-screen .crop-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9; display: none; }
 #image-editor-screen .crop-box { position: absolute; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7); border: 2px dashed var(--primary-neon); cursor: move; touch-action: none; pointer-events: auto; transition: border-radius 0.2s ease-in-out; }
 #image-editor-screen .crop-box.is-circle { border-radius: 50%; }
@@ -2222,7 +2255,7 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 #image-editor-screen .handle-mr { top: 50%; right: -12px; transform: translateY(-50%); cursor: ew-resize; }
 #image-editor-screen .handle-mb { bottom: -12px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
 
-#image-editor-screen .app-header, #image-editor-screen .editor-header { display: none; }
+#image-editor-screen .app-header, #image-editor-screen .editor-header, #image-editor-screen .editor-toolbar, #image-editor-screen .toolbar-nav { display: none; } /* Hide all old/unused toolbar elements */
 
 /* ======================================================= */
 /* === AI Photo Editor Styles (Code 1) - END === */
