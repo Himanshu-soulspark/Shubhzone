@@ -13,19 +13,19 @@
     --light-grey: #444;
 }
 
-/* === MODIFIED: Global fix for unwanted borders/lines === */
+/* MODIFIED: Reverted the aggressive global rule and used a standard box-sizing setup */
+html {
+    box-sizing: border-box;
+}
+
 *, *:before, *:after {
-    box-sizing: inherit; /* Apply box-sizing to all elements */
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
+    box-sizing: inherit;
 }
 
 html, body {
     margin: 0;
     padding: 0;
     overflow: hidden; /* Prevent overall body scroll and zoom issues */
-    box-sizing: border-box;
     height: 100%; /* Ensure html and body take full height */
     overscroll-behavior-y: none; /* Prevent pull-to-refresh/scroll conflicts */
     zoom: 1; /* Attempt to normalize zoom level */
@@ -107,6 +107,7 @@ body {
 }
 
 #splash-screen {
+    /* Splash screen has its own intentional gradient background */
     background: linear-gradient(to bottom, #87CEEB, #FFD700, #FFA500, #FF69B4, #F44336, #4CAF50);
     z-index: 11;
     display: flex;
@@ -456,8 +457,6 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
-    border: none !important;
-    box-shadow: none !important;
 }
 
 #video-swiper {
@@ -528,6 +527,7 @@ body {
     z-index: 10;
 }
 
+/* === MODIFIED / परिवर्तित === */
 .bottom-nav {
     display: flex;
     justify-content: space-around;
@@ -540,8 +540,9 @@ body {
     bottom: 0;
     left: 0;
     z-index: 100;
-    border: none !important;
-    box-shadow: none !important;
+    /* The problematic border-top is removed from here to fix the line issue. */
+    /* समस्याग्रस्त बॉर्डर-टॉप को लाइन की समस्या को ठीक करने के लिए यहाँ से हटा दिया गया है। */
+    border-top: none; 
 }
 
 .nav-item {
@@ -732,26 +733,24 @@ body {
     font-weight: bold;
 }
 
-/* === MODIFIED: Friends Screen Layout === */
 #friends-screen {
-    padding: 0; /* Remove screen padding */
+    padding: 0;
     display: flex;
     flex-direction: column;
     height: 100%;
-    overflow: hidden; /* Screen itself does not scroll */
+    overflow: hidden;
 }
 
 .friends-top-nav {
     display: flex;
-    justify-content: space-around; /* Evenly space icons */
+    justify-content: space-around;
     align-items: center;
     width: 100%;
     padding: 10px 15px;
-    background-color: var(--dark-grey); /* Use a solid dark color */
+    background-color: var(--dark-grey);
     border-bottom: 1px solid var(--light-grey);
-    flex-shrink: 0; /* Prevent this from shrinking */
+    flex-shrink: 0;
     z-index: 20;
-    /* This element is now a static header for the screen */
 }
 
 .friends-nav-icon {
@@ -763,9 +762,8 @@ body {
     cursor: pointer;
     font-size: 0.8em;
     transition: color 0.3s ease;
-    flex-grow: 1; /* This will help with even spacing */
+    flex-grow: 1;
 }
-/* ========================================= */
 
 .friends-nav-icon i {
     font-size: 1.8em;
@@ -777,11 +775,11 @@ body {
 }
 
 .user-list-container {
-    flex-grow: 1; /* This container takes up remaining space */
+    flex-grow: 1;
     width: 100%;
-    overflow-y: auto; /* This container is now the scrollable part */
-    padding: 15px; /* Add padding inside the scrollable area */
-    padding-bottom: 75px; /* 60px nav + 15px padding */
+    overflow-y: auto;
+    padding: 15px;
+    padding-bottom: 75px;
 }
 
 .user-card {
@@ -1202,7 +1200,7 @@ body {
 }
 
 #information-screen > div:nth-of-type(2) {
-    padding-bottom: 80px !important; /* Use !important to override inline style */
+    padding-bottom: 80px !important;
 }
 
 
@@ -1558,30 +1556,27 @@ html {
     font-weight: bold;
 }
 
-/* === MODIFIED / परिवर्तित === */
 .video-meta-overlay {
     position: absolute;
-    bottom: 60px;
+    bottom: 75px;
     left: 10px;
     z-index: 10;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: flex-start;
     width: calc(100% - 110px);
-    padding: 15px;
-    padding-bottom: 0;
-    box-sizing: border-box;
-    /* Reverting to a subtle gradient to make the overlay almost invisible as requested. */
-    /* अनुरोध के अनुसार ओवरले को लगभग अदृश्य बनाने के लिए एक सूक्ष्म ग्रेडिएंट पर वापस जा रहे हैं। */
-    background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     pointer-events: none;
     color: white;
-    /* Removing the box styles */
-    border-radius: 0;
-    border: none;
-    backdrop-filter: none;
+    box-sizing: border-box;
 }
+
 
 .video-meta-overlay .uploader-info {
     display: flex;
@@ -1953,6 +1948,7 @@ html {
     transform: scale(1.05);
 }
 
+/* === MODIFIED: Force Day Theme by overwriting light theme variables === */
 html.light-theme {
     --background: #0f0f0f;
     --text-color: #ffffff;
@@ -1994,8 +1990,9 @@ html.light-theme ::placeholder {
 
 html.light-theme .bottom-nav {
     background-color: rgba(0, 0, 0, 0.7);
-    border: none !important;
-    box-shadow: none !important;
+    /* The problematic border-top is removed from here to fix the line issue. */
+    /* समस्याग्रस्त बॉर्डर-टॉप को लाइन की समस्या को ठीक करने के लिए यहाँ से हटा दिया गया है। */
+    border-top: none; 
 }
 html.light-theme .screen-header,
 html.light-theme .home-top-bar,
@@ -2006,6 +2003,7 @@ html.light-theme .friends-top-nav {
 html.light-theme .main-sidebar { box-shadow: 4px 0 15px rgba(0,0,0,0.5); }
 html.light-theme .static-message { background-color: rgba(0,0,0,0.3); color: rgba(255, 255, 255, 0.7); }
 html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
+/* ======================================================================= */
 
 /* =============================================== */
 /* === Shubhzone App Styles (Code 2) - END === */
@@ -2019,12 +2017,12 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 /* === MODIFIED / परिवर्तित === */
 #image-editor-screen {
     padding: 0;
-    display: block;
-    font-family: 'Roboto Flex', sans-serif;
-    /* Fixing the scroll issue by allowing vertical overflow */
-    /* स्क्रॉल की समस्या को ठीक करने के लिए वर्टिकल ओवरफ्लो की अनुमति दी गई है */
-    overflow-y: auto;
+    /* This flexbox layout ensures all components (headers, image, toolbar) fit correctly on the screen. */
+    /* यह फ्लेक्सबॉक्स लेआउट सुनिश्चित करता है कि सभी कंपोनेंट (हेडर, इमेज, टूलबार) स्क्रीन पर सही ढंग से फिट हों। */
+    display: flex;
+    flex-direction: column;
     height: 100%;
+    font-family: 'Roboto Flex', sans-serif;
 }
 
 #image-editor-screen .editor-header {
@@ -2048,9 +2046,14 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
     font-weight: 500;
 }
 
-#image-editor-screen .app-header {
-    display: flex; justify-content: space-between; align-items: center; padding: 12px 18px;
-    background: var(--dark-grey); flex-shrink: 0; z-index: 20;
+#image-editor-screen .app-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 12px 18px;
+    background: var(--dark-grey); 
+    flex-shrink: 0; 
+    z-index: 20;
     border-bottom: 1px solid var(--light-grey);
     margin-top: 50px;
     color: var(--text-color);
@@ -2059,7 +2062,20 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 #image-editor-screen .header-btn:hover { background-color: #333; color: var(--primary-neon); }
 #image-editor-screen .header-btn:active { transform: scale(0.96); }
 #image-editor-screen #upload { display: none; }
-#image-editor-screen .image-container { height: 100%; display: flex; justify-content: center; align-items: center; padding: 15px; overflow: hidden; position: relative; }
+
+/* === MODIFIED / परिवर्तित === */
+#image-editor-screen .image-container { 
+    /* This makes the image container flexible to take available space, fixing the layout issue. */
+    /* यह इमेज कंटेनर को उपलब्ध जगह लेने के लिए लचीला बनाता है, जिससे लेआउट की समस्या ठीक हो जाती है। */
+    flex: 1;
+    min-height: 0;
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    padding: 15px; 
+    overflow: hidden; 
+    position: relative; 
+}
 #image-editor-screen .image-wrapper { width: 100%; max-width: 380px; aspect-ratio: 9 / 16; background: #1e1e1e; border-radius: 20px; display: flex; justify-content: center; align-items: center; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.4); position: relative; }
 #image-editor-screen .image-wrapper::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: 100% 100%; background-repeat: no-repeat; pointer-events: none; z-index: 5; border-radius: 20px; background-image: var(--frame-image); }
 #image-editor-screen #mainImage, #image-editor-screen #video-feed { max-width: 100%; max-height: 100%; display: block; transition: filter 0.3s ease; object-fit: contain; }
