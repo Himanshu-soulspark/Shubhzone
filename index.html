@@ -315,7 +315,6 @@
                 <h2>Upload Content</h2>
                 <p>Share your videos or edit images</p>
             </div>
-            <!-- === MODIFIED: Upload container updated with specific buttons === -->
              <div class="upload-container-new">
                 <button id="open-youtube-modal-btn" class="upload-action-button">
                     <i class="fab fa-youtube" style="margin-right: 10px;"></i> Upload via YouTube ID
@@ -448,7 +447,6 @@
             </div>
         </div>
         
-        <!-- === NEW SCREEN for Premium Video Upload === -->
         <div id="premium-upload-screen" class="screen">
             <div class="screen-header">
                 <div id="back-from-premium-btn" class="header-icon-left">
@@ -492,70 +490,82 @@
             </div>
         </div>
 
-
+        <!-- === PHOTO EDITOR SCREEN: यहाँ ज़रूरी बदलाव किए गए हैं === -->
         <div id="image-editor-screen" class="screen">
-            <div class="editor-header">
-                <button id="back-from-editor-btn"><i class="fa-solid fa-arrow-left"></i> Back to App</button>
+            <!-- Top Bar with 4 Icons -->
+            <div class="editor-top-bar">
+                <button class="top-bar-btn" data-action="back" id="back-from-editor-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Back</span>
+                </button>
+                <label class="top-bar-btn" data-action="upload" for="upload">
+                    <i class="fa-solid fa-upload"></i>
+                    <span>Upload</span>
+                </label>
+                <input type="file" id="upload" accept="image/*" style="display: none;">
+                <button class="top-bar-btn" data-action="camera" id="camera-btn">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>Camera</span>
+                </button>
+                <button class="top-bar-btn" data-action="save" onclick="photoEditor.downloadImage()">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Save</span>
+                </button>
             </div>
 
-            <div style="display: flex; flex-direction: column; height: 100%; margin-top: 50px;">
-                <header class="app-header">
-                    <label for="upload" class="header-btn"><i class="fa-solid fa-upload"></i> Upload</label>
-                    <input type="file" id="upload" accept="image/*">
-                    <button id="camera-btn" class="header-btn"><i class="fa-solid fa-camera"></i> Camera</button>
-                    <button onclick="photoEditor.downloadImage()" class="header-btn"><i class="fa-solid fa-download"></i> Save</button>
-                </header>
-                <main class="image-container" id="image-container">
-                    <div class="image-wrapper" id="image-wrapper">
-                        <video id="video-feed" autoplay playsinline></video>
-                        <img id="mainImage" src="" alt="Image Yahan Dikhegi">
-                        <canvas id="drawing-canvas"></canvas>
-                        <div id="crop-overlay" class="crop-overlay"></div>
-                        <button id="capture-btn" title="Take Picture"></button>
+            <!-- Main Image Container -->
+            <main class="image-container" id="image-container">
+                <div class="image-wrapper" id="image-wrapper">
+                    <video id="video-feed" autoplay playsinline></video>
+                    <img id="mainImage" src="" alt="Please Upload an Image">
+                    <canvas id="drawing-canvas"></canvas>
+                    <div id="crop-overlay" class="crop-overlay"></div>
+                    <button id="capture-btn" title="Take Picture"></button>
+                </div>
+            </main>
+
+            <!-- Bottom Toolbar -->
+            <footer class="toolbar">
+                <div class="panel-container" id="panel-container">
+                    <div id="filtersPanel" class="panel"></div>
+                    <div id="adjustPanel" class="panel">
+                        <div class="adjust-slider"><label>Brightness <span id="brightness-val">100</span>%</label><input type="range" class="adjust-slider-input" data-filter="brightness" min="0" max="200" value="100"></div>
+                        <div class="adjust-slider"><label>Contrast <span id="contrast-val">100</span>%</label><input type="range" class="adjust-slider-input" data-filter="contrast" min="0" max="200" value="100"></div>
+                        <div class="adjust-slider"><label>Saturation <span id="saturate-val">100</span>%</label><input type="range" class="adjust-slider-input" data-filter="saturate" min="0" max="200" value="100"></div>
+                        <div class="adjust-slider"><label>Hue <span id="hue-rotate-val">0</span>°</label><input type="range" class="adjust-slider-input" data-filter="hue-rotate" min="0" max="360" value="0"></div>
+                        <div class="adjust-slider"><label>Grayscale <span id="grayscale-val">0</span>%</label><input type="range" class="adjust-slider-input" data-filter="grayscale" min="0" max="100" value="0"></div>
+                        <div class="adjust-slider"><label>Blur <span id="blur-val">0</span>px</label><input type="range" class="adjust-slider-input" data-filter="blur" min="0" max="10" value="0" step="0.1"></div>
                     </div>
-                </main>
-                <footer class="toolbar">
-                    <div class="panel-container" id="panel-container">
-                        <div id="filtersPanel" class="panel"></div>
-                        <div id="adjustPanel" class="panel">
-                            <div class="adjust-slider"><label>Brightness <span id="brightness-val">100</span>%</label><input type="range" class="adjust-slider-input" data-filter="brightness" min="0" max="200" value="100"></div>
-                            <div class="adjust-slider"><label>Contrast <span id="contrast-val">100</span>%</label><input type="range" class="adjust-slider-input" data-filter="contrast" min="0" max="200" value="100"></div>
-                            <div class="adjust-slider"><label>Saturation <span id="saturate-val">100</span>%</label><input type="range" class="adjust-slider-input" data-filter="saturate" min="0" max="200" value="100"></div>
-                            <div class="adjust-slider"><label>Hue <span id="hue-rotate-val">0</span>°</label><input type="range" class="adjust-slider-input" data-filter="hue-rotate" min="0" max="360" value="0"></div>
-                            <div class="adjust-slider"><label>Grayscale <span id="grayscale-val">0</span>%</label><input type="range" class="adjust-slider-input" data-filter="grayscale" min="0" max="100" value="0"></div>
-                            <div class="adjust-slider"><label>Blur <span id="blur-val">0</span>px</label><input type="range" class="adjust-slider-input" data-filter="blur" min="0" max="10" value="0" step="0.1"></div>
-                        </div>
-                        <div id="stickersPanel" class="panel"></div>
-                        <div id="drawPanel" class="panel">
-                            <div class="draw-tools"><button id="brush-btn" class="draw-tool-btn active"><i class="fa-solid fa-paintbrush"></i> Brush</button><button id="eraser-btn" class="draw-tool-btn"><i class="fa-solid fa-eraser"></i> Eraser</button><div id="brush-preview"></div><input type="color" id="color-picker" value="#00e676"></div>
-                            <div class="adjust-slider"><label>Size <span id="brush-size-val">8</span>px</label><input type="range" id="brush-size" min="1" max="100" value="8"></div>
-                            <div class="draw-actions"><button id="undo-draw-btn"><i class="fa-solid fa-undo"></i> Undo</button><button id="redo-draw-btn"><i class="fa-solid fa-redo"></i> Redo</button><button id="clear-draw-btn"><i class="fa-solid fa-trash"></i> Clear</button></div>
-                        </div>
-                        <div id="textPanel" class="panel">
-                            <textarea id="text-input" placeholder="Yahan apna text likhein..."></textarea>
-                            <div class="text-options"><div id="text-preview"></div><input type="color" id="text-color-picker" value="#00e676"><input type="range" id="text-size-slider" min="10" max="150" value="40" style="flex-grow: 1;"><label><span id="text-size-val">40</span>px</label></div>
-                            <button id="font-select-btn">Roboto</button><button id="add-text-btn" class="add-text-btn"><i class="fa-solid fa-plus"></i> Text Jodein</button>
-                        </div>
-                        <div id="framesPanel" class="panel">
-                            <div id="framesCategoryPanel" class="panel-view active"></div>
-                            <div id="framesDetailPanel" class="panel-view"></div>
-                        </div>
-                        <div id="cropPanel" class="panel">
-                            <div class="crop-shapes" id="crop-shapes"><button class="shape-btn active" data-ratio="free"><i class="fa-solid fa-vector-square"></i>Free</button><button class="shape-btn" data-ratio="1:1"><i class="fa-solid fa-square"></i>1:1</button><button class="shape-btn" data-ratio="4:5"><i class="fa-solid fa-portrait"></i>4:5</button><button class="shape-btn" data-ratio="16:9"><i class="fa-solid fa-film"></i>16:9</button><button class="shape-btn" data-ratio="circle"><i class="fa-regular fa-circle"></i>Circle</button></div>
-                            <div class="crop-options"><button id="apply-crop-btn" class="crop-btn"><i class="fa-solid fa-check"></i> Apply</button><button id="cancel-crop-btn" class="crop-btn"><i class="fa-solid fa-times"></i> Cancel</button></div>
-                        </div>
+                    <div id="stickersPanel" class="panel"></div>
+                    <div id="drawPanel" class="panel">
+                        <div class="draw-tools"><button id="brush-btn" class="draw-tool-btn active"><i class="fa-solid fa-paintbrush"></i> Brush</button><button id="eraser-btn" class="draw-tool-btn"><i class="fa-solid fa-eraser"></i> Eraser</button><div id="brush-preview"></div><input type="color" id="color-picker" value="#00e676"></div>
+                        <div class="adjust-slider"><label>Size <span id="brush-size-val">8</span>px</label><input type="range" id="brush-size" min="1" max="100" value="8"></div>
+                        <div class="draw-actions"><button id="undo-draw-btn"><i class="fa-solid fa-undo"></i> Undo</button><button id="redo-draw-btn"><i class="fa-solid fa-redo"></i> Redo</button><button id="clear-draw-btn"><i class="fa-solid fa-trash"></i> Clear</button></div>
                     </div>
-                    <nav class="toolbar-nav" id="toolbar-nav">
-                        <button class="tool-btn" data-tool="filters"><i class="fa-solid fa-wand-magic-sparkles"></i> Filters</button>
-                        <button class="tool-btn" data-tool="adjust"><i class="fa-solid fa-sliders"></i> Adjust</button>
-                        <button class="tool-btn" data-tool="stickers"><i class="fa-solid fa-face-smile"></i> Stickers</button>
-                        <button class="tool-btn" data-tool="draw"><i class="fa-solid fa-pencil"></i> Draw</button>
-                        <button class="tool-btn" data-tool="text"><i class="fa-solid fa-font"></i> Text</button>
-                        <button class="tool-btn" data-tool="frames"><i class="fa-solid fa-border-all"></i> Frame</button>
-                        <button class="tool-btn" data-tool="crop"><i class="fa-solid fa-crop-simple"></i> Crop</button>
-                    </nav>
-                </footer>
-            </div>
+                    <div id="textPanel" class="panel">
+                        <textarea id="text-input" placeholder="Yahan apna text likhein..."></textarea>
+                        <div class="text-options"><div id="text-preview"></div><input type="color" id="text-color-picker" value="#00e676"><input type="range" id="text-size-slider" min="10" max="150" value="40" style="flex-grow: 1;"><label><span id="text-size-val">40</span>px</label></div>
+                        <button id="font-select-btn">Roboto</button><button id="add-text-btn" class="add-text-btn"><i class="fa-solid fa-plus"></i> Text Jodein</button>
+                    </div>
+                    <div id="framesPanel" class="panel">
+                        <div id="framesCategoryPanel" class="panel-view active"></div>
+                        <div id="framesDetailPanel" class="panel-view"></div>
+                    </div>
+                    <div id="cropPanel" class="panel">
+                        <div class="crop-shapes" id="crop-shapes"><button class="shape-btn active" data-ratio="free"><i class="fa-solid fa-vector-square"></i>Free</button><button class="shape-btn" data-ratio="1:1"><i class="fa-solid fa-square"></i>1:1</button><button class="shape-btn" data-ratio="4:5"><i class="fa-solid fa-portrait"></i>4:5</button><button class="shape-btn" data-ratio="16:9"><i class="fa-solid fa-film"></i>16:9</button><button class="shape-btn" data-ratio="circle"><i class="fa-regular fa-circle"></i>Circle</button></div>
+                        <div class="crop-options"><button id="apply-crop-btn" class="crop-btn"><i class="fa-solid fa-check"></i> Apply</button><button id="cancel-crop-btn" class="crop-btn"><i class="fa-solid fa-times"></i> Cancel</button></div>
+                    </div>
+                </div>
+                <nav class="toolbar-nav" id="toolbar-nav">
+                    <button class="tool-btn" data-tool="filters"><i class="fa-solid fa-wand-magic-sparkles"></i> Filters</button>
+                    <button class="tool-btn" data-tool="adjust"><i class="fa-solid fa-sliders"></i> Adjust</button>
+                    <button class="tool-btn" data-tool="stickers"><i class="fa-solid fa-face-smile"></i> Stickers</button>
+                    <button class="tool-btn" data-tool="draw"><i class="fa-solid fa-pencil"></i> Draw</button>
+                    <button class="tool-btn" data-tool="text"><i class="fa-solid fa-font"></i> Text</button>
+                    <button class="tool-btn" data-tool="frames"><i class="fa-solid fa-border-all"></i> Frame</button>
+                    <button class="tool-btn" data-tool="crop"><i class="fa-solid fa-crop-simple"></i> Crop</button>
+                </nav>
+            </footer>
             <div id="font-picker-modal">
                 <div class="font-picker-content"></div>
             </div>
