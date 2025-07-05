@@ -1999,11 +1999,11 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 /* === AI Photo Editor Styles (Code 1) - START === */
 /* ======================================================= */
 
-/* Main screen layout using Flexbox */
+/* Main screen layout using Grid for robustness */
 #image-editor-screen {
     padding: 0;
-    display: flex;
-    flex-direction: column;
+    display: grid; /* MODIFIED: Using Grid for stable layout */
+    grid-template-rows: auto 1fr auto; /* DEFINED: Header, Main Content (stretches), Footer */
     height: 100vh;
     font-family: 'Roboto Flex', sans-serif;
     background: var(--background);
@@ -2042,8 +2042,7 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 
 /* Main Image Display Area */
 #image-editor-screen .image-container { 
-    flex: 1; /* This takes all available vertical space */
-    min-height: 0; /* Flexbox fix */
+    min-height: 0; /* Grid/Flex fix */
     display: flex; 
     justify-content: center; 
     align-items: center; 
@@ -2069,7 +2068,6 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 /* Bottom Toolbar Wrapper */
 #image-editor-screen .editor-toolbar {
     background: var(--dark-grey); 
-    flex-shrink: 0; 
     z-index: 20;
     display: flex;
     flex-direction: column;
