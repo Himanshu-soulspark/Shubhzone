@@ -25,26 +25,29 @@ html, body {
     height: 100%; /* Ensure html and body take full height */
     overscroll-behavior-y: none; /* Prevent pull-to-refresh/scroll conflicts */
     zoom: 1; /* Attempt to normalize zoom level */
-    /* === ADDED: Attempt to remove unwanted borders/outlines === */
+    /* === ADDED: Attempt to remove unwanted borders/outlines across the whole page === */
     border: none !important;
     outline: none !important;
     box-shadow: none !important;
-    /* ========================================================= */
+    /* ============================================================================= */
 }
 
 *, *:before, *:after {
     box-sizing: inherit; /* Apply box-sizing to all elements */
-    /* === ADDED: Attempt to remove unwanted borders/outlines === */
-    border: none !important;
+    /* === ADDED: Attempt to remove unwanted borders/outlines on all elements === */
+    /* Use with caution, might affect intended borders, but targets the artifact */
+    /* border: none !important; */ /* Keep this commented unless strictly necessary as it breaks intended borders */
     outline: none !important;
     box-shadow: none !important;
-    /* ========================================================= */
+    /* ========================================================================= */
 }
 
 body {
     font-family: 'Poppins', sans-serif;
+    /* === ADDED: Ensure body uses the theme background and text color === */
     background-color: var(--background);
     color: var(--text-color);
+    /* =============================================================== */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -63,7 +66,9 @@ body {
     flex-direction: column;
     position: relative;
     overflow: hidden;
+    /* === ADDED: Ensure app container uses the theme background === */
     background-color: var(--background); /* Solid base background */
+    /* =========================================================== */
     transform-origin: center center;
     isolation: isolate; /* Create a stacking context */
     /* === ADDED: Attempt to remove unwanted borders/outlines === */
@@ -118,7 +123,7 @@ body {
     overflow-y: auto; /* Allow screens to scroll if content overflows */
     -webkit-overflow-scrolling: touch;
     transform-origin: center center;
-    /* === ADDED: Ensure screens use the theme background === */
+    /* === ADDED: Ensure all screens use the theme background === */
     background-color: var(--background);
     /* ==================================================== */
 }
@@ -505,6 +510,11 @@ body {
     justify-content: center;
     align-items: center;
     background-color: #000;
+    /* === ADDED: Target elements potentially causing video artifact === */
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    /* =============================================================== */
 }
 
 .video-slide .player-container,
@@ -517,6 +527,11 @@ body {
     left: 0;
     z-index: 1;
     object-fit: cover; /* Added for HTML5 video */
+     /* === ADDED: Target elements potentially causing video artifact === */
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    /* =============================================================== */
 }
 
 .video-slide iframe {
@@ -538,6 +553,11 @@ body {
     align-items: center;
     background-size: cover;
     background-position: center;
+     /* === ADDED: Target elements potentially causing video artifact === */
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    /* =============================================================== */
 }
 
 #home-screen .static-message {
@@ -801,7 +821,10 @@ body {
     align-items: center;
     width: calc(100% - 30px); /* Account for screen padding */
     padding: 10px 0;
-    background-color: rgba(15, 15, 15, 0.7);
+    /* === UPDATED: Use theme background for consistency === */
+    background-color: var(--dark-grey); /* Use dark-grey for visibility against darker background */
+    /* background-color: rgba(15, 15, 15, 0.7); /* Original with opacity */
+    /* ==================================================== */
     backdrop-filter: blur(5px);
     border-bottom: 1px solid var(--light-grey);
     flex-shrink: 0;
@@ -824,6 +847,10 @@ body {
     font-size: 0.8em;
     transition: color 0.3s ease;
     flex-grow: 1;
+    /* === ADDED: Explicitly set color for icons === */
+    /* Color set by parent, but reinforcing */
+    /* color: var(--text-color); */
+    /* ======================================== */
 }
 
 .friends-nav-icon i {
@@ -1724,7 +1751,10 @@ html {
     width: 100%;
     height: 60%;
     max-height: 70vh;
-    background-color: #181818; /* Specific dark background */
+    /* === ADDED: Use theme background for comments modal === */
+    background-color: var(--background);
+    /* background-color: #181818; /* Original specific dark background */
+    /* ==================================================== */
     border-radius: 15px 15px 0 0;
     box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
     display: flex;
@@ -1832,7 +1862,10 @@ html {
     left: 0;
     width: 280px;
     height: 100%;
-    background-color: #1a1a1a; /* Specific dark background */
+    /* === ADDED: Use theme background for sidebar === */
+    background-color: var(--background);
+    /* background-color: #1a1a1a; /* Original specific dark background */
+    /* ============================================ */
     z-index: 1001;
     transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
@@ -1998,7 +2031,9 @@ html {
 }
 
 #audio-issue-popup .popup-content {
+    /* === ADDED: Use theme background for popup === */
     background-color: var(--dark-grey);
+    /* ========================================== */
     padding: 30px;
     border-radius: 15px;
     width: 90%;
@@ -2048,26 +2083,25 @@ html {
 }
 
 /* Light Theme Overrides */
+/* These styles are applied *only* when the html element has the class "light-theme" */
 html.light-theme {
     --background: #f7f7f7;
     --text-color: #111111;
     --dark-grey: #ffffff;
     --light-grey: #e0e0e0;
 }
+/* Apply light theme colors to relevant elements */
 html.light-theme body,
-html.light-theme #image-editor-screen,
-html.light-theme #information-screen,
-html.light-theme #upload-screen,
-html.light-theme #wallet-screen,
-html.light-theme #friends-screen,
-html.light-theme #leaderboard-screen,
-html.light-theme #profile-screen,
-html.light-theme #withdraw-success-screen,
-html.light-theme #theme-settings-screen,
-html.light-theme #premium-upload-screen {
-     background-color: var(--background); /* Ensure all screens use the light background */
+html.light-theme .screen, /* Applies to all screens except splash */
+html.light-theme .modal-content,
+html.light-theme .comments-modal-content,
+html.light-theme .main-sidebar,
+html.light-theme #audio-issue-popup .popup-content,
+html.light-theme #image-editor-screen {
+     background-color: var(--background);
      color: var(--text-color);
 }
+
 html.light-theme .app-container::before { opacity: 0.05; } /* Reduce particle opacity in light mode */
 html.light-theme .sub-message,
 html.light-theme .wallet-card .balance-label,
@@ -2102,10 +2136,9 @@ html.light-theme .bottom-nav {
 }
 html.light-theme .screen-header,
 html.light-theme .home-top-bar,
-html.light-theme .main-sidebar,
-html.light-theme .comments-modal-content,
-html.light-theme #audio-issue-popup .popup-content {
-    background-color: var(--dark-grey); /* Use light theme dark-grey (#fff) or adjusted color */
+html.light-theme .friends-top-nav, /* Added friends top nav to light theme */
+html.light-theme .main-sidebar {
+    background-color: var(--dark-grey); /* Use light theme dark grey (#fff) or adjusted color */
 }
 html.light-theme .main-sidebar { box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
 html.light-theme .static-message { background-color: rgba(0,0,0,0.05); color: var(--text-color); }
@@ -2116,6 +2149,37 @@ html.light-theme .nav-item:not(.active)[data-nav="upload"] i { color: #4CAF50; }
 html.light-theme .nav-item:not(.active)[data-nav="wallet"] i { color: #2196F3; }
 html.light-theme .nav-item:not(.active)[data-nav="friends"] i { color: #00BCD4; }
 html.light-theme .nav-item:not(.active)[data-nav="profile"] i { color: #9C27B0; }
+
+/* Ensure padding is consistent in light theme for elements needing nav clearance */
+html.light-theme #information-screen > div:nth-of-type(2) { /* Specific selector for the information screen content div */
+    padding-bottom: 80px !important; /* Use !important to override inline style */
+}
+html.light-theme #wallet-screen,
+html.light-theme #leaderboard-screen,
+html.light-theme #profile-screen,
+html.light-theme #withdraw-success-screen,
+html.light-theme #theme-settings-screen {
+    padding-bottom: 80px;
+}
+html.light-theme #home-screen #video-swiper,
+html.light-theme #friends-screen, /* Friends screen handles its own scroll */
+html.light-theme #upload-screen .upload-container-new, /* Upload container scrolls */
+html.light-theme #premium-upload-screen .premium-upload-container /* Premium Upload container scrolls */
+{
+     padding-bottom: 60px;
+}
+/* Adjustments for light theme sticky/fixed elements */
+html.light-theme .friends-top-nav {
+    background-color: var(--dark-grey); /* Adjust sticky header background in light mode */
+    border-bottom-color: var(--light-grey);
+}
+html.light-theme .sidebar-option {
+    background: var(--dark-grey); /* Use light theme dark-grey (#fff) */
+    border-color: var(--light-grey); /* Use light theme light-grey */
+}
+html.light-theme .sidebar-option:hover {
+    background-color: var(--light-grey); /* Use light theme light-grey */
+}
 
 
 /* =============================================== */
@@ -2131,9 +2195,7 @@ html.light-theme .nav-item:not(.active)[data-nav="profile"] i { color: #9C27B0; 
     padding: 0; /* Handled by inner elements/layout */
     display: block;
     font-family: 'Roboto Flex', sans-serif;
-    background: var(--background); /* FIX: Use main theme color */
-    color: var(--text-color); /* FIX: Use main theme color */
-     /* Inherits background-color: var(--background) from .screen */
+    /* Inherits background-color: var(--background) and color: var(--text-color) from .screen */
 }
 
 #image-editor-screen .editor-header {
@@ -2169,9 +2231,21 @@ html.light-theme .nav-item:not(.active)[data-nav="profile"] i { color: #9C27B0; 
 #image-editor-screen .header-btn:active { transform: scale(0.96); }
 #image-editor-screen #upload { display: none; }
 #image-editor-screen .image-container { height: 100%; display: flex; justify-content: center; align-items: center; padding: 15px; overflow: hidden; position: relative; }
-#image-editor-screen .image-wrapper { width: 100%; max-width: 380px; aspect-ratio: 9 / 16; background: #1e1e1e; border-radius: 20px; display: flex; justify-content: center; align-items: center; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.4); position: relative; }
+#image-editor-screen .image-wrapper { width: 100%; max-width: 380px; aspect-ratio: 9 / 16; background: #1e1e1e; border-radius: 20px; display: flex; justify-content: center; align-items: center; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.4); position: relative;
+     /* === ADDED: Target elements potentially causing video artifact === */
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    /* =============================================================== */
+}
 #image-editor-screen .image-wrapper::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: 100% 100%; background-repeat: no-repeat; pointer-events: none; z-index: 5; border-radius: 20px; background-image: var(--frame-image); }
-#image-editor-screen #mainImage, #image-editor-screen #video-feed { max-width: 100%; max-height: 100%; display: block; transition: filter 0.3s ease; object-fit: contain; }
+#image-editor-screen #mainImage, #image-editor-screen #video-feed { max-width: 100%; max-height: 100%; display: block; transition: filter 0.3s ease; object-fit: contain;
+     /* === ADDED: Target elements potentially causing video artifact === */
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    /* =============================================================== */
+}
 #image-editor-screen #video-feed { display: none; }
 #image-editor-screen #drawing-canvas { position: absolute; top: 0; left: 0; z-index: 8; touch-action: none; }
 #image-editor-screen .toolbar { background: var(--dark-grey); border-top: 1px solid var(--light-grey); flex-shrink: 0; z-index: 20; padding-bottom: env(safe-area-inset-bottom); }
@@ -2339,11 +2413,9 @@ html.light-theme .nav-item:not(.active)[data-nav="profile"] i { color: #9C27B0; 
     color: var(--success-green);
 }
 html.light-theme #information-screen > div:nth-of-type(2) { /* Specific selector for the information screen content div */
-    /* Keep the padding consistent in light theme too */
     padding-bottom: 80px !important; /* Use !important to override inline style */
 }
-/* === ADDED Light Theme adjustment for Wallet, Profile, Withdraw Success, Theme Settings, Leaderboard === */
-/* Ensure padding is consistent in light theme for screens that scroll themselves */
+/* Ensure padding is consistent in light theme for elements needing nav clearance */
 html.light-theme #wallet-screen,
 html.light-theme #leaderboard-screen,
 html.light-theme #profile-screen,
@@ -2351,8 +2423,6 @@ html.light-theme #withdraw-success-screen,
 html.light-theme #theme-settings-screen {
     padding-bottom: 80px;
 }
-/* === ADDED Light Theme adjustment for Home, Friends, Upload, Premium Upload === */
-/* Ensure padding is consistent in light theme for containers that scroll or screens with specific layouts */
 html.light-theme #home-screen #video-swiper,
 html.light-theme #friends-screen, /* Friends screen handles its own scroll */
 html.light-theme #upload-screen .upload-container-new, /* Upload container scrolls */
@@ -2362,7 +2432,7 @@ html.light-theme #premium-upload-screen .premium-upload-container /* Premium Upl
 }
 /* Adjustments for light theme sticky/fixed elements */
 html.light-theme .friends-top-nav {
-    background-color: rgba(240, 240, 240, 0.95); /* Adjust sticky header background */
+    background-color: var(--dark-grey); /* Adjust sticky header background in light mode */
     border-bottom-color: var(--light-grey);
 }
 html.light-theme .modal-content {
