@@ -6,7 +6,7 @@ New File.css
 /* === Shubhzone App Styles (Code 2) - START === */
 /* ================================================= */
 
-/* Design Style Guide */
+/* Design Style Guide - Default is DARK MODE */
 :root {
     --background: #0f0f0f;
     --primary-neon: #F44336; /* Defaulting to red as per image */
@@ -17,6 +17,14 @@ New File.css
     --light-grey: #444;
 }
 
+/* === MODIFIED: Global fix for unwanted borders/lines === */
+*, *:before, *:after {
+    box-sizing: inherit; /* Apply box-sizing to all elements */
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 html, body {
     margin: 0;
     padding: 0;
@@ -25,29 +33,12 @@ html, body {
     height: 100%; /* Ensure html and body take full height */
     overscroll-behavior-y: none; /* Prevent pull-to-refresh/scroll conflicts */
     zoom: 1; /* Attempt to normalize zoom level */
-    /* === ADDED: Attempt to remove unwanted borders/outlines across the whole page === */
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-    /* ============================================================================= */
-}
-
-*, *:before, *:after {
-    box-sizing: inherit; /* Apply box-sizing to all elements */
-    /* === ADDED: Attempt to remove unwanted borders/outlines on all elements === */
-    /* Use with caution, might affect intended borders, but targets the artifact */
-    /* border: none !important; */ /* Keep this commented unless strictly necessary as it breaks intended borders */
-    outline: none !important;
-    box-shadow: none !important;
-    /* ========================================================================= */
 }
 
 body {
     font-family: 'Poppins', sans-serif;
-    /* === ADDED: Ensure body uses the theme background and text color === */
     background-color: var(--background);
     color: var(--text-color);
-    /* =============================================================== */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -66,16 +57,9 @@ body {
     flex-direction: column;
     position: relative;
     overflow: hidden;
-    /* === ADDED: Ensure app container uses the theme background === */
     background-color: var(--background); /* Solid base background */
-    /* =========================================================== */
     transform-origin: center center;
     isolation: isolate; /* Create a stacking context */
-    /* === ADDED: Attempt to remove unwanted borders/outlines === */
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-    /* ========================================================= */
 }
 
 .app-container::before {
@@ -120,28 +104,26 @@ body {
     box-sizing: border-box;
     opacity: 0;
     pointer-events: none;
-    overflow-y: auto; /* Allow screens to scroll if content overflows */
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     transform-origin: center center;
-    /* === ADDED: Ensure all screens use the theme background === */
+    /* === MODIFIED: Ensure all screens default to dark background === */
     background-color: var(--background);
-    /* ==================================================== */
 }
 
 #splash-screen {
+    /* Splash screen has its own intentional gradient background */
+    background: linear-gradient(to bottom, #87CEEB, #FFD700, #FFA500, #FF69B4, #F44336, #4CAF50);
+    z-index: 11;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
     padding: 40px 20px 20px 20px;
-    /* Kept original gradient as it seems intentional for splash */
-    background: linear-gradient(to bottom, #87CEEB, #FFD700, #FFA500, #FF69B4, #F44336, #4CAF50);
     box-sizing: border-box;
     text-align: center;
     overflow: hidden;
     position: relative;
-    /* Splash screen is explicitly not using --background */
-    /* background-color: var(--background); */
 }
 
 .screen.active {
@@ -371,9 +353,6 @@ body {
     margin: 0;
 }
 
-#information-screen {
-    /* Inherits background-color: var(--background) from .screen */
-}
 #information-screen h2 {
     font-size: 1.8em;
     margin-bottom: 20px;
@@ -423,9 +402,7 @@ body {
     color: rgba(255, 255, 255, 0.8);
     font-size: 0.9em;
 }
-#information-screen input[type="text"],
-#information-screen input[type="tel"],
-#information-screen input[type="email"],
+#information-screen input,
 #information-screen select {
     width: 100%;
     padding: 12px 15px;
@@ -480,58 +457,44 @@ body {
 }
 
 #home-screen {
-    padding: 0; /* Screen padding handled by inner elements */
-    overflow: hidden; /* Container manages its overflow */
+    padding: 0;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     height: 100%;
-     /* Inherits background-color: var(--background) from .screen */
 }
 
 #video-swiper {
     flex-grow: 1;
     width: 100%;
-    height: 100%; /* Will take remaining height due to flex-grow */
-    overflow-y: scroll; /* This element is the main scroller */
+    height: 100%;
+    overflow-y: scroll;
     scroll-snap-type: y mandatory;
     -webkit-overflow-scrolling: touch;
-    /* === ADJUSTED for Bottom Nav Clearance === */
-    /* Need 60px clearance for the fixed nav */
     padding-bottom: 60px;
-    /* ========================================= */
 }
 
 .video-slide {
     width: 100%;
-    height: 100%; /* Each slide takes full height of the swiper */
+    height: 100%;
     scroll-snap-align: start;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: #000;
-    /* === ADDED: Target elements potentially causing video artifact === */
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-    /* =============================================================== */
 }
 
 .video-slide .player-container,
-.video-slide .html5-player { /* Added html5-player */
+.video-slide .html5-player {
     width: 100%;
     height: 100%;
-    max-width: 420px; /* Restrict max width */
+    max-width: 420px;
     position: absolute;
     top: 0;
     left: 0;
     z-index: 1;
-    object-fit: cover; /* Added for HTML5 video */
-     /* === ADDED: Target elements potentially causing video artifact === */
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-    /* =============================================================== */
+    object-fit: cover;
 }
 
 .video-slide iframe {
@@ -553,11 +516,6 @@ body {
     align-items: center;
     background-size: cover;
     background-position: center;
-     /* === ADDED: Target elements potentially causing video artifact === */
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-    /* =============================================================== */
 }
 
 #home-screen .static-message {
@@ -571,7 +529,7 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 10; /* Ensure message is above video but below nav/actions */
+    z-index: 10;
 }
 
 .bottom-nav {
@@ -582,9 +540,7 @@ body {
     height: 60px;
     background-color: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(10px);
-    /* === CHANGED: Position fixed relative to viewport === */
     position: fixed;
-    /* ==================================================== */
     bottom: 0;
     left: 0;
     z-index: 100;
@@ -605,13 +561,7 @@ body {
     padding-top: 5px;
 }
 
-.nav-item.active {
-    color: transparent;
-    background: linear-gradient(45deg, var(--primary-neon), var(--accent-color));
-    -webkit-background-clip: text;
-    background-clip: text;
-}
-.nav-item.active i {
+.nav-item.active, .nav-item.active i {
     color: transparent;
     background: linear-gradient(45deg, var(--primary-neon), var(--accent-color));
     -webkit-background-clip: text;
@@ -631,11 +581,7 @@ body {
 
 #upload-screen {
     justify-content: flex-start;
-    /* Keep existing padding */
-    padding: 20px;
-    /* REMOVED: padding-bottom for nav clearance as inner container handles it */
-    /* padding-bottom: 80px; */
-    /* Inherits background-color: var(--background) from .screen */
+    padding: 0; /* Let inner container handle padding */
 }
 
 #upload-screen .upload-header {
@@ -643,6 +589,7 @@ body {
     text-align: center;
     color: var(--text-color);
     margin-bottom: 20px;
+    padding: 20px 20px 0 20px; /* Add padding to header */
 }
 #upload-screen .upload-header h2 {
     margin: 0 0 5px 0;
@@ -661,28 +608,25 @@ body {
     align-items: center;
     justify-content: center;
     gap: 20px;
-    padding: 20px; /* Internal padding */
-    overflow-y: auto; /* This is the scrollable container */
-    /* === ADJUSTED for Bottom Nav Clearance === */
-    /* Needs 60px clearance for the fixed nav */
-    padding-bottom: 60px;
-    /* ========================================= */
+    padding: 20px;
+    overflow-y: auto;
+    padding-bottom: 80px; /* 60px nav + 20px padding */
 }
 
 .upload-action-button {
-    display: flex; /* Changed to flex for icon alignment */
+    display: flex;
     align-items: center;
     justify-content: center;
-    color: #ffffff; /* Changed to white for better contrast */
+    color: var(--background);
     padding: 15px 30px;
     border-radius: 10px;
-    font-size: 1.1em; /* Slightly adjusted */
+    font-size: 1.1em;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
     border: none;
-    width: 90%; /* Adjusted width */
-    max-width: 320px; /* Adjusted max-width */
+    width: 90%;
+    max-width: 320px;
     text-align: center;
     background-color: var(--success-green);
 }
@@ -692,13 +636,8 @@ body {
 }
 
 #wallet-screen {
-    /* Keep existing padding: 20px */
     padding: 20px;
-    /* === ADJUSTED for Bottom Nav Clearance === */
-    /* Screen scrolls, needs 60px clearance for the fixed nav + screen's 20px bottom padding */
-    padding-bottom: 80px;
-    /* ========================================= */
-    /* Inherits background-color: var(--background) from .screen */
+    padding-bottom: 80px; /* 60px nav + 20px padding */
 }
 
 #wallet-screen .wallet-card {
@@ -796,45 +735,26 @@ body {
     font-weight: bold;
 }
 
+/* === MODIFIED: Friends Screen Layout === */
 #friends-screen {
-    /* padding: 0; /* Screen handles padding directly */
+    padding: 0; /* Remove screen padding */
     display: flex;
     flex-direction: column;
     height: 100%;
-    overflow-y: auto; /* Screen itself is scrollable */
-    /* Inherits background-color: var(--background) from .screen */
-    /* === ADJUSTED for Top/Bottom Nav Clearance === */
-    /* Needs 60px clearance below sticky top nav + 15px internal padding */
-    padding-top: calc(60px + 15px);
-    /* Needs 60px clearance above fixed bottom nav + 15px internal padding */
-    padding-bottom: calc(60px + 15px);
-    padding-left: 15px;
-    padding-right: 15px;
-    /* ========================================= */
+    overflow: hidden; /* Screen itself does not scroll */
 }
 
 .friends-top-nav {
     display: flex;
-    /* === MODIFIED: Ensure space-around for even distribution === */
-    justify-content: space-around; /* Use space-around as requested */
-    /* ========================================================== */
+    justify-content: space-around; /* Evenly space icons */
     align-items: center;
-    width: calc(100% - 30px); /* Account for screen padding */
-    padding: 10px 0;
-    /* === UPDATED: Use theme background for consistency === */
-    background-color: var(--dark-grey); /* Use dark-grey for visibility against darker background */
-    /* background-color: rgba(15, 15, 15, 0.7); /* Original with opacity */
-    /* ==================================================== */
-    backdrop-filter: blur(5px);
+    width: 100%;
+    padding: 10px 15px;
+    background-color: var(--dark-grey); /* Use a solid dark color */
     border-bottom: 1px solid var(--light-grey);
-    flex-shrink: 0;
+    flex-shrink: 0; /* Prevent this from shrinking */
     z-index: 20;
-    /* === ADDED: Make the header sticky at the top === */
-    position: sticky;
-    top: 0;
-    /* ================================================= */
-    margin: 0 -15px; /* Extend horizontally to cover screen padding */
-    padding: 10px 15px; /* Add back horizontal padding */
+    /* This element is now a static header for the screen */
 }
 
 .friends-nav-icon {
@@ -846,12 +766,9 @@ body {
     cursor: pointer;
     font-size: 0.8em;
     transition: color 0.3s ease;
-    flex-grow: 1;
-    /* === ADDED: Explicitly set color for icons === */
-    /* Color set by parent, but reinforcing */
-    /* color: var(--text-color); */
-    /* ======================================== */
+    flex-grow: 1; /* This will help with even spacing */
 }
+/* ========================================= */
 
 .friends-nav-icon i {
     font-size: 1.8em;
@@ -863,11 +780,11 @@ body {
 }
 
 .user-list-container {
-    flex-grow: 1;
+    flex-grow: 1; /* This container takes up remaining space */
     width: 100%;
-    /* REMOVED: overflow-y: auto as screen scrolls */
-    /* REMOVED: padding adjustments as screen handles clearance */
-    padding: 0; /* Reset padding, rely on screen padding */
+    overflow-y: auto; /* This container is now the scrollable part */
+    padding: 15px; /* Add padding inside the scrollable area */
+    padding-bottom: 75px; /* 60px nav + 15px padding */
 }
 
 .user-card {
@@ -981,13 +898,6 @@ body {
 }
 
 
-#leaderboard-screen {
-    padding: 20px; /* Add padding */
-    overflow-y: auto; /* Make screen scrollable */
-    padding-bottom: 80px; /* Add nav clearance */
-    /* Inherits background-color: var(--background) from .screen */
-}
-
 #leaderboard-screen .leaderboard-card {
     background-color: rgba(0, 0, 0, 0.3);
     border-radius: 15px;
@@ -1047,10 +957,7 @@ body {
 
 #profile-screen {
     justify-content: flex-start;
-    padding: 20px; /* Add padding */
-    /* Keep existing padding-bottom for screen element: 20px + 60px nav */
     padding-bottom: 80px;
-    /* Inherits background-color: var(--background) from .screen */
 }
 
 #profile-screen .profile-header {
@@ -1182,13 +1089,7 @@ body {
     flex-direction: column;
     justify-content: center;
     text-align: center;
-    /* Keep existing padding: 20px */
-    padding: 20px;
-    /* === ADJUSTED for Bottom Nav Clearance === */
-    /* Screen scrolls, needs 60px clearance for the fixed nav + screen's 20px bottom padding */
     padding-bottom: 80px;
-    /* ====================================== */
-    /* Inherits background-color: var(--background) from .screen */
 }
 
 #withdraw-success-screen .success-icon {
@@ -1267,7 +1168,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    overflow-y: auto; /* Allow modal content to scroll */
+    overflow-y: auto;
     max-height: 85vh;
 }
 
@@ -1297,45 +1198,31 @@ body {
 }
 
 .modal-content .input-group,
-#premium-upload-screen .input-group { /* Added premium screen selector */
+#premium-upload-screen .input-group {
     margin-bottom: 20px;
     text-align: left;
     width: 100%;
 }
 
-/* Specific selector for the information screen content div */
-/* Assuming the HTML structure is <div id="information-screen" class="screen"> ... <div style="..."> ... </div> ... </div> */
-/* The div with inline style "margin-top: 60px; width: 100%; overflow-y: auto; padding-bottom: 20px;" is the one needing adjustment */
-/* Selector `#information-screen > div:nth-of-type(2)` assumes this div is the 2nd child inside #information-screen */
 #information-screen > div:nth-of-type(2) {
-    /* Keep existing inline styles (margin-top, width, overflow-y) */
-    /* === ADJUSTED padding-bottom for Bottom Nav Clearance === */
-    /* Override the inline padding-bottom: 20px to be 80px (60px nav + 20px screen padding) */
-    /* Note: If this specific selector doesn't work due to HTML changes,
-             you might need to target it differently, e.g., using a class */
     padding-bottom: 80px !important; /* Use !important to override inline style */
-    /* ====================================== */
 }
 
 
 #information-screen label,
-#premium-upload-screen label { /* Added premium screen selector */
+#premium-upload-screen label {
     display: block;
     font-size: 1.1em;
     margin-bottom: 8px;
     color: var(--text-color);
 }
 
-#information-screen input[type="text"],
-#information-screen input[type="tel"],
-#information-screen input[type="email"],
+#information-screen input,
 #information-screen select,
-.modal-content input[type="text"],
-.modal-content input[type="email"],
-.modal-content input[type="url"],
+.modal-content input,
 .modal-content textarea,
-#premium-upload-screen input[type="text"], /* Added premium screen selector */
-#premium-upload-screen textarea { /* Added premium screen selector */
+#premium-upload-screen input,
+#premium-upload-screen textarea {
     width: 100%;
     padding: 12px 15px;
     border: none;
@@ -1348,8 +1235,8 @@ body {
 }
 .modal-content input::placeholder,
 .modal-content textarea::placeholder,
-#premium-upload-screen input::placeholder, /* Added premium screen selector */
-#premium-upload-screen textarea::placeholder { /* Added premium screen selector */
+#premium-upload-screen input::placeholder,
+#premium-upload-screen textarea::placeholder {
     color: rgba(255, 255, 255, 0.5);
 }
 
@@ -1438,11 +1325,11 @@ body {
 }
 .audience-option.selected {
     border-color: var(--primary-neon);
-    background-color: rgba(0, 255, 229, 0.2); /* Using a bright color with opacity for selection */
+    background-color: rgba(244, 67, 54, 0.15); /* Use primary neon with opacity */
 }
 .audience-option i {
     font-size: 1.2em;
-    color: var(--primary-neon); /* Use primary neon for icon */
+    color: var(--primary-neon);
 }
 
 .comments-toggle {
@@ -1499,7 +1386,7 @@ input:checked + .slider:before {
 }
 
 .modal-content .save-button,
-#premium-upload-screen .save-button { /* Added premium screen selector */
+#premium-upload-screen .save-button {
     background-color: var(--success-green);
     color: var(--background);
     padding: 12px 25px;
@@ -1512,20 +1399,17 @@ input:checked + .slider:before {
     width: 100%;
 }
 .modal-content .save-button:hover,
-#premium-upload-screen .save-button:hover { /* Added premium screen selector */
+#premium-upload-screen .save-button:hover {
     background-color: #388e3c;
 }
 
-/* Custom Scrollbar - Kept the hidden style as requested */
 ::-webkit-scrollbar {
     width: 0px;
     background: transparent;
 }
-/* For Firefox */
 html {
   scrollbar-width: none;
 }
-
 
 .screen-header {
     position: absolute;
@@ -1561,7 +1445,7 @@ html {
 
 .video-actions-overlay {
     position: absolute;
-    bottom: 75px; /* Adjust to be above nav */
+    bottom: 75px;
     right: 10px;
     z-index: 15;
     display: flex;
@@ -1583,20 +1467,20 @@ html {
     transition: transform 0.2s ease, color 0.2s ease;
 }
 
-.action-icon-container[data-action="like"] .icon { color: #ffffff; } /* Default like icon color */
-.action-icon-container[data-action="comment"] .icon { color: #2196F3; } /* Comment icon color */
+.action-icon-container[data-action="like"] .icon { color: #ffffff; }
+.action-icon-container[data-action="comment"] .icon { color: #2196F3; }
 
 .action-icon-container:hover .icon {
     transform: scale(1.1);
 }
 .action-icon-container .icon.liked {
-     color: #E91E63; /* Liked color */
+     color: #E91E63;
 }
 .action-icon-container .count {
     font-size: 0.9em;
     font-weight: bold;
     margin-top: 4px;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5); /* Add text shadow for readability */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
 }
 .action-icon-container.disabled .icon {
     color: #888;
@@ -1609,7 +1493,7 @@ html {
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
     font-size: 8em;
-    color: rgba(233, 30, 99, 0.8); /* Match liked color */
+    color: rgba(233, 30, 99, 0.8);
     z-index: 20;
     opacity: 0;
     pointer-events: none;
@@ -1642,17 +1526,17 @@ html {
     font-size: 1.6em;
     padding: 0 10px;
     cursor: pointer;
-    color: var(--text-color); /* Ensure icon uses theme color */
+    color: var(--text-color);
 }
 
 .category-scroller {
     flex-grow: 1;
     display: flex;
     gap: 10px;
-    overflow-x: auto; /* This element scrolls horizontally */
+    overflow-x: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
-    padding: 0 5px; /* Add some padding inside the scroller */
+    padding: 0 5px;
 }
 .category-scroller::-webkit-scrollbar {
     display: none;
@@ -1672,29 +1556,26 @@ html {
 
 .category-chip.active {
     background-color: var(--primary-neon);
-    color: #fff; /* Text is white when active */
+    color: #fff;
     border-color: var(--primary-neon);
     font-weight: bold;
 }
 
 .video-meta-overlay {
     position: absolute;
-    bottom: 60px; /* Adjust to be above nav */
-    /* === CHANGED: Moved from right to left === */
+    bottom: 60px;
     left: 10px;
-    /* REMOVED: right: 10px; */
-    /* ====================================== */
-    z-index: 10; /* Ensure it's below actions overlay but above video */
+    z-index: 10;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    align-items: flex-start; /* Keep aligning content to the left */
-    width: calc(100% - 110px); /* Give space for action icons on the right */
+    align-items: flex-start;
+    width: calc(100% - 110px);
     padding: 15px;
-    padding-bottom: 0; /* Adjust padding not to overlap with nav */
+    padding-bottom: 0;
     box-sizing: border-box;
-    background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); /* Keep gradient */
-    pointer-events: none; /* Allows clicks to pass through to video/nav unless needed */
+    background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+    pointer-events: none;
     color: white;
 }
 
@@ -1704,7 +1585,7 @@ html {
     align-items: center;
     gap: 10px;
     margin-bottom: 10px;
-    pointer-events: auto; /* Re-enable pointer events for interactions */
+    pointer-events: auto;
 }
 
 .video-meta-overlay .uploader-avatar {
@@ -1718,7 +1599,7 @@ html {
 .video-meta-overlay .uploader-name {
     font-weight: bold;
     font-size: 1em;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.7); /* Add text shadow for readability */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
 }
 
 .video-meta-overlay .video-title {
@@ -1751,10 +1632,7 @@ html {
     width: 100%;
     height: 60%;
     max-height: 70vh;
-    /* === ADDED: Use theme background for comments modal === */
-    background-color: var(--background);
-    /* background-color: #181818; /* Original specific dark background */
-    /* ==================================================== */
+    background-color: #181818;
     border-radius: 15px 15px 0 0;
     box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
     display: flex;
@@ -1770,7 +1648,7 @@ html {
     text-align: center;
     border-bottom: 1px solid var(--light-grey);
     position: relative;
-    color: var(--text-color); /* Ensure header text is theme color */
+    color: var(--text-color);
 }
 .comments-header h4 {
     margin: 0;
@@ -1783,7 +1661,7 @@ html {
     transform: translateY(-50%);
     font-size: 1.5em;
     cursor: pointer;
-    color: rgba(255, 255, 255, 0.7); /* Ensure close icon is visible */
+    color: rgba(255, 255, 255, 0.7);
 }
 #comments-list {
     flex-grow: 1;
@@ -1791,7 +1669,7 @@ html {
     padding: 15px;
     list-style: none;
     margin: 0;
-    color: var(--text-color); /* Ensure list items are theme color */
+    color: var(--text-color);
 }
 .comment-item {
     display: flex;
@@ -1862,10 +1740,7 @@ html {
     left: 0;
     width: 280px;
     height: 100%;
-    /* === ADDED: Use theme background for sidebar === */
-    background-color: var(--background);
-    /* background-color: #1a1a1a; /* Original specific dark background */
-    /* ============================================ */
+    background-color: #1a1a1a;
     z-index: 1001;
     transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
@@ -1916,7 +1791,7 @@ html {
     font-size: 2em;
     cursor: pointer;
     line-height: 1;
-    color: var(--text-color); /* Ensure close icon is theme color */
+    color: var(--text-color);
 }
 
 .sidebar-option {
@@ -1938,11 +1813,7 @@ html {
 
 #theme-settings-screen {
     justify-content: flex-start;
-    /* Adjusted padding for full screen scroll + nav clearance */
-    padding: 20px;
-    padding-bottom: 80px; /* 60px nav + 20px screen padding */
-    /* REMOVED explicit padding-top: 80px; */
-    /* Inherits background-color: var(--background) from .screen */
+    padding-bottom: 80px;
 }
 
 #theme-settings-screen .theme-settings-container {
@@ -1983,7 +1854,7 @@ html {
 
 .theme-btn.active {
     background-color: var(--primary-neon);
-    color: #000; /* Text color when active */
+    color: #000;
 }
 
 .color-palette-container {
@@ -2002,7 +1873,6 @@ html {
 .color-column h4 {
    width: 100%;
    text-align: center;
-   color: var(--text-color); /* Ensure color is theme color */
 }
 
 .color-grid {
@@ -2026,14 +1896,12 @@ html {
 }
 
 .color-swatch.active {
-    border-color: #fff; /* Border color when active */
+    border-color: #fff;
     transform: scale(1.1);
 }
 
 #audio-issue-popup .popup-content {
-    /* === ADDED: Use theme background for popup === */
     background-color: var(--dark-grey);
-    /* ========================================== */
     padding: 30px;
     border-radius: 15px;
     width: 90%;
@@ -2082,105 +1950,60 @@ html {
     transform: scale(1.05);
 }
 
-/* Light Theme Overrides */
-/* These styles are applied *only* when the html element has the class "light-theme" */
+/* === MODIFIED: Force Dark Theme by overwriting light theme variables === */
 html.light-theme {
-    --background: #f7f7f7;
-    --text-color: #111111;
-    --dark-grey: #ffffff;
-    --light-grey: #e0e0e0;
+    --background: #0f0f0f;
+    --text-color: #ffffff;
+    --dark-grey: #222;
+    --light-grey: #444;
 }
-/* Apply light theme colors to relevant elements */
 html.light-theme body,
-html.light-theme .screen, /* Applies to all screens except splash */
-html.light-theme .modal-content,
-html.light-theme .comments-modal-content,
-html.light-theme .main-sidebar,
-html.light-theme #audio-issue-popup .popup-content,
-html.light-theme #image-editor-screen {
+html.light-theme .screen {
      background-color: var(--background);
      color: var(--text-color);
 }
-
-html.light-theme .app-container::before { opacity: 0.05; } /* Reduce particle opacity in light mode */
+html.light-theme .app-container::before { opacity: 0.15; }
 html.light-theme .sub-message,
 html.light-theme .wallet-card .balance-label,
 html.light-theme .theme-section h4 {
-    color: rgba(0, 0, 0, 0.6);
+    color: rgba(255, 255, 255, 0.8);
 }
 html.light-theme #information-screen label,
 html.light-theme .modal-content label,
 html.light-theme .audience-selector label,
 html.light-theme .comments-toggle label {
-    color: rgba(0, 0, 0, 0.7);
+    color: var(--text-color);
 }
 
 html.light-theme input,
 html.light-theme select,
 html.light-theme textarea,
 html.light-theme .category-selector {
-    background-color: #ffffff;
-    border: 1px solid #cccccc;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--light-grey);
     color: var(--text-color);
 }
-html.light-theme ::-webkit-input-placeholder { color: rgba(0, 0, 0, 0.4); }
-html.light-theme ::-moz-placeholder { color: rgba(0, 0, 0, 0.4); }
-html.light-theme :-ms-input-placeholder { color: rgba(0, 0, 0, 0.4); }
-html.light-theme ::placeholder { color: rgba(0, 0, 0, 0.4); }
+html.light-theme ::-webkit-input-placeholder,
+html.light-theme ::-moz-placeholder,
+html.light-theme :-ms-input-placeholder,
+html.light-theme ::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
 
 html.light-theme .bottom-nav {
-    background-color: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-top: 1px solid var(--light-grey);
-    color: rgba(0, 0, 0, 0.7); /* Default color for inactive nav items */
+    background-color: rgba(0, 0, 0, 0.7);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 html.light-theme .screen-header,
 html.light-theme .home-top-bar,
-html.light-theme .friends-top-nav, /* Added friends top nav to light theme */
-html.light-theme .main-sidebar {
-    background-color: var(--dark-grey); /* Use light theme dark grey (#fff) or adjusted color */
-}
-html.light-theme .main-sidebar { box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
-html.light-theme .static-message { background-color: rgba(0,0,0,0.05); color: var(--text-color); }
-
-html.light-theme .nav-item { color: rgba(0, 0, 0, 0.7); } /* Ensure nav items are visible in light mode */
-html.light-theme .nav-item:not(.active)[data-nav="home"] i { color: #F44336; }
-html.light-theme .nav-item:not(.active)[data-nav="upload"] i { color: #4CAF50; }
-html.light-theme .nav-item:not(.active)[data-nav="wallet"] i { color: #2196F3; }
-html.light-theme .nav-item:not(.active)[data-nav="friends"] i { color: #00BCD4; }
-html.light-theme .nav-item:not(.active)[data-nav="profile"] i { color: #9C27B0; }
-
-/* Ensure padding is consistent in light theme for elements needing nav clearance */
-html.light-theme #information-screen > div:nth-of-type(2) { /* Specific selector for the information screen content div */
-    padding-bottom: 80px !important; /* Use !important to override inline style */
-}
-html.light-theme #wallet-screen,
-html.light-theme #leaderboard-screen,
-html.light-theme #profile-screen,
-html.light-theme #withdraw-success-screen,
-html.light-theme #theme-settings-screen {
-    padding-bottom: 80px;
-}
-html.light-theme #home-screen #video-swiper,
-html.light-theme #friends-screen, /* Friends screen handles its own scroll */
-html.light-theme #upload-screen .upload-container-new, /* Upload container scrolls */
-html.light-theme #premium-upload-screen .premium-upload-container /* Premium Upload container scrolls */
-{
-     padding-bottom: 60px;
-}
-/* Adjustments for light theme sticky/fixed elements */
+html.light-theme .main-sidebar,
 html.light-theme .friends-top-nav {
-    background-color: var(--dark-grey); /* Adjust sticky header background in light mode */
-    border-bottom-color: var(--light-grey);
+    background-color: var(--dark-grey);
 }
-html.light-theme .sidebar-option {
-    background: var(--dark-grey); /* Use light theme dark-grey (#fff) */
-    border-color: var(--light-grey); /* Use light theme light-grey */
-}
-html.light-theme .sidebar-option:hover {
-    background-color: var(--light-grey); /* Use light theme light-grey */
-}
-
+html.light-theme .main-sidebar { box-shadow: 4px 0 15px rgba(0,0,0,0.5); }
+html.light-theme .static-message { background-color: rgba(0,0,0,0.3); color: rgba(255, 255, 255, 0.7); }
+html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
+/* ======================================================================= */
 
 /* =============================================== */
 /* === Shubhzone App Styles (Code 2) - END === */
@@ -2192,10 +2015,9 @@ html.light-theme .sidebar-option:hover {
 /* ======================================================= */
 
 #image-editor-screen {
-    padding: 0; /* Handled by inner elements/layout */
+    padding: 0;
     display: block;
     font-family: 'Roboto Flex', sans-serif;
-    /* Inherits background-color: var(--background) and color: var(--text-color) from .screen */
 }
 
 #image-editor-screen .editor-header {
@@ -2204,9 +2026,9 @@ html.light-theme .sidebar-option:hover {
     left: 0;
     width: 100%;
     padding: 10px;
-    background: var(--dark-grey); /* FIX: Use main theme color */
+    background: var(--dark-grey);
     z-index: 100;
-    border-bottom: 1px solid var(--light-grey); /* FIX: Use main theme color */
+    border-bottom: 1px solid var(--light-grey);
 }
 #image-editor-screen #back-from-editor-btn {
     background: var(--dark-grey);
@@ -2223,29 +2045,17 @@ html.light-theme .sidebar-option:hover {
     display: flex; justify-content: space-between; align-items: center; padding: 12px 18px;
     background: var(--dark-grey); flex-shrink: 0; z-index: 20;
     border-bottom: 1px solid var(--light-grey);
-    margin-top: 50px; /* Added margin for fixed header */
-    color: var(--text-color); /* Ensure text color is theme color */
+    margin-top: 50px;
+    color: var(--text-color);
 }
 #image-editor-screen .header-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--light-grey); color: var(--text-color); border: 1px solid var(--light-grey); border-radius: 10px; font-size: 14px; cursor: pointer; font-weight: 500; transition: all 0.2s ease; }
 #image-editor-screen .header-btn:hover { background-color: #333; color: var(--primary-neon); }
 #image-editor-screen .header-btn:active { transform: scale(0.96); }
 #image-editor-screen #upload { display: none; }
 #image-editor-screen .image-container { height: 100%; display: flex; justify-content: center; align-items: center; padding: 15px; overflow: hidden; position: relative; }
-#image-editor-screen .image-wrapper { width: 100%; max-width: 380px; aspect-ratio: 9 / 16; background: #1e1e1e; border-radius: 20px; display: flex; justify-content: center; align-items: center; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.4); position: relative;
-     /* === ADDED: Target elements potentially causing video artifact === */
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-    /* =============================================================== */
-}
+#image-editor-screen .image-wrapper { width: 100%; max-width: 380px; aspect-ratio: 9 / 16; background: #1e1e1e; border-radius: 20px; display: flex; justify-content: center; align-items: center; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.4); position: relative; }
 #image-editor-screen .image-wrapper::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: 100% 100%; background-repeat: no-repeat; pointer-events: none; z-index: 5; border-radius: 20px; background-image: var(--frame-image); }
-#image-editor-screen #mainImage, #image-editor-screen #video-feed { max-width: 100%; max-height: 100%; display: block; transition: filter 0.3s ease; object-fit: contain;
-     /* === ADDED: Target elements potentially causing video artifact === */
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-    /* =============================================================== */
-}
+#image-editor-screen #mainImage, #image-editor-screen #video-feed { max-width: 100%; max-height: 100%; display: block; transition: filter 0.3s ease; object-fit: contain; }
 #image-editor-screen #video-feed { display: none; }
 #image-editor-screen #drawing-canvas { position: absolute; top: 0; left: 0; z-index: 8; touch-action: none; }
 #image-editor-screen .toolbar { background: var(--dark-grey); border-top: 1px solid var(--light-grey); flex-shrink: 0; z-index: 20; padding-bottom: env(safe-area-inset-bottom); }
@@ -2258,7 +2068,7 @@ html.light-theme .sidebar-option:hover {
 #image-editor-screen .toolbar-nav::-webkit-scrollbar { display: none; }
 #image-editor-screen .tool-btn { display: flex; flex-direction: column; align-items: center; gap: 5px; background: none; border: none; color: rgba(255, 255, 255, 0.7); font-size: 12px; cursor: pointer; padding: 8px 12px; border-radius: 8px; transition: all 0.2s ease; flex-shrink: 0; }
 #image-editor-screen .tool-btn i { font-size: 20px; }
-#image-editor-screen .tool-btn.active { color: var(--primary-neon); background: rgba(0, 230, 118, 0.1); }
+#image-editor-screen .tool-btn.active { color: var(--primary-neon); background: rgba(244, 67, 54, 0.1); }
 #image-editor-screen .tool-btn:hover:not(.active) { color: var(--text-color); }
 #image-editor-screen .filter-card { flex: 0 0 auto; margin: 0 8px; text-align: center; cursor: pointer; }
 #image-editor-screen .filter-preview { width: 60px; height: 60px; border-radius: 12px; margin-bottom: 8px; border: 2px solid transparent; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.3); background-size: cover; background-position: center; }
@@ -2292,21 +2102,20 @@ html.light-theme .sidebar-option:hover {
 #image-editor-screen .frame-option.active, #image-editor-screen .frame-category-item.active { border-color: var(--primary-neon); }
 #image-editor-screen .frame-option[data-frame="none"] { font-size: 28px;}
 #image-editor-screen .frame-category-item .category-name { position: absolute; bottom: 5px; font-size: 11px; color: var(--text-color); background: rgba(0,0,0,0.5); padding: 2px 5px; border-radius: 5px; }
-#image-editor-screen #frame-back-btn { flex-shrink: 0; width: 55px; height: 100px; font-size: 28px; margin-right: 10px; /* Add some space */
-    background: var(--dark-grey); border: 1px solid var(--light-grey); color: var(--text-color); border-radius: 10px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.2s; } /* Styled back button */
+#image-editor-screen #frame-back-btn { flex-shrink: 0; width: 55px; height: 100px; font-size: 28px; margin-right: 10px; background: var(--dark-grey); border: 1px solid var(--light-grey); color: var(--text-color); border-radius: 10px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.2s; }
 #image-editor-screen #font-picker-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 100; display: none; justify-content: center; align-items: flex-end; }
 #image-editor-screen .font-picker-content { background: var(--dark-grey); width: 100%; max-height: 70%; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; overflow-y: auto; animation: slide-up 0.3s ease-out; }
 @keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
 #image-editor-screen .font-option { display: flex; justify-content: space-between; align-items: center; padding: 15px 10px; border-bottom: 1px solid var(--light-grey); cursor: pointer; }
 #image-editor-screen .font-option:last-child { border-bottom: none; }
-#image-editor-screen .font-option span { font-size: 20px; color: var(--text-color); /* Ensure font names are theme color */ }
+#image-editor-screen .font-option span { font-size: 20px; color: var(--text-color); }
 #image-editor-screen .font-option input[type="radio"] { display: none; }
 #image-editor-screen .font-option .radio-custom { width: 22px; height: 22px; border: 2px solid rgba(255, 255, 255, 0.7); border-radius: 50%; position: relative; }
 #image-editor-screen .font-option input[type="radio"]:checked + .radio-custom { border-color: var(--primary-neon); }
 #image-editor-screen .font-option input[type="radio"]:checked + .radio-custom::after { content: ''; width: 12px; height: 12px; background: var(--primary-neon); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 #image-editor-screen #capture-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 50; padding: 18px; border-radius: 50%; border: 4px solid white; background-color: #ff4757; display: none; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.5); }
 #image-editor-screen .sticker-item { flex-shrink: 0; width: 65px; height: 65px; object-fit: contain; cursor: pointer; margin: 0 10px; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 8px; }
-#image-editor-screen #stickerPanel .panel-view { padding-left: 15px; padding-right: 15px; } /* Add padding to sticker panel view */
+#image-editor-screen #stickerPanel .panel-view { padding-left: 15px; padding-right: 15px; }
 
 #image-editor-screen .crop-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9; display: none; }
 #image-editor-screen .crop-box { position: absolute; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7); border: 2px dashed var(--primary-neon); cursor: move; touch-action: none; pointer-events: auto; transition: border-radius 0.2s ease-in-out; }
@@ -2331,11 +2140,11 @@ html.light-theme .sidebar-option:hover {
 #image-editor-screen .interactive-wrapper.active .element-controls { display: block; }
 #image-editor-screen .control-handle { position: absolute; width: 24px; height: 24px; background: var(--primary-neon); border: 2px solid var(--background); border-radius: 50%; pointer-events: auto; box-shadow: 0 0 8px rgba(0,0,0,0.7); z-index: 11; display: none; align-items: center; justify-content: center; color: var(--background); font-size: 12px;}
 #image-editor-screen .interactive-wrapper.active .control-handle { display: flex; }
-#image-editor-screen .rotate-handle { top: -12px; left: -12px; cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23F44336" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>') 10 10, auto; } /* Keep specific cursor */
+#image-editor-screen .rotate-handle { top: -12px; left: -12px; cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23F44336" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>') 10 10, auto; }
 #image-editor-screen .delete-handle { top: -12px; right: -12px; background: #ff4757; cursor: pointer; color: white; }
-#image-editor-screen .handle-br { bottom: -12px; right: -12px; cursor: nwse-resize; } /* Uniform Scale */
-#image-editor-screen .handle-mr { top: 50%; right: -12px; transform: translateY(-50%); cursor: ew-resize; } /* Horizontal Stretch */
-#image-editor-screen .handle-mb { bottom: -12px; left: 50%; transform: translateX(-50%); cursor: ns-resize; } /* Vertical Stretch */
+#image-editor-screen .handle-br { bottom: -12px; right: -12px; cursor: nwse-resize; }
+#image-editor-screen .handle-mr { top: 50%; right: -12px; transform: translateY(-50%); cursor: ew-resize; }
+#image-editor-screen .handle-mb { bottom: -12px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
 
 /* ======================================================= */
 /* === AI Photo Editor Styles (Code 1) - END === */
@@ -2344,24 +2153,18 @@ html.light-theme .sidebar-option:hover {
 /* === NEW: Styles for Premium Upload Screen === */
 #premium-upload-screen {
     justify-content: flex-start;
-    padding: 20px; /* Standard padding */
-    /* REMOVED: padding-bottom for nav clearance as inner container handles it */
-    /* padding-bottom: 80px; */
-    /* Inherits background-color: var(--background) from .screen */
+    padding: 0;
 }
 
 #premium-upload-screen .premium-upload-container {
-    margin-top: 60px; /* Push down below potential header */
+    margin-top: 60px;
     width: 100%;
-    padding: 20px; /* Internal padding */
-    overflow-y: auto; /* This is the scrollable container */
+    padding: 20px;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Adds space between input groups */
-    /* === ADJUSTED for Bottom Nav Clearance === */
-    /* This is the scrollable container. Needs 60px clearance. */
-    padding-bottom: 60px;
-    /* ========================================= */
+    gap: 15px;
+    padding-bottom: 80px; /* 60px nav + 20px padding */
 }
 
 #premium-upload-screen .file-upload-label {
@@ -2374,9 +2177,9 @@ html.light-theme .sidebar-option:hover {
     padding: 30px;
     cursor: pointer;
     text-align: center;
-    margin-bottom: 10px; /* Adjusted margin */
+    margin-bottom: 10px;
     transition: border-color 0.3s, background-color 0.3s;
-    color: var(--text-color); /* Ensure label text uses theme color */
+    color: var(--text-color);
 }
 
 #premium-upload-screen .file-upload-label:hover {
@@ -2399,9 +2202,9 @@ html.light-theme .sidebar-option:hover {
     width: 100%;
     max-height: 200px;
     border-radius: 8px;
-    margin-top: 5px; /* Adjusted margin */
+    margin-top: 5px;
     background-color: #000;
-    display: none; /* Initially hidden */
+    display: none;
 }
 
 #premium-upload-screen #premium-upload-progress {
@@ -2412,37 +2215,3 @@ html.light-theme .sidebar-option:hover {
     font-size: 1em;
     color: var(--success-green);
 }
-html.light-theme #information-screen > div:nth-of-type(2) { /* Specific selector for the information screen content div */
-    padding-bottom: 80px !important; /* Use !important to override inline style */
-}
-/* Ensure padding is consistent in light theme for elements needing nav clearance */
-html.light-theme #wallet-screen,
-html.light-theme #leaderboard-screen,
-html.light-theme #profile-screen,
-html.light-theme #withdraw-success-screen,
-html.light-theme #theme-settings-screen {
-    padding-bottom: 80px;
-}
-html.light-theme #home-screen #video-swiper,
-html.light-theme #friends-screen, /* Friends screen handles its own scroll */
-html.light-theme #upload-screen .upload-container-new, /* Upload container scrolls */
-html.light-theme #premium-upload-screen .premium-upload-container /* Premium Upload container scrolls */
-{
-     padding-bottom: 60px;
-}
-/* Adjustments for light theme sticky/fixed elements */
-html.light-theme .friends-top-nav {
-    background-color: var(--dark-grey); /* Adjust sticky header background in light mode */
-    border-bottom-color: var(--light-grey);
-}
-html.light-theme .modal-content {
-    background-color: var(--dark-grey); /* Use light theme dark-grey (#fff) */
-}
-html.light-theme .sidebar-option {
-    background: var(--dark-grey); /* Use light theme dark-grey (#fff) */
-    border-color: var(--light-grey); /* Use light theme light-grey */
-}
-html.light-theme .sidebar-option:hover {
-    background-color: var(--light-grey); /* Use light theme light-grey */
-}
-/* ================================================================================================ */
