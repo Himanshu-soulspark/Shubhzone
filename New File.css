@@ -2006,19 +2006,20 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
     height: 100vh;
     font-family: 'Roboto Flex', sans-serif;
     background: var(--background);
+    overflow: hidden; /* Prevent entire screen from scrolling */
 }
 
-/* === NEW / नया: Top control bar === */
-.editor-top-bar {
+/* Using the .app-header for the top bar as per your HTML */
+#image-editor-screen .app-header {
     display: flex;
-    justify-content: space-around; /* Changed to space-around for even spacing */
+    justify-content: space-around;
     align-items: center;
     padding: 10px 15px;
     background: var(--dark-grey);
     flex-shrink: 0;
-    width: 100%;
+    z-index: 20;
 }
-.top-bar-btn {
+#image-editor-screen .header-btn {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -2030,17 +2031,16 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
     cursor: pointer;
     font-weight: 500;
     transition: all 0.2s ease;
-    padding: 0 10px; /* Added padding for better touch area */
 }
-.top-bar-btn i {
+#image-editor-screen .header-btn i {
     font-size: 20px;
     margin-bottom: 2px;
 }
-/* Colorful icons as requested */
-.top-bar-btn[data-action="back"] i { color: #fff; }
-.top-bar-btn[data-action="upload"] i { color: #2196F3; }
-.top-bar-btn[data-action="camera"] i { color: var(--primary-neon); }
-.top-bar-btn[data-action="save"] i { color: var(--success-green); }
+
+/* This is the back button header, let's keep it but maybe you'll hide/show it with JS */
+#image-editor-screen .editor-header {
+    display: none; /* Hidden for now to avoid layout conflicts, you can show it when needed */
+}
 
 /* Main Image Display Area */
 #image-editor-screen .image-container { 
@@ -2053,63 +2053,50 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
     overflow: hidden; 
     position: relative; 
 }
-/* 9:16 Aspect ratio card as requested */
-#image-editor-screen .image-wrapper { 
-    width: 100%; 
-    max-width: 380px; 
-    aspect-ratio: 9 / 16; 
-    background: #1e1e1e; 
-    border-radius: 20px; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    overflow: hidden; 
-    box-shadow: 0 8px 30px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.4); 
-    position: relative; 
-}
+#image-editor-screen .image-wrapper { width: 100%; max-width: 380px; aspect-ratio: 9 / 16; background: #1e1e1e; border-radius: 20px; display: flex; justify-content: center; align-items: center; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.4); position: relative; }
 #image-editor-screen .image-wrapper::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: 100% 100%; background-repeat: no-repeat; pointer-events: none; z-index: 5; border-radius: 20px; background-image: var(--frame-image); }
 #image-editor-screen #mainImage, #image-editor-screen #video-feed { max-width: 100%; max-height: 100%; display: block; transition: filter 0.3s ease; object-fit: contain; }
 #image-editor-screen #video-feed { display: none; }
 #image-editor-screen #drawing-canvas { position: absolute; top: 0; left: 0; z-index: 8; touch-action: none; }
 
-/* === NEW / नया: Bottom Toolbar Structure === */
+/* === MODIFIED / परिवर्तित: Bottom Toolbar Layout === */
 #image-editor-screen .toolbar { 
     background: var(--dark-grey); 
     flex-shrink: 0; 
     z-index: 20;
     display: flex;
-    flex-direction: column; /* Panels will appear on top of the nav */
+    flex-direction: column; /* This is key: stacks the panel container ON TOP of the nav bar */
 }
 
-/* Panel Container appears above the navigation */
+/* Container for feature panels (sliders, filters, etc.) */
 #image-editor-screen .panel-container { 
-    min-height: 140px; 
-    padding: 15px 0; 
-    position: relative; 
-    overflow: hidden; 
-    display: none; /* Hidden by default */
+    min-height: 120px; /* Set a fixed minimum height */
+    padding: 10px 0; 
+    display: none; /* Hidden by default, JS will show it */
     background: var(--dark-grey);
     border-bottom: 1px solid var(--light-grey);
+    overflow: hidden;
 }
-#image-editor-screen .panel-container.visible { display: block; } /* Made visible with JS */
+#image-editor-screen .panel-container.visible { 
+    display: block; 
+}
 
+/* Individual panels (filters, adjust, etc.) */
 #image-editor-screen .panel { 
-    display: none; 
+    display: none; /* Hidden by default */
     align-items: center; 
     overflow-x: auto; 
     padding: 0 15px; 
     -ms-overflow-style: none; scrollbar-width: none; 
     width: 100%; 
-    height: 100%; 
-    position: absolute; 
-    top: 0; left: 0; 
-    transition: opacity 0.3s ease; 
-    opacity: 0; 
+    height: 100%;
 }
-#image-editor-screen .panel.active { display: flex; opacity: 1; position: relative; }
+#image-editor-screen .panel.active { 
+    display: flex; /* Shown when active */
+}
 #image-editor-screen .panel::-webkit-scrollbar { display: none; }
 
-/* Bottom navigation bar for tools */
+/* The main, always-visible navigation bar at the bottom */
 #image-editor-screen .toolbar-nav { 
     display: flex; 
     justify-content: space-around; 
@@ -2117,32 +2104,42 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
     overflow-x: auto; 
     -ms-overflow-style: none; 
     scrollbar-width: none;
+    flex-shrink: 0; /* Ensures this nav bar is never squashed */
 }
 #image-editor-screen .toolbar-nav::-webkit-scrollbar { display: none; }
 
-#image-editor-screen .tool-btn { 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    gap: 5px; 
-    background: none; 
-    border: none; 
-    color: rgba(255, 255, 255, 0.7); 
-    font-size: 12px; 
-    cursor: pointer; 
-    padding: 8px 12px; 
-    border-radius: 8px; 
-    transition: all 0.2s ease; 
-    flex-shrink: 0; 
-}
+#image-editor-screen .tool-btn { display: flex; flex-direction: column; align-items: center; gap: 5px; background: none; border: none; color: rgba(255, 255, 255, 0.7); font-size: 12px; cursor: pointer; padding: 8px 12px; border-radius: 8px; transition: all 0.2s ease; flex-shrink: 0; }
 #image-editor-screen .tool-btn i { font-size: 20px; }
 #image-editor-screen .tool-btn.active, #image-editor-screen .tool-btn:hover { color: var(--primary-neon); }
 
-/* Styles for Individual Panels (Unchanged Logic) */
-#image-editor-screen .filter-card { flex: 0 0 auto; margin: 0 8px; text-align: center; cursor: pointer; }
-#image-editor-screen .filter-preview { width: 60px; height: 60px; border-radius: 12px; margin-bottom: 8px; border: 2px solid transparent; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.3); background-size: cover; background-position: center; }
-#image-editor-screen .filter-card.active .filter-preview { border-color: var(--primary-neon); transform: scale(1.1); }
-#image-editor-screen .filter-name { color: rgba(255, 255, 255, 0.7); font-size: 12px; }
+/* === MODIFIED / परिवर्तित: Filter styles to match screenshot === */
+#image-editor-screen .filter-card { 
+    flex: 0 0 auto; 
+    margin: 0 6px; 
+    text-align: center; 
+    cursor: pointer; 
+}
+#image-editor-screen .filter-preview { 
+    width: 75px; 
+    height: 75px; 
+    border-radius: 10px; 
+    margin-bottom: 8px; 
+    border: 2px solid transparent; 
+    transition: all 0.2s ease; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3); 
+    background-size: cover; 
+    background-position: center;
+    background-color: #2a2a2a; /* Darker placeholder color */
+}
+#image-editor-screen .filter-card.active .filter-preview { 
+    border-color: var(--primary-neon); 
+    transform: scale(1.05); 
+}
+#image-editor-screen .filter-name { 
+    color: rgba(255, 255, 255, 0.8); 
+    font-size: 13px; 
+}
+
 #image-editor-screen #adjustPanel { flex-direction: column; padding: 0 25px; gap: 15px; }
 #image-editor-screen .adjust-slider { display: flex; flex-direction: column; width: 100%; }
 #image-editor-screen .adjust-slider label { font-size: 13px; color: rgba(255, 255, 255, 0.7); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: baseline; }
@@ -2185,6 +2182,7 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 #image-editor-screen #capture-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 50; padding: 18px; border-radius: 50%; border: 4px solid white; background-color: #ff4757; display: none; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.5); }
 #image-editor-screen .sticker-item { flex-shrink: 0; width: 65px; height: 65px; object-fit: contain; cursor: pointer; margin: 0 10px; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 8px; }
 #image-editor-screen #stickerPanel .panel-view { padding-left: 15px; padding-right: 15px; }
+
 #image-editor-screen .crop-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9; display: none; }
 #image-editor-screen .crop-box { position: absolute; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7); border: 2px dashed var(--primary-neon); cursor: move; touch-action: none; pointer-events: auto; transition: border-radius 0.2s ease-in-out; }
 #image-editor-screen .crop-box.is-circle { border-radius: 50%; }
@@ -2213,8 +2211,6 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 #image-editor-screen .handle-br { bottom: -12px; right: -12px; cursor: nwse-resize; }
 #image-editor-screen .handle-mr { top: 50%; right: -12px; transform: translateY(-50%); cursor: ew-resize; }
 #image-editor-screen .handle-mb { bottom: -12px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
-
-#image-editor-screen .app-header, #image-editor-screen .editor-header { display: none; }
 
 /* ======================================================= */
 /* === AI Photo Editor Styles (Code 1) - END === */
