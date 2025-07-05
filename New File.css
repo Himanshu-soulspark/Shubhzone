@@ -1,3 +1,7 @@
+New File.css
+
+
+
 /* ================================================= */
 /* === Shubhzone App Styles (Code 2) - START === */
 /* ================================================= */
@@ -466,6 +470,9 @@ body {
     overflow-y: scroll;
     scroll-snap-type: y mandatory;
     -webkit-overflow-scrolling: touch;
+    /* === ADJUSTED for Bottom Nav Clearance === */
+    padding-bottom: 60px; /* Should match the nav height */
+    /* ========================================= */
 }
 
 .video-slide {
@@ -607,6 +614,9 @@ body {
     justify-content: center;
     gap: 20px;
     padding: 20px;
+    /* === ADJUSTED for Bottom Nav Clearance === */
+    padding-bottom: 60px; /* Should match the nav height */
+    /* ========================================= */
 }
 
 .upload-action-button {
@@ -629,6 +639,13 @@ body {
 .upload-action-button:hover {
     opacity: 0.9;
     transform: scale(1.02);
+}
+
+#wallet-screen {
+    /* Keep existing padding: 20px */
+    /* === ADJUSTED for Bottom Nav Clearance === */
+    padding-bottom: 80px; /* Add 60px (nav) to existing 20px padding */
+    /* ========================================= */
 }
 
 #wallet-screen .wallet-card {
@@ -727,7 +744,7 @@ body {
 }
 
 #friends-screen {
-    padding: 0;
+    padding: 0; /* Keep existing padding */
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -774,6 +791,9 @@ body {
     width: 100%;
     overflow-y: auto;
     padding: 15px;
+    /* === ADJUSTED for Bottom Nav Clearance === */
+    padding-bottom: 60px; /* Should match the nav height */
+    /* ========================================= */
 }
 
 .user-card {
@@ -946,7 +966,7 @@ body {
 
 #profile-screen {
     justify-content: flex-start;
-    padding-bottom: 80px;
+    padding-bottom: 80px; /* Keeping existing 80px */
 }
 
 #profile-screen .profile-header {
@@ -1078,6 +1098,10 @@ body {
     flex-direction: column;
     justify-content: center;
     text-align: center;
+    /* Keep existing padding: 20px */
+    /* === ADDED for Bottom Nav Clearance === */
+    padding-bottom: 80px; /* Add 60px (nav) to existing 20px padding */
+    /* ====================================== */
 }
 
 #withdraw-success-screen .success-icon {
@@ -1192,7 +1216,20 @@ body {
     width: 100%;
 }
 
-.modal-content label,
+/* Specific selector for the information screen content div */
+/* Assuming the HTML structure is <div id="information-screen" class="screen"> ... <div style="..."> ... </div> ... </div> */
+/* The div with inline style "margin-top: 60px; width: 100%; overflow-y: auto; padding-bottom: 20px;" is the one needing adjustment */
+/* Selector `#information-screen > div:nth-of-type(2)` assumes this div is the 2nd child inside #information-screen */
+#information-screen > div:nth-of-type(2) {
+    /* Keep existing inline styles (margin-top, width, overflow-y) */
+    /* === ADJUSTED padding-bottom for Bottom Nav Clearance === */
+    /* Override the inline padding-bottom: 20px to be 80px (60px nav + 20px screen padding) */
+    padding-bottom: 80px !important; /* Use !important to override inline style */
+    /* ====================================== */
+}
+
+
+#information-screen label,
 #premium-upload-screen label { /* Added premium screen selector */
     display: block;
     font-size: 1.1em;
@@ -1200,6 +1237,10 @@ body {
     color: var(--text-color);
 }
 
+#information-screen input[type="text"],
+#information-screen input[type="tel"],
+#information-screen input[type="email"],
+#information-screen select,
 .modal-content input[type="text"],
 .modal-content input[type="email"],
 .modal-content input[type="url"],
@@ -2018,7 +2059,6 @@ html.light-theme .static-message { background-color: rgba(0,0,0,0.05); color: va
 #image-editor-screen .header-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--light-grey); color: var(--text-color); border: 1px solid var(--light-grey); border-radius: 10px; font-size: 14px; cursor: pointer; font-weight: 500; transition: all 0.2s ease; }
 #image-editor-screen .header-btn:hover { background-color: #333; color: var(--primary-neon); }
 #image-editor-screen .header-btn:active { transform: scale(0.96); }
-#image-editor-screen .header-btn i { font-size: 16px; }
 #image-editor-screen #upload { display: none; }
 #image-editor-screen .image-container { height: 100%; display: flex; justify-content: center; align-items: center; padding: 15px; overflow: hidden; position: relative; }
 #image-editor-screen .image-wrapper { width: 100%; max-width: 380px; aspect-ratio: 9 / 16; background: #1e1e1e; border-radius: 20px; display: flex; justify-content: center; align-items: center; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.4); position: relative; }
@@ -2125,6 +2165,9 @@ html.light-theme .static-message { background-color: rgba(0,0,0,0.05); color: va
     display: flex;
     flex-direction: column;
     gap: 15px; /* Adds space between input groups */
+    /* === ADJUSTED for Bottom Nav Clearance === */
+    padding-bottom: 60px; /* Should match the nav height */
+    /* ========================================= */
 }
 
 #premium-upload-screen .file-upload-label {
@@ -2174,3 +2217,21 @@ html.light-theme .static-message { background-color: rgba(0,0,0,0.05); color: va
     font-size: 1em;
     color: var(--success-green);
 }
+html.light-theme #information-screen > div:nth-of-type(2) { /* Specific selector for the information screen content div */
+    /* Keep the padding consistent in light theme too */
+    padding-bottom: 80px !important; /* Use !important to override inline style */
+}
+/* === ADDED Light Theme adjustment for Wallet, Friends, Upload, Withdraw Success, Premium Upload === */
+/* Ensure padding is consistent in light theme */
+html.light-theme #wallet-screen,
+html.light-theme #withdraw-success-screen {
+    padding-bottom: 80px;
+}
+
+html.light-theme #home-screen #video-swiper,
+html.light-theme #friends-screen .user-list-container,
+html.light-theme #upload-screen .upload-container-new,
+html.light-theme #premium-upload-screen .premium-upload-container {
+     padding-bottom: 60px;
+}
+/* ================================================================================================ */
