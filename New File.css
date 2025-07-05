@@ -548,6 +548,11 @@ body {
     left: 0;
     z-index: 100;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+    /* Add max-width to match app-container */
+    max-width: 420px; /* Ensure it stays within the app boundaries */
+    /* Center the fixed nav if app-container is centered */
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .nav-item {
@@ -1075,8 +1080,8 @@ body {
 
 .video-card-actions {
     position: absolute;
-    bottom: 0;
-    left: 0;
+    bottom: 0; /* Changed from 75px to 0, relative to the video card */
+    right: 0;
     width: 100%;
     background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
     display: flex;
@@ -1459,6 +1464,11 @@ input:checked + .slider:before {
     background-color: rgba(15, 15, 15, 0.5);
     backdrop-filter: blur(5px);
     z-index: 50;
+    /* Add max-width to match app-container */
+    max-width: 420px; /* Ensure it stays within the app boundaries */
+    /* Center the fixed header if app-container is centered */
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .screen-header .header-title {
@@ -1480,7 +1490,7 @@ input:checked + .slider:before {
 
 .video-actions-overlay {
     position: absolute;
-    bottom: 75px;
+    bottom: 75px; /* Keep this relative to the video-slide */
     right: 10px;
     z-index: 15;
     display: flex;
@@ -1554,6 +1564,14 @@ input:checked + .slider:before {
     z-index: 50;
     flex-shrink: 0;
     border-bottom: 1px solid var(--light-grey);
+    /* Add max-width to match app-container */
+    max-width: 420px; /* Ensure it stays within the app boundaries */
+    /* Center the top bar if app-container is centered */
+    position: sticky; /* Keep sticky */
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    box-sizing: border-box; /* Ensure padding is included in width */
 }
 
 .home-menu-icon {
@@ -1595,20 +1613,19 @@ input:checked + .slider:before {
 
 .video-meta-overlay {
     position: absolute;
-    bottom: 60px; /* Adjust this if needed, 60px is nav height */
-    right: 10px;
-    z-index: 10; /* Ensure it's below actions overlay but above video */
+    bottom: 60px; /* Position just above the fixed nav */
+    left: 0;
+    width: calc(100% - 110px); /* Give space for action icons */
+    padding: 0 15px 15px 15px; /* Adjusted padding: top 0, right 15px, bottom 15px, left 15px */
+    box-sizing: border-box;
+    background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); /* Keep gradient */
+    z-index: 10; /* Ensure it's below actions overlay (z-index 15) but above video (z-index 1) */
+    pointer-events: none; /* Allows clicks to pass through to video/nav */
+    color: white;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     align-items: flex-start;
-    width: calc(100% - 110px); /* Give space for action icons */
-    padding: 15px;
-    padding-bottom: 0; /* Adjust padding not to overlap with nav */
-    box-sizing: border-box;
-    background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); /* Keep gradient */
-    pointer-events: none; /* Allows clicks to pass through to video/nav */
-    color: white;
 }
 
 
@@ -1978,6 +1995,9 @@ input:checked + .slider:before {
     transform: scale(1.05);
 }
 
+/* === REMOVED Light Theme Styles === */
+/* Removing the entire html.light-theme block to enforce dark mode */
+/*
 html.light-theme {
     --background: #f7f7f7;
     --text-color: #111111;
@@ -2027,6 +2047,9 @@ html.light-theme .main-sidebar {
 }
 html.light-theme .main-sidebar { box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
 html.light-theme .static-message { background-color: rgba(0,0,0,0.05); color: var(--text-color); }
+*/
+/* =============================================== */
+
 
 /* =============================================== */
 /* === Shubhzone App Styles (Code 2) - END === */
@@ -2234,12 +2257,12 @@ html.light-theme .static-message { background-color: rgba(0,0,0,0.05); color: va
     font-size: 1em;
     color: var(--success-green);
 }
-html.light-theme #information-screen > div:nth-of-type(2) { /* Specific selector for the information screen content div */
-    /* Keep the padding consistent in light theme too */
-    padding-bottom: 80px !important; /* Use !important to override inline style */
+/* === REMOVED Light Theme adjustments === */
+/* The general html.light-theme block was removed, so these are no longer necessary */
+/*
+html.light-theme #information-screen > div:nth-of-type(2) {
+    padding-bottom: 80px !important;
 }
-/* === ADDED Light Theme adjustment for Wallet, Friends, Upload, Withdraw Success, Premium Upload === */
-/* Ensure padding is consistent in light theme */
 html.light-theme #wallet-screen,
 html.light-theme #withdraw-success-screen {
     padding-bottom: 80px;
@@ -2251,4 +2274,5 @@ html.light-theme #upload-screen .upload-container-new,
 html.light-theme #premium-upload-screen .premium-upload-container {
      padding-bottom: 60px;
 }
-/* ================================================================================================ */
+*/
+/* ===================================== */
