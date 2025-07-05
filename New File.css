@@ -361,7 +361,7 @@ body {
     position: relative;
     width: 100px;
     height: 100px;
-    margin: 0 auto 25px auto;
+    margin: 0 auto 25px auto; /* This centers the avatar upload section */
 }
 #information-screen #profile-image-preview {
     width: 100%;
@@ -582,11 +582,6 @@ body {
     background-clip: text;
 }
 
-.nav-item i {
-    font-size: 1.5em;
-    margin-bottom: 5px;
-}
-
 .nav-item:not(.active)[data-nav="home"] i { color: #F44336; }
 .nav-item:not(.active)[data-nav="upload"] i { color: #4CAF50; }
 .nav-item:not(.active)[data-nav="wallet"] i { color: #2196F3; }
@@ -777,6 +772,11 @@ body {
     z-index: 20;
     position: sticky;
     top: 0;
+    /* Add max-width and centering for sticky header */
+    max-width: 420px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-sizing: border-box;
 }
 
 .friends-nav-icon {
@@ -986,9 +986,18 @@ body {
 }
 
 #profile-screen .profile-header {
-    text-align: center;
+    /* === CHANGED: Align content to the left === */
+    text-align: left;
+    /* ========================================== */
     margin-bottom: 30px;
     width: 100%;
+    /* If you want the avatar and username side-by-side,
+       you'll need to change this to display: flex */
+    /* Example:
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    */
 }
 
 #profile-screen .profile-header .avatar {
@@ -998,17 +1007,27 @@ body {
     object-fit: cover;
     border: 3px solid var(--primary-neon);
     margin-bottom: 15px;
+    /* If you want this specifically left-aligned when profile-header is flex */
+    /* Example:
+    margin-left: 0;
+    margin-right: auto;
+    */
 }
 
 #profile-screen .profile-header .username {
     font-size: 1.8em;
     font-weight: bold;
     margin-bottom: 5px;
+    /* If you want this specifically left-aligned when profile-header is flex */
+    /* Example:
+    margin-left: 0;
+    margin-right: auto;
+    */
 }
 
 #profile-screen .profile-actions {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start; /* === CHANGED: Align buttons to the left === */
     gap: 15px;
     width: 100%;
     margin-top: 20px;
@@ -1452,7 +1471,7 @@ input:checked + .slider:before {
 }
 
 .screen-header {
-    position: absolute;
+    position: absolute; /* Keep absolute relative to screen */
     top: 0;
     left: 0;
     width: 100%;
@@ -1464,11 +1483,12 @@ input:checked + .slider:before {
     background-color: rgba(15, 15, 15, 0.5);
     backdrop-filter: blur(5px);
     z-index: 50;
-    /* Add max-width to match app-container */
-    max-width: 420px; /* Ensure it stays within the app boundaries */
-    /* Center the fixed header if app-container is centered */
+    /* REMOVED max-width and centering as screen is already max-width 420px and centered */
+    /*
+    max-width: 420px;
     left: 50%;
     transform: translateX(-50%);
+    */
 }
 
 .screen-header .header-title {
@@ -1564,13 +1584,14 @@ input:checked + .slider:before {
     z-index: 50;
     flex-shrink: 0;
     border-bottom: 1px solid var(--light-grey);
-    /* Add max-width to match app-container */
-    max-width: 420px; /* Ensure it stays within the app boundaries */
-    /* Center the top bar if app-container is centered */
-    position: sticky; /* Keep sticky */
-    top: 0;
+    /* REMOVED max-width and centering as screen is already max-width 420px and centered */
+    /*
+    max-width: 420px;
     left: 50%;
     transform: translateX(-50%);
+    */
+    position: sticky; /* Keep sticky */
+    top: 0;
     box-sizing: border-box; /* Ensure padding is included in width */
 }
 
@@ -1995,9 +2016,7 @@ input:checked + .slider:before {
     transform: scale(1.05);
 }
 
-/* === REMOVED Light Theme Styles === */
-/* Removing the entire html.light-theme block to enforce dark mode */
-/*
+/* === RESTORED Light Theme Styles === */
 html.light-theme {
     --background: #f7f7f7;
     --text-color: #111111;
@@ -2047,8 +2066,26 @@ html.light-theme .main-sidebar {
 }
 html.light-theme .main-sidebar { box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
 html.light-theme .static-message { background-color: rgba(0,0,0,0.05); color: var(--text-color); }
-*/
-/* =============================================== */
+/* ===================================== */
+
+
+/* === Added Light Theme adjustments for specific screen content padding === */
+/* These match the dark theme adjustments to ensure consistency when light theme is active */
+html.light-theme #information-screen > div:nth-of-type(2) {
+    padding-bottom: 80px !important; /* Use !important to override inline style */
+}
+html.light-theme #wallet-screen,
+html.light-theme #withdraw-success-screen {
+    padding-bottom: 80px;
+}
+
+html.light-theme #home-screen #video-swiper,
+html.light-theme #friends-screen .user-list-container,
+html.light-theme #upload-screen .upload-container-new,
+html.light-theme #premium-upload-screen .premium-upload-container {
+     padding-bottom: 60px;
+}
+/* ========================================================================= */
 
 
 /* =============================================== */
@@ -2159,120 +2196,4 @@ html.light-theme .static-message { background-color: rgba(0,0,0,0.05); color: va
 #image-editor-screen .font-option input[type="radio"] { display: none; }
 #image-editor-screen .font-option .radio-custom { width: 22px; height: 22px; border: 2px solid rgba(255, 255, 255, 0.7); border-radius: 50%; position: relative; }
 #image-editor-screen .font-option input[type="radio"]:checked + .radio-custom { border-color: var(--primary-neon); }
-#image-editor-screen .font-option input[type="radio"]:checked + .radio-custom::after { content: ''; width: 12px; height: 12px; background: var(--primary-neon); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-#image-editor-screen #capture-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 50; padding: 18px; border-radius: 50%; border: 4px solid white; background-color: #ff4757; display: none; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.5); }
-#image-editor-screen .sticker-item { width: 65px; height: 65px; object-fit: contain; cursor: pointer; margin: 0 10px; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 8px; }
-#image-editor-screen .crop-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9; display: none; }
-#image-editor-screen .crop-box { position: absolute; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7); border: 2px dashed var(--primary-neon); cursor: move; touch-action: none; pointer-events: auto; transition: border-radius 0.2s ease-in-out; }
-#image-editor-screen .crop-box.is-circle { border-radius: 50%; }
-#image-editor-screen .crop-handle { position: absolute; width: 12px; height: 12px; background: var(--primary-neon); border: 2px solid var(--background); border-radius: 3px; pointer-events: auto; }
-#image-editor-screen .crop-handle.tl { top: -7px; left: -7px; cursor: nwse-resize; }
-#image-editor-screen .crop-handle.tr { top: -7px; right: -7px; cursor: nesw-resize; }
-#image-editor-screen .crop-handle.bl { bottom: -7px; left: -7px; cursor: nesw-resize; }
-#image-editor-screen .crop-handle.br { bottom: -7px; right: -7px; cursor: nwse-resize; }
-#image-editor-screen #cropPanel { flex-direction: column; align-items: stretch; padding: 10px 15px; gap: 15px; }
-#image-editor-screen .crop-options { display: flex; justify-content: space-around; gap: 10px; width: 100%;}
-#image-editor-screen .crop-btn { background: var(--dark-grey); border: 1px solid var(--light-grey); color: var(--text-color); padding: 10px; border-radius: 8px; cursor: pointer; flex-grow: 1; transition: all 0.2s ease; }
-#image-editor-screen .crop-btn:hover { background-color: #333; }
-#image-editor-screen .crop-shapes { display: flex; justify-content: space-around; gap: 10px; width: 100%; }
-#image-editor-screen .shape-btn { background: #252525; border: 1px solid #444; color: rgba(255, 255, 255, 0.7); padding: 8px; border-radius: 8px; cursor: pointer; flex-grow: 1; font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-#image-editor-screen .shape-btn i { font-size: 18px; }
-#image-editor-screen .shape-btn.active { color: var(--primary-neon); border-color: var(--primary-neon); }
-#image-editor-screen .interactive-wrapper { position: absolute; cursor: grab; touch-action: none; z-index: 10; padding: 15px; width: auto; height: auto; }
-#image-editor-screen .interactive-wrapper.active { cursor: grabbing; }
-#image-editor-screen .interactive-wrapper .element-content { width: 100%; height: 100%; object-fit: contain; pointer-events: none; transform-origin: center center; }
-#image-editor-screen .element-controls { position: absolute; top: 15px; left: 15px; width: calc(100% - 30px); height: calc(100% - 30px); border: 2px dashed var(--primary-neon); pointer-events: none; display: none; }
-#image-editor-screen .interactive-wrapper.active .element-controls { display: block; }
-#image-editor-screen .control-handle { position: absolute; width: 24px; height: 24px; background: var(--primary-neon); border: 2px solid var(--background); border-radius: 50%; pointer-events: auto; box-shadow: 0 0 8px rgba(0,0,0,0.7); z-index: 11; display: none; align-items: center; justify-content: center; color: var(--background); font-size: 12px;}
-#image-editor-screen .interactive-wrapper.active .control-handle { display: flex; }
-#image-editor-screen .rotate-handle { top: -12px; left: -12px; cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23F44336" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>') 10 10, auto; }
-#image-editor-screen .delete-handle { top: -12px; right: -12px; background: #ff4757; cursor: pointer; color: white; }
-#image-editor-screen .handle-br { bottom: -12px; right: -12px; cursor: nwse-resize; } /* Uniform Scale */
-#image-editor-screen .handle-mr { top: 50%; right: -12px; transform: translateY(-50%); cursor: ew-resize; } /* Horizontal Stretch */
-#image-editor-screen .handle-mb { bottom: -12px; left: 50%; transform: translateX(-50%); cursor: ns-resize; } /* Vertical Stretch */
-
-/* ======================================================= */
-/* === AI Photo Editor Styles (Code 1) - END === */
-/* ======================================================= */
-
-/* === NEW: Styles for Premium Upload Screen === */
-#premium-upload-screen .premium-upload-container {
-    margin-top: 60px;
-    width: 100%;
-    padding: 20px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 15px; /* Adds space between input groups */
-    /* === ADJUSTED for Bottom Nav Clearance === */
-    /* This is the scrollable container. Needs 60px clearance. */
-    padding-bottom: 60px;
-    /* ========================================= */
-}
-
-#premium-upload-screen .file-upload-label {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border: 2px dashed var(--light-grey);
-    border-radius: 10px;
-    padding: 30px;
-    cursor: pointer;
-    text-align: center;
-    margin-bottom: 10px; /* Adjusted margin */
-    transition: border-color 0.3s, background-color 0.3s;
-}
-
-#premium-upload-screen .file-upload-label:hover {
-    border-color: var(--accent-color);
-    background-color: rgba(127, 90, 240, 0.1);
-}
-
-#premium-upload-screen .file-upload-label i {
-    font-size: 3em;
-    margin-bottom: 10px;
-    color: var(--accent-color);
-}
-
-#premium-upload-screen .file-upload-label span {
-    font-size: 1.1em;
-    font-weight: 500;
-}
-
-#premium-upload-screen #premium-video-preview {
-    width: 100%;
-    max-height: 200px;
-    border-radius: 8px;
-    margin-top: 5px; /* Adjusted margin */
-    background-color: #000;
-    display: none; /* Initially hidden */
-}
-
-#premium-upload-screen #premium-upload-progress {
-    display: none;
-    width: 100%;
-    text-align: center;
-    margin-top: 15px;
-    font-size: 1em;
-    color: var(--success-green);
-}
-/* === REMOVED Light Theme adjustments === */
-/* The general html.light-theme block was removed, so these are no longer necessary */
-/*
-html.light-theme #information-screen > div:nth-of-type(2) {
-    padding-bottom: 80px !important;
-}
-html.light-theme #wallet-screen,
-html.light-theme #withdraw-success-screen {
-    padding-bottom: 80px;
-}
-
-html.light-theme #home-screen #video-swiper,
-html.light-theme #friends-screen .user-list-container,
-html.light-theme #upload-screen .upload-container-new,
-html.light-theme #premium-upload-screen .premium-upload-container {
-     padding-bottom: 60px;
-}
-*/
-/* ===================================== */
+#image-editor-screen
