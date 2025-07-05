@@ -103,12 +103,10 @@ body {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     transform-origin: center center;
-    /* === MODIFIED: Ensure all screens default to dark background === */
     background-color: var(--background);
 }
 
 #splash-screen {
-    /* Splash screen has its own intentional gradient background */
     background: linear-gradient(to bottom, #87CEEB, #FFD700, #FFA500, #FF69B4, #F44336, #4CAF50);
     z-index: 11;
     display: flex;
@@ -1563,28 +1561,27 @@ html {
 /* === MODIFIED / परिवर्तित === */
 .video-meta-overlay {
     position: absolute;
-    bottom: 75px; /* नेविगेशन बार से थोड़ी ऊपर की जगह */
+    bottom: 60px;
     left: 10px;
     z-index: 10;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* कंटेंट को वर्टिकली सेंटर करने के लिए बदला गया */
+    justify-content: flex-end;
     align-items: flex-start;
-    width: calc(100% - 110px); /* दाईं ओर के एक्शन आइकॉन के लिए जगह */
-    
-    /* यहाँ मुख्य बदलाव किए गए हैं */
-    background-color: rgba(0, 0, 0, 0.4); /* ग्रेडिएंट की जगह एक सेमी-ट्रांसपेरेंट बैकग्राउंड */
-    backdrop-filter: blur(5px); /* पीछे के कंटेंट को धुंधला करने के लिए */
-    -webkit-backdrop-filter: blur(5px);
-    border-radius: 12px; /* बॉक्स को गोल किनारे देने के लिए */
-    padding: 12px; /* सभी तरफ बराबर पैडिंग */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* एक हल्का सा बॉर्डर */
-    
+    width: calc(100% - 110px);
+    padding: 15px;
+    padding-bottom: 0;
+    box-sizing: border-box;
+    /* Reverting to a subtle gradient to make the overlay almost invisible as requested. */
+    /* अनुरोध के अनुसार ओवरले को लगभग अदृश्य बनाने के लिए एक सूक्ष्म ग्रेडिएंट पर वापस जा रहे हैं। */
+    background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
     pointer-events: none;
     color: white;
-    box-sizing: border-box;
+    /* Removing the box styles */
+    border-radius: 0;
+    border: none;
+    backdrop-filter: none;
 }
-
 
 .video-meta-overlay .uploader-info {
     display: flex;
@@ -1956,7 +1953,6 @@ html {
     transform: scale(1.05);
 }
 
-/* === MODIFIED: Force Day Theme by overwriting light theme variables === */
 html.light-theme {
     --background: #0f0f0f;
     --text-color: #ffffff;
@@ -2010,7 +2006,6 @@ html.light-theme .friends-top-nav {
 html.light-theme .main-sidebar { box-shadow: 4px 0 15px rgba(0,0,0,0.5); }
 html.light-theme .static-message { background-color: rgba(0,0,0,0.3); color: rgba(255, 255, 255, 0.7); }
 html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
-/* ======================================================================= */
 
 /* =============================================== */
 /* === Shubhzone App Styles (Code 2) - END === */
@@ -2021,10 +2016,15 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 /* === AI Photo Editor Styles (Code 1) - START === */
 /* ======================================================= */
 
+/* === MODIFIED / परिवर्तित === */
 #image-editor-screen {
     padding: 0;
     display: block;
     font-family: 'Roboto Flex', sans-serif;
+    /* Fixing the scroll issue by allowing vertical overflow */
+    /* स्क्रॉल की समस्या को ठीक करने के लिए वर्टिकल ओवरफ्लो की अनुमति दी गई है */
+    overflow-y: auto;
+    height: 100%;
 }
 
 #image-editor-screen .editor-header {
