@@ -211,4 +211,385 @@
                 </div>
                 <div class="input-group">
                     <label for="info-country">Country</label>
-                    <select id="info-country" onchange="checkCustom(this, 'custom-
+                    <select id="info-country" onchange="checkCustom(this, 'custom-country-input')">
+                        <option value="India">India</option>
+                        <option value="United States">United States</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Australia">Australia</option>
+                        <option value="Germany">Germany</option>
+                        <option value="Japan">Japan</option>
+                        <option value="France">France</option>
+                        <option value="Brazil">Brazil</option>
+                        <option value="China">China</option>
+                        <option value="United Arab Emirates">United Arab Emirates</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                    <input type="text" id="custom-country-input" class="custom-input" placeholder="Please specify your country">
+                </div>
+                <div class="button-container">
+                    <button id="save-continue-btn" class="continue-btn" onclick="saveAndContinue()">Continue</button>
+                    <button class="logout-btn" onclick="logoutUser()">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="home-screen" class="screen">
+            <div class="home-top-bar">
+                <div id="home-menu-icon" class="home-menu-icon">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <div id="category-scroller" class="category-scroller">
+                </div>
+            </div>
+
+            <div id="video-swiper">
+                <div id="home-static-message-container" style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+                    <p class="static-message">Sorry, no video is available at the moment. <br> Please upload one!</p>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item active" data-nav="home"><i class="fas fa-home"></i>Home</div>
+                <div class="nav-item" data-nav="upload"><i class="fas fa-plus"></i>Upload</div>
+                <div class="nav-item" data-nav="wallet"><i class="fas fa-wallet"></i>Wallet</div>
+                <div class="nav-item" data-nav="friends"><i class="fas fa-user-friends"></i>Friends</div>
+                <div class="nav-item" data-nav="profile"><i class="fas fa-user"></i>Profile</div>
+            </div>
+        </div>
+
+        <div id="theme-settings-screen" class="screen">
+            <div class="screen-header">
+                <div id="back-from-theme-btn" class="header-icon-left">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+                <span class="header-title">Theme Settings</span>
+            </div>
+            <div class="theme-settings-container">
+                <div class="theme-section">
+                    <h4>Theme Mode</h4>
+                    <div class="theme-options">
+                        <button class="theme-btn active" data-theme="dark">Dark</button>
+                        <button class="theme-btn" data-theme="default">Default</button>
+                    </div>
+                </div>
+                <div class="color-palette-container">
+                    <div class="color-column">
+                        <h4>Basic Colors</h4>
+                        <div class="color-grid">
+                            <div class="color-swatch active" style="background-color: #F44336;" data-color="#F44336"></div>
+                            <div class="color-swatch" style="background-color: #E91E63;" data-color="#E91E63"></div>
+                            <div class="color-swatch" style="background-color: #9C27B0;" data-color="#9C27B0"></div>
+                            <div class="color-swatch" style="background-color: #673AB7;" data-color="#673AB7"></div>
+                            <div class="color-swatch" style="background-color: #3F51B5;" data-color="#3F51B5"></div>
+                            <div class="color-swatch" style="background-color: #2196F3;" data-color="#2196F3"></div>
+                            <div class="color-swatch" style="background-color: #009688;" data-color="#009688"></div>
+                            <div class="color-swatch" style="background-color: #4CAF50;" data-color="#4CAF50"></div>
+                            <div class="color-swatch" style="background-color: #FF9800;" data-color="#FF9800"></div>
+                            <div class="color-swatch" style="background-color: #795548;" data-color="#795548"></div>
+                            <div class="color-swatch" style="background-color: #607D8B;" data-color="#607D8B"></div>
+                        </div>
+                    </div>
+                    <div class="color-column">
+                        <h4>Neon Colors</h4>
+                         <div class="color-grid">
+                            <div class="color-swatch neon" style="background-color: #00FFE5; box-shadow: 0 0 10px #00FFE5;" data-color="#00FFE5"></div>
+                            <div class="color-swatch neon" style="background-color: #7FFF00; box-shadow: 0 0 10px #7FFF00;" data-color="#7FFF00"></div>
+                            <div class="color-swatch neon" style="background-color: #FF00FF; box-shadow: 0 0 10px #FF00FF;" data-color="#FF00FF"></div>
+                            <div class="color-swatch neon" style="background-color: #FFD700; box-shadow: 0 0 10px #FFD700;" data-color="#FFD700"></div>
+                            <div class="color-swatch neon" style="background-color: #FF4500; box-shadow: 0 0 10px #FF4500;" data-color="#FF4500"></div>
+                            <div class="color-swatch neon" style="background-color: #00BFFF; box-shadow: 0 0 10px #00BFFF;" data-color="#00BFFF"></div>
+                            <div class="color-swatch neon" style="background-color: #FF69B4; box-shadow: 0 0 10px #FF69B4;" data-color="#FF69B4"></div>
+                            <div class="color-swatch neon" style="background-color: #ADFF2F; box-shadow: 0 0 10px #ADFF2F;" data-color="#ADFF2F"></div>
+                            <div class="color-swatch neon" style="background-color: #EE82EE; box-shadow: 0 0 10px #EE82EE;" data-color="#EE82EE"></div>
+                            <div class="color-swatch neon" style="background-color: #F0E68C; box-shadow: 0 0 10px #F0E68C;" data-color="#F0E68C"></div>
+                            <div class="color-swatch neon" style="background-color: #FF1493; box-shadow: 0 0 10px #FF1493;" data-color="#FF1493"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="upload-screen" class="screen">
+            <div class="upload-header">
+                <h2>Upload Content</h2>
+                <p>Share your videos or edit images</p>
+            </div>
+             <div class="upload-container-new">
+                <button id="open-youtube-modal-btn" class="upload-action-button">
+                    <i class="fab fa-youtube" style="margin-right: 10px;"></i> Upload via YouTube ID
+                </button>
+                <button id="open-premium-upload-btn" class="upload-action-button" style="background-color: var(--accent-color);">
+                    <i class="fas fa-video" style="margin-right: 10px;"></i> Upload Premium Video
+                </button>
+                <button id="navigate-to-editor-btn" class="upload-action-button" style="background-color: #00b0ff;">
+                     <i class="fas fa-magic" style="margin-right: 10px;"></i> Image Editor
+                </button>
+            </div>
+            <div class="bottom-nav">
+                <div class="nav-item" data-nav="home"><i class="fas fa-home"></i>Home</div>
+                <div class="nav-item active" data-nav="upload"><i class="fas fa-plus"></i>Upload</div>
+                <div class="nav-item" data-nav="wallet"><i class="fas fa-wallet"></i>Wallet</div>
+                <div class="nav-item" data-nav="friends"><i class="fas fa-user-friends"></i>Friends</div>
+                <div class="nav-item" data-nav="profile"><i class="fas fa-user"></i>Profile</div>
+            </div>
+        </div>
+
+        <div id="wallet-screen" class="screen">
+            <div class="wallet-card">
+                <div class="balance-label">Your Balance</div>
+                <div class="balance-amount"><i>₹</i> <span id="current-balance">150.00</span></div>
+            </div>
+            <div class="action-section">
+                <label>Withdraw to UPI</label>
+                <div>
+                    <input type="text" id="upi-id" placeholder="Enter your UPI ID">
+                    <button class="button-withdraw" onclick="initiateWithdrawal()">Withdraw Now</button>
+                </div>
+            </div>
+            <div class="history-title">Withdraw History</div>
+            <div id="withdraw-history-list">
+                <div class="history-item">
+                    <span>2 days ago</span>
+                    <span class="amount">+ ₹50.00</span>
+                </div>
+                <div class="history-item">
+                    <span>5 days ago</span>
+                    <span class="amount">+ ₹100.00</span>
+                </div>
+            </div>
+            <div class="bottom-nav">
+                <div class="nav-item" data-nav="home"><i class="fas fa-home"></i>Home</div>
+                <div class="nav-item" data-nav="upload"><i class="fas fa-plus"></i>Upload</div>
+                <div class="nav-item active" data-nav="wallet"><i class="fas fa-wallet"></i>Wallet</div>
+                <div class="nav-item" data-nav="friends"><i class="fas fa-user-friends"></i>Friends</div>
+                <div class="nav-item" data-nav="profile"><i class="fas fa-user"></i>Profile</div>
+            </div>
+        </div>
+
+        <div id="friends-screen" class="screen">
+            <div class="friends-top-nav">
+                <div id="friends-nav-messages" class="friends-nav-icon active">
+                    <i class="fas fa-comments"></i>
+                    <span>Messages</span>
+                </div>
+                <div id="friends-nav-status" class="friends-nav-icon">
+                    <i class="fas fa-circle-notch"></i>
+                    <span>Status</span>
+                </div>
+                <div id="friends-nav-story" class="friends-nav-icon">
+                    <i class="fas fa-history"></i>
+                    <span>Story</span>
+                </div>
+                <div id="friends-nav-content" class="friends-nav-icon">
+                    <i class="fas fa-photo-video"></i>
+                    <span>Content</span>
+                </div>
+                <div id="friends-nav-ai" class="friends-nav-icon">
+                    <i class="fas fa-robot"></i>
+                    <span>AI Friend</span>
+                </div>
+            </div>
+
+            <div class="user-list-container">
+                <div class="user-card" onclick="openChatWindow('user123', 'Aarav Sharma')">
+                    <div class="user-avatar-container">
+                        <img src="https://i.pravatar.cc/150?img=5" alt="User Avatar" class="user-avatar">
+                        <div class="status-indicator online"></div>
+                    </div>
+                    <div class="user-info">
+                        <h4 class="user-name">Aarav Sharma</h4>
+                        <p class="last-message">Hey, how are you? ✓✓</p>
+                    </div>
+                    <i class="fas fa-user-plus add-member-btn"></i>
+                </div>
+                <div class="user-card" onclick="openChatWindow('user456', 'Priya Singh')">
+                    <div class="user-avatar-container">
+                        <img src="https://i.pravatar.cc/150?img=1" alt="User Avatar" class="user-avatar">
+                        <div class="status-indicator offline"></div>
+                    </div>
+                    <div class="user-info">
+                        <h4 class="user-name">Priya Singh</h4>
+                        <p class="last-message">Let's catch up tomorrow. ✓</p>
+                    </div>
+                    <i class="fas fa-user-plus add-member-btn"></i>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item" data-nav="home"><i class="fas fa-home"></i>Home</div>
+                <div class="nav-item" data-nav="upload"><i class="fas fa-plus"></i>Upload</div>
+                <div class="nav-item" data-nav="wallet"><i class="fas fa-wallet"></i>Wallet</div>
+                <div class="nav-item active" data-nav="friends"><i class="fas fa-user-friends"></i>Friends</div>
+                <div class="nav-item" data-nav="profile"><i class="fas fa-user"></i>Profile</div>
+            </div>
+        </div>
+
+        <div id="profile-screen" class="screen">
+            <div class="profile-header">
+                <img id="profile-avatar" src="https://via.placeholder.com/120/222/FFFFFF?text=+" alt="User Avatar" class="avatar">
+                <div id="profile-username" class="username">Your Name</div>
+                <div class="profile-actions">
+                    <button class="profile-action-btn edit" onclick="navigateTo('information-screen')">Edit Profile</button>
+                    <button class="profile-action-btn logout" onclick="logoutUser()">Log Out</button>
+                </div>
+            </div>
+            <div class="user-videos-title">Your Uploaded Videos</div>
+            <div id="user-video-grid" class="video-grid">
+                <p id="no-videos-message" style="color: grey; grid-column: 1 / -1; text-align: center;">You have not uploaded any videos yet.</p>
+            </div>
+            <div class="bottom-nav">
+                <div class="nav-item" data-nav="home"><i class="fas fa-home"></i>Home</div>
+                <div class="nav-item" data-nav="upload"><i class="fas fa-plus"></i>Upload</div>
+                <div class="nav-item" data-nav="wallet"><i class="fas fa-wallet"></i>Wallet</div>
+                <div class="nav-item" data-nav="friends"><i class="fas fa-user-friends"></i>Friends</div>
+                <div class="nav-item active" data-nav="profile"><i class="fas fa-user"></i>Profile</div>
+            </div>
+        </div>
+        
+        <div id="premium-upload-screen" class="screen">
+            <div class="screen-header">
+                <div id="back-from-premium-btn" class="header-icon-left">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+                <span class="header-title">Upload Premium Video</span>
+            </div>
+            <div class="premium-upload-container" style="margin-top: 60px; width: 100%; padding: 20px; overflow-y: auto;">
+                
+                <label for="premium-video-file-input" class="file-upload-label" style="display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed var(--light-grey); border-radius: 10px; padding: 30px; cursor: pointer; text-align: center; margin-bottom: 20px;">
+                    <i class="fas fa-film" style="font-size: 3em; margin-bottom: 10px; color: var(--accent-color);"></i>
+                    <span>Select Video File</span>
+                </label>
+                <input type="file" id="premium-video-file-input" accept="video/*" style="display: none;">
+                
+                <video id="premium-video-preview" style="display:none; width: 100%; max-height: 200px; border-radius: 8px; margin-top: 15px; background-color: #000;" controls></video>
+
+                <div class="input-group">
+                    <label for="premium-video-title">Title</label>
+                    <input type="text" id="premium-video-title" placeholder="Enter video title">
+                </div>
+                <div class="input-group">
+                    <label for="premium-video-description">Description</label>
+                    <textarea id="premium-video-description" rows="3" placeholder="Add a description"></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="premium-video-hashtags">Hashtags</label>
+                    <input type="text" id="premium-video-hashtags" placeholder="Add hashtags like #trending #viral">
+                </div>
+                
+                <div class="category-selector-wrapper">
+                     <label>Category (Please select a category)</label>
+                     <!-- You would reuse your category selector component here. For now, it's a placeholder. -->
+                </div>
+
+                <div id="premium-upload-progress" style="display: none; width: 100%; text-align: center; margin-top: 15px;">
+                    <p id="premium-upload-progress-text">Uploading: 0%</p>
+                </div>
+
+                <button id="premium-upload-btn" class="save-button" style="margin-top: 20px;">Upload Video</button>
+            </div>
+        </div>
+
+        <!-- === PHOTO EDITOR SCREEN: यहाँ ज़रूरी बदलाव किए गए हैं === -->
+        <div id="image-editor-screen" class="screen">
+            <!-- Top Bar with 4 Icons -->
+            <div class="editor-top-bar">
+                <button class="top-bar-btn" data-action="back" id="back-from-editor-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Back</span>
+                </button>
+                <label class="top-bar-btn" data-action="upload" for="upload">
+                    <i class="fa-solid fa-upload"></i>
+                    <span>Upload</span>
+                </label>
+                <input type="file" id="upload" accept="image/*" style="display: none;">
+                <button class="top-bar-btn" data-action="camera" id="camera-btn">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>Camera</span>
+                </button>
+                <button class="top-bar-btn" data-action="save" onclick="photoEditor.downloadImage()">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Save</span>
+                </button>
+            </div>
+
+            <!-- NEW: Toggle button for the sidebar (Eye Icon) -->
+            <button id="toggle-sidebar-btn" class="toggle-sidebar-btn">
+                <i class="fas fa-eye"></i>
+            </button>
+
+            <!-- NEW: Left Vertical Sidebar for Tools -->
+            <nav id="editor-sidebar" class="editor-sidebar">
+                <button class="tool-btn" data-tool="filters"><i class="fa-solid fa-wand-magic-sparkles"></i> Filters</button>
+                <button class="tool-btn" data-tool="adjust"><i class="fa-solid fa-sliders"></i> Adjust</button>
+                <button class="tool-btn" data-tool="stickers"><i class="fa-solid fa-face-smile"></i> Stickers</button>
+                <button class="tool-btn" data-tool="draw"><i class="fa-solid fa-pencil"></i> Draw</button>
+                <button class="tool-btn" data-tool="text"><i class="fa-solid fa-font"></i> Text</button>
+                <button class="tool-btn" data-tool="frames"><i class="fa-solid fa-border-all"></i> Frame</button>
+                <button class="tool-btn" data-tool="crop"><i class="fa-solid fa-crop-simple"></i> Crop</button>
+            </nav>
+
+            <!-- Main Image Container -->
+            <main class="image-container" id="image-container">
+                <div class="image-wrapper" id="image-wrapper">
+                    <video id="video-feed" autoplay playsinline></video>
+                    <img id="mainImage" src="" alt="Please Upload an Image">
+                    <canvas id="drawing-canvas"></canvas>
+                    <div id="crop-overlay" class="crop-overlay"></div>
+                    <button id="capture-btn" title="Take Picture"></button>
+                </div>
+            </main>
+
+            <!-- NEW: Bottom Panel for Tool Options -->
+            <div id="editor-bottom-panel" class="editor-bottom-panel">
+                <div class="panel-container" id="panel-container">
+                    <div id="filtersPanel" class="panel"></div>
+                    <div id="adjustPanel" class="panel">
+                        <div class="adjust-slider"><label>Brightness <span id="brightness-val">100</span>%</label><input type="range" class="adjust-slider-input" data-filter="brightness" min="0" max="200" value="100"></div>
+                        <div class="adjust-slider"><label>Contrast <span id="contrast-val">100</span>%</label><input type="range" class="adjust-slider-input" data-filter="contrast" min="0" max="200" value="100"></div>
+                        <div class="adjust-slider"><label>Saturation <span id="saturate-val">100</span>%</label><input type="range" class="adjust-slider-input" data-filter="saturate" min="0" max="200" value="100"></div>
+                        <div class="adjust-slider"><label>Hue <span id="hue-rotate-val">0</span>°</label><input type="range" class="adjust-slider-input" data-filter="hue-rotate" min="0" max="360" value="0"></div>
+                        <div class="adjust-slider"><label>Grayscale <span id="grayscale-val">0</span>%</label><input type="range" class="adjust-slider-input" data-filter="grayscale" min="0" max="100" value="0"></div>
+                        <div class="adjust-slider"><label>Blur <span id="blur-val">0</span>px</label><input type="range" class="adjust-slider-input" data-filter="blur" min="0" max="10" value="0" step="0.1"></div>
+                    </div>
+                    <div id="stickersPanel" class="panel"></div>
+                    <div id="drawPanel" class="panel">
+                        <div class="draw-tools"><button id="brush-btn" class="draw-tool-btn active"><i class="fa-solid fa-paintbrush"></i> Brush</button><button id="eraser-btn" class="draw-tool-btn"><i class="fa-solid fa-eraser"></i> Eraser</button><div id="brush-preview"></div><input type="color" id="color-picker" value="#00e676"></div>
+                        <div class="adjust-slider"><label>Size <span id="brush-size-val">8</span>px</label><input type="range" id="brush-size" min="1" max="100" value="8"></div>
+                        <div class="draw-actions"><button id="undo-draw-btn"><i class="fa-solid fa-undo"></i> Undo</button><button id="redo-draw-btn"><i class="fa-solid fa-redo"></i> Redo</button><button id="clear-draw-btn"><i class="fa-solid fa-trash"></i> Clear</button></div>
+                    </div>
+                    <div id="textPanel" class="panel">
+                        <textarea id="text-input" placeholder="Yahan apna text likhein..."></textarea>
+                        <div class="text-options"><div id="text-preview"></div><input type="color" id="text-color-picker" value="#00e676"><input type="range" id="text-size-slider" min="10" max="150" value="40" style="flex-grow: 1;"><label><span id="text-size-val">40</span>px</label></div>
+                        <button id="font-select-btn">Roboto</button><button id="add-text-btn" class="add-text-btn"><i class="fa-solid fa-plus"></i> Text Jodein</button>
+                    </div>
+                    <div id="framesPanel" class="panel">
+                        <div id="framesCategoryPanel" class="panel-view active"></div>
+                        <div id="framesDetailPanel" class="panel-view"></div>
+                    </div>
+                    <div id="cropPanel" class="panel">
+                        <div class="crop-shapes" id="crop-shapes"><button class="shape-btn active" data-ratio="free"><i class="fa-solid fa-vector-square"></i>Free</button><button class="shape-btn" data-ratio="1:1"><i class="fa-solid fa-square"></i>1:1</button><button class="shape-btn" data-ratio="4:5"><i class="fa-solid fa-portrait"></i>4:5</button><button class="shape-btn" data-ratio="16:9"><i class="fa-solid fa-film"></i>16:9</button><button class="shape-btn" data-ratio="circle"><i class="fa-regular fa-circle"></i>Circle</button></div>
+                        <div class="crop-options"><button id="apply-crop-btn" class="crop-btn"><i class="fa-solid fa-check"></i> Apply</button><button id="cancel-crop-btn" class="crop-btn"><i class="fa-solid fa-times"></i> Cancel</button></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Font Picker Modal (Unchanged) -->
+            <div id="font-picker-modal">
+                <div class="font-picker-content"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <!-- JavaScript फ़ाइल को यहाँ लिंक किया गया है -->
+    <script src="New File.js"></script>
+</body>
+</html>
