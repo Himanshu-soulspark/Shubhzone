@@ -1,7 +1,3 @@
-New File.css
-
-
-
 /* ================================================= */
 /* === Shubhzone App Styles (Code 2) - START === */
 /* ================================================= */
@@ -544,7 +540,9 @@ body {
     bottom: 0;
     left: 0;
     z-index: 100;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    /* MODIFIED: Removed the top border to make it seamless with the video content. */
+    /* परिवर्तित: वीडियो कंटेंट के साथ सहज बनाने के लिए ऊपर का बॉर्डर हटा दिया गया है। */
+    border-top: none; 
 }
 
 .nav-item {
@@ -1950,7 +1948,9 @@ html {
     transform: scale(1.05);
 }
 
-/* === MODIFIED: Force Dark Theme by overwriting light theme variables === */
+/* MODIFIED: Changed "Dark" to "Day" in the comment as requested. */
+/* परिवर्तित: अनुरोध के अनुसार टिप्पणी में "डार्क" को "डे" में बदल दिया गया है। */
+/* === MODIFIED: Force Day Theme by overwriting light theme variables === */
 html.light-theme {
     --background: #0f0f0f;
     --text-color: #ffffff;
@@ -1992,7 +1992,9 @@ html.light-theme ::placeholder {
 
 html.light-theme .bottom-nav {
     background-color: rgba(0, 0, 0, 0.7);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    /* MODIFIED: Removed the top border here as well for consistency. */
+    /* परिवर्तित: स्थिरता के लिए यहां भी ऊपर का बॉर्डर हटा दिया गया है। */
+    border-top: none;
 }
 html.light-theme .screen-header,
 html.light-theme .home-top-bar,
