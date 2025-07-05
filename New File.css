@@ -1,7 +1,3 @@
-New File.css
-
-
-
 /* ================================================= */
 /* === Shubhzone App Styles (Code 2) - START === */
 /* ================================================= */
@@ -470,9 +466,6 @@ body {
     overflow-y: scroll;
     scroll-snap-type: y mandatory;
     -webkit-overflow-scrolling: touch;
-    /* === ADDED for Bottom Nav Clearance === */
-    padding-bottom: 80px;
-    /* ====================================== */
 }
 
 .video-slide {
@@ -614,9 +607,6 @@ body {
     justify-content: center;
     gap: 20px;
     padding: 20px;
-    /* === ADDED for Bottom Nav Clearance === */
-    padding-bottom: 80px;
-    /* ====================================== */
 }
 
 .upload-action-button {
@@ -639,12 +629,6 @@ body {
 .upload-action-button:hover {
     opacity: 0.9;
     transform: scale(1.02);
-}
-
-#wallet-screen {
-    /* === ADDED for Bottom Nav Clearance === */
-    padding-bottom: 80px;
-    /* ====================================== */
 }
 
 #wallet-screen .wallet-card {
@@ -790,9 +774,6 @@ body {
     width: 100%;
     overflow-y: auto;
     padding: 15px;
-    /* === ADDED for Bottom Nav Clearance === */
-    padding-bottom: 80px;
-    /* ====================================== */
 }
 
 .user-card {
@@ -965,7 +946,7 @@ body {
 
 #profile-screen {
     justify-content: flex-start;
-    padding-bottom: 80px; /* Already has padding */
+    padding-bottom: 80px;
 }
 
 #profile-screen .profile-header {
@@ -1211,15 +1192,7 @@ body {
     width: 100%;
 }
 
-#information-screen > div:nth-of-type(2) { /* Specific selector for the information screen content div */
-    /* Existing inline styles would apply first, then this padding-bottom */
-    /* === ADDED for Bottom Nav Clearance === */
-    padding-bottom: 80px !important; /* Use !important to override inline style */
-    /* ====================================== */
-}
-
-
-#information-screen label,
+.modal-content label,
 #premium-upload-screen label { /* Added premium screen selector */
     display: block;
     font-size: 1.1em;
@@ -1227,10 +1200,6 @@ body {
     color: var(--text-color);
 }
 
-#information-screen input[type="text"],
-#information-screen input[type="tel"],
-#information-screen input[type="email"],
-#information-screen select,
 .modal-content input[type="text"],
 .modal-content input[type="email"],
 .modal-content input[type="url"],
@@ -2156,9 +2125,6 @@ html.light-theme .static-message { background-color: rgba(0,0,0,0.05); color: va
     display: flex;
     flex-direction: column;
     gap: 15px; /* Adds space between input groups */
-    /* === ADDED for Bottom Nav Clearance === */
-    padding-bottom: 80px;
-    /* ====================================== */
 }
 
 #premium-upload-screen .file-upload-label {
@@ -2207,8 +2173,4 @@ html.light-theme .static-message { background-color: rgba(0,0,0,0.05); color: va
     margin-top: 15px;
     font-size: 1em;
     color: var(--success-green);
-}
-html.light-theme #information-screen > div:nth-of-type(2) { /* Specific selector for the information screen content div */
-    /* Keep the padding consistent in light theme too */
-    padding-bottom: 80px !important; /* Use !important to override inline style */
 }
