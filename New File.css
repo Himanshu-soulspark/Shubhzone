@@ -2011,11 +2011,12 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 /* === MODIFIED / परिवर्तित: Top control bar === */
 .editor-top-bar {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around; /* Space icons evenly */
     align-items: center;
     padding: 10px 15px;
     background: var(--dark-grey);
-    flex-shrink: 0;
+    flex-shrink: 0; /* Prevent this bar from shrinking */
+    z-index: 20;
 }
 .top-bar-btn {
     display: flex;
@@ -2029,6 +2030,7 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
     cursor: pointer;
     font-weight: 500;
     transition: all 0.2s ease;
+    padding: 5px;
 }
 .top-bar-btn i {
     font-size: 20px;
@@ -2039,10 +2041,10 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 .top-bar-btn[data-action="camera"] i { color: var(--primary-neon); }
 .top-bar-btn[data-action="save"] i { color: var(--success-green); }
 
-/* Main Image Display Area */
+/* === MODIFIED / परिवर्तित: Main Image Display Area === */
 #image-editor-screen .image-container { 
-    flex: 1;
-    min-height: 0;
+    flex: 1; /* This makes the container take up all available space */
+    min-height: 0; /* Crucial for flexbox to prevent overflow */
     display: flex; 
     justify-content: center; 
     align-items: center; 
@@ -2059,26 +2061,43 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 /* === MODIFIED / परिवर्तित: Bottom Toolbar === */
 #image-editor-screen .toolbar { 
     background: var(--dark-grey); 
-    flex-shrink: 0; 
+    flex-shrink: 0;  /* Prevent toolbar from shrinking */
     z-index: 20;
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Panels will appear on top of the nav bar */
 }
 
+/* Container for feature panels (sliders, filters, etc.) */
 #image-editor-screen .panel-container { 
     min-height: 140px; 
     padding: 15px 0; 
     position: relative; 
     overflow: hidden; 
-    display: none;
+    display: none; /* Hidden by default */
     background: var(--dark-grey);
     border-bottom: 1px solid var(--light-grey);
 }
-#image-editor-screen .panel-container.visible { display: block; }
-#image-editor-screen .panel { display: none; align-items: center; overflow-x: auto; padding: 0 15px; -ms-overflow-style: none; scrollbar-width: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; transition: opacity 0.3s ease; opacity: 0; }
+#image-editor-screen .panel-container.visible { display: block; } /* JS will add this class to show it */
+
+/* Individual panel styling */
+#image-editor-screen .panel { 
+    display: none; 
+    align-items: center; 
+    overflow-x: auto; 
+    padding: 0 15px; 
+    -ms-overflow-style: none; scrollbar-width: none; 
+    width: 100%; 
+    height: 100%; 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    transition: opacity 0.3s ease; 
+    opacity: 0; 
+}
 #image-editor-screen .panel.active { display: flex; opacity: 1; position: relative; }
 #image-editor-screen .panel::-webkit-scrollbar { display: none; }
 
+/* The main, always-visible navigation bar at the bottom */
 #image-editor-screen .toolbar-nav { 
     display: flex; 
     justify-content: space-around; 
