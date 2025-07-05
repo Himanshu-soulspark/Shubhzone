@@ -458,9 +458,6 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
-    /* === FINAL FIX PART 1 / अंतिम समाधान भाग 1 === */
-    /* This ensures the screen behind the transparent nav bar has no border or shadow. */
-    /* यह सुनिश्चित करता है कि पारदर्शी नेविगेशन बार के पीछे वाली स्क्रीन पर कोई बॉर्डर या शैडो न हो। */
     border: none !important;
     box-shadow: none !important;
 }
@@ -545,9 +542,6 @@ body {
     bottom: 0;
     left: 0;
     z-index: 100;
-    /* === FINAL FIX PART 2 / अंतिम समाधान भाग 2 === */
-    /* This forcefully removes any border or shadow from the nav bar itself. */
-    /* यह नेविगेशन बार से ही किसी भी बॉर्डर या शैडो को जबरदस्ती हटा देता है। */
     border: none !important;
     box-shadow: none !important;
 }
@@ -1566,22 +1560,29 @@ html {
     font-weight: bold;
 }
 
+/* === MODIFIED / परिवर्तित === */
 .video-meta-overlay {
     position: absolute;
-    bottom: 60px;
+    bottom: 75px; /* नेविगेशन बार से थोड़ी ऊपर की जगह */
     left: 10px;
     z-index: 10;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: center; /* कंटेंट को वर्टिकली सेंटर करने के लिए बदला गया */
     align-items: flex-start;
-    width: calc(100% - 110px);
-    padding: 15px;
-    padding-bottom: 0;
-    box-sizing: border-box;
-    background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+    width: calc(100% - 110px); /* दाईं ओर के एक्शन आइकॉन के लिए जगह */
+    
+    /* यहाँ मुख्य बदलाव किए गए हैं */
+    background-color: rgba(0, 0, 0, 0.4); /* ग्रेडिएंट की जगह एक सेमी-ट्रांसपेरेंट बैकग्राउंड */
+    backdrop-filter: blur(5px); /* पीछे के कंटेंट को धुंधला करने के लिए */
+    -webkit-backdrop-filter: blur(5px);
+    border-radius: 12px; /* बॉक्स को गोल किनारे देने के लिए */
+    padding: 12px; /* सभी तरफ बराबर पैडिंग */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* एक हल्का सा बॉर्डर */
+    
     pointer-events: none;
     color: white;
+    box-sizing: border-box;
 }
 
 
