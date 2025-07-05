@@ -471,7 +471,8 @@ body {
     scroll-snap-type: y mandatory;
     -webkit-overflow-scrolling: touch;
     /* === ADJUSTED for Bottom Nav Clearance === */
-    padding-bottom: 60px; /* Should match the nav height */
+    /* Need 60px clearance for the fixed nav */
+    padding-bottom: 60px;
     /* ========================================= */
 }
 
@@ -540,7 +541,9 @@ body {
     height: 60px;
     background-color: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(10px);
-    position: absolute;
+    /* === CHANGED: Position fixed relative to viewport === */
+    position: fixed;
+    /* ==================================================== */
     bottom: 0;
     left: 0;
     z-index: 100;
@@ -587,7 +590,11 @@ body {
 
 #upload-screen {
     justify-content: flex-start;
-    padding-top: 20px;
+    padding-top: 20px; /* Keep existing padding */
+    /* === ADJUSTED for Bottom Nav Clearance === */
+    /* Need 60px clearance for the fixed nav + 20px screen padding */
+    padding-bottom: 80px;
+    /* ========================================= */
 }
 
 #upload-screen .upload-header {
@@ -615,7 +622,8 @@ body {
     gap: 20px;
     padding: 20px;
     /* === ADJUSTED for Bottom Nav Clearance === */
-    padding-bottom: 60px; /* Should match the nav height */
+    /* This is the scrollable container. Needs 60px clearance. */
+    padding-bottom: 60px;
     /* ========================================= */
 }
 
@@ -644,7 +652,8 @@ body {
 #wallet-screen {
     /* Keep existing padding: 20px */
     /* === ADJUSTED for Bottom Nav Clearance === */
-    padding-bottom: 80px; /* Add 60px (nav) to existing 20px padding */
+    /* Need 60px clearance for the fixed nav + 20px screen padding */
+    padding-bottom: 80px;
     /* ========================================= */
 }
 
@@ -792,7 +801,8 @@ body {
     overflow-y: auto;
     padding: 15px;
     /* === ADJUSTED for Bottom Nav Clearance === */
-    padding-bottom: 60px; /* Should match the nav height */
+    /* This is the scrollable container. Needs 60px clearance. */
+    padding-bottom: 60px;
     /* ========================================= */
 }
 
@@ -966,7 +976,8 @@ body {
 
 #profile-screen {
     justify-content: flex-start;
-    padding-bottom: 80px; /* Keeping existing 80px */
+    /* Keep existing padding-bottom for screen element: 20px + 60px nav */
+    padding-bottom: 80px;
 }
 
 #profile-screen .profile-header {
@@ -1099,8 +1110,9 @@ body {
     justify-content: center;
     text-align: center;
     /* Keep existing padding: 20px */
-    /* === ADDED for Bottom Nav Clearance === */
-    padding-bottom: 80px; /* Add 60px (nav) to existing 20px padding */
+    /* === ADJUSTED for Bottom Nav Clearance === */
+    /* Need 60px clearance for the fixed nav + 20px screen padding */
+    padding-bottom: 80px;
     /* ====================================== */
 }
 
@@ -1224,6 +1236,8 @@ body {
     /* Keep existing inline styles (margin-top, width, overflow-y) */
     /* === ADJUSTED padding-bottom for Bottom Nav Clearance === */
     /* Override the inline padding-bottom: 20px to be 80px (60px nav + 20px screen padding) */
+    /* Note: If this specific selector doesn't work due to HTML changes,
+             you might need to target it differently, e.g., using a class */
     padding-bottom: 80px !important; /* Use !important to override inline style */
     /* ====================================== */
 }
@@ -1581,27 +1595,29 @@ input:checked + .slider:before {
 
 .video-meta-overlay {
     position: absolute;
-    bottom: 60px;
-    left: 0;
-    width: 100%;
-    padding: 15px;
-    box-sizing: border-box;
-    background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
-    z-index: 10;
-    pointer-events: none;
-    color: white;
+    bottom: 60px; /* Adjust this if needed, 60px is nav height */
+    right: 10px;
+    z-index: 10; /* Ensure it's below actions overlay but above video */
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     align-items: flex-start;
+    width: calc(100% - 110px); /* Give space for action icons */
+    padding: 15px;
+    padding-bottom: 0; /* Adjust padding not to overlap with nav */
+    box-sizing: border-box;
+    background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); /* Keep gradient */
+    pointer-events: none; /* Allows clicks to pass through to video/nav */
+    color: white;
 }
+
 
 .video-meta-overlay .uploader-info {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-bottom: 10px;
-    pointer-events: auto;
+    pointer-events: auto; /* Re-enable pointer events for interactions */
 }
 
 .video-meta-overlay .uploader-avatar {
@@ -2166,7 +2182,8 @@ html.light-theme .static-message { background-color: rgba(0,0,0,0.05); color: va
     flex-direction: column;
     gap: 15px; /* Adds space between input groups */
     /* === ADJUSTED for Bottom Nav Clearance === */
-    padding-bottom: 60px; /* Should match the nav height */
+    /* This is the scrollable container. Needs 60px clearance. */
+    padding-bottom: 60px;
     /* ========================================= */
 }
 
