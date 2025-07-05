@@ -30,7 +30,7 @@
     <div id="upload-details-modal" class="modal-overlay">
         <div class="modal-content">
             <span class="close-button" onclick="closeUploadDetailsModal()">×</span>
-            <h3 id="modal-title">Upload Details (YouTube)</h3> <!-- MODIFIED: Title changed slightly for clarity -->
+            <h3 id="modal-title">Upload Details (YouTube)</h3>
             <input type="hidden" id="editing-video-id">
             <div class="input-group">
                 <label for="modal-video-title">Title</label>
@@ -513,6 +513,22 @@
                 </button>
             </div>
 
+            <!-- NEW: Toggle button for the sidebar (Eye Icon) -->
+            <button id="toggle-sidebar-btn" class="toggle-sidebar-btn">
+                <i class="fas fa-eye"></i>
+            </button>
+
+            <!-- NEW: Left Vertical Sidebar for Tools -->
+            <nav id="editor-sidebar" class="editor-sidebar">
+                <button class="tool-btn" data-tool="filters"><i class="fa-solid fa-wand-magic-sparkles"></i> Filters</button>
+                <button class="tool-btn" data-tool="adjust"><i class="fa-solid fa-sliders"></i> Adjust</button>
+                <button class="tool-btn" data-tool="stickers"><i class="fa-solid fa-face-smile"></i> Stickers</button>
+                <button class="tool-btn" data-tool="draw"><i class="fa-solid fa-pencil"></i> Draw</button>
+                <button class="tool-btn" data-tool="text"><i class="fa-solid fa-font"></i> Text</button>
+                <button class="tool-btn" data-tool="frames"><i class="fa-solid fa-border-all"></i> Frame</button>
+                <button class="tool-btn" data-tool="crop"><i class="fa-solid fa-crop-simple"></i> Crop</button>
+            </nav>
+
             <!-- Main Image Container -->
             <main class="image-container" id="image-container">
                 <div class="image-wrapper" id="image-wrapper">
@@ -524,8 +540,8 @@
                 </div>
             </main>
 
-            <!-- Bottom Toolbar -->
-            <footer class="toolbar">
+            <!-- NEW: Bottom Panel for Tool Options -->
+            <div id="editor-bottom-panel" class="editor-bottom-panel">
                 <div class="panel-container" id="panel-container">
                     <div id="filtersPanel" class="panel"></div>
                     <div id="adjustPanel" class="panel">
@@ -556,16 +572,9 @@
                         <div class="crop-options"><button id="apply-crop-btn" class="crop-btn"><i class="fa-solid fa-check"></i> Apply</button><button id="cancel-crop-btn" class="crop-btn"><i class="fa-solid fa-times"></i> Cancel</button></div>
                     </div>
                 </div>
-                <nav class="toolbar-nav" id="toolbar-nav">
-                    <button class="tool-btn" data-tool="filters"><i class="fa-solid fa-wand-magic-sparkles"></i> Filters</button>
-                    <button class="tool-btn" data-tool="adjust"><i class="fa-solid fa-sliders"></i> Adjust</button>
-                    <button class="tool-btn" data-tool="stickers"><i class="fa-solid fa-face-smile"></i> Stickers</button>
-                    <button class="tool-btn" data-tool="draw"><i class="fa-solid fa-pencil"></i> Draw</button>
-                    <button class="tool-btn" data-tool="text"><i class="fa-solid fa-font"></i> Text</button>
-                    <button class="tool-btn" data-tool="frames"><i class="fa-solid fa-border-all"></i> Frame</button>
-                    <button class="tool-btn" data-tool="crop"><i class="fa-solid fa-crop-simple"></i> Crop</button>
-                </nav>
-            </footer>
+            </div>
+
+            <!-- Font Picker Modal (Unchanged) -->
             <div id="font-picker-modal">
                 <div class="font-picker-content"></div>
             </div>
