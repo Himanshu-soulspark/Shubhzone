@@ -779,9 +779,16 @@ body {
     backdrop-filter: blur(5px);
     border-bottom: 1px solid var(--light-grey);
     flex-shrink: 0;
-    z-index: 20;
+    /* === ADJUSTED: Removed z-index to prevent it appearing on other screens === */
+    /* z-index: 20; */
+    /* ========================================================================== */
     position: sticky;
     top: 0;
+    /* Keep max-width and centering from previous fix */
+    max-width: 420px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-sizing: border-box;
 }
 
 .friends-nav-icon {
@@ -794,9 +801,9 @@ body {
     font-size: 0.8em;
     transition: color 0.3s ease;
     flex-grow: 1;
-    /* === ADDED: Attempt to center text/icon visually === */
+    /* === ADDED: Center text under the icon === */
     text-align: center;
-    /* ================================================== */
+    /* ======================================== */
 }
 
 .friends-nav-icon i {
@@ -1585,12 +1592,18 @@ input:checked + .slider:before {
     left: 50%;
     transform: translateX(-50%);
     box-sizing: border-box; /* Ensure padding is included in width */
+    /* === ADJUSTED: Fix hamburger menu alignment === */
+    justify-content: flex-start; /* Align items to the start */
+    gap: 10px; /* Add space between items */
+    /* ============================================= */
 }
 
 .home-menu-icon {
     font-size: 1.6em;
     padding: 0 10px;
     cursor: pointer;
+    /* Ensure it doesn't shrink */
+    flex-shrink: 0;
 }
 
 .category-scroller {
@@ -1615,6 +1628,7 @@ input:checked + .slider:before {
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
+    flex-shrink: 0; /* Ensure chips don't shrink */
 }
 
 .category-chip.active {
