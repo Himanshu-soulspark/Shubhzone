@@ -528,6 +528,7 @@ body {
     z-index: 10;
 }
 
+/* === MODIFIED / परिवर्तित === */
 .bottom-nav {
     display: flex;
     justify-content: space-around;
@@ -540,9 +541,10 @@ body {
     bottom: 0;
     left: 0;
     z-index: 100;
-    /* MODIFIED: Removed the top border to make it seamless with the video content. */
-    /* परिवर्तित: वीडियो कंटेंट के साथ सहज बनाने के लिए ऊपर का बॉर्डर हटा दिया गया है। */
-    border-top: none; 
+    /* MODIFIED: Aggressively removing any border, especially the top one, to fix the white line issue. */
+    /* परिवर्तित: सफेद लाइन की समस्या को ठीक करने के लिए किसी भी बॉर्डर, विशेष रूप से ऊपर वाले को, मजबूती से हटाया जा रहा है। */
+    border: none !important;
+    box-shadow: none !important;
 }
 
 .nav-item {
@@ -1948,8 +1950,6 @@ html {
     transform: scale(1.05);
 }
 
-/* MODIFIED: Changed "Dark" to "Day" in the comment as requested. */
-/* परिवर्तित: अनुरोध के अनुसार टिप्पणी में "डार्क" को "डे" में बदल दिया गया है। */
 /* === MODIFIED: Force Day Theme by overwriting light theme variables === */
 html.light-theme {
     --background: #0f0f0f;
@@ -1990,11 +1990,13 @@ html.light-theme ::placeholder {
     color: rgba(255, 255, 255, 0.5);
 }
 
+/* === MODIFIED / परिवर्तित === */
 html.light-theme .bottom-nav {
     background-color: rgba(0, 0, 0, 0.7);
-    /* MODIFIED: Removed the top border here as well for consistency. */
-    /* परिवर्तित: स्थिरता के लिए यहां भी ऊपर का बॉर्डर हटा दिया गया है। */
-    border-top: none;
+    /* MODIFIED: Also aggressively removing any border here for consistency. */
+    /* परिवर्तित: स्थिरता के लिए यहां भी किसी भी बॉर्डर को मजबूती से हटाया जा रहा है। */
+    border: none !important;
+    box-shadow: none !important;
 }
 html.light-theme .screen-header,
 html.light-theme .home-top-bar,
