@@ -103,19 +103,7 @@ body {
     overflow-y: auto; /* Allow screens to scroll if content overflows */
     -webkit-overflow-scrolling: touch;
     transform-origin: center center;
-    background-color: transparent; /* Default to transparent, screens override */
-}
-
-#splash-screen, #information-screen {
-    background-color: var(--background); /* Ensure these use theme background */
-    z-index: 11;
-}
-
-.screen.active {
-    opacity: 1;
-    pointer-events: auto;
-    z-index: 10;
-    transform: none;
+    /* background-color set explicitly on individual screens below */
 }
 
 #splash-screen {
@@ -130,7 +118,31 @@ body {
     text-align: center;
     overflow: hidden;
     position: relative;
+    opacity: 0; /* Default hidden */
+    pointer-events: none;
 }
+
+#splash-screen.active {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 10;
+    transform: none;
+}
+
+/* Explicitly setting background color for screens that need it */
+#information-screen,
+#upload-screen,
+#wallet-screen,
+#friends-screen,
+#leaderboard-screen,
+#profile-screen,
+#withdraw-success-screen,
+#theme-settings-screen,
+#premium-upload-screen,
+#image-editor-screen {
+    background-color: var(--background);
+}
+
 
 @keyframes bokeh {
     0% { transform: scale(0.5) translateY(0); opacity: 0; }
@@ -462,6 +474,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
+    background-color: var(--background); /* Ensure background is set */
 }
 
 #video-swiper {
@@ -497,7 +510,7 @@ body {
     top: 0;
     left: 0;
     z-index: 1;
-    object-fit: cover; /* Added for HTML5 video */
+    object-fit: cover; /* Added for HTML5 video - prevents stretching/distortion if aspect ratio doesn't match container */
 }
 
 .video-slide iframe {
@@ -517,8 +530,9 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-size: cover;
+    background-size: cover; /* Ensure preloader background covers the area */
     background-position: center;
+    /* Removed any filters or gradients that could cause lines */
 }
 
 #home-screen .static-message {
@@ -596,7 +610,7 @@ body {
     padding: 20px;
     /* REMOVED: padding-bottom for nav clearance as inner container handles it */
     /* padding-bottom: 80px; */
-    background-color: var(--background); /* Ensure background is set */
+    /* background-color: var(--background); /* Added above */
 }
 
 #upload-screen .upload-header {
@@ -659,7 +673,7 @@ body {
     /* Screen scrolls, needs 60px clearance for the fixed nav + screen's 20px bottom padding */
     padding-bottom: 80px;
     /* ========================================= */
-    background-color: var(--background); /* Ensure background is set */
+    /* background-color: var(--background); /* Added above */
 }
 
 #wallet-screen .wallet-card {
@@ -763,7 +777,7 @@ body {
     flex-direction: column;
     height: 100%;
     overflow-y: auto; /* Screen itself is scrollable */
-    background-color: var(--background); /* Ensure background is set */
+    /* background-color: var(--background); /* Added above */
     /* === ADJUSTED for Top/Bottom Nav Clearance === */
     /* Needs 60px clearance below sticky top nav + 15px internal padding */
     padding-top: calc(60px + 15px);
@@ -935,7 +949,7 @@ body {
     padding: 20px; /* Add padding */
     overflow-y: auto; /* Make screen scrollable */
     padding-bottom: 80px; /* Add nav clearance */
-    background-color: var(--background); /* Ensure background is set */
+    /* background-color: var(--background); /* Added above */
 }
 
 #leaderboard-screen .leaderboard-card {
@@ -1000,7 +1014,7 @@ body {
     padding: 20px; /* Add padding */
     /* Keep existing padding-bottom for screen element: 20px + 60px nav */
     padding-bottom: 80px;
-    background-color: var(--background); /* Ensure background is set */
+    /* background-color: var(--background); /* Added above */
 }
 
 #profile-screen .profile-header {
@@ -1138,7 +1152,7 @@ body {
     /* Screen scrolls, needs 60px clearance for the fixed nav + screen's 20px bottom padding */
     padding-bottom: 80px;
     /* ====================================== */
-    background-color: var(--background); /* Ensure background is set */
+    /* background-color: var(--background); /* Added above */
 }
 
 #withdraw-success-screen .success-icon {
@@ -1257,12 +1271,11 @@ body {
 /* Assuming the HTML structure is <div id="information-screen" class="screen"> ... <div style="..."> ... </div> ... </div> */
 /* The div with inline style "margin-top: 60px; width: 100%; overflow-y: auto; padding-bottom: 20px;" is the one needing adjustment */
 /* Selector `#information-screen > div:nth-of-type(2)` assumes this div is the 2nd child inside #information-screen */
+/* This targets a specific HTML structure that might exist. Add !important to ensure it overrides inline styles. */
 #information-screen > div:nth-of-type(2) {
     /* Keep existing inline styles (margin-top, width, overflow-y) */
     /* === ADJUSTED padding-bottom for Bottom Nav Clearance === */
     /* Override the inline padding-bottom: 20px to be 80px (60px nav + 20px screen padding) */
-    /* Note: If this specific selector doesn't work due to HTML changes,
-             you might need to target it differently, e.g., using a class */
     padding-bottom: 80px !important; /* Use !important to override inline style */
     /* ====================================== */
 }
@@ -1487,7 +1500,7 @@ html {
     align-items: center;
     justify-content: center;
     padding: 0 20px;
-    background-color: rgba(15, 15, 15, 0.5);
+    background-color: rgba(15, 15, 15, 0.5); /* Semi-transparent dark */
     backdrop-filter: blur(5px);
     z-index: 50;
 }
@@ -1886,7 +1899,7 @@ html {
     padding: 20px;
     padding-bottom: 80px; /* 60px nav + 20px screen padding */
     /* REMOVED explicit padding-top: 80px; */
-    background-color: var(--background); /* Ensure background is set */
+    /* background-color: var(--background); /* Added above */
 }
 
 #theme-settings-screen .theme-settings-container {
@@ -2028,11 +2041,10 @@ html {
 html.light-theme {
     --background: #f7f7f7;
     --text-color: #111111;
-    --dark-grey: #ffffff;
-    --light-grey: #e0e0e0;
+    --dark-grey: #ffffff; /* White for dark grey */
+    --light-grey: #e0e0e0; /* Lighter grey */
 }
 html.light-theme body,
-html.light-theme #image-editor-screen,
 html.light-theme #information-screen,
 html.light-theme #upload-screen,
 html.light-theme #wallet-screen,
@@ -2041,7 +2053,8 @@ html.light-theme #leaderboard-screen,
 html.light-theme #profile-screen,
 html.light-theme #withdraw-success-screen,
 html.light-theme #theme-settings-screen,
-html.light-theme #premium-upload-screen {
+html.light-theme #premium-upload-screen,
+html.light-theme #image-editor-screen {
      background-color: var(--background); /* Ensure all screens use the light background */
      color: var(--text-color);
 }
@@ -2090,6 +2103,7 @@ html.light-theme .static-message { background-color: rgba(0,0,0,0.05); color: va
 html.light-theme .nav-item { color: rgba(0, 0, 0, 0.7); } /* Ensure nav items are visible in light mode */
 html.light-theme .nav-item:not(.active)[data-nav="home"] i { color: #F44336; }
 html.light-theme .nav-item:not(.active)[data-nav="upload"] i { color: #4CAF50; }
+html.light-item .nav-item:not(.active)[data-nav="wallet"] i { color: #2196F3; } /* Corrected typo: light-theme */
 html.light-theme .nav-item:not(.active)[data-nav="wallet"] i { color: #2196F3; }
 html.light-theme .nav-item:not(.active)[data-nav="friends"] i { color: #00BCD4; }
 html.light-theme .nav-item:not(.active)[data-nav="profile"] i { color: #9C27B0; }
@@ -2108,7 +2122,7 @@ html.light-theme .nav-item:not(.active)[data-nav="profile"] i { color: #9C27B0; 
     padding: 0; /* Handled by inner elements/layout */
     display: block;
     font-family: 'Roboto Flex', sans-serif;
-    background: var(--background); /* FIX: Use main theme color */
+    /* background: var(--background); /* FIX: Use main theme color - Added above */
     color: var(--text-color); /* FIX: Use main theme color */
 }
 
@@ -2249,7 +2263,7 @@ html.light-theme .nav-item:not(.active)[data-nav="profile"] i { color: #9C27B0; 
     padding: 20px; /* Standard padding */
     /* REMOVED: padding-bottom for nav clearance as inner container handles it */
     /* padding-bottom: 80px; */
-    background-color: var(--background); /* Ensure background is set */
+    /* background-color: var(--background); /* Added above */
 }
 
 #premium-upload-screen .premium-upload-container {
@@ -2344,4 +2358,28 @@ html.light-theme .friends-top-nav {
 html.light-theme .modal-content {
     background-color: var(--dark-grey); /* Use light theme dark-grey (#fff) */
 }
+html.light-theme .comments-modal-content {
+    background-color: #eee; /* Adjust modal background for light theme */
+}
+html.light-theme .comments-header {
+    color: var(--text-color);
+}
+html.light-theme #comments-list {
+    color: var(--text-color);
+}
+html.light-theme #comment-input {
+    background-color: var(--light-grey);
+    border-color: var(--dark-grey);
+    color: var(--text-color);
+}
+html.light-theme #send-comment-btn {
+    color: var(--primary-neon); /* Keep accent color */
+}
+html.light-theme .user-card {
+     background-color: rgba(0, 0, 0, 0.05); /* Light background in light theme */
+}
+html.light-theme .user-card:hover {
+     background-color: rgba(0, 0, 0, 0.1);
+}
+
 /* ================================================================================================ */
