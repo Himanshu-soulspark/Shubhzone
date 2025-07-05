@@ -458,6 +458,11 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
+    /* === FINAL FIX PART 1 / अंतिम समाधान भाग 1 === */
+    /* This ensures the screen behind the transparent nav bar has no border or shadow. */
+    /* यह सुनिश्चित करता है कि पारदर्शी नेविगेशन बार के पीछे वाली स्क्रीन पर कोई बॉर्डर या शैडो न हो। */
+    border: none !important;
+    box-shadow: none !important;
 }
 
 #video-swiper {
@@ -528,7 +533,6 @@ body {
     z-index: 10;
 }
 
-/* === MODIFIED / परिवर्तित === */
 .bottom-nav {
     display: flex;
     justify-content: space-around;
@@ -541,8 +545,9 @@ body {
     bottom: 0;
     left: 0;
     z-index: 100;
-    /* MODIFIED: Aggressively removing any border, especially the top one, to fix the white line issue. */
-    /* परिवर्तित: सफेद लाइन की समस्या को ठीक करने के लिए किसी भी बॉर्डर, विशेष रूप से ऊपर वाले को, मजबूती से हटाया जा रहा है। */
+    /* === FINAL FIX PART 2 / अंतिम समाधान भाग 2 === */
+    /* This forcefully removes any border or shadow from the nav bar itself. */
+    /* यह नेविगेशन बार से ही किसी भी बॉर्डर या शैडो को जबरदस्ती हटा देता है। */
     border: none !important;
     box-shadow: none !important;
 }
@@ -1990,11 +1995,8 @@ html.light-theme ::placeholder {
     color: rgba(255, 255, 255, 0.5);
 }
 
-/* === MODIFIED / परिवर्तित === */
 html.light-theme .bottom-nav {
     background-color: rgba(0, 0, 0, 0.7);
-    /* MODIFIED: Also aggressively removing any border here for consistency. */
-    /* परिवर्तित: स्थिरता के लिए यहां भी किसी भी बॉर्डर को मजबूती से हटाया जा रहा है। */
     border: none !important;
     box-shadow: none !important;
 }
