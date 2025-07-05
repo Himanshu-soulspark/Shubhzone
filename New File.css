@@ -2002,8 +2002,8 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 /* Main screen layout using Grid for robustness */
 #image-editor-screen {
     padding: 0;
-    display: grid; /* MODIFIED: Using Grid for stable layout */
-    grid-template-rows: auto 1fr auto; /* DEFINED: Header, Main Content (stretches), Footer */
+    display: grid; /* Using Grid for stable layout */
+    grid-template-rows: auto 1fr auto; /* Header, Main Content (stretches), Footer */
     height: 100vh;
     font-family: 'Roboto Flex', sans-serif;
     background: var(--background);
@@ -2043,27 +2043,37 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 /* Main Image Display Area */
 #image-editor-screen .image-container { 
     min-height: 0; /* Grid/Flex fix */
-    display: flex; 
+    display: flex; /* Kept for centering, but wrapper is absolute */
     justify-content: center; 
     align-items: center; 
-    padding: 15px; 
-    position: relative; 
+    position: relative; /* IMPORTANT: Anchor for overlays */
     overflow: hidden;
 }
-#image-editor-screen .image-wrapper { 
-    width: 100%; 
-    max-width: 380px; 
-    aspect-ratio: 9 / 16;
-    background: #1e1e1e; 
-    border-radius: 20px; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    overflow: hidden; 
-    box-shadow: 0 8px 30px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.4); 
-    position: relative; 
+
+/* MODIFIED: Image wrapper now fills the container */
+#image-editor-screen .image-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    box-sizing: border-box;
 }
-#image-editor-screen #mainImage, #image-editor-screen #video-feed { max-width: 100%; max-height: 100%; display: block; transition: filter 0.3s ease; object-fit: contain; }
+
+/* MODIFIED: Image is contained within the absolute wrapper */
+#image-editor-screen #mainImage, #image-editor-screen #video-feed {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    transition: filter 0.3s ease;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+}
 
 /* Bottom Toolbar Wrapper */
 #image-editor-screen .editor-toolbar {
@@ -2124,42 +2134,51 @@ html.light-theme .nav-item { color: rgba(255, 255, 255, 0.7); }
 }
 
 
-/* Scrollable Bottom Navigation Bar */
-#image-editor-screen .toolbar-nav { 
-    display: flex; 
-    justify-content: flex-start; 
-    padding: 8px 10px; 
-    overflow-x: auto; 
-    -ms-overflow-style: none; 
-    scrollbar-width: none;
-    white-space: nowrap; 
+/* MODIFIED: Toolbar is now a vertical overlay on the image */
+#image-editor-screen .toolbar-nav {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 25;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 0;
+    overflow: visible;
+    white-space: normal;
 }
 #image-editor-screen .toolbar-nav::-webkit-scrollbar { 
-    height: 3px;
-    background: #333;
-}
-#image-editor-screen .toolbar-nav::-webkit-scrollbar-thumb {
-    background: var(--primary-neon);
+    display: none;
 }
 
-/* Tool buttons inside the scrollable nav */
-#image-editor-screen .tool-btn { 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    gap: 5px; 
-    background: none; 
-    border: none; 
-    color: rgba(255, 255, 255, 0.7); 
-    font-size: 12px; 
-    cursor: pointer; 
-    padding: 8px 12px; 
-    border-radius: 8px; 
-    transition: all 0.2s ease; 
+/* MODIFIED: Tool buttons for the vertical overlay */
+#image-editor-screen .tool-btn {
+    display: flex;
+    flex-direction: row; /* Icon and text side-by-side */
+    align-items: center;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 15px;
+    border-radius: 25px;
+    transition: all 0.2s ease;
     flex-shrink: 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
-#image-editor-screen .tool-btn i { font-size: 20px; }
-#image-editor-screen .tool-btn.active, #image-editor-screen .tool-btn:hover { color: var(--primary-neon); }
+#image-editor-screen .tool-btn i { font-size: 20px; margin: 0; }
+#image-editor-screen .tool-btn.active, #image-editor-screen .tool-btn:hover {
+    color: var(--text-color);
+    background: rgba(244, 67, 54, 0.5);
+    border-color: var(--primary-neon);
+    transform: translateX(5px);
+}
 
 
 /* Other styles remain unchanged */
