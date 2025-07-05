@@ -100,22 +100,21 @@ body {
     box-sizing: border-box;
     opacity: 0;
     pointer-events: none;
-    overflow-y: auto; /* Ensure scrolling is possible */
+    overflow-y: auto; /* Allow screens to scroll if content overflows */
     -webkit-overflow-scrolling: touch;
     transform-origin: center center;
-    background-color: transparent;
+    background-color: transparent; /* Default to transparent, screens override */
 }
 
-/* Screens that need full background and z-index */
 #splash-screen, #information-screen {
-    background-color: var(--background);
+    background-color: var(--background); /* Ensure these use theme background */
     z-index: 11;
 }
 
 .screen.active {
     opacity: 1;
     pointer-events: auto;
-    z-index: 10; /* Ensure active screen is above others */
+    z-index: 10;
     transform: none;
 }
 
@@ -125,7 +124,8 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 40px 20px 20px 20px;
-    background: linear-gradient(to bottom, #87CEEB, #FFD700, #FFA500, #FF69B4, #F44336, #4CAF50); /* Keeping original splash background */
+    /* Kept original gradient as it seems intentional for splash */
+    background: linear-gradient(to bottom, #87CEEB, #FFD700, #FFA500, #FF69B4, #F44336, #4CAF50);
     box-sizing: border-box;
     text-align: center;
     overflow: hidden;
@@ -457,8 +457,8 @@ body {
 }
 
 #home-screen {
-    padding: 0; /* Keep existing padding */
-    overflow: hidden;
+    padding: 0; /* Screen padding handled by inner elements */
+    overflow: hidden; /* Container manages its overflow */
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -467,19 +467,19 @@ body {
 #video-swiper {
     flex-grow: 1;
     width: 100%;
-    height: 100%;
-    overflow-y: scroll;
+    height: 100%; /* Will take remaining height due to flex-grow */
+    overflow-y: scroll; /* This element is the main scroller */
     scroll-snap-type: y mandatory;
     -webkit-overflow-scrolling: touch;
     /* === ADJUSTED for Bottom Nav Clearance === */
-    /* This is the main scrollable content area in home. Needs 60px clearance above fixed nav. */
+    /* Need 60px clearance for the fixed nav */
     padding-bottom: 60px;
     /* ========================================= */
 }
 
 .video-slide {
     width: 100%;
-    height: 100%;
+    height: 100%; /* Each slide takes full height of the swiper */
     scroll-snap-align: start;
     position: relative;
     display: flex;
@@ -492,7 +492,7 @@ body {
 .video-slide .html5-player { /* Added html5-player */
     width: 100%;
     height: 100%;
-    max-width: 420px;
+    max-width: 420px; /* Restrict max width */
     position: absolute;
     top: 0;
     left: 0;
@@ -532,6 +532,7 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 10; /* Ensure message is above video but below nav/actions */
 }
 
 .bottom-nav {
@@ -547,7 +548,7 @@ body {
     /* ==================================================== */
     bottom: 0;
     left: 0;
-    z-index: 100; /* High z-index to stay on top */
+    z-index: 100;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -560,7 +561,7 @@ body {
     cursor: pointer;
     font-size: 0.7em;
     transition: color 0.3s ease;
-    flex-grow: 1; /* Distribute space evenly */
+    flex-grow: 1;
     height: 100%;
     padding-top: 5px;
 }
@@ -583,7 +584,6 @@ body {
     margin-bottom: 5px;
 }
 
-/* Keeping existing specific colors for non-active icons */
 .nav-item:not(.active)[data-nav="home"] i { color: #F44336; }
 .nav-item:not(.active)[data-nav="upload"] i { color: #4CAF50; }
 .nav-item:not(.active)[data-nav="wallet"] i { color: #2196F3; }
@@ -592,11 +592,11 @@ body {
 
 #upload-screen {
     justify-content: flex-start;
-    padding-top: 20px; /* Keep existing padding-top */
-    /* === ADJUSTED for Bottom Nav Clearance === */
-    /* The screen element itself is scrollable. Needs 60px nav + 20px screen padding */
-    padding-bottom: 80px;
-    /* ========================================= */
+    /* Keep existing padding */
+    padding: 20px;
+    /* REMOVED: padding-bottom for nav clearance as inner container handles it */
+    /* padding-bottom: 80px; */
+    background-color: var(--background); /* Ensure background is set */
 }
 
 #upload-screen .upload-header {
@@ -622,10 +622,12 @@ body {
     align-items: center;
     justify-content: center;
     gap: 20px;
-    padding: 20px; /* Keep existing padding */
-    /* === REMOVED: Not needed here as screen handles padding === */
-    /* padding-bottom: 60px; */
-    /* ========================================================= */
+    padding: 20px; /* Internal padding */
+    overflow-y: auto; /* This is the scrollable container */
+    /* === ADJUSTED for Bottom Nav Clearance === */
+    /* Needs 60px clearance for the fixed nav */
+    padding-bottom: 60px;
+    /* ========================================= */
 }
 
 .upload-action-button {
@@ -652,10 +654,12 @@ body {
 
 #wallet-screen {
     /* Keep existing padding: 20px */
+    padding: 20px;
     /* === ADJUSTED for Bottom Nav Clearance === */
-    /* The screen element itself is scrollable. Needs 60px nav + 20px screen padding */
+    /* Screen scrolls, needs 60px clearance for the fixed nav + screen's 20px bottom padding */
     padding-bottom: 80px;
     /* ========================================= */
+    background-color: var(--background); /* Ensure background is set */
 }
 
 #wallet-screen .wallet-card {
@@ -754,25 +758,37 @@ body {
 }
 
 #friends-screen {
-    padding: 0; /* Keep existing padding */
+    /* padding: 0; /* Screen handles padding directly */
     display: flex;
     flex-direction: column;
     height: 100%;
+    overflow-y: auto; /* Screen itself is scrollable */
+    background-color: var(--background); /* Ensure background is set */
+    /* === ADJUSTED for Top/Bottom Nav Clearance === */
+    /* Needs 60px clearance below sticky top nav + 15px internal padding */
+    padding-top: calc(60px + 15px);
+    /* Needs 60px clearance above fixed bottom nav + 15px internal padding */
+    padding-bottom: calc(60px + 15px);
+    padding-left: 15px;
+    padding-right: 15px;
+    /* ========================================= */
 }
 
 .friends-top-nav {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    width: 100%;
+    width: calc(100% - 30px); /* Account for screen padding */
     padding: 10px 0;
     background-color: rgba(15, 15, 15, 0.7);
     backdrop-filter: blur(5px);
     border-bottom: 1px solid var(--light-grey);
     flex-shrink: 0;
     z-index: 20;
-    position: sticky;
+    position: sticky; /* Sticks to the top of the scrollable screen */
     top: 0;
+    margin: 0 -15px; /* Extend horizontally to cover screen padding */
+    padding: 10px 15px; /* Add back horizontal padding */
 }
 
 .friends-nav-icon {
@@ -799,12 +815,9 @@ body {
 .user-list-container {
     flex-grow: 1;
     width: 100%;
-    overflow-y: auto;
-    padding: 15px; /* Keep existing padding */
-    /* === ADJUSTED for Bottom Nav Clearance === */
-    /* This is the scrollable container. Needs 60px clearance above fixed nav. */
-    padding-bottom: 60px;
-    /* ========================================= */
+    /* REMOVED: overflow-y: auto as screen scrolls */
+    /* REMOVED: padding adjustments as screen handles clearance */
+    padding: 0; /* Reset padding, rely on screen padding */
 }
 
 .user-card {
@@ -918,6 +931,13 @@ body {
 }
 
 
+#leaderboard-screen {
+    padding: 20px; /* Add padding */
+    overflow-y: auto; /* Make screen scrollable */
+    padding-bottom: 80px; /* Add nav clearance */
+    background-color: var(--background); /* Ensure background is set */
+}
+
 #leaderboard-screen .leaderboard-card {
     background-color: rgba(0, 0, 0, 0.3);
     border-radius: 15px;
@@ -977,8 +997,10 @@ body {
 
 #profile-screen {
     justify-content: flex-start;
+    padding: 20px; /* Add padding */
     /* Keep existing padding-bottom for screen element: 20px + 60px nav */
     padding-bottom: 80px;
+    background-color: var(--background); /* Ensure background is set */
 }
 
 #profile-screen .profile-header {
@@ -1076,7 +1098,7 @@ body {
 
 .video-card-actions {
     position: absolute;
-    bottom: 0; /* Adjusted to be just above the bottom of the card */
+    bottom: 0;
     left: 0;
     width: 100%;
     background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
@@ -1111,10 +1133,12 @@ body {
     justify-content: center;
     text-align: center;
     /* Keep existing padding: 20px */
+    padding: 20px;
     /* === ADJUSTED for Bottom Nav Clearance === */
-    /* The screen element itself is scrollable. Needs 60px nav + 20px screen padding */
+    /* Screen scrolls, needs 60px clearance for the fixed nav + screen's 20px bottom padding */
     padding-bottom: 80px;
     /* ====================================== */
+    background-color: var(--background); /* Ensure background is set */
 }
 
 #withdraw-success-screen .success-icon {
@@ -1193,7 +1217,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    overflow-y: auto;
+    overflow-y: auto; /* Allow modal content to scroll */
     max-height: 85vh;
 }
 
@@ -1364,11 +1388,11 @@ body {
 }
 .audience-option.selected {
     border-color: var(--primary-neon);
-    background-color: rgba(0, 255, 229, 0.2);
+    background-color: rgba(0, 255, 229, 0.2); /* Using a bright color with opacity for selection */
 }
 .audience-option i {
     font-size: 1.2em;
-    color: var(--primary-neon);
+    color: var(--primary-neon); /* Use primary neon for icon */
 }
 
 .comments-toggle {
@@ -1442,10 +1466,16 @@ input:checked + .slider:before {
     background-color: #388e3c;
 }
 
+/* Custom Scrollbar - Kept the hidden style as requested */
 ::-webkit-scrollbar {
     width: 0px;
     background: transparent;
 }
+/* For Firefox */
+html {
+  scrollbar-width: none;
+}
+
 
 .screen-header {
     position: absolute;
@@ -1481,9 +1511,9 @@ input:checked + .slider:before {
 
 .video-actions-overlay {
     position: absolute;
-    bottom: 75px; /* 60px nav + ~15px gap */
+    bottom: 75px; /* Adjust to be above nav */
     right: 10px;
-    z-index: 15; /* Ensure it's above the video */
+    z-index: 15;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1503,19 +1533,20 @@ input:checked + .slider:before {
     transition: transform 0.2s ease, color 0.2s ease;
 }
 
-.action-icon-container[data-action="like"] .icon { color: #ffffff; }
-.action-icon-container[data-action="comment"] .icon { color: #2196F3; }
+.action-icon-container[data-action="like"] .icon { color: #ffffff; } /* Default like icon color */
+.action-icon-container[data-action="comment"] .icon { color: #2196F3; } /* Comment icon color */
 
 .action-icon-container:hover .icon {
     transform: scale(1.1);
 }
 .action-icon-container .icon.liked {
-     color: #E91E63;
+     color: #E91E63; /* Liked color */
 }
 .action-icon-container .count {
     font-size: 0.9em;
     font-weight: bold;
     margin-top: 4px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5); /* Add text shadow for readability */
 }
 .action-icon-container.disabled .icon {
     color: #888;
@@ -1528,8 +1559,8 @@ input:checked + .slider:before {
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
     font-size: 8em;
-    color: rgba(233, 30, 99, 0.8);
-    z-index: 20; /* Ensure it's above everything in the video slide */
+    color: rgba(233, 30, 99, 0.8); /* Match liked color */
+    z-index: 20;
     opacity: 0;
     pointer-events: none;
     text-shadow: 0 0 15px rgba(0,0,0,0.4);
@@ -1552,7 +1583,7 @@ input:checked + .slider:before {
     display: flex;
     align-items: center;
     padding: 0 10px;
-    z-index: 50; /* Ensure it's above the video swiper */
+    z-index: 50;
     flex-shrink: 0;
     border-bottom: 1px solid var(--light-grey);
 }
@@ -1561,15 +1592,17 @@ input:checked + .slider:before {
     font-size: 1.6em;
     padding: 0 10px;
     cursor: pointer;
+    color: var(--text-color); /* Ensure icon uses theme color */
 }
 
 .category-scroller {
     flex-grow: 1;
     display: flex;
     gap: 10px;
-    overflow-x: auto;
+    overflow-x: auto; /* This element scrolls horizontally */
     -ms-overflow-style: none;
     scrollbar-width: none;
+    padding: 0 5px; /* Add some padding inside the scroller */
 }
 .category-scroller::-webkit-scrollbar {
     display: none;
@@ -1589,28 +1622,32 @@ input:checked + .slider:before {
 
 .category-chip.active {
     background-color: var(--primary-neon);
-    color: #fff;
+    color: #fff; /* Text is white when active */
     border-color: var(--primary-neon);
     font-weight: bold;
 }
 
 .video-meta-overlay {
     position: absolute;
-    bottom: 75px; /* Aligned with action icons bottom position */
-    left: 0;
-    width: calc(100% - 90px); /* Give space for action icons */
-    padding: 15px;
-    padding-bottom: 0; /* Ensure no padding below content, rely on video-swiper padding */
-    box-sizing: border-box;
-    background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
-    z-index: 10; /* Below actions overlay, above video */
-    pointer-events: none; /* Allows clicks to pass through */
-    color: white;
+    bottom: 60px; /* Adjust to be above nav */
+    /* === CHANGED: Moved from right to left === */
+    left: 10px;
+    /* REMOVED: right: 10px; */
+    /* ====================================== */
+    z-index: 10; /* Ensure it's below actions overlay but above video */
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    align-items: flex-start;
+    align-items: flex-start; /* Keep aligning content to the left */
+    width: calc(100% - 110px); /* Give space for action icons on the right */
+    padding: 15px;
+    padding-bottom: 0; /* Adjust padding not to overlap with nav */
+    box-sizing: border-box;
+    background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); /* Keep gradient */
+    pointer-events: none; /* Allows clicks to pass through to video/nav unless needed */
+    color: white;
 }
+
 
 .video-meta-overlay .uploader-info {
     display: flex;
@@ -1631,6 +1668,7 @@ input:checked + .slider:before {
 .video-meta-overlay .uploader-name {
     font-weight: bold;
     font-size: 1em;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7); /* Add text shadow for readability */
 }
 
 .video-meta-overlay .video-title {
@@ -1647,7 +1685,7 @@ input:checked + .slider:before {
     width: 100%;
     height: 100%;
     background-color: rgba(0,0,0,0.5);
-    z-index: 1100; /* Higher than bottom nav */
+    z-index: 1100;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease;
@@ -1661,16 +1699,15 @@ input:checked + .slider:before {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 60%; /* Keep existing height */
-    max-height: 70vh; /* Keep existing max-height */
-    background-color: #181818;
+    height: 60%;
+    max-height: 70vh;
+    background-color: #181818; /* Specific dark background */
     border-radius: 15px 15px 0 0;
     box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
     display: flex;
     flex-direction: column;
     transform: translateY(100%);
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    padding-bottom: env(safe-area-inset-bottom); /* Account for notch on some phones */
 }
 .comments-modal-overlay.active .comments-modal-content {
     transform: translateY(0);
@@ -1680,6 +1717,7 @@ input:checked + .slider:before {
     text-align: center;
     border-bottom: 1px solid var(--light-grey);
     position: relative;
+    color: var(--text-color); /* Ensure header text is theme color */
 }
 .comments-header h4 {
     margin: 0;
@@ -1692,13 +1730,15 @@ input:checked + .slider:before {
     transform: translateY(-50%);
     font-size: 1.5em;
     cursor: pointer;
+    color: rgba(255, 255, 255, 0.7); /* Ensure close icon is visible */
 }
 #comments-list {
     flex-grow: 1;
     overflow-y: auto;
-    padding: 15px; /* Keep existing padding */
+    padding: 15px;
     list-style: none;
     margin: 0;
+    color: var(--text-color); /* Ensure list items are theme color */
 }
 .comment-item {
     display: flex;
@@ -1764,26 +1804,20 @@ input:checked + .slider:before {
 
 
 .main-sidebar {
-    position: fixed; /* Keep fixed */
+    position: fixed;
     top: 0;
     left: 0;
-    width: 280px; /* Keep existing width */
-    height: 100%; /* Keep existing height */
-    background-color: #1a1a1a; /* Keep existing background */
-    z-index: 1001; /* Keep existing z-index */
-    transform: translateX(-100%); /* Keep existing transform */
-    transition: transform 0.3s ease-in-out; /* Keep existing transition */
+    width: 280px;
+    height: 100%;
+    background-color: #1a1a1a; /* Specific dark background */
+    z-index: 1001;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
     display: flex;
     flex-direction: column;
-    padding: 20px; /* Keep existing padding */
-    box-shadow: 4px 0 15px rgba(0,0,0,0.5); /* Keep existing shadow */
-    color: var(--text-color); /* Keep existing color */
-    /* === ADDED: Padding for top bar and bottom nav clearance === */
-    padding-top: 60px; /* Space for potential fixed header above */
-    padding-bottom: 60px; /* Space for fixed bottom nav below */
-    box-sizing: border-box; /* Include padding in height calculation */
-    overflow-y: auto; /* Make sidebar scrollable if content exceeds height */
-    /* ============================================================= */
+    padding: 20px;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.5);
+    color: var(--text-color);
 }
 
 .main-sidebar.open {
@@ -1791,13 +1825,13 @@ input:checked + .slider:before {
 }
 
 .sidebar-overlay {
-    position: fixed; /* Keep fixed */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Keep background */
-    z-index: 1000; /* Keep z-index */
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease-in-out;
@@ -1815,16 +1849,6 @@ input:checked + .slider:before {
     margin-bottom: 20px;
     padding-bottom: 10px;
     border-bottom: 1px solid var(--light-grey);
-    /* === ADDED: Positioning for fixed header within sidebar === */
-    position: absolute; /* Position relative to sidebar */
-    top: 0;
-    left: 0;
-    width: 100%; /* Match sidebar width */
-    padding: 0 20px 10px 20px; /* Add horizontal padding, keep bottom padding */
-    background-color: #1a1a1a; /* Match sidebar background */
-    z-index: 1002; /* Above sidebar content, below overlay */
-    box-sizing: border-box; /* Include padding in width */
-    /* ========================================================== */
 }
 
 .sidebar-header h3 {
@@ -1836,6 +1860,7 @@ input:checked + .slider:before {
     font-size: 2em;
     cursor: pointer;
     line-height: 1;
+    color: var(--text-color); /* Ensure close icon is theme color */
 }
 
 .sidebar-option {
@@ -1849,16 +1874,7 @@ input:checked + .slider:before {
     border-radius: 8px;
     font-size: 1.1em;
     transition: background-color 0.2s ease, border-color 0.2s ease;
-    /* === ADDED: Margin to separate from fixed header === */
-    margin-top: 10px; /* Space below the fixed header */
-    /* ================================================== */
 }
-/* Remove margin-top from the first sidebar option */
-.sidebar-option:first-of-type {
-    margin-top: 0;
-}
-
-
 .sidebar-option:hover {
     background-color: var(--light-grey);
     border-color: var(--primary-neon);
@@ -1866,8 +1882,11 @@ input:checked + .slider:before {
 
 #theme-settings-screen {
     justify-content: flex-start;
-    padding-top: 80px; /* Keep existing padding-top for header */
-    padding-bottom: 20px; /* Keep existing padding-bottom */
+    /* Adjusted padding for full screen scroll + nav clearance */
+    padding: 20px;
+    padding-bottom: 80px; /* 60px nav + 20px screen padding */
+    /* REMOVED explicit padding-top: 80px; */
+    background-color: var(--background); /* Ensure background is set */
 }
 
 #theme-settings-screen .theme-settings-container {
@@ -1908,7 +1927,7 @@ input:checked + .slider:before {
 
 .theme-btn.active {
     background-color: var(--primary-neon);
-    color: #000;
+    color: #000; /* Text color when active */
 }
 
 .color-palette-container {
@@ -1927,6 +1946,7 @@ input:checked + .slider:before {
 .color-column h4 {
    width: 100%;
    text-align: center;
+   color: var(--text-color); /* Ensure color is theme color */
 }
 
 .color-grid {
@@ -1950,7 +1970,7 @@ input:checked + .slider:before {
 }
 
 .color-swatch.active {
-    border-color: #fff;
+    border-color: #fff; /* Border color when active */
     transform: scale(1.1);
 }
 
@@ -2004,8 +2024,7 @@ input:checked + .slider:before {
     transform: scale(1.05);
 }
 
-/* === COMMENTED OUT to enforce Dark Mode === */
-/*
+/* Light Theme Overrides */
 html.light-theme {
     --background: #f7f7f7;
     --text-color: #111111;
@@ -2013,10 +2032,20 @@ html.light-theme {
     --light-grey: #e0e0e0;
 }
 html.light-theme body,
-html.light-theme #image-editor-screen {
+html.light-theme #image-editor-screen,
+html.light-theme #information-screen,
+html.light-theme #upload-screen,
+html.light-theme #wallet-screen,
+html.light-theme #friends-screen,
+html.light-theme #leaderboard-screen,
+html.light-theme #profile-screen,
+html.light-theme #withdraw-success-screen,
+html.light-theme #theme-settings-screen,
+html.light-theme #premium-upload-screen {
+     background-color: var(--background); /* Ensure all screens use the light background */
      color: var(--text-color);
 }
-html.light-theme .app-container::before { opacity: 0.05; }
+html.light-theme .app-container::before { opacity: 0.05; } /* Reduce particle opacity in light mode */
 html.light-theme .sub-message,
 html.light-theme .wallet-card .balance-label,
 html.light-theme .theme-section h4 {
@@ -2046,32 +2075,29 @@ html.light-theme .bottom-nav {
     background-color: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border-top: 1px solid var(--light-grey);
-    color: rgba(0, 0, 0, 0.7);
+    color: rgba(0, 0, 0, 0.7); /* Default color for inactive nav items */
 }
 html.light-theme .screen-header,
 html.light-theme .home-top-bar,
-html.light-theme .main-sidebar {
-    background-color: #f0f0f0;
+html.light-theme .main-sidebar,
+html.light-theme .comments-modal-content,
+html.light-theme #audio-issue-popup .popup-content {
+    background-color: var(--dark-grey); /* Use light theme dark grey (#fff) or adjusted color */
 }
 html.light-theme .main-sidebar { box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
 html.light-theme .static-message { background-color: rgba(0,0,0,0.05); color: var(--text-color); }
 
-html.light-theme #information-screen > div:nth-of-type(2) {
-    padding-bottom: 80px !important;
-}
-html.light-theme #wallet-screen,
-html.light-theme #withdraw-success-screen {
-    padding-bottom: 80px;
-}
+html.light-theme .nav-item { color: rgba(0, 0, 0, 0.7); } /* Ensure nav items are visible in light mode */
+html.light-theme .nav-item:not(.active)[data-nav="home"] i { color: #F44336; }
+html.light-theme .nav-item:not(.active)[data-nav="upload"] i { color: #4CAF50; }
+html.light-theme .nav-item:not(.active)[data-nav="wallet"] i { color: #2196F3; }
+html.light-theme .nav-item:not(.active)[data-nav="friends"] i { color: #00BCD4; }
+html.light-theme .nav-item:not(.active)[data-nav="profile"] i { color: #9C27B0; }
 
-html.light-theme #home-screen #video-swiper,
-html.light-theme #friends-screen .user-list-container,
-html.light-theme #upload-screen .upload-container-new,
-html.light-theme #premium-upload-screen .premium-upload-container {
-     padding-bottom: 60px;
-}
-*/
-/* =========================================== */
+
+/* =============================================== */
+/* === Shubhzone App Styles (Code 2) - END === */
+/* =============================================== */
 
 
 /* ======================================================= */
@@ -2079,7 +2105,7 @@ html.light-theme #premium-upload-screen .premium-upload-container {
 /* ======================================================= */
 
 #image-editor-screen {
-    padding: 0;
+    padding: 0; /* Handled by inner elements/layout */
     display: block;
     font-family: 'Roboto Flex', sans-serif;
     background: var(--background); /* FIX: Use main theme color */
@@ -2087,7 +2113,7 @@ html.light-theme #premium-upload-screen .premium-upload-container {
 }
 
 #image-editor-screen .editor-header {
-    position: fixed; /* Keep fixed */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -2111,9 +2137,8 @@ html.light-theme #premium-upload-screen .premium-upload-container {
     display: flex; justify-content: space-between; align-items: center; padding: 12px 18px;
     background: var(--dark-grey); flex-shrink: 0; z-index: 20;
     border-bottom: 1px solid var(--light-grey);
-    /* === ADJUSTED margin-top for fixed header === */
-    margin-top: 60px; /* Add space below the fixed editor header */
-    /* ============================================ */
+    margin-top: 50px; /* Added margin for fixed header */
+    color: var(--text-color); /* Ensure text color is theme color */
 }
 #image-editor-screen .header-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--light-grey); color: var(--text-color); border: 1px solid var(--light-grey); border-radius: 10px; font-size: 14px; cursor: pointer; font-weight: 500; transition: all 0.2s ease; }
 #image-editor-screen .header-btn:hover { background-color: #333; color: var(--primary-neon); }
@@ -2169,19 +2194,22 @@ html.light-theme #premium-upload-screen .premium-upload-container {
 #image-editor-screen .frame-option.active, #image-editor-screen .frame-category-item.active { border-color: var(--primary-neon); }
 #image-editor-screen .frame-option[data-frame="none"] { font-size: 28px;}
 #image-editor-screen .frame-category-item .category-name { position: absolute; bottom: 5px; font-size: 11px; color: var(--text-color); background: rgba(0,0,0,0.5); padding: 2px 5px; border-radius: 5px; }
-#image-editor-screen #frame-back-btn { width: 55px; height: 100px; font-size: 28px; }
+#image-editor-screen #frame-back-btn { flex-shrink: 0; width: 55px; height: 100px; font-size: 28px; margin-right: 10px; /* Add some space */
+    background: var(--dark-grey); border: 1px solid var(--light-grey); color: var(--text-color); border-radius: 10px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.2s; } /* Styled back button */
 #image-editor-screen #font-picker-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 100; display: none; justify-content: center; align-items: flex-end; }
 #image-editor-screen .font-picker-content { background: var(--dark-grey); width: 100%; max-height: 70%; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; overflow-y: auto; animation: slide-up 0.3s ease-out; }
 @keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
 #image-editor-screen .font-option { display: flex; justify-content: space-between; align-items: center; padding: 15px 10px; border-bottom: 1px solid var(--light-grey); cursor: pointer; }
 #image-editor-screen .font-option:last-child { border-bottom: none; }
-#image-editor-screen .font-option span { font-size: 20px; }
+#image-editor-screen .font-option span { font-size: 20px; color: var(--text-color); /* Ensure font names are theme color */ }
 #image-editor-screen .font-option input[type="radio"] { display: none; }
 #image-editor-screen .font-option .radio-custom { width: 22px; height: 22px; border: 2px solid rgba(255, 255, 255, 0.7); border-radius: 50%; position: relative; }
 #image-editor-screen .font-option input[type="radio"]:checked + .radio-custom { border-color: var(--primary-neon); }
 #image-editor-screen .font-option input[type="radio"]:checked + .radio-custom::after { content: ''; width: 12px; height: 12px; background: var(--primary-neon); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 #image-editor-screen #capture-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 50; padding: 18px; border-radius: 50%; border: 4px solid white; background-color: #ff4757; display: none; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.5); }
-#image-editor-screen .sticker-item { width: 65px; height: 65px; object-fit: contain; cursor: pointer; margin: 0 10px; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 8px; }
+#image-editor-screen .sticker-item { flex-shrink: 0; width: 65px; height: 65px; object-fit: contain; cursor: pointer; margin: 0 10px; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 8px; }
+#image-editor-screen #stickerPanel .panel-view { padding-left: 15px; padding-right: 15px; } /* Add padding to sticker panel view */
+
 #image-editor-screen .crop-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9; display: none; }
 #image-editor-screen .crop-box { position: absolute; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7); border: 2px dashed var(--primary-neon); cursor: move; touch-action: none; pointer-events: auto; transition: border-radius 0.2s ease-in-out; }
 #image-editor-screen .crop-box.is-circle { border-radius: 50%; }
@@ -2196,6 +2224,7 @@ html.light-theme #premium-upload-screen .premium-upload-container {
 #image-editor-screen .crop-btn:hover { background-color: #333; }
 #image-editor-screen .crop-shapes { display: flex; justify-content: space-around; gap: 10px; width: 100%; }
 #image-editor-screen .shape-btn { background: #252525; border: 1px solid #444; color: rgba(255, 255, 255, 0.7); padding: 8px; border-radius: 8px; cursor: pointer; flex-grow: 1; font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+#image-editor-screen .shape-btn i { font-size: 18px; }
 #image-editor-screen .shape-btn.active { color: var(--primary-neon); border-color: var(--primary-neon); }
 #image-editor-screen .interactive-wrapper { position: absolute; cursor: grab; touch-action: none; z-index: 10; padding: 15px; width: auto; height: auto; }
 #image-editor-screen .interactive-wrapper.active { cursor: grabbing; }
@@ -2204,7 +2233,7 @@ html.light-theme #premium-upload-screen .premium-upload-container {
 #image-editor-screen .interactive-wrapper.active .element-controls { display: block; }
 #image-editor-screen .control-handle { position: absolute; width: 24px; height: 24px; background: var(--primary-neon); border: 2px solid var(--background); border-radius: 50%; pointer-events: auto; box-shadow: 0 0 8px rgba(0,0,0,0.7); z-index: 11; display: none; align-items: center; justify-content: center; color: var(--background); font-size: 12px;}
 #image-editor-screen .interactive-wrapper.active .control-handle { display: flex; }
-#image-editor-screen .rotate-handle { top: -12px; left: -12px; cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23F44336" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>') 10 10, auto; }
+#image-editor-screen .rotate-handle { top: -12px; left: -12px; cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23F44336" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>') 10 10, auto; } /* Keep specific cursor */
 #image-editor-screen .delete-handle { top: -12px; right: -12px; background: #ff4757; cursor: pointer; color: white; }
 #image-editor-screen .handle-br { bottom: -12px; right: -12px; cursor: nwse-resize; } /* Uniform Scale */
 #image-editor-screen .handle-mr { top: 50%; right: -12px; transform: translateY(-50%); cursor: ew-resize; } /* Horizontal Stretch */
@@ -2216,39 +2245,40 @@ html.light-theme #premium-upload-screen .premium-upload-container {
 
 /* === NEW: Styles for Premium Upload Screen === */
 #premium-upload-screen {
-    justify-content: flex-start; /* Keep existing */
-    padding-top: 20px; /* Keep existing padding */
-    /* === ADJUSTED for Bottom Nav Clearance === */
-    /* The screen element itself is scrollable. Needs 60px nav + 20px screen padding */
-    padding-bottom: 80px;
-    /* ========================================= */
+    justify-content: flex-start;
+    padding: 20px; /* Standard padding */
+    /* REMOVED: padding-bottom for nav clearance as inner container handles it */
+    /* padding-bottom: 80px; */
+    background-color: var(--background); /* Ensure background is set */
 }
 
 #premium-upload-screen .premium-upload-container {
-    margin-top: 60px; /* Keep existing margin-top for header */
+    margin-top: 60px; /* Push down below potential header */
     width: 100%;
-    padding: 20px; /* Keep existing padding */
-    overflow-y: auto; /* Keep existing */
+    padding: 20px; /* Internal padding */
+    overflow-y: auto; /* This is the scrollable container */
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Keep existing */
-    /* === REMOVED: Not needed here as screen handles padding === */
-    /* padding-bottom: 60px; */
-    /* ========================================================= */
+    gap: 15px; /* Adds space between input groups */
+    /* === ADJUSTED for Bottom Nav Clearance === */
+    /* This is the scrollable container. Needs 60px clearance. */
+    padding-bottom: 60px;
+    /* ========================================= */
 }
 
 #premium-upload-screen .file-upload-label {
-    display: flex; /* Keep existing */
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     border: 2px dashed var(--light-grey);
     border-radius: 10px;
-    padding: 30px; /* Keep existing */
+    padding: 30px;
     cursor: pointer;
     text-align: center;
-    margin-bottom: 10px; /* Keep existing */
-    transition: border-color 0.3s, background-color 0.3s; /* Keep existing */
+    margin-bottom: 10px; /* Adjusted margin */
+    transition: border-color 0.3s, background-color 0.3s;
+    color: var(--text-color); /* Ensure label text uses theme color */
 }
 
 #premium-upload-screen .file-upload-label:hover {
@@ -2271,9 +2301,9 @@ html.light-theme #premium-upload-screen .premium-upload-container {
     width: 100%;
     max-height: 200px;
     border-radius: 8px;
-    margin-top: 5px;
+    margin-top: 5px; /* Adjusted margin */
     background-color: #000;
-    display: none;
+    display: none; /* Initially hidden */
 }
 
 #premium-upload-screen #premium-upload-progress {
@@ -2284,73 +2314,34 @@ html.light-theme #premium-upload-screen .premium-upload-container {
     font-size: 1em;
     color: var(--success-green);
 }
-/* === Light Theme Styles (COMMENTED OUT) === */
-/*
-html.light-theme {
-    --background: #f7f7f7;
-    --text-color: #111111;
-    --dark-grey: #ffffff;
-    --light-grey: #e0e0e0;
+html.light-theme #information-screen > div:nth-of-type(2) { /* Specific selector for the information screen content div */
+    /* Keep the padding consistent in light theme too */
+    padding-bottom: 80px !important; /* Use !important to override inline style */
 }
-html.light-theme body,
-html.light-theme #image-editor-screen {
-     color: var(--text-color);
-}
-html.light-theme .app-container::before { opacity: 0.05; }
-html.light-theme .sub-message,
-html.light-theme .wallet-card .balance-label,
-html.light-theme .theme-section h4 {
-    color: rgba(0, 0, 0, 0.6);
-}
-html.light-theme #information-screen label,
-html.light-theme .modal-content label,
-html.light-theme .audience-selector label,
-html.light-theme .comments-toggle label {
-    color: rgba(0, 0, 0, 0.7);
-}
-
-html.light-theme input,
-html.light-theme select,
-html.light-theme textarea,
-html.light-theme .category-selector {
-    background-color: #ffffff;
-    border: 1px solid #cccccc;
-    color: var(--text-color);
-}
-html.light-theme ::-webkit-input-placeholder { color: rgba(0, 0, 0, 0.4); }
-html.light-theme ::-moz-placeholder { color: rgba(0, 0, 0, 0.4); }
-html.light-theme :-ms-input-placeholder { color: rgba(0, 0, 0, 0.4); }
-html.light-theme ::placeholder { color: rgba(0, 0, 0, 0.4); }
-
-html.light-theme .bottom-nav {
-    background-color: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-top: 1px solid var(--light-grey);
-    color: rgba(0, 0, 0, 0.7);
-}
-html.light-theme .screen-header,
-html.light-theme .home-top-bar,
-html.light-theme .main-sidebar {
-    background-color: #f0f0f0;
-}
-html.light-theme .main-sidebar { box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
-html.light-theme .static-message { background-color: rgba(0,0,0,0.05); color: var(--text-color); }
-
-html.light-theme #information-screen > div:nth-of-type(2) {
-    padding-bottom: 80px !important;
-}
+/* === ADDED Light Theme adjustment for Wallet, Profile, Withdraw Success, Theme Settings === */
+/* Ensure padding is consistent in light theme for screens that scroll themselves */
 html.light-theme #wallet-screen,
+html.light-theme #leaderboard-screen,
+html.light-theme #profile-screen,
 html.light-theme #withdraw-success-screen,
-html.light-theme #upload-screen,
-html.light-theme #premium-upload-screen {
+html.light-theme #theme-settings-screen {
     padding-bottom: 80px;
 }
-
+/* === ADDED Light Theme adjustment for Home, Friends, Upload, Premium Upload === */
+/* Ensure padding is consistent in light theme for containers that scroll or screens with specific layouts */
 html.light-theme #home-screen #video-swiper,
-html.light-theme #friends-screen .user-list-container,
-html.light-theme .upload-container-new,
-html.light-theme .premium-upload-container {
+html.light-theme #friends-screen, /* Friends screen handles its own scroll */
+html.light-theme #upload-screen .upload-container-new, /* Upload container scrolls */
+html.light-theme #premium-upload-screen .premium-upload-container /* Premium Upload container scrolls */
+{
      padding-bottom: 60px;
 }
-*/
-/* =========================================== */
+/* Adjustments for light theme sticky/fixed elements */
+html.light-theme .friends-top-nav {
+    background-color: rgba(240, 240, 240, 0.95); /* Adjust sticky header background */
+    border-bottom-color: var(--light-grey);
+}
+html.light-theme .modal-content {
+    background-color: var(--dark-grey); /* Use light theme dark-grey (#fff) */
+}
+/* ================================================================================================ */
