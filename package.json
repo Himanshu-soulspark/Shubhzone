@@ -1,7 +1,7 @@
 {
-  "name": "shubhzone-backend",
+  "name": "shubhzone-fullstack",
   "version": "1.0.0",
-  "description": "Backend for Shubhzone to handle video uploads to Wasabi.",
+  "description": "Fullstack Shubhzone App with Frontend and Backend",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
