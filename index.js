@@ -1,471 +1,186 @@
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Shubhzone</title>
+Ky yeh code mere index js ke sath comfortable h na 
 
-    <style>
-        :root {
-            --dark-bg: #0f0f0f;
-            --primary-text: #ffffff;
-            --secondary-text: #aaaaaa;
-            --card-bg: #212121;
-            --input-bg: #181818;
-            --border-color: #333333;
-            --accent-gradient: linear-gradient(90deg, #ff416c, #ff4b2b);
-            --modal-bg: rgba(0, 0, 0, 0.85);
-            --placeholder-bg: #2a2a2a;
-            --player-controls-bg: rgba(0, 0, 0, 0.4);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; background-color: var(--dark-bg); color: var(--primary-text); overflow-x: hidden; }
-        .page { padding: 20px 15px 90px 15px; display: none; min-height: calc(100vh - 70px); overflow-y: auto; }
-        .page.active { display: block; }
-        h2 { font-size: 24px; color: var(--primary-text); margin-bottom: 25px; }
-        .button { width: 100%; padding: 15px; border: none; border-radius: 12px; background: var(--accent-gradient); color: white; font-size: 18px; font-weight: bold; cursor: pointer; text-align: center; }
-        .button:disabled { opacity: 0.5; cursor: not-allowed; }
+// File: index.js (Final, Stable, and Non-Compressed Version)
 
-        /* HOMEPAGE: PLAYLIST LAYOUT */
-        .playlist-section { margin-bottom: 30px; }
-        .playlist-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px; }
-        .playlist-header h3 { font-size: 20px; }
-        .video-grid-3xN { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .video-card-grid { background-color: transparent; border-radius: 10px; overflow: hidden; cursor: pointer; }
-        .video-card-grid .thumbnail { width: 100%; aspect-ratio: 9 / 16; background-color: var(--placeholder-bg); background-size: cover; background-position: center; border-radius: 8px; margin-bottom: 5px; }
-        .video-card-grid .info p { font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--secondary-text); }
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const { getPresignedUrl, generateUploadUrl } = require('./wasabi.js');
+const { pool, initializeDatabase } = require('./db.js');
 
-        /* UPLOAD & PROFILE PAGE: PROFESSIONAL REDESIGN */
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; color: var(--secondary-text); margin-bottom: 8px; font-size: 14px; font-weight: 500; }
-        .form-group input[type="text"], .form-group input[type="email"], .form-group select, .form-group textarea { width: 100%; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; color: var(--primary-text); font-size: 16px; }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #ff4b2b; outline: none; }
-        .form-group textarea { resize: vertical; min-height: 100px; }
-        .radio-group label { margin-right: 20px; color: var(--primary-text); }
-        .radio-group input[type="radio"] { margin-right: 8px; accent-color: #ff4b2b; }
-        .file-upload-button { display: flex; align-items: center; justify-content: space-between; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; cursor: pointer; transition: background-color 0.2s; }
-        .file-upload-button:hover { background-color: var(--card-bg); }
-        .file-upload-button .file-label { color: var(--secondary-text); }
-        .file-upload-button .file-name { color: var(--primary-text); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
-        .file-upload-button .browse-btn { color: #ff4b2b; font-weight: bold; }
+// dotenv को कॉन्फ़िगर करना (केवल डेवलपमेंट के लिए)
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
-        /* UPLOAD PAGE SPECIFIC */
-        .playlist-selection { display: flex; gap: 10px; }
-        .playlist-selection select { flex-grow: 1; }
-        .playlist-selection .add-new-btn { padding: 14px; font-size: 20px; line-height: 1; border-radius: 10px; background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--primary-text); }
-        .file-upload-container { display: flex; gap: 15px; margin-bottom: 20px; }
-        .file-uploader-card { flex: 1; border: 2px dashed var(--border-color); border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: transparent; aspect-ratio: 9 / 16; cursor: pointer; overflow: hidden; position: relative; }
-        .file-uploader-card .upload-text { text-align: center; color: var(--secondary-text); padding: 10px; }
-        .file-uploader-card .preview-video, .file-uploader-card .preview-image { position: absolute; width: 100%; height: 100%; object-fit: cover; display: none; }
-        
-        /* MODAL FOR NEW PLAYLIST */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--modal-bg); z-index: 250; display: none; justify-content: center; align-items: center; padding: 15px; }
-        .modal-content { background-color: var(--card-bg); padding: 25px; border-radius: 15px; width: 100%; max-width: 400px; position: relative; }
-        .modal .close-btn { position: absolute; top: 10px; right: 15px; font-size: 28px; color: var(--secondary-text); cursor: pointer; }
-        #newPlaylistThumbUploader { width: 100%; aspect-ratio: 9 / 16; border: 2px dashed var(--border-color); border-radius: 10px; display: flex; justify-content: center; align-items: center; background-color: var(--input-bg); cursor: pointer; position: relative; overflow: hidden; }
-        #newPlaylistThumbUploader .preview-image { position: absolute; width: 100%; height: 100%; object-fit: cover; display: none; }
-        #newPlaylistThumbUploader .upload-text { color: var(--secondary-text); }
+const app = express();
+const PORT = process.env.PORT || 3001;
 
-        /* BOTTOM NAVIGATION */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background-color: rgba(15,15,15,0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 100; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--secondary-text); cursor: pointer; flex: 1; text-align: center; }
-        .nav-item.active { color: var(--primary-text); }
-        .nav-item.upload-plus { position: relative; top: -15px; }
-        .nav-icon { width: 28px; height: 28px; }
-        .nav-icon.upload-icon { width: 50px; height: 50px; background: var(--accent-gradient); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 10px rgba(255, 75, 43, 0.5); }
-        .nav-label { font-size: 10px; margin-top: 2px; }
-        
-        /* ======== NEW VIDEO PLAYER STYLES (Implemented based on your request) ======== */
-        #videoPlayerOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 300; }
-        .player-container { width: 100%; height: 100%; position: relative; display: flex; justify-content: center; align-items: center; background-color: #000; }
-        #mainPlayer { width: 100%; height: 100%; object-fit: contain; }
-        
-        .controls-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; background: transparent; opacity: 1; transition: opacity 0.3s ease; }
-        .controls-container.hidden { opacity: 0; pointer-events: none; }
-        
-        .top-controls { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent); }
-        .top-controls .video-title { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0 10px; }
-        .player-btn { background: none; border: none; color: white; cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; }
-        .player-btn svg { width: 24px; height: 24px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); }
+// मिडलवेयर
+app.use(cors());
+app.use(express.json()); // JSON बॉडी को पार्स करने के लिए
+app.use(express.static(path.join(__dirname, '/')));
 
-        .center-controls { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 40px; pointer-events: none; }
-        .center-controls .player-btn svg { width: 48px; height: 48px; }
-        .loading-spinner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite; display: none; }
-        @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
-        .seek-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; pointer-events: none; }
-        .seek-animation { background: rgba(0,0,0,0.5); color: white; padding: 10px 15px; border-radius: 15px; display: flex; flex-direction: column; align-items: center; opacity: 0; transform: scale(0.8); transition: all 0.2s ease-out; }
-        .seek-animation.visible { opacity: 1; transform: scale(1); }
-        .seek-animation svg { width: 36px; height: 36px; }
-        .seek-animation .seek-time { font-size: 14px; font-weight: bold; margin-top: 4px; }
-        .volume-hud { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.6); color: white; padding: 10px 20px; border-radius: 20px; display: flex; align-items: center; gap: 8px; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
-        .volume-hud.visible { opacity: 1; }
-        .volume-hud svg { width: 24px; height: 24px; }
-        .volume-hud .volume-level { font-size: 14px; }
+// ======== API रूट्स ========
 
-        .bottom-controls { padding: 10px 15px; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); }
-        .time-container { display: flex; justify-content: space-between; font-size: 12px; color: var(--secondary-text); margin-bottom: 5px; }
-        .progress-bar-container { width: 100%; height: 12px; cursor: pointer; display: flex; align-items: center; }
-        .progress-bar { width: 100%; height: 4px; background-color: rgba(255,255,255,0.3); border-radius: 2px; position: relative; }
-        .progress-bar .played, .progress-bar .buffered { position: absolute; top: 0; left: 0; height: 100%; border-radius: 2px; }
-        .progress-bar .played { background: var(--accent-gradient); z-index: 2; }
-        .progress-bar .buffered { background-color: rgba(255,255,255,0.5); z-index: 1; }
-        .progress-bar .thumb { width: 14px; height: 14px; background-color: white; border-radius: 50%; position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; display: none; }
-        .progress-bar-container:hover .progress-bar .thumb { display: block; }
-        .bottom-buttons { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
-        .bottom-buttons .left-buttons, .bottom-buttons .right-buttons { display: flex; align-items: center; gap: 15px; }
-        .playback-speed-btn { font-size: 14px; font-weight: bold; }
-        
-        .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; display: none; }
-        .lock-overlay.locked { display: flex; align-items: center; padding-left: 15px; background: transparent; }
-        .lock-overlay .player-btn { background: rgba(0,0,0,0.5); border-radius: 50%; width: 44px; height: 44px; }
-        
-        .pause-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; pointer-events: none; }
-        .pause-overlay .watermark { position: absolute; top: 20px; left: 20px; font-size: 16px; font-weight: bold; color: rgba(255,255,255,0.7); }
-        .pause-overlay .paused-title { font-size: 20px; font-weight: 500; padding: 0 20px; }
-    </style>
-</head>
-<body>
+// --- जेनेरिक अपलोड URL जेनरेटर ---
+// (अपरिवर्तित - यह फंक्शन सही काम कर रहा है)
+app.get('/api/generate-upload-url', async (req, res) => {
+  try {
+    const { fileName, contentType } = req.query;
+    if (!fileName || !contentType) {
+      return res.status(400).json({ success: false, message: 'fileName and contentType query parameters are required.' });
+    }
+    const { uploadUrl, key } = await generateUploadUrl(fileName, contentType);
+    res.status(200).json({ success: true, uploadUrl, key });
+  } catch (err) {
+    console.error("Error in /api/generate-upload-url:", err);
+    res.status(500).json({ success: false, message: 'Could not get upload URL.' });
+  }
+});
 
-    <!-- ======== HOMEPAGE ======== -->
-    <div id="homePage" class="page active">
-        <div id="playlist-container"></div>
-        <p id="home-status-message" style="text-align: center; color: var(--secondary-text); padding: 50px 0; display: none;"></p>
-    </div>
+// --- प्लेलिस्ट एंडपॉइंट्स ---
+// (अपरिवर्तित - यह सभी फंक्शन्स सही काम कर रहे हैं)
 
-    <!-- ======== UPLOAD PAGE (REDESIGNED) ======== -->
-    <div id="uploadPage" class="page">
-        <h2>Upload Video</h2>
-        <div class="form-group"><label for="videoTitle">Video Title</label><input type="text" id="videoTitle" placeholder="Enter a catchy title"></div>
-        <div class="form-group">
-            <label for="playlistSelect">Add to Playlist</label>
-            <div class="playlist-selection">
-                <select id="playlistSelect"></select>
-                <button class="add-new-btn" onclick="openPlaylistModal()">+</button>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Audience</label>
-            <div class="radio-group">
-                <input type="radio" id="ageAll" name="age_restriction" value="all" checked> <label for="ageAll">For Everyone</label>
-                <input type="radio" id="age18" name="age_restriction" value="18+"> <label for="age18">18+ Only</label>
-            </div>
-        </div>
-        <div class="file-upload-container">
-            <div class="file-uploader-card" onclick="document.getElementById('videoFileInput').click()">
-                 <span class="upload-text">Select Video</span>
-                 <video class="preview-video" muted></video>
-            </div>
-            <div class="file-uploader-card" onclick="document.getElementById('thumbnailInput').click()">
-                 <span class="upload-text">Select Thumbnail</span>
-                 <img class="preview-image" alt="Video Thumbnail"/>
-            </div>
-        </div>
-        <input type="file" id="videoFileInput" style="display: none;" accept="video/*" onchange="updateFileName('videoFileInput', 'videoFileName')">
-        <input type="file" id="thumbnailInput" style="display: none;" accept="image/*" onchange="updateFileName('thumbnailInput', 'thumbFileName')">
-        <div style="height: 10px;"></div>
-        <button id="uploadButton" class="button" onclick="uploadVideo()">✅ Upload Video</button>
-    </div>
+// POST /api/playlists - एक नई प्लेलिस्ट बनाना
+app.post('/api/playlists', async (req, res) => {
+  const { name, thumbnail_key } = req.body;
+  if (!name || !thumbnail_key) {
+    return res.status(400).json({ success: false, message: 'Playlist name and thumbnail_key are required.' });
+  }
+  try {
+    const insertQuery = `INSERT INTO playlists (name, thumbnail_key) VALUES ($1, $2) RETURNING *;`;
+    const result = await pool.query(insertQuery, [name, thumbnail_key]);
+    res.status(201).json({ success: true, playlist: result.rows[0] });
+  } catch (err) {
+    console.error("Error creating playlist:", err);
+    res.status(500).json({ success: false, message: 'Failed to create playlist.' });
+  }
+});
+
+// GET /api/playlists - सभी प्लेलिस्ट की लिस्ट प्राप्त करना
+app.get('/api/playlists', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id, name FROM playlists ORDER BY name ASC');
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("Error fetching playlists:", err);
+    res.status(500).json({ success: false, message: 'Failed to fetch playlists.' });
+  }
+});
+
+// --- वीडियो एंडपॉइंट्स ---
+// (अपरिवर्तित - यह सभी फंक्शन्स सही काम कर रहे हैं)
+
+// POST /api/videos - एक नया वीडियो सेव करना
+app.post('/api/videos', async (req, res) => {
+  const { title, video_key, thumbnail_key, playlist_id, age_restriction } = req.body;
+  if (!title || !video_key || !thumbnail_key || !playlist_id) {
+    return res.status(400).json({ success: false, message: 'Title, video_key, thumbnail_key, and playlist_id are required.' });
+  }
+  try {
+    const insertQuery = `
+      INSERT INTO videos (title, video_key, thumbnail_key, playlist_id, age_restriction)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *;
+    `;
+    const values = [title, video_key, thumbnail_key, parseInt(playlist_id, 10), age_restriction || 'all'];
+    const result = await pool.query(insertQuery, values);
+    res.status(201).json({ success: true, video: result.rows[0] });
+  } catch (err) {
+    console.error('Error saving video details:', err);
+    res.status(500).json({ success: false, message: 'Failed to save video details.' });
+  }
+});
+
+// GET /api/videos/:key/play - वीडियो के लिए सुरक्षित प्लेबैक URL प्राप्त करना
+app.get('/api/videos/:key/play', async (req, res) => {
+  try {
+    const { key } = req.params;
+    const signedUrl = await getPresignedUrl(key);
+    res.status(200).json({ success: true, url: signedUrl });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Could not get video URL." });
+  }
+});
+
+// --- होम पेज डेटा एंडपॉइंट (एकमात्र और सबसे महत्वपूर्ण बदलाव यहाँ है) ---
+
+// GET /api/home-content - होम पेज के लिए सभी डेटा को और सुरक्षित तरीके से लाना
+app.get('/api/home-content', async (req, res) => {
+  try {
+    // स्टेप 1: डेटाबेस से सभी प्लेलिस्ट और वीडियो को एक साथ प्राप्त करें
+    const playlistsQuery = `SELECT id, name, thumbnail_key FROM playlists ORDER BY created_at DESC;`;
+    const videosQuery = `SELECT id, title, thumbnail_key AS video_thumbnail_key, playlist_id, video_key FROM videos ORDER BY created_at DESC;`;
     
-    <!-- ======== PROFILE PAGE (REDESIGNED) ======== -->
-    <div id="infoSubmissionPage" class="page">
-        <h2>Submit Your Information</h2>
-        <p style="color: var(--secondary-text); margin-top: -20px; margin-bottom: 30px;">This information is required for verification.</p>
-        <div class="form-group"><label for="fullName">Full Name</label><input type="text" id="fullName" placeholder="As per your Government ID"></div>
-        <div class="form-group"><label for="email">Email Address</label><input type="email" id="email" placeholder="your.email@example.com"></div>
-        <div class="form-group"><label for="address">Full Address</label><textarea id="address" placeholder="Your complete residential address"></textarea></div>
-        <div class="form-group">
-            <label>Your Photos (2 required)</label>
-            <div class="file-upload-button" onclick="document.getElementById('photo1').click()">
-                <span class="file-label" id="photo1Name">Select Photo 1</span><span class="browse-btn">Browse</span>
-            </div>
-            <input type="file" id="photo1" style="display:none;" accept="image/*" onchange="updateFileName('photo1', 'photo1Name')">
-            <div style="height: 10px;"></div>
-            <div class="file-upload-button" onclick="document.getElementById('photo2').click()">
-                <span class="file-label" id="photo2Name">Select Photo 2</span><span class="browse-btn">Browse</span>
-            </div>
-            <input type="file" id="photo2" style="display:none;" accept="image/*" onchange="updateFileName('photo2', 'photo2Name')">
-        </div>
-         <div class="form-group">
-            <label>Government ID Proof (Aadhaar, etc.)</label>
-            <div class="file-upload-button" onclick="document.getElementById('govId').click()">
-                <span class="file-label" id="govIdName">Select ID Proof</span><span class="browse-btn">Browse</span>
-            </div>
-            <input type="file" id="govId" style="display:none;" accept="image/*,application/pdf" onchange="updateFileName('govId', 'govIdName')">
-        </div>
-        <button class="button" onclick="submitForApproval()" style="margin-top: 10px;">Submit for Approval</button>
-    </div>
-
-    <!-- ======== USER DASHBOARD (After Approval) ======== -->
-    <div id="userDashboardPage" class="page">
-        <h2>My Profile</h2>
-        <p>Your profile is active.</p>
-    </div>
-
-    <!-- ======== BOTTOM NAVIGATION BAR ======== -->
-    <nav class="bottom-nav">
-        <div id="navHome" class="nav-item active" onclick="showPage('homePage')">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" /></svg><span class="nav-label">Home</span>
-        </div>
-        <div class="nav-item upload-plus" onclick="showPage('uploadPage')">
-            <div class="nav-icon upload-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg></div>
-        </div>
-        <div id="navProfile" class="nav-item" onclick="handleProfileClick()">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" /></svg><span class="nav-label">Profile</span>
-        </div>
-    </nav>
-
-    <!-- ======== NEW PLAYLIST MODAL ======== -->
-    <div id="newPlaylistModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closePlaylistModal()">×</span>
-            <h3>Create New Playlist</h3>
-            <div class="form-group"><label for="newPlaylistName">Playlist Name</label><input type="text" id="newPlaylistName" placeholder="e.g., Devotional Songs"></div>
-            <div class="form-group">
-                <label>Playlist Thumbnail (9:16)</label>
-                <div id="newPlaylistThumbUploader" onclick="document.getElementById('newPlaylistThumb').click()">
-                     <span class="upload-text">Select Thumbnail</span>
-                     <img class="preview-image" id="newPlaylistPreview" alt="Playlist Thumbnail Preview"/>
-                </div>
-                <input type="file" id="newPlaylistThumb" style="display:none" accept="image/*" onchange="previewFile(this, 'newPlaylistPreview')">
-            </div>
-            <button id="createPlaylistBtn" class="button" onclick="handleCreatePlaylist()">Create Playlist</button>
-        </div>
-    </div>
-
-    <!-- ======== NEW VIDEO PLAYER OVERLAY (Structure Changed) ======== -->
-    <div id="videoPlayerOverlay">
-        <div class="player-container">
-            <video id="mainPlayer" playsinline controlslist="nodownload"></video>
-            <div class="loading-spinner"></div>
-            <div class="pause-overlay">
-                <span class="watermark">Shubhzone</span>
-                <h3 class="paused-title">Video Title</h3>
-            </div>
-            <div class="seek-overlay">
-                <div class="seek-animation" id="rewind-anim">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.5,12L15,8V16L11.5,12M10,12L13.5,8V16L10,12M8.5,12L12,8V16L8.5,12Z"/></svg>
-                    <span class="seek-time">-10s</span>
-                </div>
-                <div class="seek-animation" id="forward-anim">
-                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.5,12L9,8V16L12.5,12M14,12L10.5,8V16L14,12M15.5,12L12,8V16L15.5,12Z"/></svg>
-                    <span class="seek-time">+10s</span>
-                </div>
-            </div>
-            <div class="volume-hud">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3,9V15H7L12,20V4L7,9H3M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12Z"/></svg>
-                <span class="volume-level">50%</span>
-            </div>
-            <div class="lock-overlay">
-                <button class="player-btn" id="unlock-btn">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"/></svg>
-                </button>
-            </div>
-            <div class="controls-container">
-                <div class="top-controls">
-                    <button class="player-btn" id="player-close-btn">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/></svg>
-                    </button>
-                    <span class="video-title">Video Title</span>
-                    <button class="player-btn" id="lock-btn">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,20V10H6V20H18M18,8H6C4.89,8 4,8.89 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10C20,8.89 19.1,8 18,8M17,6V8H7V6C7,3.24 9.24,1 12,1S17,3.24 17,6Z"/></svg>
-                    </button>
-                </div>
-                <div class="center-controls">
-                    <button class="player-btn" id="prev-btn">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6,18V6H8V18H6M9.5,12L18,6V18L9.5,12Z"/></svg>
-                    </button>
-                    <button class="player-btn" id="play-pause-btn">
-                        <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>
-                        <svg class="pause-icon" style="display: none;" viewBox="0 0 24 24" fill="currentColor"><path d="M14,19H18V5H14M6,19H10V5H6V19Z"/></svg>
-                        <svg class="replay-icon" style="display: none;" viewBox="0 0 24 24" fill="currentColor"><path d="M12,5V1L7,6L12,11V7A6,6 0 0,1 18,13A6,6 0 0,1 12,19A6,6 0 0,1 6,13H4A8,8 0 0,0 12,21A8,8 0 0,0 20,13A8,8 0 0,0 12,5Z"/></svg>
-                    </button>
-                     <button class="player-btn" id="next-btn">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16,18H18V6H16M6,18L14.5,12L6,6V18Z"/></svg>
-                    </button>
-                </div>
-                <div class="bottom-controls">
-                    <div class="time-container">
-                        <span id="current-time">00:00</span>
-                        <span id="total-time">00:00</span>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar">
-                            <div class="buffered"></div>
-                            <div class="played"></div>
-                            <div class="thumb"></div>
-                        </div>
-                    </div>
-                    <div class="bottom-buttons">
-                        <div class="left-buttons">
-                           <button class="player-btn playback-speed-btn">1x</button>
-                        </div>
-                        <div class="right-buttons">
-                            <button class="player-btn" id="pip-btn">
-                                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19,11H11V17H19V11M21,3H3A2,2 0 0,0 1,5V19A2,2 0 0,0 3,21H21A2,2 0 0,0 23,19V5A2,2 0 0,0 21,3M21,19H3V5H21V19Z" /></svg>
-                            </button>
-                            <button class="player-btn" id="fullscreen-btn">
-                               <svg class="fullscreen-open-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17H5V14H7V17H10V19H5V14Z" /></svg>
-                               <svg class="fullscreen-close-icon" style="display: none;" viewBox="0 0 24 24" fill="currentColor"><path d="M14,14H19V16H16V19H14V14M5,14H10V19H8V16H5V14M8,5H10V10H5V8H8V5M19,8V10H14V5H16V8H19Z" /></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <script>
-        // ======== SCRIPT SECTION (COMPLETE) ========
-        let isUserApproved = false;
-        const API_BASE_URL = window.location.origin;
-
-        // --- HELPER FUNCTIONS ---
-        function setButtonLoading(button, isLoading, originalText = '') {
-            if (isLoading) {
-                button.disabled = true;
-                button.textContent = 'Loading...';
-            } else {
-                button.disabled = false;
-                button.textContent = originalText;
-            }
+    const [playlistsResult, videosResult] = await Promise.all([
+        pool.query(playlistsQuery),
+        pool.query(videosQuery)
+    ]);
+    
+    // स्टेप 2: एक सुरक्षित URL जेनरेटर फंक्शन जो एरर को हैंडल कर सके
+    // यह फंक्शन सुनिश्चित करेगा कि अगर कोई एक URL नहीं बनता है तो ऐप क्रैश न हो।
+    const getSafePresignedUrl = async (key) => {
+        // अगर की (key) मौजूद नहीं है, तो तुरंत null लौटा दें।
+        if (!key) {
+            return null;
         }
-        async function handleApiResponse(response) { /* ... function unchanged ... */ }
-        function updateFileName(inputId, labelId) { /* ... function unchanged ... */ }
-        function showPage(pageId) { /* ... function unchanged ... */ }
-        
-        let allVideos = []; 
-        async function populateHomePage() { /* ... function unchanged ... */ }
-        async function populatePlaylistDropdown() { /* ... function unchanged ... */ }
-        function openPlaylistModal() { /* ... function unchanged ... */ }
-        function closePlaylistModal() { /* ... function unchanged ... */ }
-        function previewFile(input, previewId) { /* ... function unchanged ... */ }
-        async function handleCreatePlaylist() { /* ... function unchanged ... */ }
-        async function uploadVideo() { /* ... function unchanged ... */ }
-        function handleProfileClick() { /* ... function unchanged ... */ }
-        function submitForApproval() { /* ... function unchanged ... */ }
-        
-        const playerOverlay = document.getElementById('videoPlayerOverlay');
-        const mainPlayer = document.getElementById('mainPlayer');
-        const controls = document.querySelector('.controls-container');
-        const playPauseBtn = document.getElementById('play-pause-btn');
-        const playIcon = playPauseBtn.querySelector('.play-icon');
-        const pauseIcon = playPauseBtn.querySelector('.pause-icon');
-        const replayIcon = playPauseBtn.querySelector('.replay-icon');
-        const progressBar = document.querySelector('.progress-bar');
-        const playedBar = progressBar.querySelector('.played');
-        const bufferedBar = progressBar.querySelector('.buffered');
-        const currentTimeEl = document.getElementById('current-time');
-        const totalTimeEl = document.getElementById('total-time');
-        const fullscreenBtn = document.getElementById('fullscreen-btn');
-        const fsOpenIcon = fullscreenBtn.querySelector('.fullscreen-open-icon');
-        const fsCloseIcon = fullscreenBtn.querySelector('.fullscreen-close-icon');
-        const pipBtn = document.getElementById('pip-btn');
-        const playerCloseBtn = document.getElementById('player-close-btn');
-        const loadingSpinner = document.querySelector('.loading-spinner');
-        const lockBtn = document.getElementById('lock-btn');
-        const unlockBtn = document.getElementById('unlock-btn');
-        const lockOverlay = document.querySelector('.lock-overlay');
-        const nextBtn = document.getElementById('next-btn');
-        const prevBtn = document.getElementById('prev-btn');
-        const playerContainer = document.querySelector('.player-container');
-        const rewindAnim = document.getElementById('rewind-anim');
-        const forwardAnim = document.getElementById('forward-anim');
-        const pauseOverlay = document.querySelector('.pause-overlay');
-        
-        let controlsTimeout;
-        let isLocked = false;
-        let currentPlaylist = [];
-        let currentVideoIndex = -1;
-
-        function formatTime(time) { /* ... function unchanged ... */ }
-        function showControls() { /* ... function unchanged ... */ }
-        async function loadVideo(videoData) { /* ... function unchanged ... */ }
-        function playVideo(element) { /* ... function unchanged ... */ }
-        function playNextVideo() { /* ... function unchanged ... */ }
-        function playPrevVideo() { /* ... function unchanged ... */ }
-        function closePlayer() { /* ... function unchanged ... */ }
-        function togglePlay() { /* ... function unchanged ... */ }
-        function handleTimeUpdate() { /* ... function unchanged ... */ }
-        function handleProgressBarClick(e) { /* ... function unchanged ... */ }
-        
-        // ===============================================
-        // *** YAHAN BADLAV KIYA GAYA HAI - THIS IS THE FIX ***
-        // ===============================================
-        function toggleFullscreen() {
-            if (!document.fullscreenElement) {
-                // पहले पूरे प्लेयर कंटेनर को फुल-स्क्रीन करने की कोशिश करें
-                playerContainer.requestFullscreen().catch(err => {
-                    // अगर कंटेनर फुल-स्क्रीन नहीं हो पाता (जैसे iframe में), तो सिर्फ वीडियो को करें
-                    console.error("Could not fullscreen the container, falling back to video element:", err);
-                    mainPlayer.requestFullscreen().catch(videoErr => {
-                        // अगर वीडियो भी नहीं हो पाता, तो फाइनल एरर दिखाएं
-                        alert(`Error attempting to enable full-screen mode: ${videoErr.message}`);
-                    });
-                });
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
-            }
+        try {
+            // URL बनाने की कोशिश करें।
+            return await getPresignedUrl(key);
+        } catch (urlError) {
+            // अगर URL बनाने में कोई समस्या आती है (जैसे Wasabi में फ़ाइल नहीं मिली),
+            // तो कंसोल में एरर दिखाएं और null लौटा दें।
+            console.error(`Could not generate URL for key: ${key}. Error: ${urlError.message}`);
+            return null;
         }
+    };
 
-        function updateFullscreenButton() { /* ... function unchanged ... */ }
-        function togglePip() { /* ... function unchanged ... */ }
-        function updatePlayPauseIcon() { /* ... function unchanged ... */ }
-        function handleEnded() { /* ... function unchanged ... */ }
-        function toggleLock() { /* ... function unchanged ... */ }
-        let lastTap = 0;
-        function handlePlayerClick(e) { /* ... function unchanged ... */ }
-        function showSeekAnimation(direction) { /* ... function unchanged ... */ }
-        let touchStartY = 0;
-        let touchCurrentVolume = 0;
-        const volumeHud = document.querySelector('.volume-hud');
-        function handleTouchStart(e) { /* ... function unchanged ... */ }
-        function handleTouchMove(e) { /* ... function unchanged ... */ }
-        function handleTouchEnd(e) { /* ... function unchanged ... */ }
-        
-        const eventListeners = [
-            { el: mainPlayer, type: 'play', func: updatePlayPauseIcon },
-            { el: mainPlayer, type: 'pause', func: updatePlayPauseIcon },
-            { el: mainPlayer, type: 'ended', func: handleEnded },
-            { el: mainPlayer, type: 'timeupdate', func: handleTimeUpdate },
-            { el: mainPlayer, type: 'waiting', func: () => loadingSpinner.style.display = 'block' },
-            { el: mainPlayer, type: 'playing', func: () => loadingSpinner.style.display = 'none' },
-            { el: mainPlayer, type: 'click', func: handlePlayerClick },
-            { el: playPauseBtn, type: 'click', func: togglePlay },
-            { el: progressBar, type: 'click', func: handleProgressBarClick },
-            { el: fullscreenBtn, type: 'click', func: toggleFullscreen },
-            { el: document, type: 'fullscreenchange', func: updateFullscreenButton },
-            { el: pipBtn, type: 'click', func: togglePip },
-            { el: playerCloseBtn, type: 'click', func: closePlayer },
-            { el: playerContainer, type: 'mousemove', func: showControls },
-            { el: lockBtn, type: 'click', func: toggleLock },
-            { el: unlockBtn, type: 'click', func: toggleLock },
-            { el: nextBtn, type: 'click', func: playNextVideo },
-            { el: prevBtn, type: 'click', func: playPrevVideo },
-            { el: playerContainer, type: 'touchstart', func: handleTouchStart, options: { passive: false } },
-            { el: playerContainer, type: 'touchmove', func: handleTouchMove, options: { passive: false } },
-            { el: playerContainer, type: 'touchend', func: handleTouchEnd }
-        ];
-        function setupPlayerEventListeners() { /* ... function unchanged ... */ }
-        function removePlayerEventListeners() { /* ... function unchanged ... */ }
-        
-        document.addEventListener('DOMContentLoaded', () => { /* ... function unchanged ... */ });
+    // स्टेप 3: हर प्लेलिस्ट और वीडियो के लिए सुरक्षित रूप से URL जेनरेट करें
+    const playlistsWithUrls = (await Promise.all(
+        playlistsResult.rows.map(async (playlist) => {
+            const thumbnailUrl = await getSafePresignedUrl(playlist.thumbnail_key);
+            // केवल उन्हीं प्लेलिस्ट को लौटाएं जिनका थंबनेल सफलतापूर्वक बन गया है।
+            return thumbnailUrl ? { ...playlist, thumbnailUrl } : null;
+        })
+    )).filter(p => p !== null); // उन सभी एंट्रीज को हटा दें जो null हैं।
+    
+    const videosWithUrls = (await Promise.all(
+        videosResult.rows.map(async (video) => {
+            const thumbnailUrl = await getSafePresignedUrl(video.video_thumbnail_key);
+            // केवल उन्हीं वीडियो को लौटाएं जिनका थंबनेल सफलतापूर्वक बन गया है।
+            return thumbnailUrl ? { ...video, thumbnailUrl } : null;
+        })
+    )).filter(v => v !== null);
 
-        // Unchanged functions (kept for compatibility)
-        (async function() {
-            const allFunctions = {
-                setButtonLoading, handleApiResponse, updateFileName, showPage, populateHomePage, populatePlaylistDropdown, openPlaylistModal, closePlaylistModal, previewFile, handleCreatePlaylist, uploadVideo, handleProfileClick, submitForApproval, formatTime, showControls, loadVideo, playVideo, playNextVideo, playPrevVideo, closePlayer, togglePlay, handleTimeUpdate, handleProgressBarClick, toggleFullscreen, updateFullscreenButton, togglePip, updatePlayPauseIcon, handleEnded, toggleLock, handlePlayerClick, showSeekAnimation, handleTouchStart, handleTouchMove, handleTouchEnd, setupPlayerEventListeners, removePlayerEventListeners
-            };
-            for(let key in allFunctions) { window[key] = allFunctions[key]; }
-            
-            document.addEventListener('DOMContentLoaded', () => {
-                showPage('homePage');
-                populateHomePage();
-                populatePlaylistDropdown();
-            });
-        })();
-    </script>
-</body>
-</html>
+    // स्टेप 4: सफल परिणाम भेजें
+    res.status(200).json({
+        success: true,
+        playlists: playlistsWithUrls,
+        videos: videosWithUrls
+    });
+
+  } catch (dbError) {
+    // यह कैच ब्लॉक अब सिर्फ डेटाबेस कनेक्शन या क्वेरी की गंभीर समस्याओं को पकड़ेगा।
+    console.error("Critical error fetching data from Database:", dbError);
+    res.status(500).json({ success: false, message: 'Failed to fetch home content due to a server database error.' });
+  }
+});
+
+
+// ======== फ्रंटएंड सर्विंग ========
+// (अपरिवर्तित)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// ======== सर्वर और डेटाबेस को शुरू करना ========
+// (अपरिवर्तित)
+const startServer = async () => {
+  await initializeDatabase(); // पहले टेबल बनाना सुनिश्चित करें
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+};
+
+startServer();
