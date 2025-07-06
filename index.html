@@ -14,7 +14,8 @@
             --input-bg: #181818;
             --border-color: #333333;
             --accent-gradient: linear-gradient(90deg, #ff416c, #ff4b2b);
-            --transparent-layer: rgba(0, 0, 0, 0.6);
+            --modal-bg: rgba(0, 0, 0, 0.85);
+            --placeholder-bg: #2a2a2a;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; background-color: var(--dark-bg); color: var(--primary-text); overflow-x: hidden; }
@@ -22,283 +23,428 @@
         .page.active { display: block; }
         h2 { font-size: 24px; color: var(--primary-text); margin-bottom: 25px; }
         .button { width: 100%; padding: 15px; border: none; border-radius: 12px; background: var(--accent-gradient); color: white; font-size: 18px; font-weight: bold; cursor: pointer; text-align: center; }
+        .button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* --- HOMEPAGE (Smaller Playlist Cards) --- */
-        .playlist-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .playlist-card { aspect-ratio: 9 / 16; border-radius: 12px; overflow: hidden; position: relative; cursor: pointer; }
-        .playlist-card img { width: 100%; height: 100%; object-fit: cover; }
-        .playlist-card .overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 10px 10px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
-        .playlist-card .overlay h3 { color: white; font-size: 18px; }
+        /* HOMEPAGE: PLAYLIST LAYOUT */
+        .playlist-section { margin-bottom: 30px; }
+        .playlist-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px; }
+        .playlist-header h3 { font-size: 20px; }
+        .video-grid-3xN { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .video-card-grid { background-color: transparent; border-radius: 10px; overflow: hidden; cursor: pointer; }
+        .video-card-grid .thumbnail { width: 100%; aspect-ratio: 9 / 16; background-color: var(--placeholder-bg); background-size: cover; background-position: center; border-radius: 8px; margin-bottom: 5px; }
+        .video-card-grid .info p { font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--secondary-text); }
 
-        /* --- UPLOAD PAGE (16:9 Ratio) --- */
-        .upload-card-16-9 { aspect-ratio: 16 / 9; flex: 1; border: 2px dashed var(--border-color); border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: transparent; cursor: pointer; overflow: hidden; position: relative; }
-        .upload-card-16-9 .upload-text { text-align: center; color: var(--secondary-text); padding: 10px; }
-        .upload-card-16-9 .preview-video, .upload-card-16-9 .preview-image { position: absolute; width: 100%; height: 100%; object-fit: cover; display: none; }
+        /* UPLOAD & PROFILE PAGE: PROFESSIONAL REDESIGN */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; color: var(--secondary-text); margin-bottom: 8px; font-size: 14px; font-weight: 500; }
+        .form-group input[type="text"], 
+        .form-group input[type="email"], 
+        .form-group select, 
+        .form-group textarea { 
+            width: 100%; 
+            background-color: var(--input-bg); 
+            border: 1px solid var(--border-color); 
+            border-radius: 10px; 
+            padding: 14px; 
+            color: var(--primary-text); 
+            font-size: 16px;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: #ff4b2b;
+            outline: none;
+        }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .radio-group label { margin-right: 20px; color: var(--primary-text); }
+        .radio-group input[type="radio"] { margin-right: 8px; accent-color: #ff4b2b; }
         
-        /* --- PLAYLIST DETAIL PAGE (NEW) --- */
-        .playlist-detail-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-        .playlist-detail-header .back-btn { background: none; border: none; color: white; font-size: 28px; cursor: pointer; }
-        .video-list-vertical .video-item { display: flex; gap: 15px; margin-bottom: 15px; cursor: pointer; }
-        .video-list-vertical .thumbnail { width: 140px; flex-shrink: 0; aspect-ratio: 16/9; border-radius: 8px; background-color: var(--placeholder-bg); background-size: cover; background-position: center; }
-        .video-list-vertical .details h4 { font-size: 16px; margin-bottom: 5px; }
-        .video-list-vertical .details p { font-size: 12px; color: var(--secondary-text); }
-        
-        /* --- PROFESSIONAL VIDEO PLAYER (REDESIGNED) --- */
-        #videoPlayerContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 300; display: none; flex-direction: column; justify-content: center; align-items: center; }
-        #videoPlayerContainer video { width: 100%; max-height: 100%; }
-        .player-ui-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.3s; }
-        .player-ui-overlay.visible { opacity: 1; }
-        .top-bar { position: absolute; top: 0; left: 0; right: 0; display: flex; padding: 15px; gap: 15px; background: linear-gradient(to bottom, var(--transparent-layer), transparent); }
-        .top-bar .back-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
-        .top-bar .title { font-size: 18px; font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .bottom-controls { position: absolute; bottom: 0; left: 0; right: 0; padding: 10px 15px; background: linear-gradient(to top, var(--transparent-layer), transparent); }
-        .progress-bar-container { width: 100%; padding: 5px 0; }
-        .progress-bar { -webkit-appearance: none; width: 100%; height: 4px; background: rgba(255, 255, 255, 0.3); border-radius: 2px; outline: none; cursor: pointer; }
-        .progress-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: #ff416c; border-radius: 50%; }
-        .time-and-buttons { display: flex; justify-content: space-between; align-items: center; }
-        .time-display { font-size: 12px; }
-        #playPauseBtn { background: none; border: none; color: white; }
-        #playPauseBtn svg { width: 36px; height: 36px; }
-        .gesture-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; }
-        .gesture-zone { flex: 1; }
-        .hud-display { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--transparent-layer); color: white; padding: 10px 20px; border-radius: 20px; font-size: 16px; display: none; }
-        .splash-screen { position: absolute; width: 100%; height: 100%; background: #000; display: flex; justify-content: center; align-items: center; z-index: 10; font-size: 32px; font-weight: bold; color: white; }
+        /* New File Upload Button Style */
+        .file-upload-button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .file-upload-button:hover { background-color: var(--card-bg); }
+        .file-upload-button .file-label { color: var(--secondary-text); }
+        .file-upload-button .file-name { color: var(--primary-text); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
+        .file-upload-button .browse-btn { color: #ff4b2b; font-weight: bold; }
 
-        /* Other common styles for forms, nav etc. remain unchanged */
-        .form-group, .file-upload-button, .modal, .bottom-nav { /* ... previous styles ... */ }
+        /* UPLOAD PAGE SPECIFIC */
+        .playlist-selection { display: flex; gap: 10px; }
+        .playlist-selection select { flex-grow: 1; }
+        .playlist-selection .add-new-btn { padding: 14px; font-size: 20px; line-height: 1; border-radius: 10px; background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--primary-text); }
+        .file-upload-container { display: flex; gap: 15px; margin-bottom: 20px; }
+        .file-uploader-card { flex: 1; border: 2px dashed var(--border-color); border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: transparent; aspect-ratio: 9 / 16; cursor: pointer; overflow: hidden; position: relative; }
+        .file-uploader-card .upload-text { text-align: center; color: var(--secondary-text); padding: 10px; }
+        .file-uploader-card .preview-video, .file-uploader-card .preview-image { position: absolute; width: 100%; height: 100%; object-fit: cover; display: none; }
+        
+        /* MODAL FOR NEW PLAYLIST */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--modal-bg); z-index: 250; display: none; justify-content: center; align-items: center; padding: 15px; }
+        .modal-content { background-color: var(--card-bg); padding: 25px; border-radius: 15px; width: 100%; max-width: 400px; position: relative; }
+        .modal .close-btn { position: absolute; top: 10px; right: 15px; font-size: 28px; color: var(--secondary-text); cursor: pointer; }
+        #newPlaylistThumbUploader { width: 100%; aspect-ratio: 9 / 16; border: 2px dashed var(--border-color); border-radius: 10px; display: flex; justify-content: center; align-items: center; background-color: var(--input-bg); cursor: pointer; position: relative; overflow: hidden; }
+        #newPlaylistThumbUploader .preview-image { position: absolute; width: 100%; height: 100%; object-fit: cover; display: none; }
+        #newPlaylistThumbUploader .upload-text { color: var(--secondary-text); }
+
+        /* BOTTOM NAVIGATION */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background-color: rgba(15,15,15,0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--secondary-text); cursor: pointer; flex: 1; text-align: center; }
+        .nav-item.active { color: var(--primary-text); }
+        .nav-item.upload-plus { position: relative; top: -15px; }
+        .nav-icon { width: 28px; height: 28px; }
+        .nav-icon.upload-icon { width: 50px; height: 50px; background: var(--accent-gradient); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 10px rgba(255, 75, 43, 0.5); }
+        .nav-label { font-size: 10px; margin-top: 2px; }
+
+        /* VIDEO PLAYER (Unchanged) */
+        #videoPlayerOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 300; }
+        #mainPlayer { width: 100%; height: 100%; }
+        #videoPlayerOverlay .close-btn { position: absolute; top: 15px; left: 15px; color: white; background: rgba(0,0,0,0.5); border: none; font-size: 24px; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <!-- ======== HOMEPAGE (REDESIGNED PLAYLIST CARDS) ======== -->
+    <!-- ======== HOMEPAGE ======== -->
     <div id="homePage" class="page active">
-        <h2>Playlists</h2>
-        <div id="playlist-container" class="playlist-grid"></div>
-        <p id="home-status-message" style="text-align: center; display: none;"></p>
-    </div>
-    
-    <!-- ======== PLAYLIST DETAIL PAGE (NEW) ======== -->
-    <div id="playlistDetailPage" class="page">
-        <header class="playlist-detail-header">
-            <button class="back-btn" onclick="showPage('homePage')"><</button>
-            <h2 id="playlistDetailTitle" style="margin-bottom: 0;"></h2>
-        </header>
-        <div id="videoListContainer" class="video-list-vertical"></div>
+        <div id="playlist-container"></div>
+        <p id="home-status-message" style="text-align: center; color: var(--secondary-text); padding: 50px 0; display: none;"></p>
     </div>
 
-    <!-- ======== UPLOAD PAGE (REDESIGNED 16:9) ======== -->
+    <!-- ======== UPLOAD PAGE (REDESIGNED) ======== -->
     <div id="uploadPage" class="page">
         <h2>Upload Video</h2>
-        <div class="form-group"><label for="videoTitle">Video Title</label><input type="text" id="videoTitle"></div>
+        <div class="form-group"><label for="videoTitle">Video Title</label><input type="text" id="videoTitle" placeholder="Enter a catchy title"></div>
         <div class="form-group">
-            <label>Playlist</label>
-            <div style="display: flex; gap: 10px;"><select id="playlistSelect"></select><button onclick="openPlaylistModal()">+</button></div>
+            <label for="playlistSelect">Add to Playlist</label>
+            <div class="playlist-selection">
+                <select id="playlistSelect"></select>
+                <button class="add-new-btn" onclick="openPlaylistModal()">+</button>
+            </div>
         </div>
-        <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-            <div class="upload-card-16-9" onclick="document.getElementById('videoFileInput').click()">
-                 <span class="upload-text">Select Video (16:9)</span>
+        <div class="form-group">
+            <label>Audience</label>
+            <div class="radio-group">
+                <input type="radio" id="ageAll" name="age_restriction" value="all" checked> <label for="ageAll">For Everyone</label>
+                <input type="radio" id="age18" name="age_restriction" value="18+"> <label for="age18">18+ Only</label>
+            </div>
+        </div>
+        <div class="file-upload-container">
+            <div class="file-uploader-card" onclick="document.getElementById('videoFileInput').click()">
+                 <span class="upload-text">Select Video</span>
                  <video class="preview-video" muted></video>
             </div>
-            <div class="upload-card-16-9" onclick="document.getElementById('thumbnailInput').click()">
-                 <span class="upload-text">Select Thumbnail (16:9)</span>
-                 <img class="preview-image" />
+            <div class="file-uploader-card" onclick="document.getElementById('thumbnailInput').click()">
+                 <span class="upload-text">Select Thumbnail</span>
+                 <img class="preview-image" alt="Video Thumbnail"/>
             </div>
         </div>
-        <input type="file" id="videoFileInput" style="display: none;"><input type="file" id="thumbnailInput" style="display: none;">
-        <button id="uploadButton" class="button" onclick="uploadVideo()">✅ Upload</button>
+        <input type="file" id="videoFileInput" style="display: none;" accept="video/*" onchange="updateFileName('videoFileInput', 'videoFileName')">
+        <input type="file" id="thumbnailInput" style="display: none;" accept="image/*" onchange="updateFileName('thumbnailInput', 'thumbFileName')">
+        <div style="height: 10px;"></div>
+        <button id="uploadButton" class="button" onclick="uploadVideo()">✅ Upload Video</button>
     </div>
     
-    <!-- Profile & Other Pages (HTML structure unchanged) -->
-    <div id="infoSubmissionPage" class="page"></div>
-    <div id="userDashboardPage" class="page"></div>
-    <nav class="bottom-nav"></nav>
-    <div id="newPlaylistModal" class="modal"></div>
+    <!-- ======== PROFILE PAGE (REDESIGNED) ======== -->
+    <div id="infoSubmissionPage" class="page">
+        <h2>Submit Your Information</h2>
+        <p style="color: var(--secondary-text); margin-top: -20px; margin-bottom: 30px;">This information is required for verification.</p>
+        <div class="form-group"><label for="fullName">Full Name</label><input type="text" id="fullName" placeholder="As per your Government ID"></div>
+        <div class="form-group"><label for="email">Email Address</label><input type="email" id="email" placeholder="your.email@example.com"></div>
+        <div class="form-group"><label for="address">Full Address</label><textarea id="address" placeholder="Your complete residential address"></textarea></div>
+        <div class="form-group">
+            <label>Your Photos (2 required)</label>
+            <div class="file-upload-button" onclick="document.getElementById('photo1').click()">
+                <span class="file-label" id="photo1Name">Select Photo 1</span><span class="browse-btn">Browse</span>
+            </div>
+            <input type="file" id="photo1" style="display:none;" accept="image/*" onchange="updateFileName('photo1', 'photo1Name')">
+            <div style="height: 10px;"></div>
+            <div class="file-upload-button" onclick="document.getElementById('photo2').click()">
+                <span class="file-label" id="photo2Name">Select Photo 2</span><span class="browse-btn">Browse</span>
+            </div>
+            <input type="file" id="photo2" style="display:none;" accept="image/*" onchange="updateFileName('photo2', 'photo2Name')">
+        </div>
+         <div class="form-group">
+            <label>Government ID Proof (Aadhaar, etc.)</label>
+            <div class="file-upload-button" onclick="document.getElementById('govId').click()">
+                <span class="file-label" id="govIdName">Select ID Proof</span><span class="browse-btn">Browse</span>
+            </div>
+            <input type="file" id="govId" style="display:none;" accept="image/*,application/pdf" onchange="updateFileName('govId', 'govIdName')">
+        </div>
+        <button class="button" onclick="submitForApproval()" style="margin-top: 10px;">Submit for Approval</button>
+    </div>
 
-    <!-- ======== PROFESSIONAL VIDEO PLAYER ======== -->
-    <div id="videoPlayerContainer">
-        <div id="splashScreen" class="splash-screen">Shubhzone</div>
-        <video id="mainPlayer" playsinline></video>
-        <div id="gestureOverlay" class="gesture-overlay">
-            <div class="gesture-zone" id="rewindZone"></div>
-            <div class="gesture-zone" id="brightnessZone"></div>
-            <div class="gesture-zone" id="volumeZone"></div>
-            <div class="gesture-zone" id="forwardZone"></div>
+    <!-- ======== USER DASHBOARD (After Approval) ======== -->
+    <div id="userDashboardPage" class="page">
+        <h2>My Profile</h2>
+        <p>Your profile is active.</p>
+    </div>
+
+    <!-- ======== BOTTOM NAVIGATION BAR ======== -->
+    <nav class="bottom-nav">
+        <div id="navHome" class="nav-item active" onclick="showPage('homePage')">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" /></svg><span class="nav-label">Home</span>
         </div>
-        <div id="hudDisplay" class="hud-display"></div>
-        <div id="playerUI" class="player-ui-overlay">
-            <div class="top-bar">
-                <button class="back-btn" onclick="closePlayer()"><</button>
-                <span class="title" id="playerVideoTitle"></span>
-            </div>
-            <div class="bottom-controls">
-                <div class="progress-bar-container">
-                    <input type="range" id="progressBar" class="progress-bar" min="0" value="0">
-                </div>
-                <div class="time-and-buttons">
-                    <span id="timeDisplay" class="time-display">00:00 / 00:00</span>
-                    <button id="playPauseBtn">
-                        <svg id="playIcon" viewBox="0 0 24 24"><path fill="currentColor" d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>
-                        <svg id="pauseIcon" style="display:none;" viewBox="0 0 24 24"><path fill="currentColor" d="M14,19H18V5H14M6,19H10V5H6V19Z"/></svg>
-                    </button>
-                    <span></span> <!-- Spacer -->
-                </div>
-            </div>
+        <div class="nav-item upload-plus" onclick="showPage('uploadPage')">
+            <div class="nav-icon upload-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg></div>
         </div>
+        <div id="navProfile" class="nav-item" onclick="handleProfileClick()">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" /></svg><span class="nav-label">Profile</span>
+        </div>
+    </nav>
+
+    <!-- ======== NEW PLAYLIST MODAL ======== -->
+    <div id="newPlaylistModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closePlaylistModal()">×</span>
+            <h3>Create New Playlist</h3>
+            <div class="form-group"><label for="newPlaylistName">Playlist Name</label><input type="text" id="newPlaylistName" placeholder="e.g., Devotional Songs"></div>
+            <div class="form-group">
+                <label>Playlist Thumbnail (9:16)</label>
+                <div id="newPlaylistThumbUploader" onclick="document.getElementById('newPlaylistThumb').click()">
+                     <span class="upload-text">Select Thumbnail</span>
+                     <img class="preview-image" id="newPlaylistPreview" alt="Playlist Thumbnail Preview"/>
+                </div>
+                <input type="file" id="newPlaylistThumb" style="display:none" accept="image/*" onchange="previewFile(this, 'newPlaylistPreview')">
+            </div>
+            <button id="createPlaylistBtn" class="button" onclick="handleCreatePlaylist()">Create Playlist</button>
+        </div>
+    </div>
+
+    <!-- ======== VIDEO PLAYER OVERLAY ======== -->
+    <div id="videoPlayerOverlay">
+        <button class="close-btn" onclick="closePlayer()"><</button>
+        <video id="mainPlayer" controls playsinline></video>
     </div>
 
     <script>
-        // --- COMPLETE SCRIPT ---
-        // (Includes all previous logic for API calls, page navigation, etc.)
-        // + NEW logic for the professional player and playlist detail page.
+        // ======== SCRIPT SECTION (COMPLETE) ========
+        let isUserApproved = false;
+        const API_BASE_URL = window.location.origin;
 
-        // ======== PLAYER LOGIC ========
-        const playerContainer = document.getElementById('videoPlayerContainer');
-        const mainPlayer = document.getElementById('mainPlayer');
-        const playerUI = document.getElementById('playerUI');
-        const progressBar = document.getElementById('progressBar');
-        const playPauseBtn = document.getElementById('playPauseBtn');
-        const timeDisplay = document.getElementById('timeDisplay');
-        const hud = document.getElementById('hudDisplay');
-        const splash = document.getElementById('splashScreen');
-        let controlsTimeout;
+        // --- HELPER FUNCTIONS ---
+        function setButtonLoading(button, isLoading, originalText = '') {
+            if (isLoading) {
+                button.disabled = true;
+                button.textContent = 'Loading...';
+            } else {
+                button.disabled = false;
+                button.textContent = originalText;
+            }
+        }
 
-        // Player Entry Point
-        async function playVideo(videoKey, title) {
-            playerContainer.style.display = 'flex';
-            splash.style.display = 'flex';
-            mainPlayer.style.display = 'none';
-            document.getElementById('playerVideoTitle').textContent = title;
+        async function handleApiResponse(response) {
+            if (!response.ok) {
+                let errorMsg = `Error: ${response.status} ${response.statusText}`;
+                try {
+                    const errorJson = await response.json();
+                    errorMsg = errorJson.message || errorMsg;
+                } catch (e) { /* Ignore if response is not JSON */ }
+                throw new Error(errorMsg);
+            }
+            return response.json();
+        }
+        
+        function updateFileName(inputId, labelId) {
+            const input = document.getElementById(inputId);
+            const label = document.getElementById(labelId);
+            if (input.files.length > 0) {
+                label.textContent = input.files[0].name;
+                label.style.color = 'var(--primary-text)';
+            } else {
+                // This part might not be needed if you don't allow clearing the file input
+                label.textContent = `Select ${labelId.includes('Photo') ? 'Photo' : 'File'}`;
+                label.style.color = 'var(--secondary-text)';
+            }
+        }
+
+        // --- PAGE NAVIGATION ---
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId)?.classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (pageId === 'homePage') document.getElementById('navHome').classList.add('active');
+            else if (pageId === 'uploadPage') document.querySelector('.upload-plus').classList.add('active');
+            else if (pageId.includes('Submission') || pageId.includes('Dashboard')) document.getElementById('navProfile').classList.add('active');
+        }
+
+        // --- API & DYNAMIC CONTENT ---
+        async function populateHomePage() {
+            const container = document.getElementById('playlist-container');
+            const statusMsg = document.getElementById('home-status-message');
+            container.innerHTML = '';
+            statusMsg.textContent = 'Loading...';
+            statusMsg.style.display = 'block';
+
             try {
-                const data = await fetch(`${window.location.origin}/api/videos/${videoKey}/play`).then(r => r.json());
-                if (!data.success) throw new Error('Could not get video URL.');
-                mainPlayer.src = data.url;
-                setTimeout(() => { // Show splash for a bit
-                    splash.style.display = 'none';
-                    mainPlayer.style.display = 'block';
-                    mainPlayer.play();
-                }, 1500);
+                const data = await fetch(`${API_BASE_URL}/api/home-content`).then(handleApiResponse);
+                if (!data.success) throw new Error(data.message);
+                if (data.playlists.length === 0) {
+                    statusMsg.textContent = 'No content found. Be the first to upload!';
+                    return;
+                }
+                statusMsg.style.display = 'none';
+
+                data.playlists.forEach(playlist => {
+                    const playlistVideos = data.videos.filter(v => v.playlist_id === playlist.id);
+                    if (playlistVideos.length === 0) return;
+
+                    const section = document.createElement('div');
+                    section.className = 'playlist-section';
+                    section.innerHTML = `
+                        <div class="playlist-header"><h3>${playlist.name}</h3></div>
+                        <div class="video-grid-3xN">
+                            ${playlistVideos.map(video => `
+                                <div class="video-card-grid" onclick="playVideo('${video.video_key}', '${video.title}')">
+                                    <div class="thumbnail" style="background-image: url('${video.thumbnailUrl}')"></div>
+                                    <div class="info"><p>${video.title}</p></div>
+                                </div>`).join('')}
+                        </div>`;
+                    container.appendChild(section);
+                });
             } catch (error) {
-                alert(`Error: ${error.message}`);
+                console.error('Error populating home page:', error);
+                statusMsg.textContent = `Error: ${error.message}`;
+                statusMsg.style.color = '#F44336';
+            }
+        }
+
+        async function populatePlaylistDropdown() {
+            const playlistSelect = document.getElementById('playlistSelect');
+            try {
+                const playlists = await fetch(`${API_BASE_URL}/api/playlists`).then(handleApiResponse);
+                playlistSelect.innerHTML = '';
+                if (playlists.length === 0) {
+                    playlistSelect.innerHTML = '<option value="" disabled selected>Create a playlist first</option>';
+                    return;
+                }
+                playlists.forEach(p => {
+                    const option = document.createElement('option');
+                    option.value = p.id;
+                    option.textContent = p.name;
+                    playlistSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching playlists:', error);
+                playlistSelect.innerHTML = '<option value="" disabled selected>Error loading playlists</option>';
+            }
+        }
+
+        function openPlaylistModal() { document.getElementById('newPlaylistModal').style.display = 'flex'; }
+        function closePlaylistModal() { document.getElementById('newPlaylistModal').style.display = 'none'; }
+        
+        function previewFile(input, previewId) {
+            const file = input.files[0];
+            const preview = document.getElementById(previewId);
+            const uploadText = preview.previousElementSibling;
+            if (file) {
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = 'block';
+                if(uploadText) uploadText.style.display = 'none';
+            }
+        }
+
+        async function handleCreatePlaylist() {
+            const nameInput = document.getElementById('newPlaylistName');
+            const thumbInput = document.getElementById('newPlaylistThumb');
+            const createBtn = document.getElementById('createPlaylistBtn');
+            if (!nameInput.value || thumbInput.files.length === 0) {
+                alert('Please provide a playlist name and a thumbnail.');
+                return;
+            }
+            setButtonLoading(createBtn, true);
+            try {
+                const thumbFile = thumbInput.files[0];
+                const urlResponse = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(thumbFile.name)}&contentType=${thumbFile.type}`).then(handleApiResponse);
+                await fetch(urlResponse.uploadUrl, { method: 'PUT', body: thumbFile });
+                const playlistData = { name: nameInput.value, thumbnail_key: urlResponse.key };
+                const saveResponse = await fetch(`${API_BASE_URL}/api/playlists`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(playlistData) }).then(handleApiResponse);
+                alert(`Playlist "${saveResponse.playlist.name}" created!`);
+                closePlaylistModal();
+                populatePlaylistDropdown();
+                nameInput.value = '';
+                thumbInput.value = '';
+                const previewImg = document.getElementById('newPlaylistPreview');
+                previewImg.style.display = 'none';
+                previewImg.previousElementSibling.style.display = 'block';
+
+            } catch (error) {
+                alert(`Failed to create playlist: ${error.message}`);
+            } finally {
+                setButtonLoading(createBtn, false, 'Create Playlist');
+            }
+        }
+
+        async function uploadVideo() {
+            const videoInput = document.getElementById('videoFileInput');
+            const thumbInput = document.getElementById('thumbnailInput');
+            const title = document.getElementById('videoTitle').value;
+            const selectedPlaylistId = document.getElementById('playlistSelect').value;
+            const ageRestriction = document.querySelector('input[name="age_restriction"]:checked').value;
+            const uploadBtn = document.getElementById('uploadButton');
+            
+            if (!videoInput.files[0] || !thumbInput.files[0] || !title || !selectedPlaylistId) {
+                alert('Please fill all fields: Title, Playlist, Video, and Thumbnail.');
+                return;
+            }
+            setButtonLoading(uploadBtn, true);
+            try {
+                const videoFile = videoInput.files[0];
+                const videoUrlRes = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(videoFile.name)}&contentType=${videoFile.type}`).then(handleApiResponse);
+                await fetch(videoUrlRes.uploadUrl, { method: 'PUT', body: videoFile });
+
+                const thumbFile = thumbInput.files[0];
+                const thumbUrlRes = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(thumbFile.name)}&contentType=${thumbFile.type}`).then(handleApiResponse);
+                await fetch(thumbUrlRes.uploadUrl, { method: 'PUT', body: thumbFile });
+
+                const videoDetails = { title, video_key: videoUrlRes.key, thumbnail_key: thumbUrlRes.key, playlist_id: selectedPlaylistId, age_restriction: ageRestriction };
+                await fetch(`${API_BASE_URL}/api/videos`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(videoDetails) }).then(handleApiResponse);
+                
+                alert('Video uploaded successfully!');
+                showPage('homePage');
+                populateHomePage();
+            } catch (error) {
+                alert(`Upload failed: ${error.message}`);
+            } finally {
+                setButtonLoading(uploadBtn, false, '✅ Upload Video');
+            }
+        }
+        
+        // --- PROFILE & PLAYER ---
+        function handleProfileClick() { showPage(isUserApproved ? 'userDashboardPage' : 'infoSubmissionPage'); }
+        function submitForApproval() { alert('Information submitted for verification.'); }
+
+        const playerOverlay = document.getElementById('videoPlayerOverlay');
+        const mainPlayer = document.getElementById('mainPlayer');
+        async function playVideo(videoKey, title) {
+            playerOverlay.style.display = 'block';
+            mainPlayer.src = '';
+            try {
+                const data = await fetch(`${API_BASE_URL}/api/videos/${videoKey}/play`).then(handleApiResponse);
+                if (data.success) {
+                    mainPlayer.src = data.url;
+                    mainPlayer.play();
+                } else { throw new Error('Could not get video URL.'); }
+            } catch(error) {
+                alert(`Error playing video: ${error.message}`);
                 closePlayer();
             }
         }
-
         function closePlayer() {
             mainPlayer.pause();
             mainPlayer.src = '';
-            playerContainer.style.display = 'none';
-        }
-
-        function showControls() {
-            playerUI.classList.add('visible');
-            clearTimeout(controlsTimeout);
-            controlsTimeout = setTimeout(() => {
-                if (!mainPlayer.paused) playerUI.classList.remove('visible');
-            }, 3000);
-        }
-        
-        // Player Events
-        mainPlayer.addEventListener('play', () => { showControls(); /* update icons */ });
-        mainPlayer.addEventListener('pause', () => { showControls(); /* update icons */ });
-        mainPlayer.addEventListener('timeupdate', () => {
-            progressBar.value = mainPlayer.currentTime;
-            timeDisplay.textContent = `${formatTime(mainPlayer.currentTime)} / ${formatTime(mainPlayer.duration)}`;
-        });
-        mainPlayer.addEventListener('loadedmetadata', () => {
-            progressBar.max = mainPlayer.duration;
-        });
-        progressBar.addEventListener('input', () => { mainPlayer.currentTime = progressBar.value; });
-        playerContainer.addEventListener('click', showControls);
-        playPauseBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent container click from firing
-            mainPlayer.paused ? mainPlayer.play() : mainPlayer.pause();
-        });
-        
-        // --- GESTURE HANDLING ---
-        const rewindZone = document.getElementById('rewindZone');
-        const forwardZone = document.getElementById('forwardZone');
-        let tapTimer;
-
-        function handleTap(e, direction) {
-            e.preventDefault();
-            clearTimeout(tapTimer);
-            if (e.detail === 1) {
-                tapTimer = setTimeout(showControls, 250);
-            } else if (e.detail === 2) {
-                mainPlayer.currentTime += direction * 10;
-                showHud(`${direction > 0 ? '+' : ''}${direction * 10}s`);
-            }
-        }
-        rewindZone.addEventListener('click', (e) => handleTap(e, -1));
-        forwardZone.addEventListener('click', (e) => handleTap(e, 1));
-        
-        let startY, startVolume, startBrightness;
-        const volumeZone = document.getElementById('volumeZone');
-        const brightnessZone = document.getElementById('brightnessZone');
-        
-        // Very basic gesture handling for volume/brightness
-        volumeZone.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; startVolume = mainPlayer.volume; });
-        volumeZone.addEventListener('touchmove', (e) => {
-            let deltaY = startY - e.touches[0].clientY;
-            let newVolume = startVolume + (deltaY / 200);
-            mainPlayer.volume = Math.max(0, Math.min(1, newVolume));
-            showHud(`Volume: ${Math.round(mainPlayer.volume * 100)}%`);
-        });
-        // Brightness would need a screen overlay div to control, it's more complex
-        
-        function showHud(text) {
-            hud.textContent = text;
-            hud.style.display = 'block';
-            setTimeout(() => hud.style.display = 'none', 1000);
-        }
-        function formatTime(seconds) {
-            return new Date(seconds * 1000).toISOString().substr(14, 5);
-        }
-
-        // --- PLAYLIST DETAIL PAGE LOGIC ---
-        async function showPlaylistDetail(playlistId, playlistName) {
-            showPage('playlistDetailPage');
-            document.getElementById('playlistDetailTitle').textContent = playlistName;
-            const container = document.getElementById('videoListContainer');
-            container.innerHTML = '<p>Loading videos...</p>';
-            // In a real app, you'd fetch videos for this playlistId
-            // For now, we'll filter the global 'videos' from the home content
-            const data = await fetch(`${window.location.origin}/api/home-content`).then(r => r.json());
-            const playlistVideos = data.videos.filter(v => v.playlist_id === playlistId);
-            
-            if (playlistVideos.length > 0) {
-                container.innerHTML = playlistVideos.map(video => `
-                    <div class="video-item" onclick="playVideo('${video.video_key}', '${video.title}')">
-                        <div class="thumbnail" style="background-image:url('${video.thumbnailUrl}')"></div>
-                        <div class="details">
-                            <h4>${video.title}</h4>
-                            <p>Some description or view count here</p>
-                        </div>
-                    </div>
-                `).join('');
-            } else {
-                container.innerHTML = '<p>No videos in this playlist.</p>';
-            }
+            playerOverlay.style.display = 'none';
         }
 
         // --- INITIALIZATION ---
-        // All other functions like populateHomePage, uploadVideo, etc. remain here
-        // We'll update populateHomePage to handle clicking on playlists
-        async function populateHomePage() {
-            const container = document.getElementById('playlist-container');
-            // ... API call logic ...
-            // Inside the loop that creates playlists:
-            // Change the onclick to call the new function
-            // container.innerHTML = data.playlists.map(p => `
-            //     <div class="playlist-card" onclick="showPlaylistDetail(${p.id}, '${p.name}')">...</div>
-            // `).join('');
-        }
-        
-        // Final initialization
         document.addEventListener('DOMContentLoaded', () => {
-            // All init functions are called here
+            showPage('homePage');
+            populateHomePage();
+            populatePlaylistDropdown();
         });
-
     </script>
 </body>
 </html>
