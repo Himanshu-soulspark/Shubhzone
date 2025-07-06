@@ -134,6 +134,7 @@
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             position: relative;
+            cursor: pointer; /* Added cursor to indicate it's clickable */
         }
         
         .video-thumbnail-placeholder {
@@ -312,12 +313,11 @@
             padding: 15px;
         }
         
-        /* NEW: Container for the Upload button on the dashboard */
         .upload-button-container {
-            margin-bottom: 20px; /* Space between button and video grid */
+            margin-bottom: 20px;
         }
-        .upload-button-container .button { /* Re-use existing button style */
-            margin-top: 0; /* Override default margin-top from .button */
+        .upload-button-container .button {
+            margin-top: 0;
         }
 
         .video-card .menu-dots { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; border-radius: 50%; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; cursor: pointer; }
@@ -381,19 +381,15 @@
         <div class="form-group"><label>Age Restriction</label><div class="radio-group"><input type="radio" id="ageAll" name="age" value="all" checked> <label for="ageAll">All Audiences</label><input type="radio" id="age18" name="age" value="18+"> <label for="age18">18+</label></div></div>
         <div class="form-group"><label>Video Type</label><div class="radio-group" id="videoTypeSelector"><input type="radio" id="typeLong" name="videoType" value="landscape" checked> <label for="typeLong">Long Video (16:9)</label><input type="radio" id="typeShort" name="videoType" value="portrait"> <label for="typeShort">Shorts (9:16)</label></div></div>
         
-        <!-- MODIFIED: Video Price Removed & File input logic added -->
         <div class="form-group">
             <label>Video File</label>
-            <!-- This is the clickable area -->
             <div class="thumbnail-uploader landscape" id="thumbnailUploader" onclick="document.getElementById('videoFileInput').click()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16"><path d="M4.502 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-1.998 2zM14 2H4a1 1 0 0 0-1 1v9l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094l1.777 1.947V3a1 1 0 0 0-1-1z"/></svg>
                 <p>Tap to select a video file</p>
             </div>
-            <!-- This is the actual file input, but it's hidden -->
             <input type="file" id="videoFileInput" style="display: none;" accept="video/*" onchange="updateVideoFileLabel()">
         </div>
         
-        <!-- MODIFIED: onclick event added -->
         <div id="uploadSubmitButton" class="button upload-button" onclick="uploadVideo()">✅ Upload Video</div>
     </div>
     
@@ -445,7 +441,6 @@
             <button class="tab-button">Shorts</button>
         </div>
         <div class="user-content-area">
-            <!-- NEW: Upload Button added here -->
             <div class="upload-button-container">
                 <button class="button" onclick="showPage('uploadPage')">➕ Upload New Video</button>
             </div>
@@ -519,32 +514,56 @@
         }
 
         // --- Content Population ---
-        function populateHomeContent() {
+        //  MODIFIED: This function now fetches real data from your backend.
+        async function populateHomeContent() {
             const sliderWrapper = document.querySelector('#homePage .slider-wrapper');
             const videoGrid = document.getElementById('homeVideoGrid');
             if (!sliderWrapper || !videoGrid) return;
-            sliderWrapper.innerHTML = '';
-            videoGrid.innerHTML = '';
 
+            // Slider part remains the same (static data)
+            sliderWrapper.innerHTML = '';
             for (let i = 1; i <= 5; i++) {
                 sliderWrapper.innerHTML += `<div class="slider-card" style="background-image: url('https://picsum.photos/seed/slider${i}/800/450')"></div>`;
             }
+            // This interval for slider is also unchanged
             setInterval(() => {
                 let currentSlide = Math.floor(Math.random() * 5);
                 sliderWrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
             }, 4000);
             
-            for (let i = 1; i <= 20; i++) {
-                videoGrid.innerHTML += `
-                    <div class="video-card">
-                        <div class="video-thumbnail-placeholder">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.647c1.295.746 1.295 2.54 0 3.286L7.279 20.99c-1.25.717-2.779-.217-2.779-1.643V5.653Z" /></svg>
-                        </div>
-                        <div class="video-card-info"><p>Awesome Video Title ${i}</p></div>
-                    </div>`;
+            // This is the new part: Fetching videos from your API
+            try {
+                const response = await fetch('/api/videos');
+                const videos = await response.json();
+                
+                videoGrid.innerHTML = ''; // Clear the grid before adding new videos
+
+                if (videos.length === 0) {
+                    videoGrid.innerHTML = '<p style="color: var(--secondary-text); grid-column: 1 / -1;">No videos have been uploaded yet. Be the first!</p>';
+                } else {
+                    videos.forEach(video => {
+                        const videoCardHTML = `
+                            <div class="video-card" onclick="playVideo('${video.wasabi_url}')">
+                                <div class="video-thumbnail-placeholder">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.647c1.295.746 1.295 2.54 0 3.286L7.279 20.99c-1.25.717-2.779-.217-2.779-1.643V5.653Z" /></svg>
+                                </div>
+                                <div class="video-card-info"><p>${video.title}</p></div>
+                            </div>`;
+                        videoGrid.innerHTML += videoCardHTML;
+                    });
+                }
+            } catch (error) {
+                console.error("Failed to fetch videos:", error);
+                videoGrid.innerHTML = '<p style="color: var(--reject-red); grid-column: 1 / -1;">Error: Could not load videos from the server.</p>';
             }
         }
         
+        // NEW and ESSENTIAL: This function plays the video when a card is clicked.
+        function playVideo(videoUrl) {
+            // A simple way to play the video is to open it in a new browser tab.
+            window.open(videoUrl, '_blank');
+        }
+
         // --- Upload Page Logic ---
         const videoTypeSelector = document.getElementById('videoTypeSelector');
         const thumbnailUploader = document.getElementById('thumbnailUploader');
@@ -553,31 +572,28 @@
                  thumbnailUploader.className = 'thumbnail-uploader ' + (event.target.value === 'landscape' ? 'landscape' : 'portrait');
              });
         }
-        
-        // NEW FUNCTION: Updates the label to show the selected file name
+
         function updateVideoFileLabel() {
             const fileInput = document.getElementById('videoFileInput');
             const uploaderP = document.querySelector('#thumbnailUploader p');
             if (fileInput.files.length > 0) {
-                uploaderP.textContent = fileInput.files[0].name; // Show file name
+                uploaderP.textContent = fileInput.files[0].name;
             } else {
                 uploaderP.textContent = 'Tap to select a video file';
             }
         }
 
-        // NEW FUNCTION: Handles the entire video upload process
+        // MODIFIED: This function is now connected to the real backend and updates the UI on success.
         async function uploadVideo() {
             const uploadButton = document.getElementById('uploadSubmitButton');
             const fileInput = document.getElementById('videoFileInput');
             const file = fileInput.files[0];
             
-            // --- 1. Get all form data ---
             const title = document.getElementById('videoTitle').value;
             const description = document.getElementById('description').value;
             const tags = document.getElementById('tags').value;
             const videoType = document.querySelector('input[name="videoType"]:checked').value;
 
-            // --- 2. Basic Validation ---
             if (!file) {
                 alert('Please select a video file to upload.');
                 return;
@@ -587,22 +603,17 @@
                 return;
             }
 
-            // --- 3. Prepare FormData ---
-            // FormData is used to send files and text data together
             const formData = new FormData();
-            formData.append('videoFile', file); // 'videoFile' must match the key expected by the backend (Multer)
+            formData.append('videoFile', file);
             formData.append('title', title);
             formData.append('description', description);
             formData.append('tags', tags);
             formData.append('videoType', videoType);
             
-            // --- 4. Disable button and show loading state ---
             uploadButton.textContent = 'Uploading...';
-            uploadButton.style.pointerEvents = 'none'; // Disable clicks
+            uploadButton.style.pointerEvents = 'none';
 
             try {
-                // --- 5. Make the API call using fetch ---
-                // We use '/api/upload' because the frontend and backend are on the same domain
                 const response = await fetch('/api/upload', {
                     method: 'POST',
                     body: formData,
@@ -611,9 +622,9 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    alert('Upload successful! Video URL: ' + result.videoUrl);
-                    // Optionally, reset the form or redirect the user
-                    showPage('userDashboardPage'); 
+                    alert('Upload successful!');
+                    showPage('homePage'); // Go back to the home page
+                    populateHomeContent(); // Refresh the video list to show the new video
                 } else {
                     alert('Upload failed: ' + result.message);
                 }
@@ -621,11 +632,10 @@
                 console.error('Error uploading file:', error);
                 alert('An error occurred during upload. Please check the console.');
             } finally {
-                // --- 6. Re-enable the button regardless of success or failure ---
                 uploadButton.textContent = '✅ Upload Video';
-                uploadButton.style.pointerEvents = 'auto'; // Re-enable clicks
-                document.getElementById('videoFileInput').value = ''; // Reset file input
-                updateVideoFileLabel(); // Reset the label text
+                uploadButton.style.pointerEvents = 'auto';
+                document.getElementById('videoFileInput').value = '';
+                updateVideoFileLabel();
             }
         }
 
@@ -675,6 +685,7 @@
         }
 
         // --- Initial Page Load ---
+        // MODIFIED: Calls the function to load videos from the database as soon as the page is ready.
         document.addEventListener('DOMContentLoaded', () => {
             populateHomeContent();
             showPage('homePage');
