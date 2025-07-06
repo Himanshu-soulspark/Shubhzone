@@ -16,7 +16,8 @@ const pool = new Pool({
  * यह ऐप के शुरू होते ही एक बार चलता है।
  */
 const createVideosTable = async () => {
-  // टेबल का स्ट्रक्चर। ध्यान दें कि इसमें 'wasabi_url' नहीं है, सिर्फ 'wasabi_key' है।
+  // टेबल का स्ट्रक्चर। इसमें अब thumbnail_key कॉलम भी है।
+  // यह कॉलम NULL हो सकता है, क्योंकि हर वीडियो का थंबनेल हो, यह ज़रूरी नहीं।
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS videos (
       id SERIAL PRIMARY KEY,
@@ -24,7 +25,8 @@ const createVideosTable = async () => {
       description TEXT,
       tags VARCHAR(255),
       video_type VARCHAR(50),
-      wasabi_key TEXT NOT NULL,
+      video_key TEXT NOT NULL,
+      thumbnail_key TEXT,
       created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );
   `;
