@@ -1,5 +1,3 @@
-Ky yeh code mere index js ke sath comfortable h na 
-
 // File: index.js (Final, Stable, and Non-Compressed Version)
 
 const express = require('express');
@@ -24,7 +22,6 @@ app.use(express.static(path.join(__dirname, '/')));
 // ======== API रूट्स ========
 
 // --- जेनेरिक अपलोड URL जेनरेटर ---
-// (अपरिवर्तित - यह फंक्शन सही काम कर रहा है)
 app.get('/api/generate-upload-url', async (req, res) => {
   try {
     const { fileName, contentType } = req.query;
@@ -40,7 +37,6 @@ app.get('/api/generate-upload-url', async (req, res) => {
 });
 
 // --- प्लेलिस्ट एंडपॉइंट्स ---
-// (अपरिवर्तित - यह सभी फंक्शन्स सही काम कर रहे हैं)
 
 // POST /api/playlists - एक नई प्लेलिस्ट बनाना
 app.post('/api/playlists', async (req, res) => {
@@ -70,7 +66,6 @@ app.get('/api/playlists', async (req, res) => {
 });
 
 // --- वीडियो एंडपॉइंट्स ---
-// (अपरिवर्तित - यह सभी फंक्शन्स सही काम कर रहे हैं)
 
 // POST /api/videos - एक नया वीडियो सेव करना
 app.post('/api/videos', async (req, res) => {
@@ -104,9 +99,7 @@ app.get('/api/videos/:key/play', async (req, res) => {
   }
 });
 
-// --- होम पेज डेटा एंडपॉइंट (एकमात्र और सबसे महत्वपूर्ण बदलाव यहाँ है) ---
-
-// GET /api/home-content - होम पेज के लिए सभी डेटा को और सुरक्षित तरीके से लाना
+// --- होम पेज डेटा एंडपॉइंट ---
 app.get('/api/home-content', async (req, res) => {
   try {
     // स्टेप 1: डेटाबेस से सभी प्लेलिस्ट और वीडियो को एक साथ प्राप्त करें
@@ -119,18 +112,13 @@ app.get('/api/home-content', async (req, res) => {
     ]);
     
     // स्टेप 2: एक सुरक्षित URL जेनरेटर फंक्शन जो एरर को हैंडल कर सके
-    // यह फंक्शन सुनिश्चित करेगा कि अगर कोई एक URL नहीं बनता है तो ऐप क्रैश न हो।
     const getSafePresignedUrl = async (key) => {
-        // अगर की (key) मौजूद नहीं है, तो तुरंत null लौटा दें।
         if (!key) {
             return null;
         }
         try {
-            // URL बनाने की कोशिश करें।
             return await getPresignedUrl(key);
         } catch (urlError) {
-            // अगर URL बनाने में कोई समस्या आती है (जैसे Wasabi में फ़ाइल नहीं मिली),
-            // तो कंसोल में एरर दिखाएं और null लौटा दें।
             console.error(`Could not generate URL for key: ${key}. Error: ${urlError.message}`);
             return null;
         }
@@ -140,15 +128,13 @@ app.get('/api/home-content', async (req, res) => {
     const playlistsWithUrls = (await Promise.all(
         playlistsResult.rows.map(async (playlist) => {
             const thumbnailUrl = await getSafePresignedUrl(playlist.thumbnail_key);
-            // केवल उन्हीं प्लेलिस्ट को लौटाएं जिनका थंबनेल सफलतापूर्वक बन गया है।
             return thumbnailUrl ? { ...playlist, thumbnailUrl } : null;
         })
-    )).filter(p => p !== null); // उन सभी एंट्रीज को हटा दें जो null हैं।
+    )).filter(p => p !== null);
     
     const videosWithUrls = (await Promise.all(
         videosResult.rows.map(async (video) => {
             const thumbnailUrl = await getSafePresignedUrl(video.video_thumbnail_key);
-            // केवल उन्हीं वीडियो को लौटाएं जिनका थंबनेल सफलतापूर्वक बन गया है।
             return thumbnailUrl ? { ...video, thumbnailUrl } : null;
         })
     )).filter(v => v !== null);
@@ -161,7 +147,6 @@ app.get('/api/home-content', async (req, res) => {
     });
 
   } catch (dbError) {
-    // यह कैच ब्लॉक अब सिर्फ डेटाबेस कनेक्शन या क्वेरी की गंभीर समस्याओं को पकड़ेगा।
     console.error("Critical error fetching data from Database:", dbError);
     res.status(500).json({ success: false, message: 'Failed to fetch home content due to a server database error.' });
   }
@@ -169,13 +154,12 @@ app.get('/api/home-content', async (req, res) => {
 
 
 // ======== फ्रंटएंड सर्विंग ========
-// (अपरिवर्तित)
+// यह सुनिश्चित करता है कि कोई भी रूट जो API का हिस्सा नहीं है, वह index.html फ़ाइल को दिखाए।
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // ======== सर्वर और डेटाबेस को शुरू करना ========
-// (अपरिवर्तित)
 const startServer = async () => {
   await initializeDatabase(); // पहले टेबल बनाना सुनिश्चित करें
   app.listen(PORT, () => {
