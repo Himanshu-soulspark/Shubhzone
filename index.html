@@ -377,12 +377,24 @@
         <div class="form-group"><label for="videoTitle">Video Title</label><input type="text" id="videoTitle" placeholder="Enter a catchy title"></div>
         <div class="form-group"><label for="description">Description</label><textarea id="description" placeholder="Tell viewers about your video"></textarea></div>
         <div class="form-group"><label for="tags">Tags</label><input type="text" id="tags" placeholder="e.g., tech, comedy, music"></div>
-        <div class="form-group toggle-switch"><label>Comments</label><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+        <div class="form-group toggle-switch"><label>Comments</label><label class="switch"><input type="checkbox" id="commentsEnabled" checked><span class="slider"></span></label></div>
         <div class="form-group"><label>Age Restriction</label><div class="radio-group"><input type="radio" id="ageAll" name="age" value="all" checked> <label for="ageAll">All Audiences</label><input type="radio" id="age18" name="age" value="18+"> <label for="age18">18+</label></div></div>
-        <div class="form-group"><label for="videoPrice">Video Price (Optional)</label><input type="number" id="videoPrice" placeholder="e.g., 50 (in ₹)"></div>
         <div class="form-group"><label>Video Type</label><div class="radio-group" id="videoTypeSelector"><input type="radio" id="typeLong" name="videoType" value="landscape" checked> <label for="typeLong">Long Video (16:9)</label><input type="radio" id="typeShort" name="videoType" value="portrait"> <label for="typeShort">Shorts (9:16)</label></div></div>
-        <div class="form-group"><label>Thumbnail</label><div class="thumbnail-uploader landscape" id="thumbnailUploader"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16"><path d="M4.502 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-1.998 2zM14 2H4a1 1 0 0 0-1 1v9l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094l1.777 1.947V3a1 1 0 0 0-1-1z"/></svg><p>Tap to upload</p></div></div>
-        <div class="button upload-button">✅ Upload Video</div>
+        
+        <!-- MODIFIED: Video Price Removed & File input logic added -->
+        <div class="form-group">
+            <label>Video File</label>
+            <!-- This is the clickable area -->
+            <div class="thumbnail-uploader landscape" id="thumbnailUploader" onclick="document.getElementById('videoFileInput').click()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16"><path d="M4.502 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-1.998 2zM14 2H4a1 1 0 0 0-1 1v9l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094l1.777 1.947V3a1 1 0 0 0-1-1z"/></svg>
+                <p>Tap to select a video file</p>
+            </div>
+            <!-- This is the actual file input, but it's hidden -->
+            <input type="file" id="videoFileInput" style="display: none;" accept="video/*" onchange="updateVideoFileLabel()">
+        </div>
+        
+        <!-- MODIFIED: onclick event added -->
+        <div id="uploadSubmitButton" class="button upload-button" onclick="uploadVideo()">✅ Upload Video</div>
     </div>
     
     <!-- History Page -->
@@ -541,6 +553,82 @@
                  thumbnailUploader.className = 'thumbnail-uploader ' + (event.target.value === 'landscape' ? 'landscape' : 'portrait');
              });
         }
+        
+        // NEW FUNCTION: Updates the label to show the selected file name
+        function updateVideoFileLabel() {
+            const fileInput = document.getElementById('videoFileInput');
+            const uploaderP = document.querySelector('#thumbnailUploader p');
+            if (fileInput.files.length > 0) {
+                uploaderP.textContent = fileInput.files[0].name; // Show file name
+            } else {
+                uploaderP.textContent = 'Tap to select a video file';
+            }
+        }
+
+        // NEW FUNCTION: Handles the entire video upload process
+        async function uploadVideo() {
+            const uploadButton = document.getElementById('uploadSubmitButton');
+            const fileInput = document.getElementById('videoFileInput');
+            const file = fileInput.files[0];
+            
+            // --- 1. Get all form data ---
+            const title = document.getElementById('videoTitle').value;
+            const description = document.getElementById('description').value;
+            const tags = document.getElementById('tags').value;
+            const videoType = document.querySelector('input[name="videoType"]:checked').value;
+
+            // --- 2. Basic Validation ---
+            if (!file) {
+                alert('Please select a video file to upload.');
+                return;
+            }
+            if (!title) {
+                alert('Please enter a video title.');
+                return;
+            }
+
+            // --- 3. Prepare FormData ---
+            // FormData is used to send files and text data together
+            const formData = new FormData();
+            formData.append('videoFile', file); // 'videoFile' must match the key expected by the backend (Multer)
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('tags', tags);
+            formData.append('videoType', videoType);
+            
+            // --- 4. Disable button and show loading state ---
+            uploadButton.textContent = 'Uploading...';
+            uploadButton.style.pointerEvents = 'none'; // Disable clicks
+
+            try {
+                // --- 5. Make the API call using fetch ---
+                // We use '/api/upload' because the frontend and backend are on the same domain
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Upload successful! Video URL: ' + result.videoUrl);
+                    // Optionally, reset the form or redirect the user
+                    showPage('userDashboardPage'); 
+                } else {
+                    alert('Upload failed: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                alert('An error occurred during upload. Please check the console.');
+            } finally {
+                // --- 6. Re-enable the button regardless of success or failure ---
+                uploadButton.textContent = '✅ Upload Video';
+                uploadButton.style.pointerEvents = 'auto'; // Re-enable clicks
+                document.getElementById('videoFileInput').value = ''; // Reset file input
+                updateVideoFileLabel(); // Reset the label text
+            }
+        }
+
 
         // --- Overlay Logic ---
         function showOverlay(overlayId) { document.getElementById(overlayId).style.display = 'flex'; }
