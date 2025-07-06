@@ -2,12 +2,16 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
+    <!-- Mobile Friendly and Zoom Lock Meta Tag -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Shubhzone</title>
+
+    <!-- ======== Firebase SDK CDN Scripts ======== -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-analytics-compat.js"></script>
 
     <style>
+        /* --- Global Styles & Theme --- */
         :root {
             --dark-bg: #121212;
             --primary-text: #ffffff;
@@ -15,9 +19,17 @@
             --card-bg: #1e1e1e;
             --accent-gradient: linear-gradient(90deg, #ff416c, #ff4b2b);
             --transparent-black: rgba(0, 0, 0, 0.7);
+            --accept-green: #4CAF50;
+            --reject-red: #F44336;
             --placeholder-bg: #2a2a2a;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             background-color: var(--dark-bg);
@@ -25,13 +37,25 @@
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
         }
+
         .page {
             padding: 20px 15px 80px 15px;
             display: none;
             min-height: calc(100vh - 65px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
-        .page.active { display: block; }
-        h2 { color: var(--primary-text); margin-bottom: 15px; }
+        
+        .page.active {
+            display: block;
+        }
+
+        h2 {
+            color: var(--primary-text);
+            margin-bottom: 15px;
+        }
+        
+        /* General Button Style */
         .button, .submit-button {
             width: 100%;
             padding: 15px;
@@ -43,21 +67,104 @@
             font-weight: bold;
             cursor: pointer;
             text-align: center;
+            box-shadow: 0 4px 10px rgba(255, 75, 43, 0.4);
         }
-        .button:disabled { background: var(--secondary-text); cursor: not-allowed; }
-        .slider-container { width: 100%; overflow: hidden; border-radius: 12px; }
-        .slider-wrapper { display: flex; transition: transform 0.8s ease; }
-        .slider-card { flex: 0 0 100%; aspect-ratio: 16 / 9; background-size: cover; background-position: center; }
-        .search-bar { display: flex; align-items: center; background-color: var(--card-bg); border-radius: 25px; padding: 8px 15px; margin: 20px 0; }
-        .search-bar input { flex-grow: 1; background: none; border: none; outline: none; color: var(--primary-text); font-size: 16px; margin: 0 10px; }
-        .search-bar .icon { width: 24px; height: 24px; color: var(--secondary-text); cursor: pointer; }
-        .video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .video-card { background-color: var(--card-bg); border-radius: 10px; overflow: hidden; cursor: pointer; }
-        .video-thumbnail-container { width: 100%; aspect-ratio: 16 / 9; background-color: var(--placeholder-bg); display: flex; justify-content: center; align-items: center; }
-        .video-thumbnail-container img { width: 100%; height: 100%; object-fit: cover; }
-        .video-thumbnail-container svg { width: 30%; height: 30%; max-width: 48px; fill: var(--secondary-text); }
-        .video-card-info { padding: 8px; }
-        .video-card-info p { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* --- Home Page Styles --- */
+        .slider-container {
+            width: 100%;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .slider-wrapper {
+            display: flex;
+            transition: transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+            touch-action: pan-y;
+        }
+
+        .slider-card {
+            flex: 0 0 100%;
+            aspect-ratio: 16 / 9;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background-color: var(--card-bg);
+            border-radius: 25px;
+            padding: 8px 15px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-bar input {
+            flex-grow: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--primary-text);
+            font-size: 16px;
+            margin: 0 10px;
+        }
+        
+        .search-bar input::placeholder {
+            color: var(--secondary-text);
+        }
+
+        .search-bar .icon {
+            width: 24px;
+            height: 24px;
+            color: var(--secondary-text);
+            cursor: pointer;
+        }
+        
+        .video-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .video-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .video-thumbnail-placeholder {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background-color: var(--placeholder-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .video-thumbnail-placeholder svg {
+            width: 30%;
+            height: 30%;
+            max-width: 48px;
+            fill: var(--secondary-text);
+            opacity: 0.5;
+        }
+
+        .video-card-info {
+            padding: 8px;
+        }
+
+        .video-card-info p {
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* --- Bottom Navigation Footer --- */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -65,30 +172,186 @@
             width: 100%;
             background-color: var(--transparent-black);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             display: flex;
             justify-content: space-around;
             padding: 10px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 100;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--secondary-text); cursor: pointer; }
-        .nav-item.active { color: var(--primary-text); }
-        .nav-item.active .nav-icon { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .nav-item.upload-plus { position: relative; top: -15px; }
-        .nav-icon { width: 28px; height: 28px; }
-        .nav-icon.upload-icon { width: 50px; height: 50px; background: var(--accent-gradient); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
-        .nav-label { font-size: 10px; margin-top: 2px; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; color: var(--secondary-text); margin-bottom: 8px; font-size: 14px; }
-        .form-group input[type="text"], .form-group textarea { width: 100%; background-color: var(--card-bg); border: 1px solid #444; border-radius: 8px; padding: 12px; color: var(--primary-text); font-size: 16px; }
-        .progress-bar-container { width: 100%; background-color: var(--card-bg); border-radius: 5px; overflow: hidden; margin-top: 10px; display: none; }
-        #progressBar { width: 0%; height: 10px; background: var(--accent-gradient); }
-        #progressText { text-align: center; font-size: 12px; color: var(--secondary-text); margin-top: 5px; }
-        .thumbnail-uploader { border: 2px dashed #444; border-radius: 10px; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 20px; color: var(--secondary-text); cursor: pointer; background-color: var(--placeholder-bg); }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--secondary-text);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .nav-item.active {
+            color: var(--primary-text);
+        }
+
+        .nav-item.active .nav-icon {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-item.upload-plus {
+            position: relative;
+            top: -15px;
+        }
+
+        .nav-icon {
+            width: 28px;
+            height: 28px;
+        }
+        
+        .nav-icon.upload-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--accent-gradient);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(255, 75, 43, 0.5);
+        }
+        
+        .nav-label {
+            font-size: 10px;
+            margin-top: 2px;
+        }
+
+        /* --- Form Group Styles --- */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--secondary-text);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group textarea {
+            width: 100%;
+            background-color: var(--card-bg);
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 12px;
+            color: var(--primary-text);
+            font-size: 16px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* --- Upload Page --- */
+        #uploadPage .upload-button {
+             margin-top: 20px;
+        }
+
+        .toggle-switch { display: flex; justify-content: space-between; align-items: center; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch input { display: none; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: .4s; border-radius: 28px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background: var(--accent-gradient); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        .radio-group label { margin-right: 15px; color: var(--primary-text); }
+        .radio-group input[type="radio"] { margin-right: 5px; }
+        
+        .thumbnail-uploader { border: 2px dashed #444; border-radius: 10px; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 20px; color: var(--secondary-text); cursor: pointer; transition: aspect-ratio 0.3s ease; background-color: var(--placeholder-bg); }
         .thumbnail-uploader.landscape { aspect-ratio: 16 / 9; }
+        .thumbnail-uploader.portrait { aspect-ratio: 9 / 16; }
+        .thumbnail-uploader svg { margin-bottom: 10px; fill: var(--secondary-text); }
+
+        /* --- History Page --- */
+        .history-list .video-card { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; padding: 10px; background-color: var(--card-bg); border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+        .history-list .video-thumbnail-placeholder { width: 120px; flex-shrink: 0; border-radius: 5px; }
+        .history-list .video-card-info p { font-size: 16px; font-weight: bold; margin-bottom: 5px; white-space: normal; overflow: visible; text-overflow: unset; }
+        .history-list .video-card-info small { font-size: 12px; }
+
+        /* --- Shorts Page --- */
+        #shortsPage { padding: 0; height: calc(100vh - 65px); overflow-y: scroll; scroll-snap-type: y mandatory; }
+        .short-video-item { height: 100%; width: 100%; scroll-snap-align: start; position: relative; background-color: black; background-size: cover; background-position: center; display: flex; align-items: flex-end; justify-content: center; padding: 20px; }
+        .short-video-item p { color: white; text-shadow: 1px 1px 3px black; font-size: 1.1em; }
+
+
+        /* ======== PROFILE/DASHBOARD PAGES ======== */
+        #infoSubmissionPage .info-button { background: var(--accent-gradient); color: white; padding: 8px 15px; border-radius: 20px; font-size: 14px; cursor: pointer; font-weight: bold; display: inline-block; margin-bottom: 20px; }
+        #infoSubmissionPage .file-upload-button { background-color: var(--card-bg); border: 1px solid #444; border-radius: 8px; padding: 12px; text-align: center; cursor: pointer; }
+        #infoSubmissionPage .file-upload-button:hover { background-color: #333; }
+        #infoSubmissionPage .submit-button { margin-top: 30px; }
+
+        #userDashboardPage { padding: 0 0 80px 0; }
+        .dashboard-header { display: flex; align-items: center; gap: 15px; padding: 15px; background-color: var(--card-bg); border-bottom: 1px solid #333; }
+        .dashboard-header .profile-pic { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background-color: var(--placeholder-bg); }
+        .dashboard-header .user-details { flex-grow: 1; }
+        .dashboard-header .user-details h3 { margin: 0; font-size: 1.2em; }
+        .dashboard-header .user-details p { font-size: 0.9em; color: var(--secondary-text); margin-top: 2px; }
+        .dashboard-header .logout-button { background: none; border: none; color: var(--secondary-text); cursor: pointer; }
+        .dashboard-header .logout-button svg { width: 28px; height: 28px; }
+
+        .content-tabs { display: flex; justify-content: space-around; padding: 15px 0; border-bottom: 1px solid #333; }
+        .content-tabs .tab-button { background: none; border: none; color: var(--secondary-text); font-size: 1em; font-weight: bold; cursor: pointer; padding: 5px 10px; }
+        .content-tabs .tab-button.active { color: var(--primary-text); border-bottom: 2px solid var(--primary-text); }
+
+        .user-content-area {
+            padding: 15px;
+        }
+        
+        .upload-button-container {
+            margin-bottom: 20px;
+        }
+        .upload-button-container .button {
+            margin-top: 0;
+        }
+
+        .video-card .menu-dots { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; border-radius: 50%; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .video-card .menu-dots svg { width: 20px; height: 20px; fill: white; }
+
+        /* --- Information Overlay --- */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 150; display: none; padding: 10px; }
+        .overlay-content-wrapper { width: 100%; max-width: 500px; background-color: var(--card-bg); border-radius: 15px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); overflow: hidden; position: relative; touch-action: pan-y; cursor: grab; }
+        .overlay-inner-container { display: flex; width: 200%; transition: transform 0.3s ease-out; }
+        .language-block { width: 50%; padding: 25px; color: var(--primary-text); text-align: center; overflow-y: auto; max-height: calc(100vh - 180px); -webkit-overflow-scrolling: touch; }
+        .language-block h3 { margin-top: 0; margin-bottom: 15px; font-size: 1.4em; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .language-block p { margin-bottom: 15px; line-height: 1.6; font-size: 1em; color: var(--secondary-text); text-align: left; word-wrap: break-word; }
+        .overlay-content-wrapper .close-button { position: absolute; top: 10px; right: 10px; font-size: 24px; color: var(--secondary-text); cursor: pointer; z-index: 10; background-color: rgba(30, 30, 30, 0.7); border-radius: 50%; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; }
+        .swipe-indicator { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; color: rgba(255, 255, 255, 0.7); font-size: 13px; z-index: 10; pointer-events: none; }
+        .swipe-indicator::before { content: '↔️'; margin-right: 5px; }
+        
+        /* --- Chat/Request Pages --- */
+        #chatPage .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; margin-bottom: 20px; border-bottom: 1px solid #333; }
+        #chatPage .top-bar .button { background: var(--accent-gradient); color: white; padding: 8px 15px; border-radius: 20px; font-size: 14px; cursor: pointer; font-weight: bold; min-width: 80px; text-align: center; }
+        #chatPage .top-bar .button.skip { background: none; border: 1px solid var(--secondary-text); color: var(--secondary-text); font-weight: normal; }
+        #requestPage .request-list .request-item { display: flex; align-items: center; justify-content: space-between; background-color: var(--card-bg); padding: 15px; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+        #requestPage .request-list .request-item .user-info { flex-grow: 1; margin-right: 10px; }
+        #requestPage .request-list .request-item .user-info p { font-weight: bold; }
+        #requestPage .request-list .request-item .actions { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+        #requestPage .request-list .request-item .actions .action-button { width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; color: white; font-size: 1.1em; }
+        #requestPage .request-list .request-item .actions .accept { background-color: var(--accept-green); }
+        #requestPage .request-list .request-item .actions .reject { background-color: var(--reject-red); }
+
     </style>
 </head>
 <body>
 
+    <!-- ======== MAIN CONTENT AREA ======== -->
+    
     <div id="homePage" class="page active">
         <div class="slider-container">
             <div class="slider-wrapper"></div>
@@ -102,7 +365,8 @@
     </div>
 
     <div id="shortsPage" class="page">
-        <p>Shorts Feature Coming Soon!</p>
+         <div class="short-video-item" style="background-image: url('https://picsum.photos/seed/short1/540/960')"><p>This is the first short video!</p></div>
+         <div class="short-video-item" style="background-image: url('https://picsum.photos/seed/short2/540/960')"><p>Scrolling works like Reels!</p></div>
     </div>
 
     <div id="uploadPage" class="page">
@@ -110,61 +374,117 @@
         <div class="form-group"><label for="videoTitle">Video Title</label><input type="text" id="videoTitle" placeholder="Enter a catchy title"></div>
         <div class="form-group"><label for="description">Description</label><textarea id="description" placeholder="Tell viewers about your video"></textarea></div>
         <div class="form-group"><label for="tags">Tags</label><input type="text" id="tags" placeholder="e.g., tech, comedy, music"></div>
+        <div class="form-group toggle-switch"><label>Comments</label><label class="switch"><input type="checkbox" id="commentsEnabled" checked><span class="slider"></span></label></div>
+        <div class="form-group"><label>Age Restriction</label><div class="radio-group"><input type="radio" id="ageAll" name="age" value="all" checked> <label for="ageAll">All Audiences</label><input type="radio" id="age18" name="age" value="18+"> <label for="age18">18+</label></div></div>
+        <div class="form-group"><label>Video Type</label><div class="radio-group" id="videoTypeSelector"><input type="radio" id="typeLong" name="videoType" value="landscape" checked> <label for="typeLong">Long Video (16:9)</label><input type="radio" id="typeShort" name="videoType" value="portrait"> <label for="typeShort">Shorts (9:16)</label></div></div>
+        
         <div class="form-group">
             <label>Video File</label>
-            <div class="thumbnail-uploader landscape" id="videoUploader" onclick="document.getElementById('videoFileInput').click()">
+            <div class="thumbnail-uploader landscape" id="thumbnailUploader" onclick="document.getElementById('videoFileInput').click()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16"><path d="M4.502 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-1.998 2zM14 2H4a1 1 0 0 0-1 1v9l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094l1.777 1.947V3a1 1 0 0 0-1-1z"/></svg>
                 <p>Tap to select a video file</p>
             </div>
-            <input type="file" id="videoFileInput" style="display: none;" accept="video/*" onchange="updateFileLabel('videoFileInput', 'videoUploader')">
+            <input type="file" id="videoFileInput" style="display: none;" accept="video/*" onchange="updateVideoFileLabel()">
         </div>
-        <div class="form-group">
-            <label>Thumbnail Image (16:9)</label>
-            <div class="thumbnail-uploader landscape" id="thumbnailUploader" onclick="document.getElementById('thumbnailInput').click()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16"><path d="M4.502 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-1.998 2zM14 2H4a1 1 0 0 0-1 1v9l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094l1.777 1.947V3a1 1 0 0 0-1-1z"/></svg>
-                <p>Tap to select a thumbnail</p>
-            </div>
-            <input type="file" id="thumbnailInput" style="display: none;" accept="image/*" onchange="updateFileLabel('thumbnailInput', 'thumbnailUploader')">
-        </div>
+        
         <div id="uploadSubmitButton" class="button upload-button" onclick="uploadVideo()">✅ Upload Video</div>
-        <div class="progress-bar-container" id="progressContainer">
-            <div id="progressBar"></div>
-            <p id="progressText">0%</p>
+    </div>
+    
+    <div id="historyPage" class="page">
+        <h2>Watch History</h2>
+        <div class="history-list" id="historyList"></div>
+    </div>
+
+    <div id="chatPage" class="page">
+        <div class="top-bar"><div class="button" onclick="showPage('requestPage')">Request</div><div class="button skip" onclick="showPage('homePage')">Skip</div></div>
+        <p style="text-align: center; margin-top: 50px; color: var(--secondary-text);">Tap 'Request' to see new chat requests.</p>
+    </div>
+    <div id="requestPage" class="page">
+        <h2>Chat Requests</h2>
+        <div class="request-list">
+            <div class="request-item"><div class="user-info"><p>User 123</p></div><div class="actions"><div class="action-button accept" onclick="alert('Request Accepted!')">✅</div><div class="action-button reject" onclick="alert('Request Rejected!')">❌</div></div></div>
+            <div class="request-item"><div class="user-info"><p>User 456</p></div><div class="actions"><div class="action-button accept" onclick="alert('Request Accepted!')">✅</div><div class="action-button reject" onclick="alert('Request Rejected!')">❌</div></div></div>
         </div>
     </div>
     
-    <div id="chatPage" class="page">
-        <!-- Chat page content -->
-    </div>
     <div id="infoSubmissionPage" class="page">
-        <!-- Info submission page content -->
-    </div>
-    <div id="userDashboardPage" class="page">
-        <!-- User dashboard content -->
+        <div class="info-button" onclick="showOverlay('infoOverlay')">Why is this information needed?</div>
+        <h2>Submit Your Information</h2>
+        <p style="color: var(--secondary-text); margin-top: -10px; margin-bottom: 25px;">Your details will be verified. After approval, your profile will be activated.</p>
+        <div class="form-group"><label for="fullName">Full Name</label><input type="text" id="fullName" placeholder="आपका पूरा नाम"></div>
+        <div class="form-group"><label for="email">Email Address</label><input type="email" id="email" placeholder="आपका ईमेल पता"></div>
+        <div class="form-group"><label for="phone">Phone Number</label><input type="tel" id="phone" placeholder="आपका फ़ोन नंबर"></div>
+        <div class="form-group"><label for="userPhotos">Upload Your Photos (min 2)</label><div class="file-upload-button" onclick="alert('File picker would open here')">Select Photos</div></div>
+        <div class="form-group"><label for="userDocs">Upload Documents (Aadhaar, etc)</label><div class="file-upload-button" onclick="alert('File picker would open here')">Select Documents</div></div>
+        <div class="submit-button" onclick="submitForApproval()">Submit for Approval</div>
     </div>
 
+    <div id="userDashboardPage" class="page">
+        <header class="dashboard-header">
+            <img class="profile-pic" src="https://picsum.photos/seed/user_approved/120/120" alt="User Profile Picture">
+            <div class="user-details">
+                <h3>User's Name</h3>
+                <p>Unique ID: SHZ123456789</p>
+            </div>
+            <button class="logout-button" title="Logout" onclick="logoutUser()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M7.5 3.75A1.5 1.5 0 0 0 6 5.25v13.5a1.5 1.5 0 0 0 1.5 1.5h6a1.5 1.5 0 0 0 1.5-1.5V15a.75.75 0 0 1 1.5 0v3.75a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3V5.25a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3V9A.75.75 0 0 1 15 9V5.25a1.5 1.5 0 0 0-1.5-1.5h-6Zm10.72 4.72a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1 0 1.06l-3 3a.75.75 0 1 1-1.06-1.06l1.72-1.72H9a.75.75 0 0 1 0-1.5h10.94l-1.72-1.72a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" /></svg>
+            </button>
+        </header>
+        <div class="content-tabs">
+            <button class="tab-button active">Long Videos</button>
+            <button class="tab-button">Shorts</button>
+        </div>
+        <div class="user-content-area">
+            <div class="upload-button-container">
+                <button class="button" onclick="showPage('uploadPage')">➕ Upload New Video</button>
+            </div>
+            <div class="video-grid" id="userVideoGrid"></div>
+        </div>
+    </div>
+
+    <!-- ======== BOTTOM NAVIGATION BAR ======== -->
     <nav class="bottom-nav">
         <div id="navHome" class="nav-item active" onclick="showPage('homePage')"><svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4.75 9.5a.75.75 0 0 0 0 1.5h.5a.75.75 0 0 0 0-1.5h-.5ZM6 11a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 6 11Zm-1.25 2a.75.75 0 0 0 0 1.5h.5a.75.75 0 0 0 0-1.5h-.5ZM6 15a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 6 15Zm11-5.5a.75.75 0 0 0 0 1.5h.5a.75.75 0 0 0 0-1.5h-.5Zm1.25 1.25a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5a.75.75 0 0 1-.75-.75Zm-1.25 2a.75.75 0 0 0 0 1.5h.5a.75.75 0 0 0 0-1.5h-.5Zm1.25 1.25a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h.5a.75.75 0 0 1-.75-.75ZM21 8.5v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3ZM8.5 8a.5.5 0 0 0-1 0v8a.5.5 0 0 0 1 0v-8Zm3 0a.5.5 0 0 0-1 0v8a.5.5 0 0 0 1 0v-8Zm3 0a.5.5 0 0 0-1 0v8a.5.5 0 0 0 1 0v-8Z"/></svg><span class="nav-label">Long Video</span></div>
-        <div id="navShorts" class="nav-item" onclick="showPage('shortsPage')" style="display: none;"><svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.968 2.055a.75.75 0 0 0-1.06-.092l-6.5 5.5a.75.75 0 0 0 .592 1.287h2.75v5.5h-2.75a.75.75 0 0 0-.592 1.287l6.5 5.5a.75.75 0 0 0 1.06-.092l6.5-5.5a.75.75 0 0 0-.592-1.287h-2.75v-5.5h2.75a.75.75 0 0 0 .592-1.287l-6.5-5.5Z"/></svg><span class="nav-label">Shorts</span></div>
+        <div id="navShorts" class="nav-item" onclick="showPage('shortsPage')"><svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.968 2.055a.75.75 0 0 0-1.06-.092l-6.5 5.5a.75.75 0 0 0 .592 1.287h2.75v5.5h-2.75a.75.75 0 0 0-.592 1.287l6.5 5.5a.75.75 0 0 0 1.06-.092l6.5-5.5a.75.75 0 0 0-.592-1.287h-2.75v-5.5h2.75a.75.75 0 0 0 .592-1.287l-6.5-5.5Z"/></svg><span class="nav-label">Shorts</span></div>
         <div class="nav-item upload-plus" onclick="showPage('uploadPage')"><div class="nav-icon upload-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg></div></div>
         <div id="navChat" class="nav-item" onclick="showPage('chatPage')"><svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M4.848 2.771A49.144 49.144 0 0 1 12 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 0 1-14.304 0c-1.978-.292-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.678 3.348-3.97ZM6.75 8.25a.75.75 0 0 1 .75-.75h9a.75.75 0 0 1 0 1.5h-9a.75.75 0 0 1-.75-.75Zm.75 2.25a.75.75 0 0 0 0 1.5H12a.75.75 0 0 0 0-1.5H7.5Z" clip-rule="evenodd" /></svg><span class="nav-label">Chat</span></div>
         <div id="navProfile" class="nav-item" onclick="handleProfileClick()"><svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653ZM5.855 16.52a7.486 7.486 0 0 1 5.855-2.812c1.585 0 3.065.392 4.392 1.07a6.241 6.241 0 0 0-10.247 0ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" /></svg><span class="nav-label">Profile</span></div>
     </nav>
-    
+
+    <div id="infoOverlay" class="overlay">
+         <div class="overlay-content-wrapper">
+            <span class="close-button" onclick="hideOverlay('infoOverlay')">×</span>
+            <div class="overlay-inner-container">
+                <div class="language-block">
+                    <h3>Information for Your Safety (English)</h3>
+                    <p>Shubhzone collects details like your name, ID, and photos for identity verification. This is crucial to ensure user safety, prevent fake profiles, and maintain accountability. The registered user is responsible for all content shared from their account. Your data is stored securely.</p>
+                </div>
+                <div class="language-block">
+                    <h3>आपकी सुरक्षा के लिए जानकारी (Hindi)</h3>
+                    <p>शुभज़ोन आपकी पहचान सत्यापित करने के लिए आपका नाम, आईडी और फोटो जैसे विवरण एकत्र करता है। यह उपयोगकर्ता की सुरक्षा सुनिश्चित करने, नकली प्रोफाइल को रोकने और जवाबदेही बनाए रखने के लिए महत्वपूर्ण है। पंजीकृत उपयोगकर्ता अपने खाते से साझा की गई सभी सामग्री के लिए जिम्मेदार है। आपका डेटा सुरक्षित रूप से संग्रहीत किया जाता है।</p>
+                </div>
+            </div>
+            <div class="swipe-indicator">↔️ Swipe for Language</div>
+         </div>
+    </div>
+
+
     <script>
+        // ======== Firebase Initialization ========
         const firebaseConfig = {
-            authDomain: "shubhzone-4a6b0.firebaseapp.com",
-            databaseURL: "https://shubhzone-4a6b0-default-rtdb.firebaseio.com",
-            projectId: "shubhzone-4a6b0",
-            storageBucket: "shubhzone-4a6b0.firebasestorage.app",
-            messagingSenderId: "439309269785",
-            appId: "1:439309269785:web:08a1256812648daafea388",
-            measurementId: "G-5S0VFF21SB"
+          authDomain: "shubhzone-4a6b0.firebaseapp.com",
+          databaseURL: "https://shubhzone-4a6b0-default-rtdb.firebaseio.com",
+          projectId: "shubhzone-4a6b0",
+          storageBucket: "shubhzone-4a6b0.firebasestorage.app",
+          messagingSenderId: "439309269785",
+          appId: "1:439309269785:web:08a1256812648daafea388",
+          measurementId: "G-5S0VFF21SB"
         };
         if (typeof firebase !== 'undefined') {
             try { firebase.initializeApp(firebaseConfig); } catch (e) { console.error("Firebase init failed:", e); }
-        }
+        } else { console.error("Firebase SDK not loaded."); }
 
+        // ======== App Logic ========
         let isUserApproved = false;
         const pages = document.querySelectorAll('.page');
         const navItems = document.querySelectorAll('.nav-item');
@@ -175,51 +495,46 @@
             const targetPage = document.getElementById(pageId);
             if (targetPage) {
                 targetPage.classList.add('active');
+                targetPage.scrollTop = 0;
             }
-            let activeNavItemId = 'nav' + pageId.charAt(0).toUpperCase() + pageId.slice(1).replace('Page', '');
-            const activeNavItem = document.getElementById(activeNavItemId);
-            if (activeNavItem) {
-                activeNavItem.classList.add('active');
-            } else if (pageId === 'uploadPage') {
-                document.querySelector('.upload-plus').classList.add('active');
-            }
+            let activeNavItem = null;
+            if (pageId.includes('home') || pageId.includes('history')) activeNavItem = document.getElementById('navHome');
+            else if (pageId.includes('chat') || pageId.includes('request')) activeNavItem = document.getElementById('navChat'); 
+            else if (pageId.includes('shorts')) activeNavItem = document.getElementById('navShorts');
+            else if (pageId.includes('upload')) activeNavItem = document.querySelector('.upload-plus');
+            else if (pageId.includes('infoSubmission') || pageId.includes('userDashboard')) activeNavItem = document.getElementById('navProfile');
+            if(activeNavItem) activeNavItem.classList.add('active');
         }
 
-        function populateHomeContent() {
+        // --- Content Population ---
+        async function populateHomeContent() {
             const sliderWrapper = document.querySelector('#homePage .slider-wrapper');
-            if(sliderWrapper){
-                sliderWrapper.innerHTML = '';
-                for (let i = 1; i <= 5; i++) {
-                    sliderWrapper.innerHTML += `<div class="slider-card" style="background-image: url('https://picsum.photos/seed/slider${i}/800/450')"></div>`;
-                }
-            }
-            fetchAndDisplayVideos();
-        }
-
-        async function fetchAndDisplayVideos() {
             const videoGrid = document.getElementById('homeVideoGrid');
-            if (!videoGrid) return;
-            videoGrid.innerHTML = '<p style="color: var(--secondary-text); grid-column: 1 / -1;">Loading videos...</p>';
-            const bunnyPullZoneUrl = 'https://shubhzone-cdn.b-cdn.net';
+            if (!sliderWrapper || !videoGrid) return;
+
+            sliderWrapper.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                sliderWrapper.innerHTML += `<div class="slider-card" style="background-image: url('https://picsum.photos/seed/slider${i}/800/450')"></div>`;
+            }
+            setInterval(() => {
+                let currentSlide = Math.floor(Math.random() * 5);
+                sliderWrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+            }, 4000);
             
             try {
                 const response = await fetch('/api/videos');
                 const videos = await response.json();
                 
                 videoGrid.innerHTML = ''; 
+
                 if (videos.length === 0) {
-                    videoGrid.innerHTML = '<p style="color: var(--secondary-text); grid-column: 1 / -1;">No videos have been uploaded yet.</p>';
+                    videoGrid.innerHTML = '<p style="color: var(--secondary-text); grid-column: 1 / -1;">No videos have been uploaded yet. Be the first!</p>';
                 } else {
                     videos.forEach(video => {
-                        const thumbnailContent = video.thumbnail_key
-                            ? `<img src="${bunnyPullZoneUrl}/${video.thumbnail_key}" alt="${video.title}" onerror="this.style.display='none'; this.parentElement.querySelector('svg').style.display='block';">
-                               <svg style="display:none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.647c1.295.746 1.295 2.54 0 3.286L7.279 20.99c-1.25.717-2.779-.217-2.779-1.643V5.653Z" /></svg>`
-                            : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.647c1.295.746 1.295 2.54 0 3.286L7.279 20.99c-1.25.717-2.779-.217-2.779-1.643V5.653Z" /></svg>`;
-
                         const videoCardHTML = `
-                            <div class="video-card" onclick="playVideo('${video.video_key}')">
-                                <div class="video-thumbnail-container">
-                                    ${thumbnailContent}
+                            <div class="video-card" onclick="playVideo('${video.wasabi_key}')">
+                                <div class="video-thumbnail-placeholder">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.647c1.295.746 1.295 2.54 0 3.286L7.279 20.99c-1.25.717-2.779-.217-2.779-1.643V5.653Z" /></svg>
                                 </div>
                                 <div class="video-card-info"><p>${video.title}</p></div>
                             </div>`;
@@ -227,121 +542,175 @@
                     });
                 }
             } catch (error) {
-                videoGrid.innerHTML = '<p style="color: var(--reject-red); grid-column: 1 / -1;">Error: Could not load videos.</p>';
+                console.error("Failed to fetch videos:", error);
+                videoGrid.innerHTML = '<p style="color: var(--reject-red); grid-column: 1 / -1;">Error: Could not load videos from the server.</p>';
             }
         }
         
         async function playVideo(videoKey) {
+            const statusElement = document.getElementById('homeVideoGrid');
+            statusElement.insertAdjacentHTML('beforebegin', '<p id="loading-message" style="color: var(--primary-text); text-align: center; margin-bottom: 15px;">Getting secure link, please wait...</p>');
+
             try {
                 const response = await fetch(`/api/videos/${videoKey}/play`);
                 const data = await response.json();
+                
+                document.getElementById('loading-message')?.remove();
+
                 if (data.success) {
                     window.open(data.url, '_blank');
                 } else {
-                    alert('Error: Could not get video link.');
+                    alert('Error: Could not get video link. ' + data.message);
                 }
             } catch (error) {
-                alert('An error occurred while trying to play the video.');
+                document.getElementById('loading-message')?.remove();
+                console.error('Error in playVideo:', error);
+                alert('A client-side error occurred.');
             }
         }
 
-        function updateFileLabel(inputId, uploaderId) {
-            const fileInput = document.getElementById(inputId);
-            const uploaderP = document.querySelector(`#${uploaderId} p`);
+        // --- Upload Page Logic ---
+        const videoTypeSelector = document.getElementById('videoTypeSelector');
+        const thumbnailUploader = document.getElementById('thumbnailUploader');
+        if (videoTypeSelector && thumbnailUploader) {
+             videoTypeSelector.addEventListener('change', (event) => {
+                 thumbnailUploader.className = 'thumbnail-uploader ' + (event.target.value === 'landscape' ? 'landscape' : 'portrait');
+             });
+        }
+
+        function updateVideoFileLabel() {
+            const fileInput = document.getElementById('videoFileInput');
+            const uploaderP = document.querySelector('#thumbnailUploader p');
             if (fileInput.files.length > 0) {
                 uploaderP.textContent = fileInput.files[0].name;
+            } else {
+                uploaderP.textContent = 'Tap to select a video file';
             }
         }
         
         async function uploadVideo() {
             const uploadButton = document.getElementById('uploadSubmitButton');
-            const videoInput = document.getElementById('videoFileInput');
-            const thumbnailInput = document.getElementById('thumbnailInput');
-            const progressContainer = document.getElementById('progressContainer');
+            const fileInput = document.getElementById('videoFileInput');
+            const file = fileInput.files[0];
             
-            const videoFile = videoInput.files[0];
-            const thumbnailFile = thumbnailInput.files[0];
             const title = document.getElementById('videoTitle').value;
+            const description = document.getElementById('description').value;
+            const tags = document.getElementById('tags').value;
+            const videoType = document.querySelector('input[name="videoType"]:checked').value;
 
-            if (!videoFile || !title) {
+            if (!file || !title) {
                 alert('Please select a video file and enter a title.');
                 return;
             }
 
-            uploadButton.disabled = true;
-            progressContainer.style.display = 'block';
+            uploadButton.textContent = 'Preparing...';
+            uploadButton.style.pointerEvents = 'none';
 
             try {
-                const videoKey = await uploadFileWithProgress(videoFile, 'video');
-                let thumbnailKey = null;
-                if (thumbnailFile) {
-                    thumbnailKey = await uploadFileWithProgress(thumbnailFile, 'thumbnail');
+                const urlResponse = await fetch(`/api/generate-upload-url?fileName=${encodeURIComponent(file.name)}`);
+                const urlData = await urlResponse.json();
+
+                if (!urlData.success) {
+                    throw new Error('Could not get a secure upload URL from the server.');
+                }
+
+                const { uploadUrl, key } = urlData;
+
+                uploadButton.textContent = 'Uploading...';
+                
+                const uploadResponse = await fetch(uploadUrl, {
+                    method: 'PUT',
+                    body: file,
+                    headers: {
+                        'Content-Type': file.type
+                    }
+                });
+                
+                if (!uploadResponse.ok) {
+                    throw new Error('The file could not be uploaded to the storage service.');
                 }
                 
-                const progressText = document.getElementById('progressText');
-                progressText.textContent = 'Saving details...';
+                uploadButton.textContent = 'Saving details...';
 
-                const saveResponse = await fetch('/api/save-video-details', {
+                const saveDetailsResponse = await fetch('/api/save-video-details', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        title: title,
-                        description: document.getElementById('description').value,
-                        tags: document.getElementById('tags').value,
-                        video_key: videoKey,
-                        thumbnail_key: thumbnailKey
+                        title,
+                        description,
+                        tags,
+                        videoType,
+                        wasabi_key: key
                     })
                 });
-                if (!saveResponse.ok) { throw new Error('Failed to save video details.'); }
-                
+
+                const saveDetailsData = await saveDetailsResponse.json();
+
+                if (!saveDetailsData.success) {
+                    throw new Error('The video details could not be saved to the database.');
+                }
+
                 alert('Upload successful!');
                 showPage('homePage');
                 populateHomeContent();
+
             } catch (error) {
+                console.error('Error during direct upload process:', error);
                 alert(`An error occurred: ${error.message}`);
             } finally {
-                uploadButton.disabled = false;
-                progressContainer.style.display = 'none';
-                document.getElementById('uploadPage').querySelector('form')? document.getElementById('uploadPage').querySelector('form').reset() : null;
+                uploadButton.textContent = '✅ Upload Video';
+                uploadButton.style.pointerEvents = 'auto';
+                fileInput.value = '';
+                updateVideoFileLabel();
+            }
+        }
+
+
+        // --- Overlay Logic ---
+        function showOverlay(overlayId) { document.getElementById(overlayId).style.display = 'flex'; }
+        function hideOverlay(overlayId) { document.getElementById(overlayId).style.display = 'none'; }
+
+        // --- Profile Workflow Logic ---
+        function handleProfileClick() {
+            showPage(isUserApproved ? 'userDashboardPage' : 'infoSubmissionPage');
+        }
+
+        function submitForApproval() {
+            alert('Information submitted for approval! You will be redirected.');
+            isUserApproved = true;
+            populateUserVideos();
+            showPage('userDashboardPage');
+        }
+        
+        function populateUserVideos() {
+            const grid = document.getElementById('userVideoGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            for(let i = 1; i <= 8; i++) {
+                grid.innerHTML += `
+                    <div class="video-card">
+                        <div class="video-thumbnail-placeholder">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.647c1.295.746 1.295 2.54 0 3.286L7.279 20.99c-1.25.717-2.779-.217-2.779-1.643V5.653Z" /></svg>
+                        </div>
+                        <div class="video-card-info"><p>My Uploaded Video ${i}</p></div>
+                        <div class="menu-dots" onclick="showVideoOptions()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.5 6a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0ZM10.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0ZM12 19.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" clip-rule="evenodd" /></svg></div>
+                    </div>`;
             }
         }
         
-        function uploadFileWithProgress(file, type) {
-            return new Promise(async (resolve, reject) => {
-                const progressText = document.getElementById('progressText');
-                const progressBar = document.getElementById('progressBar');
-                try {
-                    progressText.textContent = `Getting ${type} upload link...`;
-                    progressBar.style.width = '0%';
-                    const urlResponse = await fetch(`/api/generate-upload-url?fileName=${encodeURIComponent(file.name)}`);
-                    const urlData = await urlResponse.json();
-                    if (!urlData.success) { return reject(new Error(`Could not get ${type} upload URL.`)); }
-                    
-                    const { uploadUrl, key } = urlData;
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('PUT', uploadUrl, true);
-                    xhr.upload.onprogress = (event) => {
-                        if (event.lengthComputable) {
-                            const percentComplete = Math.round((event.loaded / event.total) * 100);
-                            progressBar.style.width = percentComplete + '%';
-                            progressText.textContent = `Uploading ${type}... ${percentComplete}%`;
-                        }
-                    };
-                    xhr.onload = () => {
-                        if (xhr.status >= 200 && xhr.status < 300) { resolve(key); }
-                        else { reject(new Error(`${type} upload failed.`)); }
-                    };
-                    xhr.onerror = () => { reject(new Error(`Network error during ${type} upload.`)); };
-                    xhr.setRequestHeader('Content-Type', file.type);
-                    xhr.send(file);
-                } catch (error) {
-                    reject(error);
-                }
-            });
+        function showVideoOptions() {
+            alert('Options:\n- Edit Video Details\n- Delete Video');
         }
-        
-        function handleProfileClick() { /* ... */ }
 
+        function logoutUser() {
+            if (confirm('Are you sure you want to log out?')) {
+                isUserApproved = false;
+                alert('You have been logged out.');
+                showPage('homePage');
+            }
+        }
+
+        // --- Initial Page Load ---
         document.addEventListener('DOMContentLoaded', () => {
             populateHomeContent();
             showPage('homePage');
