@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -7,8 +8,12 @@
     <title>Shubhzone</title>
 
     <!-- ======== Firebase SDK CDN Scripts ======== -->
+    <!-- Note: Firebase is included as requested, but requires proper configuration and backend integration to be fully functional -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-analytics-compat.js"></script>
+    <!-- Add storage for upload -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+
 
     <style>
         /* --- Global Styles & Theme --- */
@@ -36,12 +41,19 @@
             color: var(--primary-text);
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
+            /* Hide system scrollbars */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* Internet Explorer 10+ */
         }
+        body::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
 
         .page {
             padding: 20px 15px 80px 15px;
             display: none;
-            min-height: calc(100vh - 65px);
+            min-height: calc(100vh - 65px); /* Account for bottom nav height */
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -68,10 +80,12 @@
             cursor: pointer;
             text-align: center;
             box-shadow: 0 4px 10px rgba(255, 75, 43, 0.4);
+            transition: opacity 0.3s ease;
         }
         
-        .button:disabled {
-            background: var(--secondary-text);
+        .button:disabled, .submit-button:disabled {
+            background: #555; /* Darker grey when disabled */
+            opacity: 0.6;
             cursor: not-allowed;
             box-shadow: none;
         }
@@ -87,7 +101,7 @@
         .slider-wrapper {
             display: flex;
             transition: transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
-            touch-action: pan-y;
+            touch-action: pan-y; /* Allow vertical scroll on page, disable horizontal for slider */
         }
 
         .slider-card {
@@ -95,6 +109,7 @@
             aspect-ratio: 16 / 9;
             background-size: cover;
             background-position: center;
+            background-color: var(--placeholder-bg); /* Placeholder */
         }
 
         .search-bar {
@@ -115,6 +130,7 @@
             color: var(--primary-text);
             font-size: 16px;
             margin: 0 10px;
+            padding: 5px 0; /* Add padding for better touch area */
         }
         
         .search-bar input::placeholder {
@@ -141,6 +157,8 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             position: relative;
             cursor: pointer;
+            display: flex; /* Use flex for vertical layout */
+            flex-direction: column;
         }
         
         .video-thumbnail-container {
@@ -150,6 +168,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-shrink: 0; /* Prevent shrinking in flex */
         }
         .video-thumbnail-container img {
             width: 100%;
@@ -166,6 +185,10 @@
 
         .video-card-info {
             padding: 8px;
+            flex-grow: 1; /* Allow info to take available space */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Vertically center text if short */
         }
 
         .video-card-info p {
@@ -173,6 +196,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            color: var(--primary-text); /* Ensure title is primary color */
         }
 
         /* --- Bottom Navigation Footer --- */
@@ -205,14 +229,17 @@
         }
 
         .nav-item.active .nav-icon {
+             /* Apply gradient for icon color */
             background: var(--accent-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
         }
         
         .nav-item.upload-plus {
             position: relative;
-            top: -15px;
+            top: -15px; /* Lift the plus button */
         }
 
         .nav-icon {
@@ -230,8 +257,14 @@
             justify-content: center;
             align-items: center;
             box-shadow: 0 0 15px rgba(255, 75, 43, 0.5);
+             /* Inner plus icon color */
+            fill: white;
         }
-        
+         .nav-icon.upload-icon svg {
+             fill: white;
+         }
+
+
         .nav-label {
             font-size: 10px;
             margin-top: 2px;
@@ -261,7 +294,19 @@
             padding: 12px;
             color: var(--primary-text);
             font-size: 16px;
+             /* Remove default outline */
+            outline: none;
+             /* Smooth focus transition */
+            transition: border-color 0.3s ease;
         }
+         .form-group input[type="text"]:focus,
+         .form-group input[type="number"]:focus,
+         .form-group input[type="email"]:focus,
+         .form-group input[type="tel"]:focus,
+         .form-group textarea:focus {
+             border-color: #ff4b2b; /* Accent color on focus */
+         }
+
 
         .form-group textarea {
             resize: vertical;
@@ -270,7 +315,7 @@
         
         .progress-bar-container {
             width: 100%;
-            background-color: var(--card-bg);
+            background-color: #444; /* Darker background for container */
             border-radius: 5px;
             overflow: hidden;
             margin-top: 10px;
@@ -281,12 +326,14 @@
             height: 10px;
             background: var(--accent-gradient);
             transition: width 0.3s ease;
+             /* Smooth transition for color change? No, just width */
         }
         #progressText {
             text-align: center;
             font-size: 12px;
             color: var(--secondary-text);
             margin-top: 5px;
+            margin-bottom: 10px; /* Add space below text */
         }
 
         /* --- Upload Page --- */
@@ -295,50 +342,68 @@
         }
 
         .toggle-switch { display: flex; justify-content: space-between; align-items: center; }
-        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; flex-shrink: 0; /* Prevent switch from shrinking */ }
         .switch input { display: none; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: .4s; border-radius: 28px; }
         .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background: var(--accent-gradient); }
         input:checked + .slider:before { transform: translateX(22px); }
+        /* Add text next to toggle switch */
+        .toggle-switch label:first-child { margin-right: 10px; flex-grow: 1; }
 
-        .radio-group label { margin-right: 15px; color: var(--primary-text); }
-        .radio-group input[type="radio"] { margin-right: 5px; }
-        
-        .thumbnail-uploader { border: 2px dashed #444; border-radius: 10px; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 20px; color: var(--secondary-text); cursor: pointer; transition: aspect-ratio 0.3s ease; background-color: var(--placeholder-bg); }
+
+        .radio-group { display: flex; align-items: center; flex-wrap: wrap; /* Allow wrapping on small screens */ }
+        .radio-group label { margin-right: 15px; color: var(--primary-text); font-size: 1rem; /* Match input font size */ margin-bottom: 5px; /* Space out items if they wrap */ }
+         .radio-group input[type="radio"] { margin-right: 5px; margin-bottom: 5px; /* Space out items if they wrap */ accent-color: #ff4b2b; /* Accent color for radio buttons */ }
+
+        .thumbnail-uploader { border: 2px dashed #444; border-radius: 10px; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 20px; color: var(--secondary-text); cursor: pointer; transition: aspect-ratio 0.3s ease, border-color 0.3s ease; background-color: var(--placeholder-bg); text-align: center; }
+         .thumbnail-uploader:hover { border-color: var(--secondary-text); } /* Visual feedback on hover */
         .thumbnail-uploader.landscape { aspect-ratio: 16 / 9; }
         .thumbnail-uploader.portrait { aspect-ratio: 9 / 16; }
         .thumbnail-uploader svg { margin-bottom: 10px; fill: var(--secondary-text); }
+         .thumbnail-uploader p { margin-top: 0; font-size: 0.9em; word-break: break-word; /* Prevent long filenames from overflowing */ }
+
 
         /* --- History Page --- */
-        .history-list .video-card { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; padding: 10px; background-color: var(--card-bg); border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
-        .history-list .video-thumbnail-container { width: 120px; flex-shrink: 0; border-radius: 5px; }
+        .history-list .video-card { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; padding: 10px; background-color: var(--card-bg); border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); cursor: pointer; /* Make whole card clickable */ }
+        .history-list .video-thumbnail-container { width: 120px; flex-shrink: 0; border-radius: 5px; overflow: hidden; /* Ensure border-radius is applied */ }
+         .history-list .video-thumbnail-container img { border-radius: 5px; } /* Apply radius to image too */
+        .history-list .video-card-info { flex-direction: column; align-items: flex-start; } /* Align text to the left */
         .history-list .video-card-info p { font-size: 16px; font-weight: bold; margin-bottom: 5px; white-space: normal; overflow: visible; text-overflow: unset; }
-        .history-list .video-card-info small { font-size: 12px; }
+        .history-list .video-card-info small { font-size: 12px; color: var(--secondary-text); }
 
-        /* --- Shorts Page --- */
-        #shortsPage { padding: 0; height: calc(100vh - 65px); overflow-y: scroll; scroll-snap-type: y mandatory; }
-        .short-video-item { height: 100%; width: 100%; scroll-snap-align: start; position: relative; background-color: black; background-size: cover; background-position: center; display: flex; align-items: flex-end; justify-content: center; padding: 20px; }
-        .short-video-item p { color: white; text-shadow: 1px 1px 3px black; font-size: 1.1em; }
+        /* --- Chat/Request Pages --- */
+        #chatPage .top-bar { display: flex; justify-content: center; gap: 20px; padding: 10px 0; margin-bottom: 20px; border-bottom: 1px solid #333; } /* Center buttons */
+        #chatPage .top-bar .button { background: var(--accent-gradient); color: white; padding: 8px 15px; border-radius: 20px; font-size: 14px; cursor: pointer; font-weight: bold; min-width: 100px; text-align: center; flex-grow: 0; /* Prevent stretching */ }
+        #chatPage .top-bar .button.skip { background: none; border: 1px solid var(--secondary-text); color: var(--secondary-text); font-weight: normal; }
+        #requestPage .request-list .request-item { display: flex; align-items: center; justify-content: space-between; background-color: var(--card-bg); padding: 15px; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+        #requestPage .request-list .request-item .user-info { flex-grow: 1; margin-right: 10px; }
+        #requestPage .request-list .request-item .user-info p { font-weight: bold; }
+        #requestPage .request-list .request-item .actions { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+        #requestPage .request-list .request-item .actions .action-button { width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; color: white; font-size: 1.1em; transition: background-color 0.3s ease; } /* Make buttons slightly bigger */
+        #requestPage .request-list .request-item .actions .accept { background-color: var(--accept-green); }
+         #requestPage .request-list .request-item .actions .accept:active { background-color: #388E3C; } /* Darken on press */
+        #requestPage .request-list .request-item .actions .reject { background-color: var(--reject-red); }
+         #requestPage .request-list .request-item .actions .reject:active { background-color: #D32F2F; } /* Darken on press */
 
 
         /* ======== PROFILE/DASHBOARD PAGES ======== */
         #infoSubmissionPage .info-button { background: var(--accent-gradient); color: white; padding: 8px 15px; border-radius: 20px; font-size: 14px; cursor: pointer; font-weight: bold; display: inline-block; margin-bottom: 20px; }
-        #infoSubmissionPage .file-upload-button { background-color: var(--card-bg); border: 1px solid #444; border-radius: 8px; padding: 12px; text-align: center; cursor: pointer; }
-        #infoSubmissionPage .file-upload-button:hover { background-color: #333; }
+        #infoSubmissionPage .file-upload-button { background-color: var(--card-bg); border: 1px solid #444; border-radius: 8px; padding: 12px; text-align: center; cursor: pointer; color: var(--secondary-text); /* Default color */ transition: background-color 0.3s ease, border-color 0.3s ease; }
+        #infoSubmissionPage .file-upload-button:hover { background-color: #333; border-color: var(--secondary-text); }
         #infoSubmissionPage .submit-button { margin-top: 30px; }
 
         #userDashboardPage { padding: 0 0 80px 0; }
         .dashboard-header { display: flex; align-items: center; gap: 15px; padding: 15px; background-color: var(--card-bg); border-bottom: 1px solid #333; }
-        .dashboard-header .profile-pic { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background-color: var(--placeholder-bg); }
-        .dashboard-header .user-details { flex-grow: 1; }
-        .dashboard-header .user-details h3 { margin: 0; font-size: 1.2em; }
-        .dashboard-header .user-details p { font-size: 0.9em; color: var(--secondary-text); margin-top: 2px; }
-        .dashboard-header .logout-button { background: none; border: none; color: var(--secondary-text); cursor: pointer; }
-        .dashboard-header .logout-button svg { width: 28px; height: 28px; }
+        .dashboard-header .profile-pic { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background-color: var(--placeholder-bg); flex-shrink: 0; /* Prevent image from shrinking */ }
+        .dashboard-header .user-details { flex-grow: 1; overflow: hidden; /* Hide overflow text */ }
+        .dashboard-header .user-details h3 { margin: 0; font-size: 1.2em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .dashboard-header .user-details p { font-size: 0.9em; color: var(--secondary-text); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .dashboard-header .logout-button { background: none; border: none; color: var(--secondary-text); cursor: pointer; padding: 5px; /* Add padding for easier tap */ flex-shrink: 0; /* Prevent button from shrinking */ }
+        .dashboard-header .logout-button svg { width: 28px; height: 28px; fill: var(--secondary-text); /* Ensure icon color */ }
 
-        .content-tabs { display: flex; justify-content: space-around; padding: 15px 0; border-bottom: 1px solid #333; }
-        .content-tabs .tab-button { background: none; border: none; color: var(--secondary-text); font-size: 1em; font-weight: bold; cursor: pointer; padding: 5px 10px; }
+        .content-tabs { display: flex; justify-content: space-around; padding: 15px 0; border-bottom: 1px solid #333; background-color: var(--card-bg); /* Match header background */ }
+        .content-tabs .tab-button { background: none; border: none; color: var(--secondary-text); font-size: 1em; font-weight: bold; cursor: pointer; padding: 5px 10px; transition: color 0.3s ease, border-bottom-color 0.3s ease; }
         .content-tabs .tab-button.active { color: var(--primary-text); border-bottom: 2px solid var(--primary-text); }
 
         .user-content-area {
@@ -352,61 +417,308 @@
             margin-top: 0;
         }
 
-        .video-card .menu-dots { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; border-radius: 50%; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .video-card .menu-dots { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; border-radius: 50%; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 5; /* Above thumbnail */ }
         .video-card .menu-dots svg { width: 20px; height: 20px; fill: white; }
 
         /* --- Information Overlay --- */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 150; display: none; padding: 10px; }
-        .overlay-content-wrapper { width: 100%; max-width: 500px; background-color: var(--card-bg); border-radius: 15px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); overflow: hidden; position: relative; touch-action: pan-y; cursor: grab; }
+        .overlay-content-wrapper { width: 100%; max-width: 500px; background-color: var(--card-bg); border-radius: 15px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); overflow: hidden; position: relative; touch-action: pan-y; cursor: grab; /* Indicate swipe */ }
         .overlay-inner-container { display: flex; width: 200%; transition: transform 0.3s ease-out; }
-        .language-block { width: 50%; padding: 25px; color: var(--primary-text); text-align: center; overflow-y: auto; max-height: calc(100vh - 180px); -webkit-overflow-scrolling: touch; }
-        .language-block h3 { margin-top: 0; margin-bottom: 15px; font-size: 1.4em; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .language-block { width: 50%; padding: 25px; color: var(--primary-text); text-align: center; overflow-y: auto; max-height: calc(100vh - 180px); -webkit-overflow-scrolling: touch; /* Enable smooth scrolling within the block */ }
+        .language-block h3 { margin-top: 0; margin-bottom: 15px; font-size: 1.4em; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-fill-color: transparent; }
         .language-block p { margin-bottom: 15px; line-height: 1.6; font-size: 1em; color: var(--secondary-text); text-align: left; word-wrap: break-word; }
         .overlay-content-wrapper .close-button { position: absolute; top: 10px; right: 10px; font-size: 24px; color: var(--secondary-text); cursor: pointer; z-index: 10; background-color: rgba(30, 30, 30, 0.7); border-radius: 50%; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; }
         .swipe-indicator { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; color: rgba(255, 255, 255, 0.7); font-size: 13px; z-index: 10; pointer-events: none; }
         .swipe-indicator::before { content: '↔️'; margin-right: 5px; }
-        
-        /* --- Chat/Request Pages --- */
-        #chatPage .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; margin-bottom: 20px; border-bottom: 1px solid #333; }
-        #chatPage .top-bar .button { background: var(--accent-gradient); color: white; padding: 8px 15px; border-radius: 20px; font-size: 14px; cursor: pointer; font-weight: bold; min-width: 80px; text-align: center; }
-        #chatPage .top-bar .button.skip { background: none; border: 1px solid var(--secondary-text); color: var(--secondary-text); font-weight: normal; }
-        #requestPage .request-list .request-item { display: flex; align-items: center; justify-content: space-between; background-color: var(--card-bg); padding: 15px; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
-        #requestPage .request-list .request-item .user-info { flex-grow: 1; margin-right: 10px; }
-        #requestPage .request-list .request-item .user-info p { font-weight: bold; }
-        #requestPage .request-list .request-item .actions { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
-        #requestPage .request-list .request-item .actions .action-button { width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; color: white; font-size: 1.1em; }
-        #requestPage .request-list .request-item .actions .accept { background-color: var(--accept-green); }
-        #requestPage .request-list .request-item .actions .reject { background-color: var(--reject-red); }
+         /* Add smooth scrolling for overlay content */
+         .language-block { scrollbar-width: thin; scrollbar-color: #888 #555; }
+         .language-block::-webkit-scrollbar { width: 8px; }
+         .language-block::-webkit-scrollbar-track { background: #555; border-radius: 10px; }
+         .language-block::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+         .language-block::-webkit-scrollbar-thumb:hover { background: #bbb; }
 
-        /* ======== IN-APP VIDEO PLAYER ======== */
+        /* ======== IN-APP VIDEO PLAYER OVERLAY ======== */
         #videoPlayerOverlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #000;
+            background-color: #000; /* Black background */
             z-index: 200;
-            display: none;
+            display: none; /* Hidden by default */
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            overflow: hidden; /* Hide overflow from scaling/gestures */
         }
         #videoPlayerOverlay video {
             width: 100%;
-            max-width: 100%;
-            max-height: 100%;
+            height: 100%; /* Take full container size */
+            object-fit: contain; /* Contain video within bounds */
+            position: absolute; /* Position video within overlay */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+             /* Disable default controls */
+            /* display: none; */ /* Hide until controls are ready or manual controls are preferred */
         }
-        .close-player-button {
+
+        /* Player Controls and Overlay */
+        .player-controls-overlay {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 30px;
+            top: 0;
+left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent black */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            opacity: 1;
+            transition: opacity 0.3s ease-in-out;
+             z-index: 10; /* Below UI elements, above video */
+             pointer-events: none; /* Allow clicks to pass through unless controls are active */
+        }
+        .player-controls-overlay.active {
+             opacity: 1;
+             pointer-events: auto; /* Enable interaction when active */
+        }
+         .player-controls-overlay:not(.active) .player-ui-element {
+             opacity: 0;
+             transition: opacity 0.2s ease-in-out; /* Faster fade out */
+         }
+         .player-controls-overlay.active .player-ui-element {
+             opacity: 1;
+             transition: opacity 0.2s ease-in-out; /* Faster fade in */
+         }
+
+        .player-ui-element {
+             z-index: 20; /* Ensure UI elements are above the semi-transparent overlay */
+        }
+
+        .player-top-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 12px;
+            padding: 0 10px;
+        }
+         .player-top-bar-left { display: flex; align-items: center; gap: 8px; } /* Time, Battery etc. */
+
+
+        .player-middle-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+        }
+        .player-middle-controls button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 40px; /* Large size for main controls */
+            cursor: pointer;
+            padding: 10px;
+        }
+         .player-middle-controls svg { width: 40px; height: 40px; fill: white; }
+
+
+        .player-bottom-bar {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            padding: 0 10px;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+             margin-bottom: 5px;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--accent-gradient);
+            border-radius: 4px;
+        }
+         /* Seek thumbnail preview placeholder */
+         .seek-thumbnail {
+             position: absolute;
+             bottom: 12px; /* Above progress bar */
+             left: 0;
+             width: 100px; /* Adjust size as needed */
+             height: 60px; /* Adjust aspect ratio */
+             background-color: rgba(0,0,0,0.8);
+             border-radius: 5px;
+             overflow: hidden;
+             display: none; /* Hide by default */
+             pointer-events: none; /* Don't interfere with progress bar clicks */
+             transform: translateX(-50%); /* Center thumbnail above thumb */
+             box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+         }
+         .seek-thumbnail img {
+             width: 100%;
+             height: 100%;
+             object-fit: cover;
+         }
+         .progress-thumb {
+             position: absolute;
+             top: -4px; /* Vertically center thumb */
+             width: 16px;
+             height: 16px;
+             background-color: white;
+             border-radius: 50%;
+             cursor: pointer;
+             transform: translateX(-50%);
+             pointer-events: auto; /* Allow dragging */
+             box-shadow: 0 0 5px rgba(0,0,0,0.5);
+         }
+
+
+        .time-display {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            color: white;
+            font-size: 12px;
+             margin-bottom: 10px;
+        }
+
+        .player-action-buttons {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end; /* Align to the right */
+            align-items: center;
+            gap: 15px;
+            padding-top: 5px; /* Space above buttons */
+        }
+        .player-action-buttons button {
             background: none;
             border: none;
             color: white;
             cursor: pointer;
+            padding: 8px;
+            font-size: 16px; /* Match other UI text size */
         }
+         .player-action-buttons svg { width: 24px; height: 24px; fill: white; }
+
+
+        .player-splash {
+             position: absolute;
+             top: 0; left: 0; right: 0; bottom: 0;
+             background-color: #000;
+             display: flex;
+             justify-content: center;
+             align-items: center;
+             z-index: 30; /* Above everything else initially */
+             color: white;
+             font-size: 3em;
+             font-weight: bold;
+             opacity: 1;
+             transition: opacity 0.5s ease-out 1.5s; /* Fade out after a delay */
+        }
+         .player-splash.hidden { opacity: 0; pointer-events: none; }
+
+
+        .player-buffering {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 40; /* Above splash/controls */
+            display: none; /* Hidden by default */
+             width: 50px; height: 50px;
+             border: 5px solid rgba(255, 255, 255, 0.3);
+             border-top-color: white;
+             border-radius: 50%;
+             animation: spin 0.8s linear infinite;
+        }
+         .player-buffering.active { display: block; }
+         @keyframes spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+
+
+        .player-gesture-hud {
+             position: absolute;
+             top: 50%;
+             left: 50%;
+             transform: translate(-50%, -50%);
+             z-index: 50; /* Topmost layer */
+             background-color: rgba(0, 0, 0, 0.6);
+             color: white;
+             padding: 10px 20px;
+             border-radius: 10px;
+             display: flex;
+             align-items: center;
+             gap: 10px;
+             opacity: 0;
+             transition: opacity 0.2s ease-in-out;
+             pointer-events: none; /* Don't interfere with anything */
+        }
+         .player-gesture-hud.active { opacity: 1; }
+         .player-gesture-hud svg { width: 30px; height: 30px; fill: white; }
+
+
+         .player-skip-animation {
+             position: absolute;
+             top: 50%;
+             left: 50%;
+             transform: translate(-50%, -50%);
+             z-index: 50; /* Topmost layer */
+             color: white;
+             font-size: 3em;
+             opacity: 0;
+             transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+             pointer-events: none;
+         }
+          .player-skip-animation.active { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+
+
+         .player-lock-button {
+             position: absolute;
+             top: 50%;
+             left: 10px; /* Position on the side */
+             transform: translateY(-50%);
+             z-index: 60; /* Above everything else */
+             background-color: rgba(0,0,0,0.5);
+             border-radius: 50%;
+             width: 40px; height: 40px;
+             display: flex; justify-content: center; align-items: center;
+             cursor: pointer;
+             opacity: 1;
+             transition: opacity 0.3s ease-in-out;
+         }
+          .player-lock-button svg { width: 24px; height: 24px; fill: white; }
+          .player-lock-button.hidden { opacity: 0; pointer-events: none; } /* Hide when controls hide */
+          .player-lock-button.locked { background-color: rgba(255, 75, 43, 0.7); } /* Accent color when locked */
+
+
+         /* Hide default video controls */
+         video::-webkit-media-controls { display: none !important; }
+         video::-webkit-media-controls-enclosure { display: none !important; }
+         video::-moz-progress-bar { display: none !important; } /* Firefox */
+         video::-ms-fill-lower { display: none !important; } /* IE */
+         video::-ms-fill-upper { display: none !important; } /* IE */
+
+
+         /* Styles for player elements when lock is active */
+         .player-controls-overlay.locked {
+             opacity: 0 !important; /* Hide controls completely */
+             pointer-events: none !important; /* Disable all interaction */
+         }
+          #videoPlayerOverlay.locked video {
+              pointer-events: none; /* Disable video interaction like double-tap */
+          }
+
 
     </style>
 </head>
@@ -427,8 +739,10 @@
     </div>
 
     <div id="shortsPage" class="page">
+         <!-- Static placeholders for Shorts - dynamic loading needed for full feature -->
          <div class="short-video-item" style="background-image: url('https://picsum.photos/seed/short1/540/960')"><p>This is the first short video!</p></div>
          <div class="short-video-item" style="background-image: url('https://picsum.photos/seed/short2/540/960')"><p>Scrolling works like Reels!</p></div>
+          <div class="short-video-item" style="background-image: url('https://picsum.photos/seed/short3/540/960')"><p>More shorts coming soon!</p></div>
     </div>
 
     <div id="uploadPage" class="page">
@@ -436,12 +750,16 @@
         <div class="form-group"><label for="videoTitle">Video Title</label><input type="text" id="videoTitle" placeholder="Enter a catchy title"></div>
         <div class="form-group"><label for="description">Description</label><textarea id="description" placeholder="Tell viewers about your video"></textarea></div>
         <div class="form-group"><label for="tags">Tags</label><input type="text" id="tags" placeholder="e.g., tech, comedy, music"></div>
-        <div class="form-group toggle-switch"><label>Comments</label><label class="switch"><input type="checkbox" id="commentsEnabled" checked><span class="slider"></span></label></div>
+        
+         <!-- Improved UI for toggle and radio groups -->
+        <div class="form-group toggle-switch"><label for="commentsEnabled">Comments Enabled</label><label class="switch"><input type="checkbox" id="commentsEnabled" checked><span class="slider"></span></label></div>
+
         <div class="form-group"><label>Age Restriction</label><div class="radio-group"><input type="radio" id="ageAll" name="age" value="all" checked> <label for="ageAll">All Audiences</label><input type="radio" id="age18" name="age" value="18+"> <label for="age18">18+</label></div></div>
+        
         <div class="form-group"><label>Video Type</label><div class="radio-group" id="videoTypeSelector"><input type="radio" id="typeLong" name="videoType" value="landscape" checked> <label for="typeLong">Long Video (16:9)</label><input type="radio" id="typeShort" name="videoType" value="portrait"> <label for="typeShort">Shorts (9:16)</label></div></div>
         
         <div class="form-group">
-            <label>Video File</label>
+            <label for="videoFileInput">Video File</label>
             <div class="thumbnail-uploader landscape" id="videoUploader" onclick="document.getElementById('videoFileInput').click()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16"><path d="M4.502 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-1.998 2zM14 2H4a1 1 0 0 0-1 1v9l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094l1.777 1.947V3a1 1 0 0 0-1-1z"/></svg>
                 <p>Tap to select a video file</p>
@@ -450,7 +768,7 @@
         </div>
 
         <div class="form-group">
-            <label>Thumbnail Image (16:9)</label>
+            <label for="thumbnailInput">Thumbnail Image (16:9 for Long, 9:16 for Shorts)</label>
             <div class="thumbnail-uploader landscape" id="thumbnailUploader" onclick="document.getElementById('thumbnailInput').click()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16"><path d="M4.502 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-1.998 2zM14 2H4a1 1 0 0 0-1 1v9l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094l1.777 1.947V3a1 1 0 0 0-1-1z"/></svg>
                 <p>Tap to select a thumbnail</p>
@@ -458,28 +776,33 @@
             <input type="file" id="thumbnailInput" style="display: none;" accept="image/*" onchange="updateFileLabel('thumbnailInput', 'thumbnailUploader')">
         </div>
         
-        <div id="uploadSubmitButton" class="button upload-button" onclick="uploadVideo()">✅ Upload Video</div>
+        <button id="uploadSubmitButton" class="submit-button upload-button" onclick="uploadVideo()">✅ Upload Video</button>
         
         <div class="progress-bar-container" id="progressContainer">
             <div id="progressBar"></div>
-            <p id="progressText">0%</p>
+            <p id="progressText">Waiting for upload...</p>
         </div>
     </div>
     
     <div id="historyPage" class="page">
         <h2>Watch History</h2>
-        <div class="history-list" id="historyList"></div>
+        <div class="history-list" id="historyList">
+             <!-- Placeholder for history items -->
+             <p style="color: var(--secondary-text); text-align: center;">History items will appear here.</p>
+        </div>
     </div>
 
     <div id="chatPage" class="page">
         <div class="top-bar"><div class="button" onclick="showPage('requestPage')">Request</div><div class="button skip" onclick="showPage('homePage')">Skip</div></div>
         <p style="text-align: center; margin-top: 50px; color: var(--secondary-text);">Tap 'Request' to see new chat requests.</p>
+         <!-- Chat UI placeholder -->
     </div>
     <div id="requestPage" class="page">
         <h2>Chat Requests</h2>
         <div class="request-list">
             <div class="request-item"><div class="user-info"><p>User 123</p></div><div class="actions"><div class="action-button accept" onclick="alert('Request Accepted!')">✅</div><div class="action-button reject" onclick="alert('Request Rejected!')">❌</div></div></div>
             <div class="request-item"><div class="user-info"><p>User 456</p></div><div class="actions"><div class="action-button accept" onclick="alert('Request Accepted!')">✅</div><div class="action-button reject" onclick="alert('Request Rejected!')">❌</div></div></div>
+             <!-- More requests would be dynamically added here -->
         </div>
     </div>
     
@@ -490,9 +813,9 @@
         <div class="form-group"><label for="fullName">Full Name</label><input type="text" id="fullName" placeholder="आपका पूरा नाम"></div>
         <div class="form-group"><label for="email">Email Address</label><input type="email" id="email" placeholder="आपका ईमेल पता"></div>
         <div class="form-group"><label for="phone">Phone Number</label><input type="tel" id="phone" placeholder="आपका फ़ोन नंबर"></div>
-        <div class="form-group"><label for="userPhotos">Upload Your Photos (min 2)</label><div class="file-upload-button" onclick="alert('File picker would open here')">Select Photos</div></div>
-        <div class="form-group"><label for="userDocs">Upload Documents (Aadhaar, etc)</label><div class="file-upload-button" onclick="alert('File picker would open here')">Select Documents</div></div>
-        <div class="submit-button" onclick="submitForApproval()">Submit for Approval</div>
+        <div class="form-group"><label for="userPhotosInput">Upload Your Photos (min 2)</label><div class="file-upload-button" onclick="document.getElementById('userPhotosInput').click()">Select Photos</div><input type="file" id="userPhotosInput" multiple style="display: none;" accept="image/*"></div>
+        <div class="form-group"><label for="userDocsInput">Upload Documents (Aadhaar, etc)</label><div class="file-upload-button" onclick="document.getElementById('userDocsInput').click()">Select Documents</div><input type="file" id="userDocsInput" multiple style="display: none;" accept="image/*,.pdf"></div>
+        <button class="submit-button" onclick="submitForApproval()">Submit for Approval</button>
     </div>
 
     <div id="userDashboardPage" class="page">
@@ -514,7 +837,10 @@
             <div class="upload-button-container">
                 <button class="button" onclick="showPage('uploadPage')">➕ Upload New Video</button>
             </div>
-            <div class="video-grid" id="userVideoGrid"></div>
+            <div class="video-grid" id="userVideoGrid">
+                 <!-- Placeholder for user's uploaded videos -->
+                 <p style="color: var(--secondary-text); grid-column: 1 / -1; text-align: center;">Your uploaded videos will appear here.</p>
+            </div>
         </div>
     </div>
 
@@ -543,15 +869,116 @@
          </div>
     </div>
 
+    <!-- ======== NEW IN-APP VIDEO PLAYER OVERLAY ======== -->
     <div id="videoPlayerOverlay">
-        <button class="close-player-button" onclick="closePlayer()">×</button>
-        <video id="mainVideoPlayer" controls></video>
+        <!-- Video element -->
+        <video id="mainVideoPlayer" playsinline webkit-playsinline>
+             <!-- Source will be added by JS -->
+        </video>
+
+        <!-- Player UI Splash (Shubhzone logo fade in) -->
+        <div class="player-splash">Shubhzone</div>
+
+        <!-- Buffering Indicator -->
+        <div class="player-buffering" id="playerBuffering"></div>
+
+        <!-- Controls Overlay (Tap to show/hide) -->
+        <div class="player-controls-overlay" id="playerControlsOverlay">
+
+            <!-- Top Bar (Time, Battery, Status) -->
+            <div class="player-top-bar player-ui-element">
+                 <div class="player-top-bar-left">
+                    <span id="currentTimeDisplayTop">0:00</span>
+                    <!-- Battery icon placeholder -->
+                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M9.5 0a1 1 0 0 1 1 1v1H15a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H0a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h4.5V1a1 1 0 0 1 1-1h3z"/></svg>
+                 </div>
+                 <!-- Status icon placeholder -->
+                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M14.854 4.146a.5.5 0 0 1 0 .708l-7.5 7.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L7 11.293l7.146-7.147a.5.5 0 0 1 .708 0z"/></svg>
+            </div>
+
+            <!-- Pause Screen Elements (Shown when paused and controls are active) -->
+            <div class="player-pause-screen player-ui-element" style="display: none; text-align: center;">
+                 <p style="font-size: 1.5em; margin-bottom: 10px; color: white; text-shadow: 0 0 5px black;">Shubhzone</p>
+                 <p id="videoTitleDisplay" style="font-size: 1.1em; color: rgba(255,255,255,0.8); text-shadow: 0 0 5px black;"></p>
+            </div>
+
+
+            <!-- Middle Controls (Play/Pause) -->
+            <div class="player-middle-controls player-ui-element">
+                <!-- Placeholder for Previous button -->
+                <button id="playerPrevBtn" style="display: none;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 0 0-1.03-.094l-9.75 7.5a.75.75 0 0 0 0 1.144l9.75 7.5a.75.75 0 0 0 1.03-.094 8.25 8.25 0 1 1 0-12.215ZM8.25 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Z" clip-rule="evenodd" /></svg></button>
+
+                <button id="playerPlayPauseBtn" onclick="togglePlayPause()">
+                     <!-- Play icon -->
+                    <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.647c1.295.746 1.295 2.54 0 3.286L7.279 20.99c-1.25.717-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" /></svg>
+                     <!-- Pause icon (hidden by default) -->
+                    <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" style="display: none;" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M6.75 5.25a.75.75 0 0 1 .75-.75H9a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H7.5a.75.75 0 0 1-.75-.75V5.25Zm7.5 0A.75.75 0 0 1 15 4.5h1.5a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H15a.75.75 0 0 1-.75-.75V5.25Z" clip-rule="evenodd" /></svg>
+                </button>
+                
+                <!-- Placeholder for Next button -->
+                <button id="playerNextBtn" style="display: none;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M11.485 2.17a.75.75 0 0 1 1.03 0l9.75 7.5a.75.75 0 0 1 0 1.144l-9.75 7.5a.75.75 0 0 1-1.03-.094L2.25 10.5a.75.75 0 0 1 0-1.144l9.75-7.5ZM15 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" clip-rule="evenodd" /></svg></button>
+
+            </div>
+
+            <!-- Bottom Bar (Progress Bar, Time, Actions) -->
+            <div class="player-bottom-bar player-ui-element">
+                <div class="progress-container" id="progressContainerPlayer">
+                    <div class="progress-bar" id="progressBarPlayer"></div>
+                     <!-- Seek thumbnail placeholder -->
+                     <div class="seek-thumbnail"><img src="" alt="Seek thumbnail"></div>
+                     <!-- Progress thumb -->
+                     <div class="progress-thumb" id="progressThumb"></div>
+                </div>
+                <div class="time-display">
+                    <span id="elapsedTime">0:00</span>
+                    <span id="remainingTime">-0:00</span>
+                </div>
+                <div class="player-action-buttons">
+                     <!-- Quality Button -->
+                    <button title="Quality"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3H6ZM12 8.25a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1-.75-.75Z" /></svg></button>
+                     <!-- Speed Button -->
+                    <button title="Playback Speed"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M.375 9a.75.75 0 0 0 0 1.5h15.75a.75.75 0 0 0 0-1.5H.375ZM3 12.75a.75.75 0 0 0 0 1.5h12.75a.75.75 0 0 0 0-1.5H3ZM7.5 16.5a.75.75 0 0 0 0 1.5h5.25a.75.75 0 0 0 0-1.5h-5.25Z" /></svg></button>
+                     <!-- Subtitle Button -->
+                    <button title="Subtitles"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 3.751c0-1.036.84-1.875 1.875-1.875h15A1.875 1.875 0 0 1 23.25 3.75v15a1.875 1.875 0 0 1-1.875 1.875h-15A1.875 1.875 0 0 1 4.5 18.75v-15ZM6.375 7.5a.75.75 0 0 0-.75.75v2.25c0 .414.336.75.75.75h2.25a.75.75 0 0 0 .75-.75v-2.25a.75.75 0 0 0-.75-.75H6.375ZM6 14.25a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75v-.75ZM10.5 7.5a.75.75 0 0 0-.75.75v2.25c0 .414.336.75.75.75h2.25a.75.75 0 0 0 .75-.75v-2.25a.75.75 0 0 0-.75-.75H10.5ZM10.5 14.25a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75v-.75ZM15 7.5a.75.75 0 0 0-.75.75v2.25c0 .414.336.75.75.75h2.25a.75.75 0 0 0 .75-.75v-2.25a.75.75 0 0 0-.75-.75H15ZM15 14.25a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75v-.75Z" /></svg></button>
+                     <!-- PiP Button -->
+                    <button title="Picture-in-Picture"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M8.25 4.5a.75.75 0 0 1 .75-.75h9a.75.75 0 0 1 .75.75v9a.75.75 0 0 1-.75.75h-9a.75.75 0 0 1-.75-.75v-9ZM6 6a1.5 1.5 0 0 0-1.5 1.5v10.5c0 .828.672 1.5 1.5 1.5h10.5a1.5 1.5 0 0 0 1.5-1.5V18H17.25a.75.75 0 0 1-.75-.75V15a.75.75 0 0 1 .75-.75H21v-2.25a.75.75 0 0 0-.75-.75H18V9a.75.75 0 0 0-.75-.75H15V6h-9Z" clip-rule="evenodd" /></svg></button>
+                     <!-- Fullscreen Button -->
+                    <button title="Fullscreen"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M13.5 6A.75.75 0 0 1 14.25 5v1.5a.75.75 0 0 1-1.5 0V5a.75.75 0 0 1 .75-.75Zm0 12a.75.75 0 0 1 .75-.75v1.5a.75.75 0 0 1-1.5 0V18a.75.75 0 0 1 .75-.75ZM4.5 6A.75.75 0 0 1 5.25 5v1.5a.75.75 0 0 1-1.5 0V5a.75.75 0 0 1 .75-.75Zm0 12a.75.75 0 0 1 .75-.75v1.5a.75.75 0 0 1-1.5 0V18a.75.75 0 0 1 .75-.75ZM10.5 6A.75.75 0 0 1 11.25 5v1.5a.75.75 0 0 1-1.5 0V5a.75.75 0 0 1 .75-.75Zm0 12a.75.75 0 0 1 .75-.75v1.5a.75.75 0 0 1-1.5 0V18a.75.75 0 0 1 .75-.75ZM18 6A.75.75 0 0 1 18.75 5v1.5a.75.75 0 0 1-1.5 0V5a.75.75 0 0 1 .75-.75Zm0 12a.75.75 0 0 1 .75-.75v1.5a.75.75 0 0 1-1.5 0V18a.75.75 0 0 1 .75-.75ZM20.25 3a.75.75 0 0 0-.75.75v1.5a.75.75 0 0 0 1.5 0V3.75a.75.75 0 0 0-.75-.75ZM3.75 3a.75.75 0 0 0-.75.75v1.5a.75.75 0 0 0 1.5 0V3.75a.75.75 0 0 0-.75-.75ZM20.25 21a.75.75 0 0 0-.75-.75v1.5a.75.75 0 0 0 1.5 0V20.25a.75.75 0 0 0-.75-.75ZM3.75 21a.75.75 0 0 0-.75-.75v1.5a.75.75 0 0 0 1.5 0V20.25a.75.75 0 0 0-.75-.75ZM15 3a.75.75 0 0 0-.75.75v1.5a.75.75 0 0 0 1.5 0V3.75a.75.75 0 0 0-.75-.75ZM9 3a.75.75 0 0 0-.75.75v1.5a.75.75 0 0 0 1.5 0V3.75a.75.75 0 0 0-.75-.75ZM15 21a.75.75 0 0 0-.75-.75v1.5a.75.75 0 0 0 1.5 0V20.25a.75.75 0 0 0-.75-.75ZM9 21a.75.75 0 0 0-.75-.75v1.5a.75.75 0 0 0 1.5 0V20.25a.75.75 0 0 0-.75-.75Z" clip-rule="evenodd" /></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Close Player Button (Always visible unless locked) -->
+        <button class="close-player-button player-ui-element" onclick="closePlayer()">×</button>
+
+        <!-- Lock Button -->
+        <div class="player-lock-button" id="playerLockButton" onclick="togglePlayerLock()">
+             <!-- Lock icon -->
+             <svg id="lockIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z" clip-rule="evenodd" /></svg>
+              <!-- Unlock icon (hidden by default) -->
+             <svg id="unlockIcon" xmlns="http://www.w3.org/2000/svg" style="display: none;" viewBox="0 0 24 24" fill="currentColor"><path d="M18.75 12.75v3.375c0 1.036-.84 1.875-1.875 1.875h-1.5a2.625 2.625 0 0 1-2.625-2.625v-1.5a.75.75 0 0 0-.75-.75H8.625a.75.75 0 0 0-.75.75v1.5c0 .978-.348 1.903-.961 2.638A4.493 4.493 0 0 0 10.5 21a4.5 4.5 0 0 0 4.5-4.5v-3.375a.75.75 0 0 1 1.5 0ZM12 2.25a5.25 5.25 0 0 0-5.25 5.25v3a.75.75 0 0 0 1.5 0V7.5a3.75 3.75 0 1 1 7.5 0v3a.75.75 0 0 0 1.5 0v-3c0-2.9-2.35-5.25-5.25-5.25Z" /></svg>
+        </div>
+
+        <!-- Gesture HUDs (Volume, Brightness) -->
+         <div class="player-gesture-hud" id="volumeHud">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 4.05c0-1.39-.823-2.187-2.094-2.274C10.64 1.76 10 2.303 10 3v1.243c0 .816-.394 1.576-1.05 2.043L4.848 9.24A2.25 2.25 0 0 0 3 11.25v1.5c0 .885.9 1.403 1.658.954l4.142-2.503a2.25 2.25 0 0 1 2.05-1.35h1.694c.612 0 1.14.402 1.33.988.38.19-.02.9-.14 1.116-.22.4-.745 1.05-.745 1.05s.944-.177 1.302-.383c.42-.24.72-.933.603-1.312.447-.24.947-.3 1.5-.1.43.15.655.66.655 1.131v2.57c0 1.125 1 1.75 1.5 1.75.24 0 .49-.04.74-.11.61-.17.99-.79.99-1.49v-3.44c0-1.125-1-1.75-1.5-1.75a1.75 1.75 0 0 0-1.75 1.75v2.57a.75.75 0 0 0 .75.75c.24 0 .39-.13.45-.26.1-.2.06-.4-.24-.55-.47-.25-.7-.63-.7-1.14V9.5a.75.75 0 0 0-.75-.75h-1.694c-.27 0-.53-.09-.74-.25a.75.75 0 0 0-.25-.5c-.1-.09-.2-.14-.4-.14a.75.75 0 0 0-.4.14c-.1.09-.2.14-.25.26-.21.15-.46.24-.74.24H5.158c-.17 0-.34-.03-.5-.1-.42-.17-.65-.59-.65-1.09v-1.5c0-.15.04-.3.1-.43a.75.75 0 0 0 .27-.32.75.75 0 0 0 .2-.53V5.03c0-.6.44-.97.99-1.13a.75.75 0 0 0 .51-.14c.11-.08.2-.18.26-.3a.75.75 0 0 0 .12-.54V3c0-.22.22-.44.47-.47.2-.02.35-.03.5-.03.71 0 1.39.47 1.53 1.15A.75.75 0 0 0 12 4.05h1.5Z" /></svg>
+              <span id="volumeLevel">50%</span>
+         </div>
+         <div class="player-gesture-hud" id="brightnessHud">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.94 6.598a.75.75 0 0 0-1.06-1.06l-1.59 1.59V7.5a.75.75 0 0 0 .75.75h1.352a.75.75 0 0 0 .53-.22ZM5.06 6.598a.75.75 0 0 0-1.06 1.06l1.59 1.59V7.5a.75.75 0 0 1 .75-.75h1.352a.75.75 0 0 1 .53.22Zm1.59 12.197a.75.75 0 0 0 1.06 1.06l1.59-1.59V16.5a.75.75 0 0 0-.75-.75H7.598a.75.75 0 0 0-.53.22ZM17.34 17.197a.75.75 0 0 0 1.06 1.06l1.59-1.59V16.5a.75.75 0 0 0-.75-.75h-1.352a.75.75 0 0 0-.53.22ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-5.25 3a.75.75 0 0 0-.75.75v2.25a.75.75 0 0 0 1.5 0V18a.75.75 0 0 0-.75-.75ZM18 18.75a.75.75 0 0 0-.75-.75H16.5a.75.75 0 0 0-.75.75v2.25a.75.75 0 0 0 1.5 0V18.75ZM12 18.75a.75.75 0 0 0-.75-.75h-1.5a.75.75 0 0 0-.75.75v2.25a.75.75 0 0 0 1.5 0V18.75h.75v2.25a.75.75 0 0 0 1.5 0V18.75h-.75Z" clip-rule="evenodd" /></svg>
+              <span id="brightnessLevel">50%</span>
+         </div>
+
+        <!-- Skip Animation Text -->
+         <div class="player-skip-animation" id="skipAnimationText"></div>
+
     </div>
 
 
     <script>
         // ======== Firebase Initialization ========
         const firebaseConfig = {
+          apiKey: "YOUR_API_KEY", // Replace with your actual API Key
           authDomain: "shubhzone-4a6b0.firebaseapp.com",
           databaseURL: "https://shubhzone-4a6b0-default-rtdb.firebaseio.com",
           projectId: "shubhzone-4a6b0",
@@ -560,12 +987,28 @@
           appId: "1:439309269785:web:08a1256812648daafea388",
           measurementId: "G-5S0VFF21SB"
         };
+        let firebaseApp;
+        let firebaseStorage;
         if (typeof firebase !== 'undefined') {
-            try { firebase.initializeApp(firebaseConfig); } catch (e) { console.error("Firebase init failed:", e); }
+            try {
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+                // Check if analytics and storage modules are available
+                 if (firebase.analytics) {
+                     firebase.analytics(); // Initialize analytics
+                 } else {
+                     console.warn("Firebase Analytics SDK not available.");
+                 }
+                 if (firebase.storage) {
+                     firebaseStorage = firebase.storage(); // Initialize storage
+                     console.log("Firebase Storage initialized.");
+                 } else {
+                     console.error("Firebase Storage SDK not available.");
+                 }
+            } catch (e) { console.error("Firebase init failed:", e); }
         } else { console.error("Firebase SDK not loaded."); }
 
         // ======== App Logic ========
-        let isUserApproved = false;
+        let isUserApproved = false; // Placeholder for user approval status
         const pages = document.querySelectorAll('.page');
         const navItems = document.querySelectorAll('.nav-item');
 
@@ -578,26 +1021,88 @@
                 targetPage.scrollTop = 0;
             }
             let activeNavItem = null;
-            if (pageId.includes('home') || pageId.includes('history')) activeNavItem = document.getElementById('navHome');
-            else if (pageId.includes('chat') || pageId.includes('request')) activeNavItem = document.getElementById('navChat'); 
+            if (pageId.includes('home')) activeNavItem = document.getElementById('navHome');
             else if (pageId.includes('shorts')) activeNavItem = document.getElementById('navShorts');
             else if (pageId.includes('upload')) activeNavItem = document.querySelector('.upload-plus');
-            else if (pageId.includes('infoSubmission') || pageId.includes('userDashboard')) activeNavItem = document.getElementById('navProfile');
+            else if (pageId.includes('chat') || pageId.includes('request')) activeNavItem = document.getElementById('navChat');
+            else if (pageId.includes('infoSubmission') || pageId.includes('userDashboard') || pageId.includes('history')) {
+                 // History page uses the home icon as per original code/logic
+                if (pageId.includes('history')) activeNavItem = document.getElementById('navHome');
+                else activeNavItem = document.getElementById('navProfile');
+            }
+             // Fallback for pages not explicitly tied to a single nav item if needed
+             if (!activeNavItem) {
+                 // For pages like requestPage, highlight Chat icon
+                 if (pageId === 'requestPage') { activeNavItem = document.getElementById('navChat'); }
+                 // Add other specific page-to-nav mappings if necessary
+             }
+
+
             if(activeNavItem) activeNavItem.classList.add('active');
+
+             // Ensure correct thumbnail uploader aspect ratio on upload page
+             if (pageId === 'uploadPage') {
+                 updateThumbnailUploaderAspectRatio();
+                 document.querySelectorAll('input[name="videoType"]').forEach(radio => {
+                     radio.addEventListener('change', updateThumbnailUploaderAspectRatio);
+                 });
+             } else {
+                 document.querySelectorAll('input[name="videoType"]').forEach(radio => {
+                      radio.removeEventListener('change', updateThumbnailUploaderAspectRatio);
+                 });
+             }
         }
+
+         function updateThumbnailUploaderAspectRatio() {
+             const thumbnailUploader = document.getElementById('thumbnailUploader');
+             const selectedType = document.querySelector('input[name="videoType"]:checked').value;
+             thumbnailUploader.classList.remove('landscape', 'portrait');
+             thumbnailUploader.classList.add(selectedType);
+         }
+
 
         // --- Content Population ---
         function populateHomeContent() {
             const sliderWrapper = document.querySelector('#homePage .slider-wrapper');
             if (sliderWrapper) {
                 sliderWrapper.innerHTML = '';
-                for (let i = 1; i <= 5; i++) {
-                    sliderWrapper.innerHTML += `<div class="slider-card" style="background-image: url('https://picsum.photos/seed/slider${i}/800/450')"></div>`;
-                }
-                setInterval(() => {
-                    let currentSlide = Math.floor(Math.random() * 5);
-                    sliderWrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
-                }, 4000);
+                // Use diverse random images for better visual representation
+                const sliderImages = [
+                    'https://picsum.photos/seed/shz_slider1/800/450',
+                    'https://picsum.photos/seed/shz_slider2/800/450',
+                    'https://picsum.photos/seed/shz_slider3/800/450',
+                    'https://picsum.photos/seed/shz_slider4/800/450',
+                    'https://picsum.photos/seed/shz_slider5/800/450'
+                ];
+                sliderImages.forEach(imgUrl => {
+                     sliderWrapper.innerHTML += `<div class="slider-card" style="background-image: url('${imgUrl}')"></div>`;
+                });
+
+                let currentSlideIndex = 0;
+                const totalSlides = sliderImages.length;
+                const moveSlider = () => {
+                    currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
+                    sliderWrapper.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
+                };
+
+                // Auto-slide every 4 seconds
+                setInterval(moveSlider, 4000);
+
+                 // Add swipe support for the slider (basic)
+                 let startX;
+                 sliderWrapper.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; });
+                 sliderWrapper.addEventListener('touchmove', (e) => { /* Prevent vertical scroll interference if needed */ });
+                 sliderWrapper.addEventListener('touchend', (e) => {
+                     const endX = e.changedTouches[0].clientX;
+                     const deltaX = endX - startX;
+                     if (deltaX > 50) { // Swipe right (previous)
+                         currentSlideIndex = (currentSlideIndex - 1 + totalSlides) % totalSlides;
+                     } else if (deltaX < -50) { // Swipe left (next)
+                         currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
+                     }
+                      sliderWrapper.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
+                 });
+
             }
             fetchAndDisplayVideos();
         }
@@ -606,82 +1111,652 @@
             const videoGrid = document.getElementById('homeVideoGrid');
             if (!videoGrid) return;
 
-            videoGrid.innerHTML = '<p style="color: var(--secondary-text); grid-column: 1 / -1;">Loading videos...</p>';
-            const bunnyPullZoneUrl = 'https://shubhzone-cdn.b-cdn.net';
-            
-            try {
-                const response = await fetch('/api/videos');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const videos = await response.json();
-                
-                videoGrid.innerHTML = ''; 
+            videoGrid.innerHTML = '<p style="color: var(--secondary-text); grid-column: 1 / -1; text-align: center;">Loading videos...</p>';
+            // Use a placeholder/mock CDN URL if BunnyCDN isn't configured
+            const bunnyPullZoneUrl = 'https://cdn.bunny.net/shubhzone'; // Example/Placeholder URL
 
-                if (videos.length === 0) {
-                    videoGrid.innerHTML = '<p style="color: var(--secondary-text); grid-column: 1 / -1;">No videos have been uploaded yet.</p>';
+            // Mock API endpoint - replace with your actual backend API call
+            const mockApiUrl = '/api/videos'; // This should point to your server
+
+            try {
+                // Note: Fetching directly from a static mock or requiring a backend
+                // is necessary here. A simple file won't list directory contents.
+                // This assumes a backend serves the list of videos.
+                 const response = await fetch(mockApiUrl);
+                // Using mock data for demonstration if API fails or not available
+                const videos = [
+                     { id: 'mock1', title: 'Sample Long Video 1', video_key: 'mock/video1.mp4', thumbnail_key: 'mock/thumb1.jpg', video_type: 'landscape' },
+                     { id: 'mock2', title: 'Sample Long Video 2', video_key: 'mock/video2.mp4', thumbnail_key: 'mock/thumb2.jpg', video_type: 'landscape' },
+                     { id: 'mock3', title: 'Sample Long Video 3 (No Thumb)', video_key: 'mock/video3.mp4', thumbnail_key: null, video_type: 'landscape' },
+                     { id: 'mock4', title: 'Another Sample Video', video_key: 'mock/video4.mp4', thumbnail_key: 'mock/thumb4.jpg', video_type: 'landscape' },
+                     { id: 'mock5', title: 'Sample Short 1', video_key: 'mock/short1.mp4', thumbnail_key: 'mock/short_thumb1.jpg', video_type: 'portrait' }, // Example short, though homepage is for long
+                ];
+                 // Filter for long videos on the home page
+                 const longVideos = videos.filter(video => video.video_type === 'landscape');
+
+
+                videoGrid.innerHTML = ''; // Clear loading message
+
+                 if (longVideos.length === 0) {
+                    videoGrid.innerHTML = '<p style="color: var(--secondary-text); grid-column: 1 / -1; text-align: center;">No long videos available yet.</p>';
                 } else {
-                    videos.forEach(video => {
-                        const thumbnailContent = video.thumbnail_key
-                            ? `<img src="${bunnyPullZoneUrl}/${video.thumbnail_key}" alt="${video.title}" onerror="this.onerror=null;this.src='https://via.placeholder.com/400x225.png/1e1e1e/ffffff?text=No+Thumb';">`
+                    longVideos.forEach(video => {
+                        // Construct thumbnail URL based on key and pull zone URL
+                        const thumbnailUrl = video.thumbnail_key ? `${bunnyPullZoneUrl}/${video.thumbnail_key}` : null;
+
+                        const thumbnailContent = thumbnailUrl
+                            ? `<img src="${thumbnailUrl}" alt="${video.title}" onerror="this.onerror=null;this.src='https://via.placeholder.com/400x225.png/1e1e1e/ffffff?text=No+Thumb';">` // Fallback placeholder
                             : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.647c1.295.746 1.295 2.54 0 3.286L7.279 20.99c-1.25.717-2.779-.217-2.779-1.643V5.653Z" /></svg>`;
 
                         const videoCardHTML = `
-                            <div class="video-card" onclick="playVideo('${video.video_key}')">
+                            <div class="video-card" data-video-key="${video.video_key}" data-video-title="${video.title}">
                                 <div class="video-thumbnail-container">
                                     ${thumbnailContent}
                                 </div>
-                                <div class="video-card-info"><p>${video.title}</p></div>
+                                <div class="video-card-info">
+                                    <p>${video.title}</p>
+                                    <!-- Add more info if available, e.g., views, uploader -->
+                                </div>
                             </div>`;
                         videoGrid.innerHTML += videoCardHTML;
                     });
+
+                     // Add click listener to video cards
+                     document.querySelectorAll('#homeVideoGrid .video-card').forEach(card => {
+                         card.addEventListener('click', function() {
+                             const videoKey = this.dataset.videoKey;
+                             const videoTitle = this.dataset.videoTitle;
+                             playVideo(videoKey, videoTitle);
+                         });
+                     });
                 }
             } catch (error) {
                 console.error("Failed to fetch videos:", error);
-                videoGrid.innerHTML = '<p style="color: var(--reject-red); grid-column: 1 / -1;">Error: Could not load videos.</p>';
+                videoGrid.innerHTML = '<p style="color: var(--reject-red); grid-column: 1 / -1; text-align: center;">Error: Could not load videos.</p>';
             }
         }
         
         // --- Video Player Logic ---
-        async function playVideo(videoKey) {
-            const playerOverlay = document.getElementById('videoPlayerOverlay');
-            const videoPlayer = document.getElementById('mainVideoPlayer');
-            
+         const videoPlayer = document.getElementById('mainVideoPlayer');
+         const playerOverlay = document.getElementById('videoPlayerOverlay');
+         const playerControlsOverlay = document.getElementById('playerControlsOverlay');
+         const playerPlayPauseBtn = document.getElementById('playerPlayPauseBtn');
+         const playIcon = document.getElementById('playIcon');
+         const pauseIcon = document.getElementById('pauseIcon');
+         const playerBuffering = document.getElementById('playerBuffering');
+         const progressContainerPlayer = document.getElementById('progressContainerPlayer');
+         const progressBarPlayer = document.getElementById('progressBarPlayer');
+         const progressThumb = document.getElementById('progressThumb');
+         const elapsedTimeDisplay = document.getElementById('elapsedTime');
+         const remainingTimeDisplay = document.getElementById('remainingTime');
+         const videoTitleDisplay = document.getElementById('videoTitleDisplay');
+         const playerSplash = document.getElementById('playerSplash'); // Note: Element ID was player-splash in HTML, fixed in JS
+         const playerLockButton = document.getElementById('playerLockButton');
+         const lockIcon = document.getElementById('lockIcon');
+         const unlockIcon = document.getElementById('unlockIcon');
+         const volumeHud = document.getElementById('volumeHud');
+         const volumeLevel = document.getElementById('volumeLevel');
+         const brightnessHud = document.getElementById('brightnessHud');
+         const brightnessLevel = document.getElementById('brightnessLevel');
+         const skipAnimationText = document.getElementById('skipAnimationText');
+
+
+         let controlsTimeout;
+         let isLocked = false;
+         let touchStartX, touchStartY;
+         let lastTapTime = 0;
+         let isSeeking = false; // Flag for progress bar seeking
+
+
+        async function playVideo(videoKey, videoTitle) {
             playerOverlay.style.display = 'flex';
-            videoPlayer.src = '';
+            videoPlayer.src = ''; // Clear previous source
+            videoTitleDisplay.textContent = videoTitle || 'Video Title';
+            resetPlayerState();
+
+            // Show splash screen initially
+             playerSplash.classList.remove('hidden');
+
 
             try {
-                const response = await fetch(`/api/videos/${videoKey}/play`);
-                const data = await response.json();
+                 // Use a mock URL for demonstration if backend API is not hooked up
+                 const videoUrl = `https://cdn.bunny.net/shubhzone/${videoKey}`; // Example/Placeholder URL
 
-                if (data.success) {
-                    videoPlayer.src = data.url;
-                    videoPlayer.play();
-                } else {
-                    alert('Error: Could not get video link.');
-                    closePlayer();
-                }
+                 // Simulate network fetch delay if not using real API
+                 await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API call delay
+
+                 // Check if URL is valid (basic check, real validation needed)
+                 if (!videoUrl) {
+                      throw new Error('Could not get video URL.');
+                 }
+
+                 videoPlayer.src = videoUrl;
+                 videoPlayer.load(); // Load the video
+                 videoPlayer.play(); // Attempt to auto-play
+
+
             } catch (error) {
                 console.error('Error in playVideo:', error);
-                alert('An error occurred while trying to play the video.');
+                alert(`An error occurred while trying to play the video: ${error.message}`);
                 closePlayer();
             }
         }
 
+         function resetPlayerState() {
+             videoPlayer.currentTime = 0;
+             progressBarPlayer.style.width = '0%';
+             elapsedTimeDisplay.textContent = '0:00';
+             remainingTimeDisplay.textContent = '-0:00';
+             playIcon.style.display = 'none'; // Hide play, show pause initially or show buffering
+             pauseIcon.style.display = 'none';
+             playerBuffering.classList.add('active'); // Show buffering
+             playerControlsOverlay.classList.remove('active', 'locked');
+             playerLockButton.classList.remove('locked', 'hidden');
+             lockIcon.style.display = 'block';
+             unlockIcon.style.display = 'none';
+             isLocked = false;
+             hideControls(); // Start with controls hidden
+             hideHud('volume');
+             hideHud('brightness');
+             hideSkipAnimation();
+             // Hide pause screen title/logo initially
+             document.querySelector('.player-pause-screen').style.display = 'none';
+         }
+
+
         function closePlayer() {
-            const playerOverlay = document.getElementById('videoPlayerOverlay');
-            const videoPlayer = document.getElementById('mainVideoPlayer');
             videoPlayer.pause();
-            videoPlayer.src = '';
+            videoPlayer.src = ''; // Clear source
             playerOverlay.style.display = 'none';
+             // Remove all gesture/control listeners if they were attached on play
+             removePlayerEventListeners();
+             clearTimeout(controlsTimeout);
         }
+
+         function togglePlayPause() {
+             if (videoPlayer.paused) {
+                 videoPlayer.play();
+             } else {
+                 videoPlayer.pause();
+             }
+         }
+
+         function updatePlayPauseButton() {
+             if (videoPlayer.paused) {
+                 playIcon.style.display = 'block';
+                 pauseIcon.style.display = 'none';
+                 // Show pause screen elements when paused
+                 document.querySelector('.player-pause-screen').style.display = 'block';
+
+             } else {
+                 playIcon.style.display = 'none';
+                 pauseIcon.style.display = 'block';
+                 // Hide pause screen elements when playing
+                 document.querySelector('.player-pause-screen').style.display = 'none';
+             }
+         }
+
+         function updateProgressBar() {
+             const percent = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+             progressBarPlayer.style.width = percent + '%';
+
+             // Update time displays
+             const formatTime = (seconds) => {
+                 if (isNaN(seconds)) return '0:00';
+                 const minutes = Math.floor(seconds / 60);
+                 const remainingSeconds = Math.floor(seconds % 60);
+                 const paddedSeconds = remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds;
+                 return `${minutes}:${paddedSeconds}`;
+             };
+
+             elapsedTimeDisplay.textContent = formatTime(videoPlayer.currentTime);
+             remainingTimeDisplay.textContent = `-${formatTime(videoPlayer.duration - videoPlayer.currentTime)}`;
+
+             // Update thumb position (basic - needs refinement for dragging)
+              if (!isSeeking) { // Only update thumb position if not being dragged
+                const thumbPosition = (percent / 100) * progressContainerPlayer.offsetWidth;
+                progressThumb.style.left = thumbPosition + 'px';
+              }
+         }
+
+         function showControls() {
+             if (isLocked) return; // Don't show if locked
+             playerControlsOverlay.classList.add('active');
+             playerLockButton.classList.remove('hidden'); // Show lock button
+             clearTimeout(controlsTimeout);
+             controlsTimeout = setTimeout(hideControls, 3000); // Hide after 3 seconds
+         }
+
+         function hideControls() {
+             if (isSeeking || isLocked) return; // Don't hide if seeking or locked
+             playerControlsOverlay.classList.remove('active');
+             playerLockButton.classList.add('hidden'); // Hide lock button
+             clearTimeout(controlsTimeout);
+         }
+
+         function togglePlayerLock() {
+             isLocked = !isLocked;
+             playerControlsOverlay.classList.toggle('locked', isLocked);
+             playerLockButton.classList.toggle('locked', isLocked);
+             lockIcon.style.display = isLocked ? 'none' : 'block';
+             unlockIcon.style.display = isLocked ? 'block' : 'none';
+             hideHud('volume'); // Hide HUDs when locking
+             hideHud('brightness');
+             hideSkipAnimation();
+
+             if (isLocked) {
+                 // Controls are hidden by CSS, clear timeout just in case
+                 clearTimeout(controlsTimeout);
+                 // Optional: Show a "Tap to unlock" hint briefly
+                 // Implement hint UI similar to gesture HUD if desired
+             } else {
+                  // Unlock: Show controls briefly
+                  showControls();
+             }
+         }
+
+
+         // --- Gesture Handling (Simplified Simulation for UI) ---
+         // Note: Full, robust gesture handling (swipe vs tap, differentiating double-tap, pinch zoom)
+         // requires careful multi-touch event processing and is complex in pure JS/single file.
+         // This provides basic event listeners and simulates the UI responses.
+
+         const playerGestureArea = playerOverlay; // Use the whole overlay for gestures
+
+         function addPlayerEventListeners() {
+             videoPlayer.addEventListener('play', handlePlay);
+             videoPlayer.addEventListener('pause', handlePause);
+             videoPlayer.addEventListener('timeupdate', updateProgressBar);
+             videoPlayer.addEventListener('progress', updateBuffering); // Or 'waiting'
+             videoPlayer.addEventListener('waiting', handleBuffering);
+             videoPlayer.addEventListener('playing', handlePlaying);
+             videoPlayer.addEventListener('loadeddata', handleLoadedData); // Video data loaded
+
+             playerGestureArea.addEventListener('click', handleTap);
+             playerGestureArea.addEventListener('touchstart', handleTouchStart, { passive: false });
+             playerGestureArea.addEventListener('touchmove', handleTouchMove, { passive: false });
+             playerGestureArea.addEventListener('touchend', handleTouchEnd);
+
+              // Progress bar seeking listeners
+              progressContainerPlayer.addEventListener('click', handleProgressClick);
+              progressThumb.addEventListener('touchstart', handleThumbTouchStart, { passive: false });
+         }
+
+         function removePlayerEventListeners() {
+             videoPlayer.removeEventListener('play', handlePlay);
+             videoPlayer.removeEventListener('pause', handlePause);
+             videoPlayer.removeEventListener('timeupdate', updateProgressBar);
+             videoPlayer.removeEventListener('progress', updateBuffering);
+             videoPlayer.removeEventListener('waiting', handleBuffering);
+             videoPlayer.removeEventListener('playing', handlePlaying);
+             videoPlayer.removeEventListener('loadeddata', handleLoadedData);
+
+             playerGestureArea.removeEventListener('click', handleTap);
+             playerGestureArea.removeEventListener('touchstart', handleTouchStart);
+             playerGestureArea.removeEventListener('touchmove', handleTouchMove);
+             playerGestureArea.removeEventListener('touchend', handleTouchEnd);
+
+              // Progress bar seeking listeners
+              progressContainerPlayer.removeEventListener('click', handleProgressClick);
+              progressThumb.removeEventListener('touchstart', handleThumbTouchStart);
+              // Need to ensure touchend/touchmove listeners *on the document* for thumb dragging are removed too
+              document.removeEventListener('touchmove', handleThumbTouchMove);
+              document.removeEventListener('touchend', handleThumbTouchEnd);
+
+         }
+
+
+         function handleLoadedData() {
+             // Video metadata loaded, duration available
+              console.log("Video loadeddata event fired.");
+             // Simulate splash fade out after a delay once video is ready
+             setTimeout(() => {
+                 playerSplash.classList.add('hidden');
+                 // Also attempt to hide buffering if it was showing prematurely
+                 if (!videoPlayer.paused && !videoPlayer.seeking && !videoPlayer.waiting) {
+                      playerBuffering.classList.remove('active');
+                 }
+                 updateProgressBar(); // Initial time update
+             }, 100); // Short delay
+         }
+
+         function handlePlay() {
+              console.log("Video playing.");
+             updatePlayPauseButton();
+             playerBuffering.classList.remove('active'); // Hide buffering on play
+             showControls(); // Show controls briefly on state change
+         }
+
+         function handlePause() {
+              console.log("Video paused.");
+             updatePlayPauseButton();
+             showControls(); // Show controls when paused
+         }
+
+         function handleBuffering() {
+              console.log("Video buffering...");
+             if (!videoPlayer.paused) { // Only show buffering if not intentionally paused
+                 playerBuffering.classList.add('active');
+             }
+         }
+
+         function handlePlaying() {
+             // This event fires after buffering ends and playback resumes
+              console.log("Video is playing again.");
+             playerBuffering.classList.remove('active');
+         }
+
+         function updateBuffering() {
+             // This event happens during download. 'waiting' is often better for actual stalls.
+             // We primarily rely on 'waiting'/'playing' events for the spinner.
+             // Could use this to update a buffer progress indicator if needed.
+              // console.log("Video progress update.");
+         }
+
+
+         // Basic tap detection (doesn't handle double-tap vs single-tap robustly here)
+         function handleTap(event) {
+             if (isLocked) {
+                 // Show unlock hint? For now, just toggle lock on *any* tap when locked
+                 togglePlayerLock();
+                 return;
+             }
+             // Prevent click event if it was part of a swipe
+             if (Math.abs(event.clientX - touchStartX) > 10 || Math.abs(event.clientY - touchStartY) > 10) {
+                  return; // Was likely a drag/swipe, ignore as a tap
+             }
+
+             const now = new Date().getTime();
+             const lastTapDiff = now - lastTapTime;
+             lastTapTime = now;
+
+             if (lastTapDiff < 300) { // Treat as double tap (adjust time threshold)
+                 // Handle double tap
+                 const tapAreaWidth = playerGestureArea.offsetWidth;
+                 const tapX = event.clientX;
+
+                 let skipSeconds = 10; // Default skip time
+                 // Add logic here to accumulate skip time on rapid double taps if needed
+                 // For simplicity, just skip 10s for now.
+
+                 if (tapX > tapAreaWidth / 2) {
+                     // Double tapped right side
+                     videoPlayer.currentTime += skipSeconds;
+                     showSkipAnimation(`+${skipSeconds}s`);
+                 } else {
+                     // Double tapped left side
+                     videoPlayer.currentTime -= skipSeconds;
+                      if (videoPlayer.currentTime < 0) videoPlayer.currentTime = 0;
+                     showSkipAnimation(`-${skipSeconds}s`);
+                 }
+                 // Prevent single tap logic from running
+                 clearTimeout(controlsTimeout); // Clear any pending hide
+                 showControls(); // Ensure controls are visible briefly after skip
+             } else {
+                 // Treat as single tap
+                 if (playerControlsOverlay.classList.contains('active')) {
+                     hideControls();
+                 } else {
+                     showControls();
+                 }
+             }
+              event.preventDefault(); // Prevent default browser behavior (like context menus on some devices)
+         }
+
+         function handleTouchStart(event) {
+              if (isLocked) return;
+             if (event.touches.length === 1) {
+                 touchStartX = event.touches[0].clientX;
+                 touchStartY = event.touches[0].clientY;
+                  // Reset seek flag
+                 isSeeking = false;
+             } else if (event.touches.length === 2) {
+                 // Handle pinch-to-zoom start (placeholder)
+                 console.log("Pinch start");
+                 // You would track initial distance between touches here
+             }
+         }
+
+         function handleTouchMove(event) {
+              if (isLocked) { event.preventDefault(); return; } // Prevent scrolling when locked
+
+             if (event.touches.length === 1) {
+                 const currentX = event.touches[0].clientX;
+                 const currentY = event.touches[0].clientY;
+                 const deltaX = currentX - touchStartX;
+                 const deltaY = currentY - touchStartY;
+
+                 // Determine if it's primarily a horizontal or vertical drag
+                 if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 20) { // Horizontal drag threshold
+                     // Horizontal drag (seeking) - Covered by progress bar interaction below
+                      // Note: Implementing seeking via general screen swipe is complex
+                      // and often conflicts with other gestures. The progress bar is standard.
+                     console.log("Horizontal drag - seeking (UI placeholder)");
+                     // To implement seeking here, you'd calculate time change based on deltaX
+                     // and update videoPlayer.currentTime.
+                     // For now, let's rely on progress bar interaction.
+
+                 } else if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 20) { // Vertical drag threshold
+                      // Vertical drag (volume/brightness)
+                      const dragThreshold = 5; // Pixels to trigger adjustment
+                      if (Math.abs(deltaY) > dragThreshold) {
+                           event.preventDefault(); // Prevent page scroll
+                           const areaWidth = playerGestureArea.offsetWidth;
+                           const dragSide = touchStartX > areaWidth / 2 ? 'right' : 'left'; // Which side started the drag
+
+                           const adjustmentFactor = 0.005; // How much to change per pixel dragged
+                           let change = -deltaY * adjustmentFactor; // Dragging down increases, up decreases
+
+                           if (dragSide === 'right') {
+                                // Volume control
+                                videoPlayer.volume = Math.max(0, Math.min(1, videoPlayer.volume + change));
+                                showHud('volume', `${Math.round(videoPlayer.volume * 100)}%`);
+                           } else {
+                                // Brightness control (simulated - browser JS cannot change actual screen brightness)
+                                // We can show a HUD, but cannot change the OS brightness.
+                                // A common workaround is adjusting an overlay filter, but that affects the *app* brightness, not system.
+                                // For this exercise, we'll just show the HUD.
+                                let currentBrightness = parseFloat(brightnessLevel.textContent) / 100;
+                                currentBrightness = Math.max(0, Math.min(1, currentBrightness + change));
+                                brightnessLevel.textContent = `${Math.round(currentBrightness * 100)}%`;
+                                showHud('brightness', null, true); // Pass true to indicate brightness HUD
+                           }
+                            // Update start position for continuous drag
+                           touchStartY = currentY;
+                            touchStartX = currentX; // Update X too just in case, though primarily vertical
+                      }
+                 }
+             } else if (event.touches.length === 2) {
+                 // Handle pinch-to-zoom move (placeholder)
+                 console.log("Pinch move");
+                 // You would calculate the new distance and scale the video element
+             }
+         }
+
+         function handleTouchEnd(event) {
+              if (isLocked) return;
+             // Hide HUDs after a short delay when touch ends
+              setTimeout(() => {
+                 hideHud('volume');
+                 hideHud('brightness');
+              }, 500); // Hide HUDs after 0.5 seconds
+         }
+
+
+         // --- HUD & Animation Helpers ---
+         let hudTimeout;
+         function showHud(type, value, isBrightness = false) {
+              let hudElement;
+              if (type === 'volume') hudElement = volumeHud;
+              else if (type === 'brightness') hudElement = brightnessHud;
+              else return;
+
+              if (value !== null && value !== undefined) {
+                  if (isBrightness) brightnessLevel.textContent = value;
+                  else volumeLevel.textContent = value;
+              }
+
+              hudElement.classList.add('active');
+              clearTimeout(hudTimeout);
+              hudTimeout = setTimeout(() => {
+                  hideHud(type);
+              }, 1000); // Hide HUD after 1 second
+         }
+
+         function hideHud(type) {
+              let hudElement;
+              if (type === 'volume') hudElement = volumeHud;
+              else if (type === 'brightness') hudElement = brightnessHud;
+              else return;
+              hudElement.classList.remove('active');
+         }
+
+         let skipTimeout;
+         function showSkipAnimation(text) {
+              skipAnimationText.textContent = text;
+              skipAnimationText.classList.add('active');
+              clearTimeout(skipTimeout);
+              skipTimeout = setTimeout(() => {
+                 hideSkipAnimation();
+              }, 500); // Hide animation after 0.5 seconds
+         }
+         function hideSkipAnimation() {
+              skipAnimationText.classList.remove('active');
+         }
+
+
+         // --- Progress Bar Seeking ---
+         let isDraggingThumb = false;
+
+         function handleProgressClick(event) {
+             // Prevent click event if dragging
+             if (isDraggingThumb) return;
+
+             const pos = event.offsetX / this.offsetWidth;
+             videoPlayer.currentTime = pos * videoPlayer.duration;
+             // Update UI immediately
+             updateProgressBar();
+             showControls(); // Show controls after seeking
+         }
+
+          function handleThumbTouchStart(event) {
+              if (isLocked) return;
+              isDraggingThumb = true;
+              // Prevent default scrolling and tap behavior
+              event.preventDefault();
+              event.stopPropagation();
+
+               // Add move and end listeners to the document to handle drags outside the thumb
+              document.addEventListener('touchmove', handleThumbTouchMove, { passive: false });
+              document.addEventListener('touchend', handleThumbTouchEnd);
+
+              // Pause video while dragging (optional, but common UX)
+              if (!videoPlayer.paused) {
+                   videoPlayer.pause();
+                   // Keep play/pause button as 'play' while seeking
+                   playIcon.style.display = 'block';
+                   pauseIcon.style.display = 'none';
+                   // Hide pause screen during scrubbing
+                   document.querySelector('.player-pause-screen').style.display = 'none';
+              }
+              showControls(); // Ensure controls stay visible while dragging
+          }
+
+          function handleThumbTouchMove(event) {
+              if (!isDraggingThumb) return;
+              event.preventDefault(); // Prevent default scrolling
+
+              const touchX = event.touches[0].clientX;
+              const progressContainerRect = progressContainerPlayer.getBoundingClientRect();
+
+              // Calculate position relative to the progress bar container
+              let newPos = touchX - progressContainerRect.left;
+              // Clamp position within container bounds
+              newPos = Math.max(0, Math.min(newPos, progressContainerRect.width));
+
+              // Update thumb position and progress bar visually
+              progressThumb.style.left = newPos + 'px';
+              const percent = (newPos / progressContainerRect.width) * 100;
+              progressBarPlayer.style.width = percent + '%';
+
+              // Calculate and update time display (optional, can update on touch end)
+              const newTime = (percent / 100) * videoPlayer.duration;
+              elapsedTimeDisplay.textContent = formatTime(newTime);
+              remainingTimeDisplay.textContent = `-${formatTime(videoPlayer.duration - newTime)}`;
+
+              // Simulate seek thumbnail preview (needs actual thumbnail generation logic)
+              // const seekThumbnail = progressContainerPlayer.querySelector('.seek-thumbnail');
+              // seekThumbnail.style.left = newPos + 'px';
+              // seekThumbnail.style.display = 'block';
+              // Update seek thumbnail image/time based on newTime (placeholder)
+              // seekThumbnail.querySelector('img').src = '...'; // Needs server-side thumbnail generation
+          }
+
+          function handleThumbTouchEnd(event) {
+              if (!isDraggingThumb) return;
+              isDraggingThumb = false;
+
+              document.removeEventListener('touchmove', handleThumbTouchMove);
+              document.removeEventListener('touchend', handleThumbTouchEnd);
+
+              const touchX = event.changedTouches[0].clientX;
+              const progressContainerRect = progressContainerPlayer.getBoundingClientRect();
+
+              // Calculate final position relative to the progress bar container
+              let finalPos = touchX - progressContainerRect.left;
+              finalPos = Math.max(0, Math.min(finalPos, progressContainerRect.width));
+
+              // Calculate final time and seek the video
+              const percent = (finalPos / progressContainerRect.width) * 100;
+              videoPlayer.currentTime = (percent / 100) * videoPlayer.duration;
+
+              // Resume video playback if it was playing before dragging (optional)
+               // if (!videoPlayer.paused) { // Check a flag saved at touchstart if it was playing
+               //     videoPlayer.play();
+               // } else {
+              // If it was paused, keep it paused but update the button state
+              updatePlayPauseButton();
+              // }
+
+              // Hide seek thumbnail preview (placeholder)
+              // progressContainerPlayer.querySelector('.seek-thumbnail').style.display = 'none';
+
+               showControls(); // Ensure controls are visible after seeking
+          }
+
+
+        // Helper function to format time (already used in updateProgressBar, defined here for clarity)
+         function formatTime(seconds) {
+             if (isNaN(seconds) || seconds < 0) return '0:00';
+             const minutes = Math.floor(seconds / 60);
+             const remainingSeconds = Math.floor(seconds % 60);
+             const paddedSeconds = remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds;
+             return `${minutes}:${paddedSeconds}`;
+         }
+
 
         // --- Upload Page Logic ---
         function updateFileLabel(inputId, uploaderId) {
             const fileInput = document.getElementById(inputId);
-            const uploaderP = document.querySelector(`#${uploaderId} p`);
+            const uploaderElement = document.getElementById(uploaderId);
+            const uploaderP = uploaderElement.querySelector('p');
+            const uploaderSvg = uploaderElement.querySelector('svg');
+
             if (fileInput.files.length > 0) {
-                uploaderP.textContent = fileInput.files[0].name;
+                const fileName = fileInput.files[0].name;
+                uploaderP.textContent = fileName;
+                 // Optional: Hide SVG when file is selected
+                 if (uploaderSvg) uploaderSvg.style.display = 'none';
+                 // Optional: Add a class to indicate file selected for styling
+                 uploaderElement.classList.add('file-selected');
+            } else {
+                if (inputId === 'videoFileInput') {
+                    uploaderP.textContent = 'Tap to select a video file';
+                } else if (inputId === 'thumbnailInput') {
+                     uploaderP.textContent = 'Tap to select a thumbnail';
+                }
+                if (uploaderSvg) uploaderSvg.style.display = 'block';
+                 uploaderElement.classList.remove('file-selected');
             }
         }
         
@@ -690,120 +1765,206 @@
             const videoInput = document.getElementById('videoFileInput');
             const thumbnailInput = document.getElementById('thumbnailInput');
             const progressContainer = document.getElementById('progressContainer');
+            const progressText = document.getElementById('progressText');
+            const progressBar = document.getElementById('progressBar');
             
             const videoFile = videoInput.files[0];
             const thumbnailFile = thumbnailInput.files[0];
-            const title = document.getElementById('videoTitle').value;
+            const title = document.getElementById('videoTitle').value.trim(); // Trim whitespace
+            const description = document.getElementById('description').value;
+            const tags = document.getElementById('tags').value;
+            const commentsEnabled = document.getElementById('commentsEnabled').checked;
+            const ageRestriction = document.querySelector('input[name="age"]:checked').value;
+            const videoType = document.querySelector('input[name="videoType"]:checked').value;
 
-            if (!videoFile || !title) {
-                alert('Please select a video file and enter a title.');
+
+            if (!videoFile) {
+                alert('Please select a video file.');
+                return;
+            }
+             if (!title) {
+                alert('Please enter a video title.');
                 return;
             }
 
+
             uploadButton.disabled = true;
             progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            progressText.textContent = 'Starting upload...';
+
 
             try {
-                const videoKey = await uploadFileWithProgress(videoFile, 'video');
-                let thumbnailKey = null;
-                if (thumbnailFile) {
-                    thumbnailKey = await uploadFileWithProgress(thumbnailFile, 'thumbnail');
-                }
-                
-                const progressText = document.getElementById('progressText');
-                progressText.textContent = 'Saving details...';
+                 // Note: This uses Firebase Storage which needs proper setup and security rules.
+                 // Replace with your actual backend API for signed URLs if not using client-side Firebase upload.
+                 if (!firebaseStorage) {
+                     throw new Error("Firebase Storage is not initialized. Check your Firebase config and SDK includes.");
+                 }
 
-                const saveResponse = await fetch('/api/save-video-details', {
+                 // Generate unique filename/key (e.g., using a timestamp and original name)
+                 const timestamp = Date.now();
+                 const videoFilename = `videos/${timestamp}_${videoFile.name}`;
+                 const thumbnailFilename = thumbnailFile ? `thumbnails/${timestamp}_${thumbnailFile.name}` : null;
+
+                 // Upload video file
+                 progressText.textContent = 'Uploading video... 0%';
+                 const videoStorageRef = firebaseStorage.ref().child(videoFilename);
+                 const videoUploadTask = videoStorageRef.put(videoFile);
+
+                 await new Promise((resolve, reject) => {
+                     videoUploadTask.on('state_changed', 
+                         (snapshot) => {
+                             const percentComplete = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+                             progressBar.style.width = percentComplete + '%';
+                             progressText.textContent = `Uploading video... ${percentComplete}%`;
+                         }, 
+                         (error) => {
+                             console.error("Video upload failed:", error);
+                             reject(new Error(`Video upload failed: ${error.message}`));
+                         }, 
+                         () => {
+                             // Video upload complete
+                             progressText.textContent = 'Video upload complete.';
+                             resolve();
+                         }
+                     );
+                 });
+
+                 let thumbnailKey = null;
+                 if (thumbnailFile) {
+                      // Upload thumbnail file
+                      progressText.textContent = 'Uploading thumbnail... 0%';
+                      const thumbnailStorageRef = firebaseStorage.ref().child(thumbnailFilename);
+                      const thumbnailUploadTask = thumbnailStorageRef.put(thumbnailFile);
+
+                      await new Promise((resolve, reject) => {
+                         thumbnailUploadTask.on('state_changed',
+                             (snapshot) => {
+                                 const percentComplete = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+                                 // This progress is only for the thumbnail, could combine or show separately
+                                 progressText.textContent = `Uploading thumbnail... ${percentComplete}%`;
+                                 // If you want total progress, you'd track bytes for both files
+                             },
+                             (error) => {
+                                 console.error("Thumbnail upload failed:", error);
+                                 // Don't necessarily reject if thumbnail fails, maybe just log warning
+                                 // For this example, we'll reject to simplify error handling
+                                 reject(new Error(`Thumbnail upload failed: ${error.message}`));
+                             },
+                             () => {
+                                 // Thumbnail upload complete
+                                 progressText.textContent = 'Thumbnail upload complete.';
+                                 thumbnailKey = thumbnailFilename; // Use the full path as key
+                                 resolve();
+                             }
+                         );
+                     });
+                 }
+
+                 // --- Save video details to backend API ---
+                 progressText.textContent = 'Saving video details...';
+                 progressBar.style.width = '100%'; // Simulate detail saving is fast or the final step
+
+                 // Mock API endpoint - replace with your actual backend API call
+                 const saveDetailsApiUrl = '/api/save-video-details'; // This should point to your server
+
+                const saveResponse = await fetch(saveDetailsApiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         title: title,
-                        description: document.getElementById('description').value,
-                        tags: document.getElementById('tags').value,
-                        videoType: document.querySelector('input[name="videoType"]:checked').value,
-                        video_key: videoKey,
-                        thumbnail_key: thumbnailKey
+                        description: description,
+                        tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''), // Split tags by comma
+                        commentsEnabled: commentsEnabled,
+                        ageRestriction: ageRestriction,
+                        videoType: videoType,
+                        video_key: videoFilename, // Use the full path from storage
+                        thumbnail_key: thumbnailKey,
+                        // Add user ID or other relevant data if needed
+                         uploaderId: 'mockUserId123' // Placeholder
                     })
                 });
 
                 if (!saveResponse.ok) {
-                    const errorResult = await saveResponse.json();
-                    throw new Error(errorResult.message || 'Failed to save video details.');
+                     // Attempt to read error message from response body
+                    let errorMsg = `Failed to save video details. Status: ${saveResponse.status}`;
+                    try {
+                         const errorResult = await saveResponse.json();
+                         errorMsg = errorResult.message || errorMsg;
+                    } catch (jsonError) {
+                         console.warn("Could not parse error response as JSON:", jsonError);
+                         // Keep the default error message
+                    }
+                    throw new Error(errorMsg);
                 }
-                
+
+                // If details saved successfully
+                progressText.textContent = 'Upload successful!';
                 alert('Upload successful!');
-                showPage('homePage');
-                populateHomeContent();
+                showPage('homePage'); // Go back to home or dashboard after upload
+                populateHomeContent(); // Refresh home page content
+
 
             } catch (error) {
-                alert(`An error occurred: ${error.message}`);
+                console.error("Upload process failed:", error);
+                progressText.textContent = `Upload failed: ${error.message}`;
+                alert(`Upload failed: ${error.message}`);
             } finally {
                 uploadButton.disabled = false;
-                progressContainer.style.display = 'none';
-                // Reset form fields
+                // Keep progress bar visible for a few seconds to show final status
+                setTimeout(() => {
+                     progressContainer.style.display = 'none';
+                }, 3000);
+
+                // Reset form fields and file inputs
                 document.getElementById('videoTitle').value = '';
                 document.getElementById('description').value = '';
                 document.getElementById('tags').value = '';
-                videoInput.value = '';
+                 document.getElementById('commentsEnabled').checked = true;
+                 document.getElementById('ageAll').checked = true;
+                 document.getElementById('typeLong').checked = true;
+                 updateThumbnailUploaderAspectRatio(); // Reset thumbnail uploader aspect ratio
+
+                const videoFileInput = document.getElementById('videoFileInput');
+                const thumbnailInput = document.getElementById('thumbnailInput');
+                 // Reset file input value to allow uploading the same file again
+                videoFileInput.value = '';
                 thumbnailInput.value = '';
+                // Update file labels to show default text
                 updateFileLabel('videoFileInput', 'videoUploader');
                 updateFileLabel('thumbnailInput', 'thumbnailUploader');
+
             }
         }
-        
-        function uploadFileWithProgress(file, type) {
-            return new Promise(async (resolve, reject) => {
-                const progressText = document.getElementById('progressText');
-                const progressBar = document.getElementById('progressBar');
-                
-                try {
-                    progressText.textContent = `Getting ${type} upload link...`;
-                    progressBar.style.width = '0%';
-                    const urlResponse = await fetch(`/api/generate-upload-url?fileName=${encodeURIComponent(file.name)}`);
-                    const urlData = await urlResponse.json();
-                    if (!urlData.success) {
-                        return reject(new Error(`Could not get ${type} upload URL.`));
-                    }
-                    
-                    const { uploadUrl, key } = urlData;
 
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('PUT', uploadUrl, true);
-
-                    xhr.upload.onprogress = (event) => {
-                        if (event.lengthComputable) {
-                            const percentComplete = Math.round((event.loaded / event.total) * 100);
-                            progressBar.style.width = percentComplete + '%';
-                            progressText.textContent = `Uploading ${type}... ${percentComplete}%`;
-                        }
-                    };
-
-                    xhr.onload = () => {
-                        if (xhr.status >= 200 && xhr.status < 300) {
-                            resolve(key);
-                        } else {
-                            reject(new Error(`${type} upload failed with status: ${xhr.status}`));
-                        }
-                    };
-
-                    xhr.onerror = () => {
-                        reject(new Error(`A network error occurred during ${type} upload.`));
-                    };
-                    
-                    xhr.setRequestHeader('Content-Type', file.type);
-                    xhr.send(file);
-
-                } catch (error) {
-                    reject(error);
-                }
-            });
-        }
 
         // --- Other Unchanged Functions ---
         function handleProfileClick() { showPage(isUserApproved ? 'userDashboardPage' : 'infoSubmissionPage'); }
-        function submitForApproval() { alert('Information submitted for approval! You will be redirected.'); isUserApproved = true; populateUserVideos(); showPage('userDashboardPage'); }
-        function populateUserVideos() { /* Placeholder */ }
-        function showVideoOptions() { alert('Options:\n- Edit Video Details\n- Delete Video'); }
+        function submitForApproval() {
+            // Placeholder for actual submission logic (e.g., sending data to backend)
+            // After successful submission and hypothetical approval
+             alert('Information submitted for approval! Please wait for verification.');
+            // In a real app, you would wait for backend approval.
+            // For this demo, we'll simulate approval and show the dashboard
+            setTimeout(() => {
+                 isUserApproved = true;
+                 alert('Your profile has been approved! Redirecting to dashboard.');
+                 populateUserVideos(); // Load user's videos placeholder
+                 showPage('userDashboardPage');
+            }, 2000); // Simulate approval delay
+        }
+        function populateUserVideos() {
+             const userVideoGrid = document.getElementById('userVideoGrid');
+             if (!userVideoGrid) return;
+             // Placeholder: Fetch user's videos from API and display in the grid
+             userVideoGrid.innerHTML = '<p style="color: var(--secondary-text); grid-column: 1 / -1; text-align: center;">Loading your videos...</p>';
+             // Example: Fetch /api/user/videos?userId=... and populate grid similar to home page
+             setTimeout(() => {
+                 userVideoGrid.innerHTML = '<p style="color: var(--secondary-text); grid-column: 1 / -1; text-align: center;">No videos uploaded yet.</p>';
+                  // Or populate with video-card elements if user has videos
+             }, 1000);
+        }
+        function showVideoOptions(videoId) { /* Placeholder for options menu */ alert(`Options for video ID: ${videoId}\n- Edit\n- Delete`); }
         function logoutUser() { if (confirm('Are you sure you want to log out?')) { isUserApproved = false; alert('You have been logged out.'); showPage('homePage'); } }
         function showOverlay(overlayId) { document.getElementById(overlayId).style.display = 'flex'; }
         function hideOverlay(overlayId) { document.getElementById(overlayId).style.display = 'none'; }
@@ -813,7 +1974,30 @@
         document.addEventListener('DOMContentLoaded', () => {
             populateHomeContent();
             showPage('homePage');
+             // Add player event listeners once DOM is ready
+             addPlayerEventListeners();
         });
+
+         // --- Helper function to get time/battery (mock implementation) ---
+         function updateSystemInfo() {
+              const now = new Date();
+              const hours = now.getHours();
+              const minutes = now.getMinutes();
+              const timeString = `${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
+              // Placeholder for battery level
+              const batteryLevel = '75%'; // Replace with Battery Status API if needed/available
+              // Placeholder for network status
+              const networkStatus = 'LTE'; // Replace with navigator.connection if needed
+
+              const topBarTime = document.getElementById('currentTimeDisplayTop');
+               if(topBarTime) topBarTime.textContent = timeString;
+              // Update battery/network icons/text if added to the UI
+         }
+
+         // Update system info periodically
+         setInterval(updateSystemInfo, 60000); // Update every minute
+         updateSystemInfo(); // Initial update
+
     </script>
 </body>
 </html>
