@@ -1,11 +1,11 @@
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
-const fs = 'fs';
+const path = require('path'); // Node.js का path मॉड्यूल
+const fs = require('fs'); // Node.js का file system मॉड्यूल
 const { uploadFileToWasabi } = require('./wasabi.js');
 
-// dotenv को कॉन्फ़िगर करना ताकि .env फ़ाइल से variables पढ़ सके (लोकल डेवलपमेंट के लिए)
-// Render पर यह सीधे Environment Variables का उपयोग करेगा
+// dotenv को कॉन्फ़िगर करना (लोकल डेवलपमेंट के लिए)
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
@@ -13,25 +13,31 @@ if (process.env.NODE_ENV !== 'production') {
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// CORS मिडलवेयर का उपयोग करना ताकि आपका फ्रंटएंड इस सर्वर से बात कर सके
+// मिडलवेयर
 app.use(cors());
 app.use(express.json());
 
-// Multer को कॉन्फ़िगर करना - यह आने वाली फाइलों को tạm thời 'uploads/' फ़ोल्डर में रखेगा
+// ======== स्टैटिक फाइल सर्विंग (यह नया हिस्सा है) ========
+// यह Express को बताता है कि प्रोजेक्ट के रूट फोल्डर में मौजूद फाइलों (जैसे index.html, css, js) को सीधे सर्व करना है।
+app.use(express.static(path.join(__dirname, '/')));
+// ========================================================
+
+
+// Multer को कॉन्फ़िगर करना
 const upload = multer({ dest: 'uploads/' });
 
-// एक बेसिक रूट यह चेक करने के लिए कि सर्वर चल रहा है या नहीं
-app.get('/', (req, res) => {
-  res.send('Shubhzone Backend is running!');
+// ======== API रूट्स ========
+
+// एक बेसिक रूट यह चेक करने के लिए कि सर्वर चल रहा है
+app.get('/api/status', (req, res) => {
+  res.send('Shubhzone Backend API is running!');
 });
 
 // वीडियो अपलोड के लिए API एंडपॉइंट
-// 'upload.single('videoFile')' का मतलब है कि हम 'videoFile' नाम के फील्ड से एक फ़ाइल की उम्मीद कर रहे हैं
 app.post('/api/upload', upload.single('videoFile'), async (req, res) => {
   const file = req.file;
   const { title, description, tags, videoType } = req.body;
 
-  // अगर कोई फ़ाइल नहीं मिली तो एरर भेजें
   if (!file) {
     return res.status(400).json({ success: false, message: 'No file uploaded.' });
   }
@@ -40,18 +46,18 @@ app.post('/api/upload', upload.single('videoFile'), async (req, res) => {
   console.log('Metadata:', { title, description, tags, videoType });
 
   try {
-    // Wasabi पर फ़ाइल अपलोड करने के लिए फंक्शन को कॉल करना
     const result = await uploadFileToWasabi(file);
 
-    // सर्वर पर बनी tạm thời फ़ाइल को डिलीट करना
-    // fs.unlinkSync(file.path); // fs is not defined issue. Fixed by defining fs as a string. Not the best but avoids crash on render. A better fix would be to properly import and handle fs.
-    // For now, let's just log and move on, as Render has ephemeral storage.
-    console.log(`Temporary file ${file.path} should be deleted.`);
-
+    // अस्थायी फ़ाइल को डिलीट करना
+    try {
+      fs.unlinkSync(file.path);
+      console.log(`Temporary file ${file.path} deleted.`);
+    } catch (unlinkErr) {
+      console.error("Error deleting temporary file:", unlinkErr);
+    }
 
     if (result.success) {
       console.log('Upload successful. URL:', result.url);
-      // फ्रंटएंड को सफलता का संदेश और वीडियो का URL भेजना
       res.status(200).json({
         success: true,
         message: 'File uploaded successfully to Wasabi!',
@@ -59,7 +65,6 @@ app.post('/api/upload', upload.single('videoFile'), async (req, res) => {
         videoKey: result.key
       });
     } else {
-      // अगर Wasabi पर अपलोड में कोई एरर आए
       res.status(500).json({ success: false, message: 'Failed to upload to Wasabi.', error: result.error });
     }
   } catch (err) {
@@ -67,6 +72,14 @@ app.post('/api/upload', upload.single('videoFile'), async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal server error.', error: err.message });
   }
 });
+
+// ======== फ्रंटएंड को सर्व करने के लिए कैच-ऑल रूट ========
+// यह सुनिश्चित करता है कि अगर कोई किसी भी पेज पर सीधे जाता है, तो भी index.html लोड हो।
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+// ======================================================
+
 
 // सर्वर को सुनना शुरू करना
 app.listen(PORT, () => {
