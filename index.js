@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { getPresignedUrl, generateUploadUrl } = require('./wasabi.js');
-const { pool, createVideosTable } = require('./db.js');
+const { pool, initializeDatabase } = require('./db.js');
 
 // dotenv को कॉन्फ़िगर करना
 if (process.env.NODE_ENV !== 'production') {
@@ -19,15 +19,74 @@ app.use(express.static(path.join(__dirname, '/')));
 
 // ======== API रूट्स ========
 
-// GET /api/videos - डेटाबेस से सभी वीडियो की लिस्ट प्राप्त करना
-app.get('/api/videos', async (req, res) => {
+// --- जेनेरिक अपलोड URL जेनरेटर ---
+// अब यह Content-Type भी लेता है ताकि Wasabi सही मेटाडेटा सेट कर सके।
+app.get('/api/generate-upload-url', async (req, res) => {
   try {
-    // अब हम thumbnail_key को भी सेलेक्ट कर रहे हैं
-    const result = await pool.query('SELECT id, title, video_key, thumbnail_key, created_at FROM videos ORDER BY created_at DESC');
+    const { fileName, contentType } = req.query;
+    if (!fileName || !contentType) {
+      return res.status(400).json({ success: false, message: 'fileName and contentType query parameters are required.' });
+    }
+    const { uploadUrl, key } = await generateUploadUrl(fileName, contentType);
+    res.status(200).json({ success: true, uploadUrl, key });
+  } catch (err) {
+    console.error("Error in /api/generate-upload-url:", err);
+    res.status(500).json({ success: false, message: 'Could not get upload URL.' });
+  }
+});
+
+// --- प्लेलिस्ट एंडपॉइंट्स ---
+
+// POST /api/playlists - एक नई प्लेलिस्ट बनाना
+app.post('/api/playlists', async (req, res) => {
+  const { name, thumbnail_key } = req.body;
+  if (!name || !thumbnail_key) {
+    return res.status(400).json({ success: false, message: 'Playlist name and thumbnail_key are required.' });
+  }
+
+  try {
+    const insertQuery = `INSERT INTO playlists (name, thumbnail_key) VALUES ($1, $2) RETURNING *;`;
+    const result = await pool.query(insertQuery, [name, thumbnail_key]);
+    res.status(201).json({ success: true, playlist: result.rows[0] });
+  } catch (err) {
+    console.error("Error creating playlist:", err);
+    res.status(500).json({ success: false, message: 'Failed to create playlist.' });
+  }
+});
+
+// GET /api/playlists - सभी प्लेलिस्ट की लिस्ट प्राप्त करना (ड्रॉपडाउन के लिए)
+app.get('/api/playlists', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id, name FROM playlists ORDER BY name ASC');
     res.status(200).json(result.rows);
   } catch (err) {
-    console.error('Error fetching videos:', err);
-    res.status(500).json({ success: false, message: 'Failed to fetch videos.' });
+    console.error("Error fetching playlists:", err);
+    res.status(500).json({ success: false, message: 'Failed to fetch playlists.' });
+  }
+});
+
+// --- वीडियो एंडपॉइंट्स ---
+
+// POST /api/videos - एक नया वीडियो सेव करना (अब प्लेलिस्ट से लिंक है)
+app.post('/api/videos', async (req, res) => {
+  const { title, video_key, thumbnail_key, playlist_id, age_restriction } = req.body;
+
+  if (!title || !video_key || !thumbnail_key || !playlist_id) {
+    return res.status(400).json({ success: false, message: 'Title, video_key, thumbnail_key, and playlist_id are required.' });
+  }
+
+  try {
+    const insertQuery = `
+      INSERT INTO videos (title, video_key, thumbnail_key, playlist_id, age_restriction)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *;
+    `;
+    const values = [title, video_key, thumbnail_key, parseInt(playlist_id, 10), age_restriction || 'all'];
+    const result = await pool.query(insertQuery, values);
+    res.status(201).json({ success: true, video: result.rows[0] });
+  } catch (err) {
+    console.error('Error saving video details:', err);
+    res.status(500).json({ success: false, message: 'Failed to save video details.' });
   }
 });
 
@@ -42,44 +101,44 @@ app.get('/api/videos/:key/play', async (req, res) => {
   }
 });
 
+// --- होम पेज डेटा एंडपॉइंट ---
 
-// GET /api/generate-upload-url - डायरेक्ट अपलोड के लिए एक सुरक्षित URL जेनरेट करना
-app.get('/api/generate-upload-url', async (req, res) => {
+// GET /api/home-content - होम पेज के लिए सभी प्लेलिस्ट और उनके वीडियो को लाना
+app.get('/api/home-content', async (req, res) => {
   try {
-    const { fileName } = req.query;
-    if (!fileName) {
-      return res.status(400).json({ message: 'fileName query parameter is required.' });
-    }
-    const { uploadUrl, key } = await generateUploadUrl(fileName);
-    res.status(200).json({ success: true, uploadUrl, key });
+    // 1. सभी प्लेलिस्ट को उनके थंबनेल URL के साथ प्राप्त करें
+    const playlistsQuery = `SELECT id, name, thumbnail_key FROM playlists ORDER BY created_at DESC;`;
+    const playlistsResult = await pool.query(playlistsQuery);
+    
+    // 2. सभी वीडियो को उनके थंबनेल URL के साथ प्राप्त करें
+    const videosQuery = `SELECT id, title, thumbnail_key as video_thumbnail_key, playlist_id, video_key FROM videos ORDER BY created_at DESC;`;
+    const videosResult = await pool.query(videosQuery);
+    
+    // 3. हर प्लेलिस्ट के लिए एक अस्थायी (pre-signed) URL जेनरेट करें
+    const playlistsWithUrls = await Promise.all(playlistsResult.rows.map(async (p) => {
+        return {
+            ...p,
+            thumbnailUrl: await getPresignedUrl(p.thumbnail_key)
+        };
+    }));
+    
+    // 4. हर वीडियो के लिए एक अस्थायी (pre-signed) URL जेनरेट करें
+    const videosWithUrls = await Promise.all(videosResult.rows.map(async (v) => {
+        return {
+            ...v,
+            thumbnailUrl: await getPresignedUrl(v.video_thumbnail_key)
+        };
+    }));
+    
+    res.status(200).json({
+        success: true,
+        playlists: playlistsWithUrls,
+        videos: videosWithUrls
+    });
+
   } catch (err) {
-    res.status(500).json({ success: false, message: 'Could not get upload URL.' });
-  }
-});
-
-// POST /api/save-video-details - डायरेक्ट अपलोड पूरा होने के बाद वीडियो की जानकारी सेव करना
-app.post('/api/save-video-details', async (req, res) => {
-  // अब हम रिक्वेस्ट से thumbnail_key भी ले रहे हैं
-  const { title, description, tags, videoType, video_key, thumbnail_key } = req.body;
-
-  if (!title || !video_key) {
-    return res.status(400).json({ success: false, message: 'Title and video_key are required.' });
-  }
-
-  try {
-    const insertQuery = `
-      INSERT INTO videos (title, description, tags, video_type, video_key, thumbnail_key)
-      VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING *;
-    `;
-    const values = [title, description, tags, videoType, video_key, thumbnail_key];
-    const dbResult = await pool.query(insertQuery, values);
-
-    console.log('Video details saved after direct upload:', dbResult.rows[0]);
-    res.status(201).json({ success: true, video: dbResult.rows[0] });
-  } catch (err) {
-    console.error('Error saving video details:', err);
-    res.status(500).json({ success: false, message: 'Internal server error.' });
+    console.error("Error fetching home content:", err);
+    res.status(500).json({ success: false, message: 'Failed to fetch home content.' });
   }
 });
 
@@ -92,7 +151,7 @@ app.get('*', (req, res) => {
 
 // ======== सर्वर और डेटाबेस को शुरू करना ========
 const startServer = async () => {
-  await createVideosTable(); // पहले टेबल बनाना सुनिश्चित करें
+  await initializeDatabase(); // पहले टेबल बनाना सुनिश्चित करें
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
