@@ -19,8 +19,8 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; background-color: var(--dark-bg); color: var(--primary-text); overflow-x: hidden; }
-        
-        /* === [नया बदलाव] अपलोड प्रोग्रेस बार स्टाइल === */
+
+        /* === Upload Progress Bar Style === */
         #uploadProgressBarContainer {
             position: fixed;
             top: 0;
@@ -28,7 +28,7 @@
             width: 100%;
             height: 4px;
             z-index: 9999;
-            display: none; /* यह जावास्क्रिप्ट से कंट्रोल होगा */
+            display: none; /* Controlled by JavaScript */
             background-color: var(--card-bg);
         }
         #uploadProgressBar {
@@ -69,45 +69,45 @@
         .playlist-selection { display: flex; gap: 10px; }
         .playlist-selection select { flex-grow: 1; }
         .playlist-selection .add-new-btn { padding: 14px; font-size: 20px; line-height: 1; border-radius: 10px; background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--primary-text); }
-        
-        /* === [नया बदलाव] अपलोड कार्ड स्टाइल === */
+
+        /* === Upload Card Style (Used in Upload Page) === */
         .file-upload-container { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 20px; }
-        .file-uploader-card { 
+        .file-uploader-card {
             width: 100%;
-            max-width: 320px; /* कार्ड को थोड़ा छोटा रखने के लिए */
-            border: 2px dashed var(--border-color); 
-            border-radius: 10px; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            background-color: transparent; 
-            aspect-ratio: 16 / 9; /* बदला हुआ आस्पेक्ट रेशियो */
-            cursor: pointer; 
-            overflow: hidden; 
-            position: relative; 
+            max-width: 320px; /* Card kept slightly smaller */
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: transparent;
+            aspect-ratio: 16 / 9; /* Changed aspect ratio */
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
         }
         .file-uploader-card .upload-text { text-align: center; color: var(--secondary-text); padding: 10px; font-size: 14px; }
         .file-uploader-card .preview-video, .file-uploader-card .preview-image { position: absolute; width: 100%; height: 100%; object-fit: cover; display: none; }
-        
+
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--modal-bg); z-index: 250; display: none; justify-content: center; align-items: center; padding: 15px; }
         .modal-content { background-color: var(--card-bg); padding: 25px; border-radius: 15px; width: 100%; max-width: 400px; position: relative; }
         .modal .close-btn { position: absolute; top: 10px; right: 15px; font-size: 28px; color: var(--secondary-text); cursor: pointer; }
         #newPlaylistThumbUploader { width: 100%; aspect-ratio: 9 / 16; border: 2px dashed var(--border-color); border-radius: 10px; display: flex; justify-content: center; align-items: center; background-color: var(--input-bg); cursor: pointer; position: relative; overflow: hidden; }
         #newPlaylistThumbUploader .preview-image { position: absolute; width: 100%; height: 100%; object-fit: cover; display: none; }
         #newPlaylistThumbUploader .upload-text { color: var(--secondary-text); }
-        
-        /* === [नया बदलाव] नेविगेशन बार स्टाइल === */
+
+        /* === Navigation Bar Style === */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background-color: rgba(15,15,15,0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 100; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--secondary-text); cursor: pointer; flex: 1; text-align: center; }
         .nav-item.active { color: var(--primary-text); }
         .nav-item.upload-plus { position: relative; top: -15px; }
         .nav-icon { width: 28px; height: 28px; }
-        .nav-icon-emoji { font-size: 26px; line-height: 28px; } /* इमोजी के लिए नया स्टाइल */
+        .nav-icon-emoji { font-size: 26px; line-height: 28px; } /* Style for emojis */
         .nav-icon.upload-icon { width: 50px; height: 50px; background: var(--accent-gradient); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 10px rgba(255, 75, 43, 0.5); }
         .nav-label { font-size: 10px; margin-top: 2px; }
-        
-        /* ======== VIDEO PLAYER STYLES ======== */
+
+        /* ======== VIDEO PLAYER STYLES (Existing) ======== */
         #videoPlayerOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 300; }
         .player-container { width: 100%; height: 100%; position: relative; display: flex; justify-content: center; align-items: center; background-color: #000; }
         #mainPlayer { width: 100%; height: 100%; object-fit: contain; }
@@ -150,11 +150,156 @@
         .pause-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; pointer-events: none; }
         .pause-overlay .watermark { position: absolute; top: 20px; left: 20px; font-size: 16px; font-weight: bold; color: rgba(255,255,255,0.7); }
         .pause-overlay .paused-title { font-size: 20px; font-weight: 500; padding: 0 20px; }
+
+        /* ======== NEW AI AVATAR STYLES ======== */
+        #packagePage .upload-ai-assets-btn {
+            margin-bottom: 30px;
+        }
+
+        #avatarGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Responsive grid */
+            gap: 15px; /* Gap between avatar cards */
+            justify-content: center;
+        }
+
+        .avatar-card {
+            width: 100%;
+            aspect-ratio: 1 / 1; /* 1:1 Aspect Ratio */
+            border-radius: 50%; /* Make it circular */
+            overflow: hidden; /* Crop image to circle */
+            cursor: pointer;
+            background-color: var(--card-bg); /* Placeholder background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid transparent; /* Border for selection/hover */
+            transition: border-color 0.2s ease;
+        }
+
+        .avatar-card:hover {
+            border-color: #ff4b2b; /* Highlight on hover */
+        }
+
+        .avatar-card img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensure image covers the circle */
+        }
+
+        /* ======== AI AVATAR DETAIL/PREVIEW PAGE ======== */
+        #avatarDetailPage {
+            display: none; /* Controlled by JavaScript */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000; /* Black background */
+            z-index: 400; /* Above other overlays */
+            overflow: hidden;
+        }
+
+        #avatarDetailPage .video-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Fit video within bounds */
+            background-color: #000;
+        }
+
+        .avatar-detail-controls {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent 100px), linear-gradient(to top, rgba(0,0,0,0.5), transparent 100px);
+            pointer-events: none; /* Allow clicks to pass through by default */
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+        .avatar-detail-controls.hidden { opacity: 0; }
+
+
+        .avatar-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            pointer-events: auto; /* Make controls clickable */
+        }
+
+        .avatar-detail-header .header-btn {
+            background: rgba(255,255,255,0.1); /* Slightly visible background */
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%; /* Circular buttons */
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .avatar-detail-header .header-btn svg {
+             width: 20px; height: 20px;
+        }
+        .avatar-detail-header .header-btn-text {
+             font-size: 16px; font-weight: bold;
+        }
+
+
+        /* ======== AI AVATAR SELECT SIDE PANEL ======== */
+        #avatarSelectPanel {
+            position: fixed; /* Fixed position */
+            top: 0;
+            right: 0; /* Appears on the right */
+            width: 120px; /* Fixed width for the panel */
+            height: 100%;
+            background-color: rgba(0,0,0,0.8); /* Semi-transparent dark background */
+            backdrop-filter: blur(5px); /* Blur effect */
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 450; /* Above detail page controls */
+            display: none; /* Controlled by JavaScript */
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 10px; /* Padding inside panel */
+            overflow-y: auto; /* Make it scrollable */
+            gap: 15px; /* Gap between list cards */
+        }
+
+        .avatar-select-card {
+             width: 100px; /* Fixed width for list item */
+             aspect-ratio: 9 / 16; /* 9:16 Aspect Ratio */
+             border-radius: 8px; /* Rounded corners */
+             overflow: hidden;
+             cursor: pointer;
+             background-color: var(--card-bg);
+             border: 2px solid transparent; /* Border for selection */
+             transition: border-color 0.2s ease;
+        }
+         .avatar-select-card:hover {
+            border-color: #ff4b2b; /* Highlight on hover */
+        }
+
+         .avatar-select-card img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensure image covers the card */
+         }
+
+
     </style>
 </head>
 <body>
-    
-    <!-- [नया] अपलोड प्रोग्रेस बार -->
+
+    <!-- Upload Progress Bar -->
     <div id="uploadProgressBarContainer">
         <div id="uploadProgressBar"></div>
     </div>
@@ -163,13 +308,14 @@
         <div id="playlist-container"></div>
         <p id="home-status-message" style="text-align: center; color: var(--secondary-text); padding: 50px 0; display: none;"></p>
     </div>
+
     <div id="uploadPage" class="page">
         <h2>Upload Video</h2>
         <div class="form-group"><label for="videoTitle">Video Title</label><input type="text" id="videoTitle" placeholder="Enter a catchy title"></div>
         <div class="form-group"><label for="playlistSelect">Add to Playlist</label><div class="playlist-selection"><select id="playlistSelect"></select><button class="add-new-btn" onclick="openPlaylistModal()">+</button></div></div>
         <div class="form-group"><label>Audience</label><div class="radio-group"><input type="radio" id="ageAll" name="age_restriction" value="all" checked> <label for="ageAll">For Everyone</label><input type="radio" id="age18" name="age_restriction" value="18+"> <label for="age18">18+ Only</label></div></div>
-        
-        <!-- [बदलाव] अपलोड कार्ड्स का नया लेआउट -->
+
+        <!-- Upload Cards New Layout -->
         <div class="file-upload-container">
             <div class="file-uploader-card" onclick="document.getElementById('videoFileInput').click()">
                 <span class="upload-text">Select Video (16:9)</span>
@@ -186,7 +332,26 @@
         <div style="height: 10px;"></div>
         <button id="uploadButton" class="button" onclick="uploadVideo()">✅ Upload Video</button>
     </div>
-    
+
+    <div id="packagePage" class="page">
+        <h2>Packages</h2>
+        <!-- Development Upload Button -->
+        <button id="uploadAiAssetsBtn" class="button upload-ai-assets-btn">Upload AI Assets (Dev)</button>
+
+        <div id="avatarGrid">
+            <!-- AI Avatar Cards will be populated here by JavaScript -->
+            <!-- Example Cards (replace with dynamic loading from backend later) -->
+             <div class="avatar-card" data-avatar-id="avatar1" data-image-url="https://i.ibb.co/BHN46hts/Leonardo-Phoenix-10-A-young-girl-sitting-in-a-cozy-dimly-lit-r-0.jpg" data-video-url="/path/to/avatar1_video.mp4" data-avatar-name="Jiya">
+                <img src="https://i.ibb.co/BHN46hts/Leonardo-Phoenix-10-A-young-girl-sitting-in-a-cozy-dimly-lit-r-0.jpg" alt="Avatar 1">
+            </div>
+             <div class="avatar-card" data-avatar-id="avatar2" data-image-url="https://i.ibb.co/3yBVKWnn/Fum-D-gyl-TImey-U43-n-Q4eg.webp" data-video-url="/path/to/avatar2_video.mp4" data-avatar-name="Vikram">
+                <img src="https://i.ibb.co/3yBVKWnn/Fum-D-gyl-TImey-U43-n-Q4eg.webp" alt="Avatar 2">
+            </div>
+             <!-- Add more avatar cards here dynamically -->
+        </div>
+        <p id="package-status-message" style="text-align: center; color: var(--secondary-text); padding: 50px 0; display: none;"></p>
+    </div>
+
     <div id="infoSubmissionPage" class="page">
         <h2>Submit Your Information</h2>
         <p style="color: var(--secondary-text); margin-top: -20px; margin-bottom: 30px;">This information is required for verification.</p>
@@ -197,22 +362,58 @@
     </div>
     <div id="userDashboardPage" class="page"><h2>My Profile</h2><p>Your profile is active.</p></div>
 
-    <!-- [नया] पैकेज पेज के लिए खाली डिव -->
-    <div id="packagePage" class="page">
-        <h2>Packages</h2>
-        <p style="text-align: center; color: var(--secondary-text); padding: 50px 0;">This section is under construction.</p>
+    <!-- AI Avatar Detail/Preview Page -->
+    <div id="avatarDetailPage">
+         <video class="video-preview" muted playsinline></video>
+         <div class="avatar-detail-controls">
+             <div class="avatar-detail-header">
+                 <!-- Back Button -->
+                 <button class="header-btn" id="avatar-back-btn">
+                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/></svg>
+                 </button>
+                 <!-- Avatar Name / Title -->
+                 <span class="header-btn-text" id="avatar-preview-name">Avatar Name</span>
+                 <!-- Select Avatar Button (🤵 icon) -->
+                 <button class="header-btn" id="select-avatar-btn">
+                     🤵
+                 </button>
+             </div>
+             <!-- Placeholder for bottom controls if needed (currently not requested) -->
+             <div></div>
+         </div>
+         <!-- Vertical Avatar Select Panel -->
+         <div id="avatarSelectPanel">
+             <!-- Avatar list cards will be populated here by JavaScript -->
+             <!-- Example List Card (replace with dynamic loading) -->
+             <div class="avatar-select-card" data-avatar-id="avatar1" data-image-url="https://i.ibb.co/BHN46hts/Leonardo-Phoenix-10-A-young-girl-sitting-in-a-cozy-dimly-lit-r-0.jpg" data-avatar-name="Jiya">
+                <img src="https://i.ibb.co/BHN46hts/Leonardo-Phoenix-10-A-young-girl-sitting-in-a-cozy-dimly-lit-r-0.jpg" alt="Avatar 1">
+             </div>
+              <div class="avatar-select-card" data-avatar-id="avatar2" data-image-url="https://i.ibb.co/3yBVKWnn/Fum-D-gyl-TImey-U43-n-Q4eg.webp" data-avatar-name="Vikram">
+                <img src="https://i.ibb.co/3yBVKWnn/Fum-D-gyl-TImey-U43-n-Q4eg.webp" alt="Avatar 2">
+             </div>
+             <!-- Add more list cards here dynamically -->
+         </div>
     </div>
 
-    <!-- [बदलाव] नेविगेशन बार में नया आइकॉन -->
+
+    <!-- Bottom Navigation Bar -->
     <nav class="bottom-nav">
-        <div id="navHome" class="nav-item active" onclick="showPage('homePage')"><svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" /></svg><span class="nav-label">Home</span></div>
-        <div class="nav-item upload-plus" onclick="showPage('uploadPage')"><div class="nav-icon upload-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg></div></div>
-        <!-- नया पैकेज आइकॉन -->
+        <div id="navHome" class="nav-item active" onclick="showPage('homePage')">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" /></svg>
+            <span class="nav-label">Home</span>
+        </div>
+        <div class="nav-item upload-plus" onclick="showPage('uploadPage')">
+            <div class="nav-icon upload-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg></div>
+        </div>
+        <!-- Updated Packages Icon -->
         <div id="navPackage" class="nav-item" onclick="showPage('packagePage')">
-            <span class="nav-icon nav-icon-emoji">📦</span>
+            <span class="nav-icon nav-icon-emoji">🎁</span> <!-- Gift Box Emoji -->
             <span class="nav-label">Packages</span>
         </div>
-        <div id="navProfile" class="nav-item" onclick="handleProfileClick()"><svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" /></svg><span class="nav-label">Profile</span></div>
+        <div id="navProfile" class="nav-item" onclick="handleProfileClick()">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" /></svg>
+            <span class="nav-label">Profile</span>
+        </div>
     </nav>
 
     <div id="newPlaylistModal" class="modal">
@@ -237,7 +438,7 @@
 
     <script>
         // ======== SCRIPT SECTION ========
-        
+
         const playerOverlay = document.getElementById('videoPlayerOverlay');
         const mainPlayer = document.getElementById('mainPlayer');
         const playerContainer = document.querySelector('.player-container');
@@ -265,22 +466,78 @@
         const rewindAnim = document.getElementById('rewind-anim');
         const forwardAnim = document.getElementById('forward-anim');
         const pauseOverlay = document.querySelector('.pause-overlay');
-        // [नया] प्रोग्रेस बार के लिए वेरिएबल
+
+        // [New] AI Avatar UI elements
+        const avatarDetailPage = document.getElementById('avatarDetailPage');
+        const avatarPreviewVideo = avatarDetailPage.querySelector('.video-preview');
+        const avatarBackBtn = document.getElementById('avatar-back-btn');
+        const selectAvatarBtn = document.getElementById('select-avatar-btn');
+        const avatarSelectPanel = document.getElementById('avatarSelectPanel');
+        const avatarPreviewName = document.getElementById('avatar-preview-name'); // To show avatar name on detail page
+        const uploadAiAssetsBtn = document.getElementById('uploadAiAssetsBtn'); // Dev upload button
+
+        // Upload Progress Bar variables
         const uploadProgressBar = document.getElementById('uploadProgressBar');
         const uploadProgressBarContainer = document.getElementById('uploadProgressBarContainer');
 
-        let isUserApproved = false;
-        const API_BASE_URL = window.location.origin;
-        let allVideos = [];
-        let controlsTimeout;
-        let isLocked = false;
-        let currentPlaylist = [];
-        let currentVideoIndex = -1;
 
+        let isUserApproved = false; // This will need proper management
+        const API_BASE_URL = window.location.origin;
+        let allVideos = []; // For video playlists
+        let allAvatars = []; // [New] For AI avatars
+        let controlsTimeout;
+        let isLocked = false; // For video player
+        let currentPlaylist = []; // For video player
+        let currentVideoIndex = -1; // For video player
+        let currentPlayingAvatarVideo = null; // [New] To manage the avatar preview video
+
+
+        // Helper function to set button loading state
         function setButtonLoading(button, isLoading, originalText = '') { if (isLoading) { button.disabled = true; button.textContent = 'Uploading...'; } else { button.disabled = false; button.textContent = originalText; } }
+
+        // Helper function to handle API responses
         async function handleApiResponse(response) { if (!response.ok) { let errorMsg = `Error: ${response.status} ${response.statusText}`; try { const errorJson = await response.json(); errorMsg = errorJson.message || errorMsg; } catch (e) {} throw new Error(errorMsg); } return response.json(); }
-        
-        // [बदलाव] इस फंक्शन को बदला गया है ताकि यह प्रीव्यू भी दिखाए
+
+        // [Modified] Updated page navigation function to handle new pages
+        function showPage(pageId) {
+            // Hide all pages first
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            // Hide AI Detail page if open
+            avatarDetailPage.style.display = 'none';
+            // Hide AI Select Panel if open
+            avatarSelectPanel.style.display = 'none';
+            // Stop any playing avatar preview video
+            if(currentPlayingAvatarVideo) {
+                 currentPlayingAvatarVideo.pause();
+                 currentPlayingAvatarVideo.removeAttribute('src'); // Clear src
+                 currentPlayingAvatarVideo = null;
+            }
+
+
+            // Show the requested page
+            document.getElementById(pageId)?.classList.add('active');
+
+            // Update active state in bottom nav
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (pageId === 'homePage') document.getElementById('navHome').classList.add('active');
+            else if (pageId === 'uploadPage') document.querySelector('.upload-plus').classList.add('active');
+            else if (pageId === 'packagePage') document.getElementById('navPackage').classList.add('active'); // New case
+            else if (pageId.includes('Submission') || pageId.includes('Dashboard')) document.getElementById('navProfile').classList.add('active');
+
+            // Specific actions when showing certain pages
+            if (pageId === 'homePage') {
+                populateHomePage(); // Refresh home content
+            } else if (pageId === 'uploadPage') {
+                 populatePlaylistDropdown(); // Refresh playlist dropdown
+            } else if (pageId === 'packagePage') {
+                 // [New] Populate AI Avatars on Package page
+                 populateAvatarGrid();
+                 // Temporarily show the dev upload button (will hide later in production)
+                 uploadAiAssetsBtn.style.display = 'block'; // Or handle this with a flag/auth
+            }
+        }
+
+        // [Modified] Preview function (used for video upload, thumbnail upload, new playlist thumbnail)
         function previewAndNameUpdate(input, type) {
             const file = input.files[0];
             let previewElement, uploadTextElement;
@@ -291,37 +548,51 @@
             } else if (type === 'thumbnail') {
                 previewElement = document.querySelector('#thumbnailInput ~ .file-upload-container .preview-image');
                 uploadTextElement = previewElement.previousElementSibling;
+            } else if (type === 'newPlaylistThumb') {
+                 previewElement = document.getElementById('newPlaylistPreview');
+                 uploadTextElement = document.querySelector('#newPlaylistThumbUploader .upload-text');
             }
+
 
             if (file) {
                 previewElement.src = URL.createObjectURL(file);
                 previewElement.style.display = 'block';
-                uploadTextElement.style.display = 'none';
-                if(type === 'video') previewElement.play(); // वीडियो प्रीव्यू को चलाएं
+                if(uploadTextElement) uploadTextElement.style.display = 'none'; // Hide text if image/video is shown
+                if(type === 'video' && previewElement.tagName === 'VIDEO') {
+                    previewElement.muted = true; // Mute preview video
+                    previewElement.play(); // Play video preview
+                }
+            } else {
+                 // Handle file deselection - clear preview and show text
+                 previewElement.style.display = 'none';
+                 previewElement.removeAttribute('src');
+                 if(uploadTextElement) uploadTextElement.style.display = 'block'; // Show text
             }
         }
-        function updateFileName(inputId, labelId) { const input = document.getElementById(inputId); const label = document.getElementById(labelId); if (input.files.length > 0) { label.textContent = input.files[0].name; label.style.color = 'var(--primary-text)'; } else { label.textContent = `Select ${labelId.includes('Photo') ? 'Photo' : 'File'}`; label.style.color = 'var(--secondary-text)'; } }
-        
-        // [बदलाव] नए पेज को सपोर्ट करने के लिए पेज नेविगेशन फंक्शन अपडेट किया गया
-        function showPage(pageId) { 
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
-            document.getElementById(pageId)?.classList.add('active'); 
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); 
-            if (pageId === 'homePage') document.getElementById('navHome').classList.add('active'); 
-            else if (pageId === 'uploadPage') document.querySelector('.upload-plus').classList.add('active'); 
-            else if (pageId === 'packagePage') document.getElementById('navPackage').classList.add('active'); // नया केस
-            else if (pageId.includes('Submission') || pageId.includes('Dashboard')) document.getElementById('navProfile').classList.add('active'); 
+
+        // Function to update file name display (used in Info Submission page)
+        function updateFileName(inputId, labelId) {
+            const input = document.getElementById(inputId);
+            const label = document.getElementById(labelId);
+            if (input.files.length > 0) {
+                label.textContent = input.files[0].name;
+                label.style.color = 'var(--primary-text)'; // Change color to show file is selected
+            } else {
+                label.textContent = `Select ${labelId.includes('Photo') ? 'Photo' : 'File'}`;
+                label.style.color = 'var(--secondary-text)'; // Reset color
+            }
         }
-        
-        async function populateHomePage() { const container = document.getElementById('playlist-container'); const statusMsg = document.getElementById('home-status-message'); container.innerHTML = ''; statusMsg.textContent = 'Loading...'; statusMsg.style.display = 'block'; try { const data = await fetch(`${API_BASE_URL}/api/home-content`).then(handleApiResponse); if (!data.success) throw new Error(data.message); if (data.playlists.length === 0) { statusMsg.textContent = 'No content found. Be the first to upload!'; return; } statusMsg.style.display = 'none'; allVideos = data.videos; data.playlists.forEach(playlist => { const playlistVideos = allVideos.filter(v => v.playlist_id === playlist.id); if (playlistVideos.length === 0) return; const section = document.createElement('div'); section.className = 'playlist-section'; let videoCardsHTML = playlistVideos.map((video, index) => `<div class="video-card-grid" data-video-key="${video.video_key}" data-video-title="${video.title}" data-playlist-id="${playlist.id}" data-video-index="${index}" onclick="playVideo(this)"><div class="thumbnail" style="background-image: url('${video.thumbnailUrl}')"></div><div class="info"><p>${video.title}</p></div></div>`).join(''); section.innerHTML = `<div class="playlist-header"><h3>${playlist.name}</h3></div><div class="video-grid-3xN">${videoCardsHTML}</div>`; container.appendChild(section); }); } catch (error) { console.error('Error populating home page:', error); statusMsg.textContent = `Error: ${error.message}`; statusMsg.style.color = '#F44336'; } }
-        async function populatePlaylistDropdown() { const playlistSelect = document.getElementById('playlistSelect'); try { const playlists = await fetch(`${API_BASE_URL}/api/playlists`).then(handleApiResponse); playlistSelect.innerHTML = ''; if (playlists.length === 0) { playlistSelect.innerHTML = '<option value="" disabled selected>Create a playlist first</option>'; return; } playlists.forEach(p => { const option = document.createElement('option'); option.value = p.id; option.textContent = p.name; playlistSelect.appendChild(option); }); } catch (error) { console.error('Error fetching playlists:', error); playlistSelect.innerHTML = '<option value="" disabled selected>Error loading playlists</option>'; } }
+
+
+        // Existing functions for Playlist Modal and Creation
         function openPlaylistModal() { document.getElementById('newPlaylistModal').style.display = 'flex'; }
         function closePlaylistModal() { document.getElementById('newPlaylistModal').style.display = 'none'; }
-        function previewFile(input, previewId) { const file = input.files[0]; const preview = document.getElementById(previewId); const uploadText = preview.previousElementSibling; if (file) { preview.src = URL.createObjectURL(file); preview.style.display = 'block'; if(uploadText) uploadText.style.display = 'none'; } }
-        async function handleCreatePlaylist() { const nameInput = document.getElementById('newPlaylistName'); const thumbInput = document.getElementById('newPlaylistThumb'); const createBtn = document.getElementById('createPlaylistBtn'); if (!nameInput.value || thumbInput.files.length === 0) { alert('Please provide a playlist name and a thumbnail.'); return; } setButtonLoading(createBtn, true); try { const thumbFile = thumbInput.files[0]; const urlResponse = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(thumbFile.name)}&contentType=${thumbFile.type}`).then(handleApiResponse); await fetch(urlResponse.uploadUrl, { method: 'PUT', body: thumbFile }); const playlistData = { name: nameInput.value, thumbnail_key: urlResponse.key }; const saveResponse = await fetch(`${API_BASE_URL}/api/playlists`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(playlistData) }).then(handleApiResponse); alert(`Playlist "${saveResponse.playlist.name}" created!`); closePlaylistModal(); populatePlaylistDropdown(); nameInput.value = ''; thumbInput.value = ''; const previewImg = document.getElementById('newPlaylistPreview'); previewImg.style.display = 'none'; previewImg.previousElementSibling.style.display = 'block'; } catch (error) { alert(`Failed to create playlist: ${error.message}`); } finally { setButtonLoading(createBtn, false, 'Create Playlist'); } }
+         // Renamed previewFile to previewAndNameUpdate and consolidated logic
+        async function handleCreatePlaylist() { const nameInput = document.getElementById('newPlaylistName'); const thumbInput = document.getElementById('newPlaylistThumb'); const createBtn = document.getElementById('createPlaylistBtn'); if (!nameInput.value || thumbInput.files.length === 0) { alert('Please provide a playlist name and a thumbnail.'); return; } setButtonLoading(createBtn, true); try { const thumbFile = thumbInput.files[0]; // Use wasabi upload logic const urlResponse = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(thumbFile.name)}&contentType=${thumbFile.type}`).then(handleApiResponse); await uploadFileWithProgress(urlResponse.uploadUrl, thumbFile, (progress) => console.log(`Thumbnail upload progress: ${progress * 100}%`)); const playlistData = { name: nameInput.value, thumbnail_key: urlResponse.key }; const saveResponse = await fetch(`${API_BASE_URL}/api/playlists`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(playlistData) }).then(handleApiResponse); alert(`Playlist "${saveResponse.playlist.name}" created!`); closePlaylistModal(); populatePlaylistDropdown(); nameInput.value = ''; // Clear form previewAndNameUpdate(thumbInput, 'newPlaylistThumb'); // Reset preview } catch (error) { alert(`Failed to create playlist: ${error.message}`); } finally { setButtonLoading(createBtn, false, 'Create Playlist'); } }
 
-        // [बदलाव] प्रोग्रेस बार के लिए नया अपलोड फंक्शन
-        function uploadFileWithProgress(url, file, onProgress) {
+
+        // [New] Function to upload file with progress (reused from video upload)
+         function uploadFileWithProgress(url, file, onProgress) {
             return new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
                 xhr.open('PUT', url, true);
@@ -335,14 +606,15 @@
                     if (xhr.status >= 200 && xhr.status < 300) {
                         resolve(xhr.response);
                     } else {
-                        reject(new Error(`Upload failed with status: ${xhr.status}`));
+                        reject(new Error(`Upload failed with status: ${xhr.status}. Response: ${xhr.responseText}`));
                     }
                 };
                 xhr.onerror = () => reject(new Error('Network error during upload.'));
-                xhr.send(file);
+                 xhr.send(file);
             });
         }
 
+        // Existing function to upload video (modified to use uploadFileWithProgress)
         async function uploadVideo() {
             const videoInput = document.getElementById('videoFileInput');
             const thumbInput = document.getElementById('thumbnailInput');
@@ -355,7 +627,7 @@
                 alert('Please fill all fields: Title, Playlist, Video, and Thumbnail.');
                 return;
             }
-            
+
             setButtonLoading(uploadBtn, true);
             uploadProgressBarContainer.style.display = 'block';
             uploadProgressBar.style.width = '0%';
@@ -364,33 +636,40 @@
                 const videoFile = videoInput.files[0];
                 const thumbFile = thumbInput.files[0];
 
-                // वीडियो के लिए URL प्राप्त करना
+                // Get URL for video
                 const videoUrlRes = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(videoFile.name)}&contentType=${videoFile.type}`).then(handleApiResponse);
-                // वीडियो अपलोड करना (80% प्रोग्रेस इसके लिए)
+                // Upload video (80% progress for this)
                 await uploadFileWithProgress(videoUrlRes.uploadUrl, videoFile, (progress) => {
                     uploadProgressBar.style.width = `${progress * 80}%`;
                 });
-                
-                // थंबनेल के लिए URL प्राप्त करना
+
+                // Get URL for thumbnail
                 const thumbUrlRes = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(thumbFile.name)}&contentType=${thumbFile.type}`).then(handleApiResponse);
-                // थंबनेल अपलोड करना (बाकी 20% प्रोग्रेस इसके लिए)
+                // Upload thumbnail (remaining 20% progress for this)
                 await uploadFileWithProgress(thumbUrlRes.uploadUrl, thumbFile, (progress) => {
                     uploadProgressBar.style.width = `${80 + (progress * 20)}%`;
                 });
-                
-                uploadProgressBar.style.width = '100%';
+
+                uploadProgressBar.style.width = '100%'; // Finish progress bar
 
                 const videoDetails = { title, video_key: videoUrlRes.key, thumbnail_key: thumbUrlRes.key, playlist_id: selectedPlaylistId, age_restriction: ageRestriction };
                 await fetch(`${API_BASE_URL}/api/videos`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(videoDetails) }).then(handleApiResponse);
-                
+
                 alert('Video uploaded successfully!');
-                showPage('homePage');
-                populateHomePage();
+                // Clear form and previews
+                document.getElementById('videoTitle').value = '';
+                videoInput.value = '';
+                thumbInput.value = '';
+                previewAndNameUpdate(videoInput, 'video'); // Reset video preview
+                previewAndNameUpdate(thumbInput, 'thumbnail'); // Reset thumbnail preview
+
+
+                showPage('homePage'); // Go back to home
             } catch (error) {
                 alert(`Upload failed: ${error.message}`);
             } finally {
                 setButtonLoading(uploadBtn, false, '✅ Upload Video');
-                // प्रोग्रेस बार को थोड़ा रुक कर छिपाएं
+                // Hide progress bar after a short delay
                 setTimeout(() => {
                     uploadProgressBarContainer.style.display = 'none';
                     uploadProgressBar.style.width = '0%';
@@ -398,59 +677,321 @@
             }
         }
 
+        // Existing Profile/Info Submission logic
         function handleProfileClick() { showPage(isUserApproved ? 'userDashboardPage' : 'infoSubmissionPage'); }
-        function submitForApproval() { alert('Information submitted for verification.'); }
+        function submitForApproval() { alert('Information submitted for verification.'); } // Placeholder
+
+
+        // Existing Video Player logic (keep as is for now)
         function formatTime(time) { const seconds = Math.floor(time % 60); const minutes = Math.floor(time / 60) % 60; const hours = Math.floor(time / 3600); if (hours > 0) { return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`; } return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`; }
         function showControls() { if(isLocked) return; controls.classList.remove('hidden'); clearTimeout(controlsTimeout); controlsTimeout = setTimeout(() => controls.classList.add('hidden'), 3000); }
         async function loadVideo(videoData) { const { videoKey, title } = videoData; document.querySelector('.top-controls .video-title').textContent = title; document.querySelector('.pause-overlay .paused-title').textContent = title; mainPlayer.src = ''; loadingSpinner.style.display = 'block'; try { const data = await fetch(`${API_BASE_URL}/api/videos/${videoKey}/play`).then(handleApiResponse); if (data.success) { mainPlayer.src = data.url; mainPlayer.play(); } else { throw new Error('Could not get video URL.'); } } catch (error) { alert(`Error playing video: ${error.message}`); closePlayer(); } }
-        function playVideo(element) { const videoKey = element.dataset.videoKey; const title = element.dataset.videoTitle; const playlistId = element.dataset.playlistId; currentVideoIndex = parseInt(element.dataset.videoIndex, 10); currentPlaylist = allVideos.filter(v => v.playlist_id == playlistId); playerOverlay.style.display = 'block'; document.body.style.overflow = 'hidden'; loadVideo({ videoKey, title }); isLocked = false; lockOverlay.classList.remove('locked'); controls.classList.remove('hidden'); setupPlayerEventListeners(); showControls(); }
-        function playNextVideo() { if (currentVideoIndex < currentPlaylist.length - 1) { currentVideoIndex++; const nextVideo = currentPlaylist[currentVideoIndex]; loadVideo({ videoKey: nextVideo.video_key, title: nextVideo.title }); } }
-        function playPrevVideo() { if (currentVideoIndex > 0) { currentVideoIndex--; const prevVideo = currentPlaylist[currentVideoIndex]; loadVideo({ videoKey: prevVideo.video_key, title: prevVideo.title }); } }
-        function toggleFullscreen() {
-            const isFullscreen = document.body.classList.contains('fullscreen-active');
-            if (!isFullscreen) {
-                document.body.classList.add('fullscreen-active');
-                playerContainer.classList.add('pseudo-fullscreen');
-                fsOpenIcon.style.display = 'none';
-                fsCloseIcon.style.display = 'block';
-                if (screen.orientation && screen.orientation.lock) {
-                    screen.orientation.lock('landscape').catch(e => console.log("Could not lock screen:", e));
+        function playVideo(element) { const videoKey = element.dataset.videoKey; const title = element.dataset.videoTitle; const playlistId = element.dataset.playlistId; currentVideoIndex = parseInt(element.dataset.videoIndex, 10); currentPlaylist = allVideos.filter(v => v.playlist_id == playlistId); playerOverlay.style.display = 'block'; document.body.style.overflow = 'hidden'; loadVideo({ videoKey, title }); isLocked = false; lockOverlay.classList.remove('locked'); controls.classList.remove('hidden'); setupPlayerEventListeners(); showControls(); } // This is for USER videos
+        function playNextVideo() { if (currentVideoIndex < currentPlaylist.length - 1) { currentVideoIndex++; const nextVideo = currentPlaylist[currentVideoIndex]; loadVideo({ videoKey: nextVideo.video_key, title: nextVideo.title }); } } // For user videos
+        function playPrevVideo() { if (currentVideoIndex > 0) { currentVideoIndex--; const prevVideo = currentPlaylist[currentVideoIndex]; loadVideo({ videoKey: prevVideo.video_key, title: prevVideo.title }); } } // For user videos
+        function toggleFullscreen() { /* ... existing fullscreen logic ... */
+             const isFullscreen = document.body.classList.contains('fullscreen-active');
+             if (!isFullscreen) {
+                 document.body.classList.add('fullscreen-active');
+                 playerContainer.classList.add('pseudo-fullscreen');
+                 fsOpenIcon.style.display = 'none';
+                 fsCloseIcon.style.display = 'block';
+                 if (screen.orientation && screen.orientation.lock) { screen.orientation.lock('landscape').catch(e => console.log("Could not lock screen:", e)); }
+             } else {
+                 document.body.classList.remove('fullscreen-active');
+                 playerContainer.classList.remove('pseudo-fullscreen');
+                 fsOpenIcon.style.display = 'block';
+                 fsCloseIcon.style.display = 'none';
+                 if (screen.orientation && screen.orientation.unlock) { screen.orientation.unlock(); }
+             }
+         }
+        function closePlayer() { mainPlayer.pause(); mainPlayer.src = ''; if (document.body.classList.contains('fullscreen-active')) { toggleFullscreen(); } if (document.pictureInPictureElement) { document.exitPictureInPicture(); } playerOverlay.style.display = 'none'; document.body.style.overflow = 'auto'; removePlayerEventListeners(); } // For user videos
+        function togglePlay() { if (mainPlayer.paused || mainPlayer.ended) { mainPlayer.play(); } else { mainPlayer.pause(); } } // For user videos
+        function handleTimeUpdate() { /* ... existing time update logic ... */
+            const progress = (mainPlayer.currentTime / mainPlayer.duration) * 100;
+            playedBar.style.width = `${progress}%`;
+            currentTimeEl.textContent = formatTime(mainPlayer.currentTime);
+            if(mainPlayer.duration && !isNaN(mainPlayer.duration)) totalTimeEl.textContent = formatTime(mainPlayer.duration);
+            if (mainPlayer.buffered.length > 0) {
+                const bufferedEnd = mainPlayer.buffered.end(mainPlayer.buffered.length - 1);
+                const bufferedProgress = (bufferedEnd / mainPlayer.duration) * 100;
+                bufferedBar.style.width = `${bufferedProgress}%`;
+            }
+         }
+        function handleProgressBarClick(e) { const rect = progressBar.getBoundingClientRect(); const clickX = e.clientX - rect.left; const percentage = clickX / rect.width; mainPlayer.currentTime = mainPlayer.duration * percentage; } // For user videos
+        function togglePip() { if (document.pictureInPictureElement) { document.exitPictureInPicture(); } else { if(document.pictureInPictureEnabled && !mainPlayer.paused) { mainPlayer.requestPictureInPicture().catch(err => console.error("PiP Error:", err)); } } } // For user videos
+        function updatePlayPauseIcon() { playIcon.style.display = mainPlayer.paused ? 'block' : 'none'; pauseIcon.style.display = mainPlayer.paused ? 'none' : 'block'; replayIcon.style.display = 'none'; pauseOverlay.style.display = mainPlayer.paused && !mainPlayer.ended ? 'flex' : 'none'; } // For user videos
+        function handleEnded() { playIcon.style.display = 'none'; pauseIcon.style.display = 'none'; replayIcon.style.display = 'block'; } // For user videos
+        function toggleLock() { isLocked = !isLocked; lockOverlay.classList.toggle('locked', isLocked); if (isLocked) { controls.classList.add('hidden'); } else { showControls(); } } // For user videos
+        let lastTap = 0; // For user videos
+        function handlePlayerClick(e) { /* ... existing double tap logic ... */
+             const currentTime = new Date().getTime();
+             const tapLength = currentTime - lastTap;
+             // Check if click is within player bounds but outside specific controls
+             const rect = mainPlayer.getBoundingClientRect();
+             const clickX = e.clientX;
+             const clickY = e.clientY;
+             // Simple check to avoid double-tap when clicking controls at edges
+             const edgePadding = 80; // Pixels from edges to ignore double tap
+             if (clickX > rect.left + edgePadding && clickX < rect.right - edgePadding &&
+                 clickY > rect.top + edgePadding && clickY < rect.bottom - edgePadding)
+             {
+                 if (tapLength < 300 && tapLength > 0) {
+                     const tapAreaX = e.clientX - rect.left;
+                     if (tapAreaX < rect.width / 2) {
+                         mainPlayer.currentTime -= 10; showSeekAnimation('rewind');
+                     } else {
+                         mainPlayer.currentTime += 10; showSeekAnimation('forward');
+                     }
+                     e.preventDefault(); // Prevent default action like pausing on second tap
+                 } else {
+                     if(!isLocked) togglePlay(); // Toggle play/pause on single tap if not locked
+                 }
+             } else {
+                 // If click is near edges, just show controls if not locked
+                  if(!isLocked) showControls();
+             }
+             lastTap = currentTime;
+         }
+        function showSeekAnimation(direction) { const animEl = direction === 'forward' ? forwardAnim : rewindAnim; animEl.classList.add('visible'); setTimeout(() => animEl.classList.remove('visible'), 500); } // For user videos
+        let touchStartY = 0; let touchCurrentVolume = 0; const volumeHud = document.querySelector('.volume-hud'); // For user videos
+        function handleTouchStart(e) { if (e.touches.length === 1) { const touch = e.touches[0]; const rect = playerContainer.getBoundingClientRect(); if (touch.clientX > rect.left + rect.width / 2) { touchStartY = touch.clientY; touchCurrentVolume = mainPlayer.volume; } else { touchStartY = 0; } } } // For user videos
+        function handleTouchMove(e) { if (e.touches.length === 1 && touchStartY !== 0) { e.preventDefault(); const touch = e.touches[0]; const deltaY = touchStartY - touch.clientY; const sensitivity = 200; const volumeChange = deltaY / sensitivity; let newVolume = touchCurrentVolume + volumeChange; newVolume = Math.max(0, Math.min(1, newVolume)); mainPlayer.volume = newVolume; volumeHud.classList.add('visible'); volumeHud.querySelector('.volume-level').textContent = `${Math.round(newVolume * 100)}%`; } } // For user videos
+        function handleTouchEnd(e) { touchStartY = 0; setTimeout(() => volumeHud.classList.remove('visible'), 500); } // For user videos
+
+        // Existing Video Player Event Listeners (only for mainPlayer)
+        const videoPlayerEventListeners = [ { el: mainPlayer, type: 'play', func: updatePlayPauseIcon }, { el: mainPlayer, type: 'pause', func: updatePlayPauseIcon }, { el: mainPlayer, type: 'ended', func: handleEnded }, { el: mainPlayer, type: 'timeupdate', func: handleTimeUpdate }, { el: mainPlayer, type: 'waiting', func: () => loadingSpinner.style.display = 'block' }, { el: mainPlayer, type: 'playing', func: () => loadingSpinner.style.display = 'none' }, { el: mainPlayer, type: 'click', func: handlePlayerClick }, { el: playPauseBtn, type: 'click', func: togglePlay }, { el: progressBar, type: 'click', func: handleProgressBarClick }, { el: fullscreenBtn, type: 'click', func: toggleFullscreen }, { el: pipBtn, type: 'click', func: togglePip }, { el: playerCloseBtn, type: 'click', func: closePlayer }, { el: playerContainer, type: 'mousemove', func: showControls }, { el: lockBtn, type: 'click', func: toggleLock }, { el: unlockBtn, type: 'click', func: toggleLock }, { el: nextBtn, type: 'click', func: playNextVideo }, { el: prevBtn, type: 'click', func: playPrevVideo }, { el: playerContainer, type: 'touchstart', func: handleTouchStart, options: { passive: false } }, { el: playerContainer, type: 'touchmove', func: handleTouchMove, options: { passive: false } }, { el: playerContainer, type: 'touchend', func: handleTouchEnd } ];
+        function setupPlayerEventListeners() { videoPlayerEventListeners.forEach(({ el, type, func, options }) => el.addEventListener(type, func, options)); }
+        function removePlayerEventListeners() { videoPlayerEventListeners.forEach(({ el, type, func, options }) => el.removeEventListener(type, func, options)); }
+
+
+        // [New] Functions for AI Avatar interaction
+        async function populateHomePage() {
+            const container = document.getElementById('playlist-container');
+            const statusMsg = document.getElementById('home-status-message');
+            container.innerHTML = ''; // Clear previous content
+            statusMsg.textContent = 'Loading...';
+            statusMsg.style.display = 'block';
+
+            try {
+                // Fetch both video playlists and AI avatars
+                const [videoData, avatarData] = await Promise.all([
+                     fetch(`${API_BASE_URL}/api/home-content`).then(handleApiResponse),
+                     fetch(`${API_BASE_URL}/api/avatars`).then(handleApiResponse) // [New] Fetch avatars
+                ]);
+
+
+                // --- Handle Video Playlists (Existing Logic) ---
+                if (!videoData.success) throw new Error(videoData.message);
+                allVideos = videoData.videos; // Store all videos globally
+
+                if (videoData.playlists.length === 0 && avatarData.avatars.length === 0) { // Check both for no content
+                    statusMsg.textContent = 'No content found. Be the first to upload!';
+                    return;
                 }
-            } else {
-                document.body.classList.remove('fullscreen-active');
-                playerContainer.classList.remove('pseudo-fullscreen');
-                fsOpenIcon.style.display = 'block';
-                fsCloseIcon.style.display = 'none';
-                if (screen.orientation && screen.orientation.unlock) {
-                    screen.orientation.unlock();
-                }
+                statusMsg.style.display = 'none'; // Hide status if content exists
+
+                // Add AI Avatar section to Home page (Simple for now, just show selected avatar?)
+                // TODO: Design how AI Avatar appears on Home page. For now, maybe just show the default/selected one?
+                // This is where the actual AI conversation UI will eventually go.
+                // Let's add a placeholder for the AI Avatar interaction area.
+                 const aiAvatarArea = document.createElement('div');
+                 aiAvatarArea.id = 'aiAvatarHomeArea';
+                 aiAvatarArea.innerHTML = '<h2>AI Avatar Interaction Area</h2><p>Select an avatar from the Packages tab to start!</p>'; // Placeholder content
+                 container.appendChild(aiAvatarArea);
+
+
+                // Populate Video Playlists
+                videoData.playlists.forEach(playlist => {
+                    const playlistVideos = allVideos.filter(v => v.playlist_id === playlist.id);
+                    if (playlistVideos.length === 0) return; // Skip empty playlists
+
+                    const section = document.createElement('div');
+                    section.className = 'playlist-section';
+                    let videoCardsHTML = playlistVideos.map((video, index) =>
+                        `<div class="video-card-grid" data-video-key="${video.video_key}" data-video-title="${video.title}" data-playlist-id="${playlist.id}" data-video-index="${index}" onclick="playVideo(this)">
+                            <div class="thumbnail" style="background-image: url('${video.thumbnailUrl}')"></div>
+                            <div class="info"><p>${video.title}</p></div>
+                        </div>`
+                    ).join('');
+                    section.innerHTML = `<div class="playlist-header"><h3>${playlist.name}</h3></div><div class="video-grid-3xN">${videoCardsHTML}</div>`;
+                    container.appendChild(section);
+                });
+
+            } catch (error) {
+                console.error('Error populating home page:', error);
+                statusMsg.textContent = `Error: ${error.message}`;
+                statusMsg.style.color = '#F44336';
             }
         }
-        function closePlayer() { mainPlayer.pause(); mainPlayer.src = ''; if (document.body.classList.contains('fullscreen-active')) { toggleFullscreen(); } if (document.pictureInPictureElement) { document.exitPictureInPicture(); } playerOverlay.style.display = 'none'; document.body.style.overflow = 'auto'; removePlayerEventListeners(); }
-        function togglePlay() { if (mainPlayer.paused || mainPlayer.ended) { mainPlayer.play(); } else { mainPlayer.pause(); } }
-        function handleTimeUpdate() { const progress = (mainPlayer.currentTime / mainPlayer.duration) * 100; playedBar.style.width = `${progress}%`; currentTimeEl.textContent = formatTime(mainPlayer.currentTime); if(mainPlayer.duration) totalTimeEl.textContent = formatTime(mainPlayer.duration); if (mainPlayer.buffered.length > 0) { const bufferedEnd = mainPlayer.buffered.end(mainPlayer.buffered.length - 1); const bufferedProgress = (bufferedEnd / mainPlayer.duration) * 100; bufferedBar.style.width = `${bufferedProgress}%`; } }
-        function handleProgressBarClick(e) { const rect = progressBar.getBoundingClientRect(); const clickX = e.clientX - rect.left; const percentage = clickX / rect.width; mainPlayer.currentTime = mainPlayer.duration * percentage; }
-        function togglePip() { if (document.pictureInPictureElement) { document.exitPictureInPicture(); } else { if(document.pictureInPictureEnabled) { mainPlayer.requestPictureInPicture().catch(err => console.error("PiP Error:", err)); } } }
-        function updatePlayPauseIcon() { playIcon.style.display = mainPlayer.paused ? 'block' : 'none'; pauseIcon.style.display = mainPlayer.paused ? 'none' : 'block'; replayIcon.style.display = 'none'; pauseOverlay.style.display = mainPlayer.paused && !mainPlayer.ended ? 'flex' : 'none'; }
-        function handleEnded() { playIcon.style.display = 'none'; pauseIcon.style.display = 'none'; replayIcon.style.display = 'block'; }
-        function toggleLock() { isLocked = !isLocked; lockOverlay.classList.toggle('locked', isLocked); if (isLocked) { controls.classList.add('hidden'); } else { showControls(); } }
-        let lastTap = 0;
-        function handlePlayerClick(e) { const currentTime = new Date().getTime(); const tapLength = currentTime - lastTap; if (tapLength < 300 && tapLength > 0) { const rect = e.target.getBoundingClientRect(); const tapX = e.clientX - rect.left; if (tapX < rect.width / 2) { mainPlayer.currentTime -= 10; showSeekAnimation('rewind'); } else { mainPlayer.currentTime += 10; showSeekAnimation('forward'); } e.preventDefault(); } else { if(!isLocked) togglePlay(); } lastTap = currentTime; }
-        function showSeekAnimation(direction) { const animEl = direction === 'forward' ? forwardAnim : rewindAnim; animEl.classList.add('visible'); setTimeout(() => animEl.classList.remove('visible'), 500); }
-        let touchStartY = 0; let touchCurrentVolume = 0; const volumeHud = document.querySelector('.volume-hud');
-        function handleTouchStart(e) { if (e.touches.length === 1) { const touch = e.touches[0]; const rect = playerContainer.getBoundingClientRect(); if (touch.clientX > rect.left + rect.width / 2) { touchStartY = touch.clientY; touchCurrentVolume = mainPlayer.volume; } else { touchStartY = 0; } } }
-        function handleTouchMove(e) { if (e.touches.length === 1 && touchStartY !== 0) { e.preventDefault(); const touch = e.touches[0]; const deltaY = touchStartY - touch.clientY; const sensitivity = 200; const volumeChange = deltaY / sensitivity; let newVolume = touchCurrentVolume + volumeChange; newVolume = Math.max(0, Math.min(1, newVolume)); mainPlayer.volume = newVolume; volumeHud.classList.add('visible'); volumeHud.querySelector('.volume-level').textContent = `${Math.round(newVolume * 100)}%`; } }
-        function handleTouchEnd(e) { touchStartY = 0; setTimeout(() => volumeHud.classList.remove('visible'), 500); }
-        
-        const eventListeners = [ { el: mainPlayer, type: 'play', func: updatePlayPauseIcon }, { el: mainPlayer, type: 'pause', func: updatePlayPauseIcon }, { el: mainPlayer, type: 'ended', func: handleEnded }, { el: mainPlayer, type: 'timeupdate', func: handleTimeUpdate }, { el: mainPlayer, type: 'waiting', func: () => loadingSpinner.style.display = 'block' }, { el: mainPlayer, type: 'playing', func: () => loadingSpinner.style.display = 'none' }, { el: mainPlayer, type: 'click', func: handlePlayerClick }, { el: playPauseBtn, type: 'click', func: togglePlay }, { el: progressBar, type: 'click', func: handleProgressBarClick }, { el: fullscreenBtn, type: 'click', func: toggleFullscreen }, { el: pipBtn, type: 'click', func: togglePip }, { el: playerCloseBtn, type: 'click', func: closePlayer }, { el: playerContainer, type: 'mousemove', func: showControls }, { el: lockBtn, type: 'click', func: toggleLock }, { el: unlockBtn, type: 'click', func: toggleLock }, { el: nextBtn, type: 'click', func: playNextVideo }, { el: prevBtn, type: 'click', func: playPrevVideo }, { el: playerContainer, type: 'touchstart', func: handleTouchStart, options: { passive: false } }, { el: playerContainer, type: 'touchmove', func: handleTouchMove, options: { passive: false } }, { el: playerContainer, type: 'touchend', func: handleTouchEnd } ];
-        function setupPlayerEventListeners() { eventListeners.forEach(({ el, type, func, options }) => el.addEventListener(type, func, options)); }
-        function removePlayerEventListeners() { eventListeners.forEach(({ el, type, func, options }) => el.removeEventListener(type, func, options)); }
-        
+
+         // [New] Function to populate the AI Avatar Grid on Package page
+        async function populateAvatarGrid() {
+             const gridContainer = document.getElementById('avatarGrid');
+             const statusMsg = document.getElementById('package-status-message');
+             gridContainer.innerHTML = ''; // Clear existing cards
+             statusMsg.textContent = 'Loading Avatars...';
+             statusMsg.style.display = 'block';
+
+             try {
+                 const data = await fetch(`${API_BASE_URL}/api/avatars`).then(handleApiResponse); // Fetch avatars from new backend endpoint
+                 if (!data.success || !data.avatars || data.avatars.length === 0) {
+                     statusMsg.textContent = data.message || 'No AI avatars found. Use the dev upload!';
+                     return;
+                 }
+                 statusMsg.style.display = 'none'; // Hide status if avatars exist
+
+                 allAvatars = data.avatars; // Store all avatars globally
+
+                 allAvatars.forEach(avatar => {
+                     const avatarCard = document.createElement('div');
+                     avatarCard.className = 'avatar-card';
+                     // Store data attributes for easy access later
+                     avatarCard.dataset.avatarId = avatar.id;
+                     avatarCard.dataset.imageUrl = avatar.imageUrl; // Assuming backend provides presigned URL
+                     avatarCard.dataset.videoUrl = avatar.videoUrl; // Assuming backend provides presigned URL
+                     avatarCard.dataset.avatarName = avatar.name;
+
+                     // Set background image or img src
+                     // Using <img> tag as requested
+                     avatarCard.innerHTML = `<img src="${avatar.imageUrl}" alt="${avatar.name}">`;
+
+                     // Add click listener to open the detail page
+                     avatarCard.onclick = () => showAvatarDetail(avatar); // Pass the whole avatar object
+
+                     gridContainer.appendChild(avatarCard);
+                 });
+
+             } catch (error) {
+                 console.error('Error populating avatar grid:', error);
+                 statusMsg.textContent = `Error loading avatars: ${error.message}`;
+                 statusMsg.style.color = '#F44336';
+             }
+        }
+
+         // [New] Function to populate the Avatar Select Panel (the vertical list)
+         function populateAvatarSelectPanel() {
+             const panel = document.getElementById('avatarSelectPanel');
+             panel.innerHTML = ''; // Clear existing cards
+
+             if (!allAvatars || allAvatars.length === 0) {
+                 panel.innerHTML = '<p style="color:var(--secondary-text); text-align:center; font-size:12px; padding: 10px;">No avatars loaded.</p>';
+                 return;
+             }
+
+             allAvatars.forEach(avatar => {
+                 const selectCard = document.createElement('div');
+                 selectCard.className = 'avatar-select-card';
+                 selectCard.dataset.avatarId = avatar.id;
+                 selectCard.dataset.avatarName = avatar.name;
+                 // Use 9:16 image URL here if you have one, otherwise reuse the 1:1 image
+                 // For simplicity, reusing the 1:1 image; CSS will handle aspect ratio
+                 selectCard.innerHTML = `<img src="${avatar.imageUrl}" alt="${avatar.name}">`; // Using <img> tag
+
+                 // Add click listener to select this avatar (Placeholder logic)
+                 selectCard.onclick = () => selectAvatar(avatar);
+
+                 panel.appendChild(selectCard);
+             });
+         }
+
+
+         // [New] Function to show the AI Avatar Detail/Preview page
+         function showAvatarDetail(avatarData) {
+             // Hide all other pages
+             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+             document.body.style.overflow = 'hidden'; // Prevent body scroll
+
+             // Set video source and play
+             if (avatarData.videoUrl) {
+                 avatarPreviewVideo.src = avatarData.videoUrl; // Assuming it's a presigned URL
+                 avatarPreviewVideo.play().catch(error => console.error("Video playback failed:", error));
+                 currentPlayingAvatarVideo = avatarPreviewVideo; // Keep track of the playing video
+             } else {
+                 console.warn("No video URL found for avatar:", avatarData.name);
+                 // Handle case with no video (maybe show image and a message?)
+                 avatarPreviewVideo.removeAttribute('src');
+                 // TODO: Add UI feedback if video fails or is missing
+             }
+
+             // Set avatar name in the header
+             avatarPreviewName.textContent = avatarData.name;
+
+             // Show the detail page
+             avatarDetailPage.style.display = 'block';
+
+             // Populate the select panel initially (it's hidden by default)
+             populateAvatarSelectPanel();
+
+             // Add listeners specifically for this page if needed (like controls toggle)
+             // For simplicity, controls are always visible initially on this page
+         }
+
+         // [New] Function to hide the AI Avatar Detail/Preview page
+         function hideAvatarDetail() {
+              if(currentPlayingAvatarVideo) {
+                 currentPlayingAvatarVideo.pause();
+                 currentPlayingAvatarVideo.removeAttribute('src'); // Clear src
+                 currentPlayingAvatarVideo = null;
+              }
+              avatarDetailPage.style.display = 'none';
+              avatarSelectPanel.style.display = 'none'; // Ensure panel is hidden too
+              document.body.style.overflow = 'auto'; // Allow body scroll again
+              showPage('packagePage'); // Go back to package page after closing detail
+         }
+
+         // [New] Function to toggle the AI Avatar Select Panel visibility
+         function toggleAvatarSelectPanel() {
+             const isHidden = avatarSelectPanel.style.display === 'none' || avatarSelectPanel.style.display === '';
+             avatarSelectPanel.style.display = isHidden ? 'flex' : 'none';
+         }
+
+         // [New] Function to handle selecting an avatar from the side panel (Placeholder)
+         function selectAvatar(avatarData) {
+             console.log("Avatar Selected:", avatarData.name, "(ID:", avatarData.id, ")");
+             // TODO: Implement logic to store the selected avatar ID (e.g., in localStorage)
+             // This selected ID will be used later when the user goes to the actual AI conversation page
+             alert(`Avatar "${avatarData.name}" selected!`); // Simple feedback for now
+             hideAvatarDetail(); // Close the detail page after selection
+             // You might want to navigate to the Home page or the future AI conversation page here
+             // showPage('homePage'); // Example: Go back home after selection
+         }
+
+        // [New] Placeholder function for uploading AI assets (Development only)
+        function uploadAiAssetsDev() {
+            alert("AI Asset Upload (Dev) - To be implemented!\n\nThis will involve a form to select Avatar Image and Video and upload them using the Wasabi functions.");
+            // TODO: Implement a simple form or modal here to:
+            // 1. Input Avatar Name (or select existing avatar ID)
+            // 2. Select Avatar Image file
+            // 3. Select Avatar Video file
+            // 4. Use generateUploadUrl for each file
+            // 5. Use uploadFileWithProgress for each file
+            // 6. Call a NEW backend endpoint (e.g., POST /api/avatars) to save the metadata (name, image_key, video_key)
+        }
+
+
+        // ======== Event Listeners ========
+
         document.addEventListener('DOMContentLoaded', () => {
-            showPage('homePage');
-            populateHomePage();
-            populatePlaylistDropdown();
+            // Initial page load
+            showPage('homePage'); // Start on the home page
+
+            // [New] Add event listener for AI Avatar clicks on Package page (done via onclick attribute in HTML for now)
+            // Event delegation could be used here later for better performance
+
+            // [New] Add event listener for Back button on Avatar Detail page
+            avatarBackBtn.addEventListener('click', hideAvatarDetail);
+
+            // [New] Add event listener for Select Avatar button on Avatar Detail page
+            selectAvatarBtn.addEventListener('click', toggleAvatarSelectPanel);
+
+            // [New] Add event listener for the Dev AI Assets Upload button
+            uploadAiAssetsBtn.addEventListener('click', uploadAiAssetsDev);
+
+            // Initial setup for existing video player listeners (only when player is shown)
+            // The listeners are added/removed when playVideo/closePlayer is called.
         });
+
     </script>
 </body>
 </html>
