@@ -320,7 +320,7 @@
             align-items: center;
             padding: 15px 10px; /* Padding inside panel */
             overflow-y: auto; /* Make it scrollable */
-            gap: 15px; /* Gap between list cards */
+            gap: 15px; /* Space between list cards */
              box-shadow: -5px 0 15px rgba(0,0,0,0.5); /* Add a shadow */
         }
 
@@ -688,7 +688,7 @@
         <!-- Content Overlay (Status, Chat, Controls) -->
         <div class="conversation-content-overlay">
              <!-- Status Indicator (e.g., "Listening...", "Speaking...", "Thinking...", "Ready") -->
-             <div id="conversationStatus" class="conversation-status">Ready</div>
+             <div id="conversationStatus" class="conversation-status">Connecting...</div> <!-- Set initial status -->
 
              <!-- Chat Message Area (Placeholder for now) -->
              <div id="conversationChatArea" class="conversation-chat-area">
@@ -700,7 +700,7 @@
                  <button id="endCallButton" class="end-call-button">
                       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20,15.5C18.8,15.5 17.5,15.3 16.4,15C16.1,15.4 15.7,15.7 15.3,16.1C14.7,16.7 13.9,17.2 13.1,17.6C13,17.6 12.9,17.7 12.9,17.7L11,19.6C10,19.4 9.1,19.1 8.2,18.7C5.4,17.3 3,14.9 1.6,12.1C1.2,11.2 0.9,10.3 0.7,9.4L2.6,7.5C2.6,7.5 2.7,7.6 2.7,7.7C3.1,6.9 3.6,6.1 4.2,5.5C4.6,5.1 5,4.7 5.4,4.4C5.1,3.2 4.9,2 4.7,0.8L2.1,0C1.8,2.3 1.9,4.7 2.6,7C3.3,9.3 4.6,11.3 6.4,13.1C8.2,14.9 10.2,16.2 12.5,16.9C14.8,17.6 17.2,17.7 19.5,17.4L18.7,14.8C17.5,15 16.2,15.5 15.5,15.5Z" /></svg>
                  </button>
-                 <button id="micButton" class="mic-button">🎤</button>
+                 <button id="micButton" class="mic-button" disabled style="opacity: 0.5;">🎤</button> <!-- Set initial disabled state and opacity -->
                   <!-- Placeholder for any other control -->
                   <div style="width: 40px; height: 40px;"></div> <!-- Keep layout symmetrical -->
              </div>
@@ -958,6 +958,9 @@
                 activeAvatarVideo.removeAttribute('src');
             }
             // TODO: Also stop WebSocket connection if active when leaving aiConversationPage
+            // This would be part of the endAiConversation logic, which is called when navigating away from the AI page.
+            // endAiConversation is called by the red hang up button. We might also need to call it
+            // when navigating away using the bottom nav if a conversation is active.
 
 
             document.body.style.overflow = 'auto'; // Enable body scroll by default
@@ -976,7 +979,8 @@
                       } else {
                            console.error("Cannot start conversation: No avatar selected.");
                            alert("Please select an AI avatar from the Packages tab first.");
-                           showPage('packagePage'); // Go back to packages if no avatar selected
+                           showPage('packagePage'); // Fallback if somehow AI page is accessed without selected avatar
+                           return; // Prevent showing AI page
                       }
                  }
             } else {
@@ -992,7 +996,7 @@
             else if (pageId === 'uploadPage') document.querySelector('.upload-plus').classList.add('active');
             else if (pageId === 'packagePage') document.getElementById('navPackage').classList.add('active');
             else if (pageId === 'infoSubmissionPage' || pageId === 'userDashboardPage') document.getElementById('navProfile').classList.add('active');
-            // Note: aiConversationPage is a full overlay, not directly controlled by nav items
+            // Note: aiConversationPage and avatarDetailPage are full overlays, not directly controlled by main nav items
 
             // Specific actions when showing certain pages
             if (pageId === 'homePage') {
@@ -1491,7 +1495,7 @@
             // TODO: Implement actual submission logic here
             // This would involve using generateUploadUrl and uploadFileWithProgress
             // for the photos and ID, and then sending all the data (including keys)
-            // to a new backend endpoint (e.g., POST /api/user-verification).
+            // to a new backend endpoint (e.e.g., POST /api/user-verification).
 
             setButtonLoading(submitBtn, true, 'Submit for Approval');
             // --- REMOVED: Progress bar display call ---
@@ -1828,7 +1832,7 @@
                 const imageUrlRes = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(imageFile.name)}&contentType=${imageFile.type}`).then(handleApiResponse);
                  if (!imageUrlRes.success || !imageUrlRes.uploadUrl || !imageUrlRes.key) throw new Error(`Failed to get image upload URL: ${imageUrlRes.message || ''}`);
 
-                // Upload Image (e.g., 30% progress)
+                // Upload Image (e.e.g., 30% progress)
                 await uploadFileWithProgress(imageUrlRes.uploadUrl, imageFile); // Removed progress tracking call here for simplicity
                  console.log("Image uploaded successfully to Wasabi.");
 
@@ -1905,61 +1909,387 @@
             }
         }
 
-         // ======== AI Conversation Logic (Placeholder/Entry Point) ========
 
-         // Function to start the AI conversation page and setup WebSocket
-         function startAiConversation(avatarData) {
-             if (!avatarData || !avatarData.videoUrl) {
-                 console.error("Cannot start conversation: Invalid avatar data or missing video URL.");
-                 alert("Failed to load avatar data for conversation.");
-                 showPage('homePage'); // Fallback
+        // ======== Video Player Logic (Existing) ========
+        // Keep all existing video player functions (formatTime, showControls, loadVideo, playVideo, playNextVideo, playPrevVideo, toggleFullscreen, closePlayer, togglePlay, handleTimeUpdate, handleProgressBarClick, togglePip, updatePlayPauseIcon, handleEnded, toggleLock, handlePlayerClick, showSeekAnimation, handleTouchStart, handleTouchMove, handleTouchEnd) as they were.
+        // Ensure event listeners are added/removed correctly by playVideo/closePlayer.
+        // The eventListeners array was correct. The setupPlayerEventListeners and removePlayerEventListeners functions should attach/detach these.
+        // (Code for these functions is omitted here for brevity as you only asked for HTML, but ensure they are in your actual index.html script block)
+
+         // Re-including essential video player logic structure for clarity on event listeners
+         const videoPlayerEventListeners = [
+            { el: mainPlayer, type: 'play', func: updatePlayPauseIcon },
+            { el: mainPlayer, type: 'pause', func: updatePlayPauseIcon },
+            { el: mainPlayer, type: 'ended', func: handleEnded },
+            { el: mainPlayer, type: 'timeupdate', func: handleTimeUpdate },
+            { el: mainPlayer, type: 'waiting', func: () => { if(playerOverlay.style.display !== 'none') loadingSpinner.style.display = 'block'; } }, // Only show if player is visible
+            { el: mainPlayer, type: 'playing', func: () => { loadingSpinner.style.display = 'none'; } },
+            { el: mainPlayer, type: 'error', func: (e) => { console.error("Video Player Error:", e); alert("Error playing video."); loadingSpinner.style.display = 'none'; closePlayer(); }},
+            { el: playPauseBtn, type: 'click', func: togglePlay },
+            { el: progressBar, type: 'click', func: handleProgressBarClick },
+            { el: fullscreenBtn, type: 'click', func: toggleFullscreen },
+            { el: pipBtn, type: 'click', func: togglePip },
+            { el: playerCloseBtn, type: 'click', func: closePlayer },
+            { el: lockBtn, type: 'click', toggleLock },
+            { el: unlockBtn, type: 'click', toggleLock },
+            { el: nextBtn, type: 'click', func: playNextVideo },
+            { el: prevBtn, type: 'click', func: playPrevVideo },
+            // Touch/Mouse listeners added to playerContainer below
+         ];
+
+        function setupPlayerEventListeners() {
+             videoPlayerEventListeners.forEach(({ el, type, func, options }) => el.addEventListener(type, func, options));
+        }
+        function removePlayerEventListeners() {
+             videoPlayerEventListeners.forEach(({ el, type, func, options }) => el.removeEventListener(type, func, options));
+        }
+
+         // Add the click listener for the main video player area (for play/pause/double tap)
+         // This listener is added ONCE to the playerContainer, not added/removed with other controls
+         const playerContainerEl = document.querySelector('#videoPlayerOverlay .player-container');
+         if(playerContainerEl) {
+             playerContainerEl.addEventListener('click', handlePlayerClick); // Single/Double tap logic
+             playerContainerEl.addEventListener('mousemove', showControls); // Show controls on mouse move
+              // Add touch listeners for volume/brightness (if implemented) or controls
+             playerContainerEl.addEventListener('touchstart', handleTouchStart, { passive: false });
+             playerContainerEl.addEventListener('touchmove', handleTouchMove, { passive: false });
+             playerContainerEl.addEventListener('touchend', handleTouchEnd);
+         }
+
+
+        // ======== WebSocket Client Setup and Handling ========
+        let ws = null; // Global WebSocket instance for the conversation
+        let audioQueue = []; // To buffer received audio chunks
+        let audioContext = null; // Web Audio API context
+        let audioBufferSourceNode = null; // To play audio buffer
+
+        // Function to initialize Web Audio API
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                console.log("AudioContext initialized.");
+            }
+        }
+
+        // Function to play audio from a URL
+        function playAudioFromUrl(url) {
+             if (!url) {
+                 console.error("No audio URL provided for playback.");
                  return;
              }
+             // Stop any currently playing audio before starting new one
+             stopAudioPlayback();
 
-             // Set the avatar video source and play (this should be the idle loop)
+             console.log("Attempting to play audio from URL:", url);
+
+             const audio = new Audio(url);
+
+             audio.onplay = () => {
+                 console.log("Audio playback started.");
+                 // You might update UI to show speaking state, though backend should send ai_speaking
+             };
+
+             audio.onended = () => {
+                 console.log("Audio playback ended.");
+                 // Backend sends ai_finished_speaking, which handles UI updates
+             };
+
+             audio.onerror = (e) => {
+                 console.error("Audio playback error:", e);
+                 // Handle audio errors, perhaps show a message or transition state
+                 if (conversationStatus) conversationStatus.textContent = 'Audio Error';
+                 // Optionally, trigger ai_finished_speaking state reset
+                 handleWebSocketMessage(JSON.stringify({ type: 'ai_finished_speaking' }));
+             };
+
+             // Play the audio
+             audio.play().catch(e => {
+                 console.error("Audio playback failed (play promise rejected):", e);
+                 // Handle autoplay restrictions, user gesture required etc.
+                 if (conversationStatus) conversationStatus.textContent = 'Audio Play Failed';
+                 // Optionally, trigger ai_finished_speaking state reset
+                 handleWebSocketMessage(JSON.stringify({ type: 'ai_finished_speaking' }));
+             });
+        }
+
+         // Function to stop any currently playing audio
+         function stopAudioPlayback() {
+             // Stop URL-based audio
+             const audioElements = document.querySelectorAll('audio'); // Find any audio elements created
+             audioElements.forEach(audio => {
+                 if (!audio.paused) {
+                      console.log("Stopping active audio element.");
+                      audio.pause();
+                      audio.removeAttribute('src'); // Clear source
+                      audio.load(); // Reset audio element
+                 }
+             });
+
+             // Stop Web Audio API audio if playing
+             if (audioBufferSourceNode) {
+                 try {
+                     audioBufferSourceNode.stop();
+                     console.log("Stopping Web Audio API node.");
+                 } catch (e) {
+                     console.warn("Error stopping audio buffer source node:", e);
+                 }
+                 audioBufferSourceNode = null;
+             }
+             // TODO: Clear audioQueue if using chunk streaming
+             audioQueue = [];
+         }
+
+
+        // Function to establish WebSocket connection
+        function connectWebSocket() {
+            // Check if connection already exists or is being established
+            if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+                console.log("WebSocket already open or connecting.");
+                return;
+            }
+
+            // Determine WebSocket URL (use wss for Render/HTTPS, ws for local/HTTP)
+            const wsUrl = window.location.protocol === 'https:' ? `wss://${window.location.host}` : `ws://${window.location.host}`;
+
+            console.log(`Attempting to connect WebSocket to: ${wsUrl}`);
+
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                console.log('WebSocket connection established.');
+                if (conversationStatus) {
+                     conversationStatus.textContent = 'Connected'; // Update UI status
+                     // Note: Mic button will be enabled only after 'session_ready' from backend
+                }
+
+                // If we are on the AI conversation page when the connection opens,
+                // send the start_session message immediately.
+                // This handles cases where the user navigated to the AI page before WS connected
+                // or if the WS reconnected while on the AI page.
+                if (document.getElementById('aiConversationPage').classList.contains('active')) {
+                     if (selectedAvatar && ws && ws.readyState === WebSocket.OPEN) {
+                          console.log(`Sending start_session for avatar: ${selectedAvatar.id}`);
+                          ws.send(JSON.stringify({
+                               type: 'start_session',
+                               userId: 'user123', // Replace with actual user ID if implemented
+                               avatarId: selectedAvatar.id
+                          }));
+                          if (conversationStatus) conversationStatus.textContent = 'Starting session...';
+                     } else {
+                          console.warn("WebSocket opened, but not on AI page or no avatar selected. Session not started automatically.");
+                           if (conversationStatus) conversationStatus.textContent = 'Ready (Disconnected)'; // Indicate ready state but potential issue
+                     }
+                }
+            };
+
+            ws.onmessage = (event) => {
+                // Handle incoming messages from the backend AI chat handler
+                // console.log('WebSocket message received:', event.data); // Too verbose for binary data
+                handleWebSocketMessage(event.data); // Process different message types
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                if (conversationStatus) conversationStatus.textContent = 'Connection Error';
+                if (micButton) micButton.disabled = true; // Disable mic on error
+                 micButton.style.opacity = 0.5;
+                 micButton.classList.remove('listening');
+                // TODO: Implement retry logic or show persistent error message
+            };
+
+            ws.onclose = (event) => {
+                console.log(`WebSocket connection closed. Code: ${event.code}, Reason: ${event.reason || 'N/A'}`);
+                if (conversationStatus) conversationStatus.textContent = 'Disconnected';
+                if (micButton) micButton.disabled = true; // Disable mic on close
+                 micButton.style.opacity = 0.5;
+                 micButton.classList.remove('listening');
+                 stopAudioPlayback(); // Stop any ongoing audio
+
+                // Attempt to reconnect on unexpected closures (e.g., not user-initiated close '1000')
+                if (event.code !== 1000 && event.code !== 1001) { // 1000 = Normal, 1001 = Going Away
+                     console.warn("Attempting to reconnect WebSocket in 5 seconds...");
+                     setTimeout(connectWebSocket, 5000);
+                }
+            };
+        }
+
+        // Function to handle different WebSocket message types from backend
+        function handleWebSocketMessage(message) {
+             try {
+                 // First, try parsing as JSON for command messages
+                 let data;
+                 try {
+                     data = JSON.parse(message);
+                     console.log('WebSocket JSON message:', data);
+                 } catch (e) {
+                     // If parsing fails, it might be binary data (audio chunk)
+                     console.log('WebSocket potentially binary message (audio)');
+                      // Handle binary data separately if needed for audio streaming
+                      // For now, assuming audio comes as URL or specific type in JSON
+                     return; // Stop processing if not JSON
+                 }
+
+
+                 // Check if we are on the AI conversation page before updating UI specific to it
+                 // This prevents updates if the user navigated away while processing was happening
+                 if (!document.getElementById('aiConversationPage').classList.contains('active') && data.type !== 'ai_error') {
+                      console.warn(`Received WebSocket message type ${data.type} but not on AI conversation page. Ignoring UI update.`);
+                      // Still process non-UI logic if needed (e.g., session data update)
+                      return; // Stop if not on the AI page and not a critical error
+                 }
+
+
+                 switch (data.type) {
+                     case 'connected':
+                         console.log('Backend says:', data.message);
+                         // Status updated in ws.onopen
+                         break;
+                     case 'session_ready':
+                         console.log('AI Session Ready.');
+                         if (conversationStatus) conversationStatus.textContent = 'Ready';
+                         if (micButton) {
+                             micButton.disabled = false; // Enable mic
+                             micButton.style.opacity = 1;
+                         }
+                         // TODO: Possibly start idle animation here
+                         break;
+                     case 'ai_thinking':
+                         console.log('AI is thinking...');
+                         if (conversationStatus) conversationStatus.textContent = 'Thinking...';
+                         // TODO: Change avatar video to thinking loop?
+                         if (micButton) { // Ensure mic is disabled while AI is thinking/speaking
+                             micButton.disabled = true;
+                             micButton.style.opacity = 0.5;
+                             micButton.classList.remove('listening');
+                         }
+                         break;
+                     case 'ai_speaking':
+                         console.log('AI is speaking...');
+                         if (conversationStatus) conversationStatus.textContent = 'Speaking...';
+                         // TODO: Change avatar video to speaking loop?
+                         if (micButton) { // Ensure mic is disabled while AI is thinking/speaking
+                             micButton.disabled = true;
+                             micButton.style.opacity = 0.5;
+                             micButton.classList.remove('listening');
+                         }
+                          stopAudioPlayback(); // Stop any previous audio just in case
+                         // Now wait for the audio URL or chunks...
+                         break;
+                     case 'ai_audio_url': // Backend sends a pre-signed URL for the full audio file (XTTS v2 default)
+                         console.log('Received audio URL:', data.url);
+                         if (data.url) {
+                              playAudioFromUrl(data.url);
+                         } else {
+                             console.error("Received ai_audio_url message but URL is missing.");
+                             // Handle case where URL is missing
+                              if (conversationStatus) conversationStatus.textContent = 'Audio URL Missing';
+                              // Trigger finish speaking state as no audio will play
+                             handleWebSocketMessage(JSON.stringify({ type: 'ai_finished_speaking' }));
+                         }
+                         break;
+                      case 'ai_audio_chunk': // Backend sends audio in chunks (requires Web Audio API)
+                          console.log('Received audio chunk (binary/base64).');
+                          // TODO: This requires complex Web Audio API buffering and playback
+                          // For a simpler approach like XTTS v2, the 'ai_audio_url' method is used.
+                          // Implementing this would involve converting data.audioChunk (Base64 or ArrayBuffer)
+                          // into AudioBufferSourceNode and playing it. This is beyond basic implementation.
+                          console.warn("Received audio chunk, but Web Audio API chunk handling is not fully implemented in frontend.");
+                          // As a fallback, if using XTTS, this case might not even be hit,
+                          // or you might need a different Replicate model/version.
+                         break;
+                     case 'ai_finished_speaking':
+                         console.log('AI finished speaking.');
+                         stopAudioPlayback(); // Ensure audio stops if it wasn't already (e.g. error)
+                         if (conversationStatus) conversationStatus.textContent = 'Ready';
+                          if (micButton) {
+                             micButton.disabled = false; // Enable mic again
+                             micButton.style.opacity = 1;
+                             micButton.classList.remove('listening'); // Ensure listening state is off
+                          }
+                         // TODO: Change avatar video back to idle loop?
+                         break;
+                     case 'ai_error':
+                         console.error('AI error:', data.message);
+                         if (conversationStatus) conversationStatus.textContent = `Error: ${data.message}`;
+                         if (micButton) {
+                             // Decide if mic should be ready or disabled after an error
+                             micButton.disabled = false; // Enable mic so user can try again
+                             micButton.style.opacity = 1;
+                             micButton.classList.remove('listening');
+                         }
+                          stopAudioPlayback(); // Stop any ongoing audio on error
+                          // TODO: Show error message in chat area?
+                         handleWebSocketMessage(JSON.stringify({ type: 'ai_finished_speaking' })); // Reset state
+                         break;
+                      case 'audio_text_chunk': // Received partial or final text from STT (if backend provides)
+                           // This might be useful for live transcription display
+                           // console.log("Backend STT:", data.text); // Uncomment to see live transcription
+                           // TODO: Update a temporary display element with the partial text
+                           // If data.isFinal is true, add it as a user message to chat history display
+                           break;
+                      case 'user_interrupted_ack': // Backend acknowledges user interruption
+                           console.log('Backend acknowledged user interruption.');
+                           // Frontend should already be in listening state and ready for new input
+                           break;
+                      // Add other cases for future message types (e.g., system messages, avatar state changes)
+                     default:
+                         console.warn('Received unknown WebSocket message type:', data.type, data);
+                 }
+             } catch (e) {
+                 console.error("Error processing WebSocket message:", e, "Original data:", message);
+                  // Attempt to reset state on unexpected message errors
+                 if (conversationStatus) conversationStatus.textContent = 'Protocol Error';
+                 if (micButton) {
+                      micButton.disabled = false;
+                      micButton.style.opacity = 1;
+                      micButton.classList.remove('listening');
+                 }
+             }
+        }
+
+        // Modified startAiConversation to correctly initiate WebSocket communication
+        function startAiConversation(avatarData) {
+             if (!avatarData || !avatarData.videoUrl) {
+                  console.error("Cannot start conversation: Invalid avatar data or missing video URL.");
+                  alert("Failed to load avatar data for conversation.");
+                  showPage('homePage'); // Fallback
+                  return;
+             }
+
+             // Ensure AudioContext is initialized for potential audio playback
+             initAudioContext();
+             stopAudioPlayback(); // Stop any lingering audio from previous sessions/previews
+
+
+             // Set the avatar video source and play (this should be the idle loop, will switch later)
              if (activeAvatarVideo) {
-                  // Use the avatar's main video loop as the background
-                 activeAvatarVideo.src = avatarData.videoUrl;
-                 activeAvatarVideo.muted = false; // Keep it muted initially, but we'll control audio via WebSocket
-                 activeAvatarVideo.loop = true; // Loop the background video
-                 activeAvatarVideo.play().catch(e => console.warn("Conversation video autoplay failed:", e));
-                  // TODO: In the future, switch between idle_loop_url, talking_loop_url, listening_loop_url
-                  // For now, we just use the main videoUrl which is assumed to be the talking loop from dev upload.
+                  activeAvatarVideo.src = avatarData.videoUrl; // Assuming this is the main visual loop
+                  activeAvatarVideo.muted = true; // Keep background video muted unless it has intended ambient sound
+                  activeAvatarVideo.loop = true;
+                  activeAvatarVideo.play().catch(e => console.warn("Conversation video autoplay failed:", e));
              }
 
              // Set initial status
              if (conversationStatus) {
-                 conversationStatus.textContent = 'Connecting...';
-                 micButton.disabled = true; // Disable mic while connecting
-                 micButton.style.opacity = 0.5;
+                  conversationStatus.textContent = 'Connecting...'; // Initial state before WS connection
+                  micButton.disabled = true;
+                  micButton.style.opacity = 0.5;
+                  micButton.classList.remove('listening');
              }
 
              // Clear previous chat history display (placeholder)
              if (conversationChatArea) {
-                 conversationChatArea.innerHTML = '';
-                 // Add a welcome message (optional)
-                 // const welcomeMessage = document.createElement('p');
-                 // welcomeMessage.textContent = `Starting conversation with ${avatarData.name}.`;
-                 // welcomeMessage.style.color = 'var(--secondary-text)';
-                 // conversationChatArea.appendChild(welcomeMessage);
+                  conversationChatArea.innerHTML = '';
+                   // Optional: Add a loading or welcome message
+                   // const loadingMsg = document.createElement('p');
+                   // loadingMsg.textContent = `Connecting to ${avatarData.name}...`;
+                   // loadingMsg.style.color = 'var(--secondary-text)';
+                   // conversationChatArea.appendChild(loadingMsg);
              }
 
-
-             // TODO: Establish WebSocket connection and handle messages (This will be in ai_chat.js)
-             // Example placeholder calls (will be replaced by actual WebSocket logic):
-             console.log(`Starting WebSocket conversation session with avatar ID: ${avatarData.id}`);
-
-             // Simulate WebSocket connection
-             setTimeout(() => {
-                  console.log("Simulated WebSocket connected.");
-                   if (conversationStatus) {
-                        conversationStatus.textContent = 'Ready';
-                        micButton.disabled = false; // Enable mic
-                        micButton.style.opacity = 1;
-                   }
-                   // TODO: Send 'start_session' message to backend via WebSocket
-                    // ws.send(JSON.stringify({ type: 'start_session', userId: 'user123', avatarId: selectedAvatar.id }));
-             }, 2000); // Simulate connection delay
+             // Establish WebSocket connection. The onopen handler will send 'start_session'
+             // once the connection is ready and if the AI page is active.
+             connectWebSocket(); // Call connectWebSocket to initiate connection
 
 
              // Add event listeners for conversation controls (Mic and End Call)
@@ -1972,89 +2302,137 @@
                  endCallButton.addEventListener('click', endAiConversation);
              }
 
-             // TODO: Implement Speech-to-Text (STT) listener setup here or in ai_chat.js
-             // You'll need a browser SpeechRecognition or other STT library.
-             // This STT listener will trigger the audio/text streaming via WebSocket.
+             // TODO: Implement Speech-to-Text (STT) listener setup here or triggered by button click
+             // This STT listener needs to capture audio and send it via ws.send() as 'audio_chunk' or similar type.
+             // setupSTT(); // Need to implement actual browser STT or a library
+        }
 
-             // Example placeholder:
-             // setupSTT(); // Need to implement this
-         }
-
-         // Function to end the AI conversation and close WebSocket
-         function endAiConversation() {
+        // Modified endAiConversation to use the actual WebSocket connection and cleanup
+        function endAiConversation() {
              console.log("Ending AI conversation session.");
-             // TODO: Implement WebSocket closing logic
-             // ws.close(); // Assuming 'ws' is your WebSocket instance
+             // Stop any ongoing processes (audio, STT)
+             stopAudioPlayback();
+             // TODO: Stop browser STT/MediaRecorder if active
 
-             // Stop video playback
+             // Send a 'end_session' message to backend (optional, backend might infer from WS close)
+             if (ws && ws.readyState === WebSocket.OPEN) {
+                 ws.send(JSON.stringify({ type: 'end_session' }));
+                 // Close WebSocket connection gracefully
+                 ws.close(1000, 'User ended conversation'); // 1000 is Normal Closure code
+             } else {
+                  console.warn("WebSocket not open, cannot send end_session or close gracefully.");
+                   // Force cleanup if WS wasn't open
+                  if (ws) ws = null; // Clear reference
+             }
+
+             // Stop background video playback
              if (activeAvatarVideo) {
                  activeAvatarVideo.pause();
                  activeAvatarVideo.removeAttribute('src');
              }
 
              // Reset UI state
-              if (conversationStatus) conversationStatus.textContent = 'Disconnected';
-              if (micButton) {
-                   micButton.disabled = true;
-                   micButton.style.opacity = 0.5;
-                   micButton.classList.remove('listening'); // Remove listening class
-              }
-              // Clear chat area (optional)
-              if (conversationChatArea) conversationChatArea.innerHTML = '';
+             if (conversationStatus) conversationStatus.textContent = 'Disconnected';
+             if (micButton) {
+                  micButton.disabled = true;
+                  micButton.style.opacity = 0.5;
+                  micButton.classList.remove('listening');
+             }
+             // Clear chat area (optional)
+             if (conversationChatArea) conversationChatArea.innerHTML = '';
 
-             selectedAvatar = null; // Clear selected avatar
+             // Clear selected avatar state
+             selectedAvatar = null;
              localStorage.removeItem('selectedAvatar'); // Remove from localStorage
              updateHomeAiCards(); // Update home page UI
 
              // Navigate back to the Home page
              showPage('homePage');
-         }
+        }
 
-         // Function to toggle microphone state (start/stop listening) - Placeholder
-         function toggleMicrophone() {
+        // Modified toggleMicrophone to send message via WebSocket (placeholder for STT data)
+        function toggleMicrophone() {
              if (!selectedAvatar) {
                  console.warn("Cannot toggle mic: No avatar selected.");
                  alert("Please select an AI avatar first.");
                  return;
              }
 
+             if (!ws || ws.readyState !== WebSocket.OPEN) {
+                  console.warn("WebSocket is not open. Cannot toggle mic.");
+                  if (conversationStatus) conversationStatus.textContent = 'Error: Not Connected';
+                  // Mic button state should already reflect this (disabled)
+                  return;
+             }
+
+
              if (isListening) {
-                 // Stop Listening
+                 // --- Stop Listening ---
                  console.log("Stopping microphone input.");
                  isListening = false;
-                 micButton.classList.remove('listening'); // Remove listening class
-                 if (conversationStatus) conversationStatus.textContent = 'Processing...'; // Or Thinking...
-                 // TODO: Stop browser STT/MediaRecorder
-                 // TODO: Send 'end_of_speech' signal via WebSocket
+                 micButton.classList.remove('listening'); // Remove visual class
+
+                 // Update status while processing
+                 if (conversationStatus) conversationStatus.textContent = 'Processing...';
+
+                 // TODO: **Implement actual browser STT/MediaRecorder stop**
+                 // The code below is a PLACEHOLDER for sending the final transcription
+
+                 // Send 'end_of_speech' signal with final user text (placeholder text)
+                 if (ws && ws.readyState === WebSocket.OPEN) {
+                      const userFinalText = "नमस्ते, आप कैसे हैं?"; // Replace with actual transcription result from STT
+                      console.log("Simulating sending final user text:", userFinalText);
+                      ws.send(JSON.stringify({ type: 'end_of_speech', fullText: userFinalText }));
+                       // Add the final user message to the chat display (optional but good for UI)
+                       addUserMessageToChat(userFinalText);
+                 }
+
+
              } else {
-                 // Start Listening
+                 // --- Start Listening ---
                   console.log("Starting microphone input.");
+                 // Check mic permission first in a real app!
                  isListening = true;
                  micButton.classList.add('listening'); // Add visual indication
+
+                 // Update status
                  if (conversationStatus) conversationStatus.textContent = 'Listening...';
-                  // TODO: Start browser STT/MediaRecorder to capture audio
-                  // TODO: Start streaming audio chunks via WebSocket
-                  // TODO: Send 'audio_text_chunk' messages (as transcribed or raw audio bytes)
+
+                 // If AI was speaking, send interruption signal BEFORE starting STT
+                 if (conversationStatus && conversationStatus.textContent === 'Speaking...') {
+                      console.log("User interrupted. Sending user_interrupted signal.");
+                      stopAudioPlayback(); // Immediately stop AI audio
+                      if (ws && ws.readyState === WebSocket.OPEN) {
+                          ws.send(JSON.stringify({ type: 'user_interrupted' }));
+                      }
+                 }
+
+                  // TODO: **Implement actual browser STT/MediaRecorder start**
+                  // This STT should capture audio/text and send it via WebSocket
+                  // Example: Using Web Speech API or MediaRecorder + a library like @picovoice/web-voice-processor
+                  // As STT produces text/audio chunks, send them via ws.send({ type: 'audio_chunk', data: ... })
+                  // or ws.send({ type: 'audio_text_chunk', text: ... })
              }
-         }
+        }
 
-        // Placeholder for adding AI response text/audio to chat area
-         function addAiMessageToChat(text, audioUrl = null) {
-             const messageElement = document.createElement('div');
-             messageElement.textContent = `AI: ${text}`; // Basic text
-             // TODO: Add actual chat bubble styling, handle audio playback etc.
-              conversationChatArea.appendChild(messageElement);
-              conversationChatArea.scrollTop = conversationChatArea.scrollHeight; // Auto-scroll
-         }
-
-         // Placeholder for adding user message text to chat area
-         function addUserMessageToChat(text) {
-             const messageElement = document.createElement('div');
-             messageElement.textContent = `User: ${text}`; // Basic text
-             // TODO: Add actual chat bubble styling
+        // Placeholder for adding AI response text/audio to chat area (Keep this, update styling later)
+        function addAiMessageToChat(text, audioUrl = null) {
+            const messageElement = document.createElement('div');
+            // Basic text, replace with actual bubble HTML later
+            messageElement.textContent = `AI: ${text}`;
+            // TODO: Handle audioUrl for playback if backend sends it this way
              conversationChatArea.appendChild(messageElement);
              conversationChatArea.scrollTop = conversationChatArea.scrollHeight; // Auto-scroll
-         }
+        }
+
+        // Placeholder for adding user message text to chat area (Keep this, update styling later)
+        function addUserMessageToChat(text) {
+            const messageElement = document.createElement('div');
+            // Basic text, replace with actual bubble HTML later
+            messageElement.textContent = `User: ${text}`;
+            conversationChatArea.appendChild(messageElement);
+            conversationChatArea.scrollTop = conversationChatArea.scrollHeight; // Auto-scroll
+        }
 
 
         // ======== Initialization ========
@@ -2065,11 +2443,11 @@
             let lastPage = localStorage.getItem('lastPage');
 
             // === MODIFIED INITIATION LOGIC ===
-            // Always start on the Home Page regardless of what was saved,
-            // unless the saved page is specifically one of the main navigation pages.
+            // Always start on the Home Page by default.
+            // Only load a non-home page from localStorage if it's a valid main navigation page.
             const validMainPages = ['homePage', 'uploadPage', 'packagePage', 'infoSubmissionPage', 'userDashboardPage'];
             if (!lastPage || !validMainPages.includes(lastPage)) {
-                 lastPage = 'homePage';
+                 lastPage = 'homePage'; // Default to home page if lastPage is invalid or an overlay page
             }
              // ===============================
 
@@ -2093,12 +2471,13 @@
             // Save current page to localStorage when leaving the page (optional)
              window.addEventListener('beforeunload', () => {
                  const activePageElement = document.querySelector('.page.active');
-                 if (activePageElement && activePageElement.id !== 'aiConversationPage' && activePageElement.id !== 'videoPlayerOverlay' && activePageElement.id !== 'avatarDetailPage') {
-                     // Only save the page if it's a 'main' page and not an overlay like video player or conversation or avatar detail
+                 if (activePageElement && activePageElement.id && !['aiConversationPage', 'videoPlayerOverlay', 'avatarDetailPage'].includes(activePageElement.id)) {
+                     // Only save the ID if it's a main page and exists
                      localStorage.setItem('lastPage', activePageElement.id);
+                 } else {
+                     // If on an overlay or no active page found, save the home page as default
+                     localStorage.setItem('lastPage', 'homePage');
                  }
-                 // If leaving from an overlay, don't save it as the last page.
-                 // The previous logic already handled this partially, but explicitly checking avatarDetailPage too.
              });
 
 
@@ -2140,125 +2519,11 @@
              // Existing video player event listeners are set up/removed by playVideo/closePlayer
              // The global touch/mousemove listeners for video player controls are attached above (to playerContainerEl)
 
-             // Initialize WebSocket connection framework on app startup (will be handled in index.js/ai_chat.js)
-             // connectWebSocket(); // This function call will be added to index.js after WebSocket server is set up.
-             console.log("Frontend script initialized. Waiting for WebSocket connection...");
-
+            // === Initiate WebSocket connection when the page loads ===
+            // This is crucial for the AI chat functionality to be ready.
+            connectWebSocket(); // Start the WebSocket connection process early
 
         });
-
-        // Placeholder for WebSocket connection function (will be defined in index.js/ai_chat.js)
-        // let ws = null; // Global WebSocket instance
-        // function connectWebSocket() {
-        //     const wsUrl = `ws://${window.location.host}`; // Or wss for HTTPS
-        //     ws = new WebSocket(wsUrl);
-        //
-        //     ws.onopen = () => {
-        //         console.log('WebSocket connection established.');
-        //         // TODO: Send initial messages like authentication if needed
-        //          // If on the AI conversation page, send the start_session message here
-        //          if (document.getElementById('aiConversationPage').classList.contains('active')) {
-        //               if (selectedAvatar) {
-        //                    // Ensure UI is ready before sending session start
-        //                    if (conversationStatus) conversationStatus.textContent = 'Ready';
-        //                     if (micButton) {
-        //                         micButton.disabled = false;
-        //                         micButton.style.opacity = 1;
-        //                     }
-        //                    ws.send(JSON.stringify({ type: 'start_session', userId: 'user123', avatarId: selectedAvatar.id }));
-        //               } else {
-        //                    console.error("WebSocket opened but no avatar selected for conversation.");
-        //                    // Handle this case - potentially close WS and show error
-        //               }
-        //          }
-        //     };
-        //
-        //     ws.onmessage = (event) => {
-        //         // TODO: Handle incoming messages (ai_thinking, ai_speaking, ai_audio_stream, ai_finished_speaking, ai_error)
-        //         console.log('WebSocket message received:', event.data);
-        //         handleWebSocketMessage(event.data); // Function to process different message types
-        //     };
-        //
-        //     ws.onerror = (error) => {
-        //         console.error('WebSocket error:', error);
-        //         // Handle connection errors, attempt reconnect?
-        //          if (conversationStatus) conversationStatus.textContent = 'Connection Error';
-        //           if (micButton) micButton.disabled = true;
-        //     };
-        //
-        //     ws.onclose = (event) => {
-        //         console.log('WebSocket connection closed:', event.code, event.reason);
-        //         // Handle disconnection, attempt reconnect?
-        //          if (conversationStatus) conversationStatus.textContent = 'Disconnected';
-        //           if (micButton) micButton.disabled = true;
-        //          // TODO: Clean up any ongoing processes (STT, audio players)
-        //          // Maybe attempt to reconnect after a delay
-        //          // setTimeout(connectWebSocket, 5000);
-        //     };
-        // }
-        //
-        // // Placeholder function to handle different WebSocket message types (will be in ai_chat.js)
-        // function handleWebSocketMessage(message) {
-        //      try {
-        //          const data = JSON.parse(message);
-        //          switch (data.type) {
-        //              case 'connected':
-        //                  console.log('Backend says:', data.message);
-        //                  // Connection confirmed, maybe update UI status
-        //                  break;
-        //              case 'session_ready':
-        //                  console.log('AI Session Ready.');
-        //                   if (conversationStatus) conversationStatus.textContent = 'Ready';
-        //                    if (micButton) {
-        //                         micButton.disabled = false;
-        //                         micButton.style.opacity = 1;
-        //                    }
-        //                  break;
-        //              case 'ai_thinking':
-        //                  console.log('AI is thinking...');
-        //                   if (conversationStatus) conversationStatus.textContent = 'Thinking...';
-        //                   // TODO: Change avatar video to thinking loop?
-        //                  break;
-        //              case 'ai_speaking':
-        //                  console.log('AI is speaking...');
-        //                   if (conversationStatus) conversationStatus.textContent = 'Speaking...';
-        //                  // TODO: Change avatar video to speaking loop? Start audio playback
-        //                  break;
-        //              case 'ai_audio_stream':
-        //                  // Receive audio chunks from backend
-        //                  // data.audioChunk is a base64 string or ArrayBuffer depending on implementation
-        //                  console.log('Received audio chunk. Size:', data.audioChunk ? data.audioChunk.length : 0);
-        //                  // TODO: Buffer and play the audio chunks
-        //                  break;
-        //              case 'ai_finished_speaking':
-        //                  console.log('AI finished speaking.');
-        //                   if (conversationStatus) conversationStatus.textContent = 'Ready';
-        //                   // TODO: Change avatar video back to idle loop? Stop audio playback
-        //                    if (micButton) {
-        //                         micButton.disabled = false;
-        //                         micButton.style.opacity = 1;
-        //                    }
-        //                  break;
-        //              case 'ai_error':
-        //                  console.error('AI error:', data.message);
-        //                   if (conversationStatus) conversationStatus.textContent = `Error: ${data.message}`;
-        //                  // Reset state, maybe show error message in chat area
-        //                   if (micButton) micButton.disabled = true; // Keep disabled on error?
-        //                  break;
-        //               case 'audio_text_chunk':
-        //                   // Received partial or final text from STT (useful for live transcription display)
-        //                   // console.log("STT:", data.text); // Uncomment to see live transcription
-        //                   // TODO: Update a display element with the partial/full text
-        //                   break;
-        //               // Add other cases for future features (e.g., user_text_final)
-        //              default:
-        //                  console.warn('Received unknown message type:', data.type, data);
-        //          }
-        //      } catch (e) {
-        //          console.error("Error processing WebSocket message:", e, "Original data:", message);
-        //      }
-        // }
-
 
     </script>
 </body>
