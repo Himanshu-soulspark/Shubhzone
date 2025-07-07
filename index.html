@@ -403,7 +403,7 @@
             align-items: center;
             padding: 20px 15px 100px 15px; /* Padding for controls/chat */
             background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent 150px), linear-gradient(to top, rgba(0,0,0,0.8), transparent 150px); /* Gradients for readability */
-             pointer-events: none; /* Default to allow clicks to pass if no specific element handles them */
+             pointer-events: none; /* Default to allow clicks to pass through by default */
         }
 
         #aiConversationPage .conversation-status {
@@ -711,11 +711,11 @@
     <!-- Bottom Navigation Bar -->
     <nav class="bottom-nav">
         <div id="navHome" class="nav-item active" onclick="showPage('homePage')">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" /></svg>
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"/></svg>
             <span class="nav-label">Home</span>
         </div>
         <div class="nav-item upload-plus" onclick="showPage('uploadPage')">
-            <div class="nav-icon upload-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg></div>
+            <div class="nav-icon upload-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg></div>
         </div>
         <!-- Updated Packages Icon -->
         <div id="navPackage" class="nav-item" onclick="showPage('packagePage')">
@@ -957,10 +957,8 @@
                 activeAvatarVideo.pause();
                 activeAvatarVideo.removeAttribute('src');
             }
-            // TODO: Also stop WebSocket connection if active when leaving aiConversationPage
-            // This would be part of the endAiConversation logic, which is called when navigating away from the AI page.
-            // endAiConversation is called by the red hang up button. We might also need to call it
-            // when navigating away using the bottom nav if a conversation is active.
+            // Stop any ongoing audio playback (AI speaking)
+             stopAudioPlayback(); // Call the stop audio function
 
 
             document.body.style.overflow = 'auto'; // Enable body scroll by default
@@ -1495,7 +1493,7 @@
             // TODO: Implement actual submission logic here
             // This would involve using generateUploadUrl and uploadFileWithProgress
             // for the photos and ID, and then sending all the data (including keys)
-            // to a new backend endpoint (e.e.g., POST /api/user-verification).
+            // to a new backend endpoint (e.g., POST /api/user-verification).
 
             setButtonLoading(submitBtn, true, 'Submit for Approval');
             // --- REMOVED: Progress bar display call ---
@@ -1832,7 +1830,7 @@
                 const imageUrlRes = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(imageFile.name)}&contentType=${imageFile.type}`).then(handleApiResponse);
                  if (!imageUrlRes.success || !imageUrlRes.uploadUrl || !imageUrlRes.key) throw new Error(`Failed to get image upload URL: ${imageUrlRes.message || ''}`);
 
-                // Upload Image (e.e.g., 30% progress)
+                // Upload Image (e.g., 30% progress)
                 await uploadFileWithProgress(imageUrlRes.uploadUrl, imageFile); // Removed progress tracking call here for simplicity
                  console.log("Image uploaded successfully to Wasabi.");
 
@@ -1959,9 +1957,9 @@
 
         // ======== WebSocket Client Setup and Handling ========
         let ws = null; // Global WebSocket instance for the conversation
-        let audioQueue = []; // To buffer received audio chunks
+        let audioQueue = []; // To buffer received audio chunks (for chunked audio streaming)
         let audioContext = null; // Web Audio API context
-        let audioBufferSourceNode = null; // To play audio buffer
+        let audioSourceNode = null; // To play audio chunks buffer source
 
         // Function to initialize Web Audio API
         function initAudioContext() {
@@ -1971,7 +1969,7 @@
             }
         }
 
-        // Function to play audio from a URL
+        // Function to play audio from a URL (Used for XTTS v2)
         function playAudioFromUrl(url) {
              if (!url) {
                  console.error("No audio URL provided for playback.");
@@ -1985,19 +1983,19 @@
              const audio = new Audio(url);
 
              audio.onplay = () => {
-                 console.log("Audio playback started.");
-                 // You might update UI to show speaking state, though backend should send ai_speaking
+                 console.log("Audio playback started from URL.");
+                 // Status should already be 'Speaking...' from backend message
              };
 
              audio.onended = () => {
-                 console.log("Audio playback ended.");
-                 // Backend sends ai_finished_speaking, which handles UI updates
+                 console.log("Audio playback ended from URL.");
+                 // Backend sends ai_finished_speaking, which handles final UI updates
              };
 
              audio.onerror = (e) => {
-                 console.error("Audio playback error:", e);
+                 console.error("Audio playback error from URL:", e);
                  // Handle audio errors, perhaps show a message or transition state
-                 if (conversationStatus) conversationStatus.textContent = 'Audio Error';
+                 if (conversationStatus) conversationStatus.textContent = 'Audio Playback Error';
                  // Optionally, trigger ai_finished_speaking state reset
                  handleWebSocketMessage(JSON.stringify({ type: 'ai_finished_speaking' }));
              };
@@ -2012,43 +2010,92 @@
              });
         }
 
+        // Function to play audio chunks (More complex, requires backend to send binary data or Base64 chunks)
+        // This is a simplified placeholder; full implementation is complex.
+        async function playAudioChunk(audioChunkData) {
+             if (!audioContext) initAudioContext(); // Ensure AudioContext is ready
+             if (!audioContext) {
+                 console.error("AudioContext not available for chunk playback.");
+                 return;
+             }
+
+             try {
+                 // Assuming audioChunkData is an ArrayBuffer or can be converted to one
+                 // If backend sends Base64, you'd need to decode it first:
+                 // const binaryString = window.atob(audioChunkData);
+                 // const len = binaryString.length;
+                 // const bytes = new Uint8Array(len);
+                 // for (let i = 0; i < len; i++) { bytes[i] = binaryString.charCodeAt(i); }
+                 // const arrayBuffer = bytes.buffer;
+
+                 // Decode audio data (assuming it's raw audio like WAV or a supported format chunk)
+                 const audioBuffer = await audioContext.decodeAudioData(audioChunkData);
+
+                 audioSourceNode = audioContext.createBufferSource();
+                 audioSourceNode.buffer = audioBuffer;
+                 audioSourceNode.connect(audioContext.destination);
+
+                 audioSourceNode.onended = () => {
+                     console.log("Audio chunk playback ended.");
+                     audioSourceNode = null; // Clear reference
+                     // If using a queue, play the next chunk here
+                 };
+
+                 audioSourceNode.start(); // Play the chunk
+                 console.log("Playing audio chunk.");
+
+             } catch (e) {
+                 console.error("Error decoding or playing audio chunk:", e);
+                  // Handle error, maybe clear queue and reset state
+                  audioQueue = []; // Clear queue on error
+                  if (conversationStatus) conversationStatus.textContent = 'Audio Chunk Error';
+                  handleWebSocketMessage(JSON.stringify({ type: 'ai_finished_speaking' })); // Reset state
+             }
+        }
+
+
          // Function to stop any currently playing audio
          function stopAudioPlayback() {
-             // Stop URL-based audio
-             const audioElements = document.querySelectorAll('audio'); // Find any audio elements created
+             console.log("Attempting to stop any ongoing audio playback.");
+             // Stop URL-based audio (find any <audio> elements created by playAudioFromUrl)
+             const audioElements = document.querySelectorAll('audio');
              audioElements.forEach(audio => {
                  if (!audio.paused) {
-                      console.log("Stopping active audio element.");
+                      console.log("Stopping HTML Audio element.");
                       audio.pause();
                       audio.removeAttribute('src'); // Clear source
-                      audio.load(); // Reset audio element
+                      audio.load(); // Reset audio element to stop download/buffering
                  }
+                  // Optional: Remove the element from DOM
+                  // audio.remove();
              });
 
-             // Stop Web Audio API audio if playing
-             if (audioBufferSourceNode) {
+             // Stop Web Audio API audio if playing from chunks
+             if (audioSourceNode) {
                  try {
-                     audioBufferSourceNode.stop();
+                     audioSourceNode.stop();
                      console.log("Stopping Web Audio API node.");
                  } catch (e) {
-                     console.warn("Error stopping audio buffer source node:", e);
+                     console.warn("Error stopping audio source node:", e);
                  }
-                 audioBufferSourceNode = null;
+                 audioSourceNode = null; // Clear reference
              }
-             // TODO: Clear audioQueue if using chunk streaming
+             // Clear any pending audio chunks in the queue
              audioQueue = [];
+             console.log("Audio playback stopped and queue cleared.");
          }
 
 
         // Function to establish WebSocket connection
         function connectWebSocket() {
-            // Check if connection already exists or is being established
+            // Check if connection already exists or is in a connecting state
             if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
                 console.log("WebSocket already open or connecting.");
                 return;
             }
 
             // Determine WebSocket URL (use wss for Render/HTTPS, ws for local/HTTP)
+            // Use window.location.host to get the correct host for both local and Render
             const wsUrl = window.location.protocol === 'https:' ? `wss://${window.location.host}` : `ws://${window.location.host}`;
 
             console.log(`Attempting to connect WebSocket to: ${wsUrl}`);
@@ -2057,58 +2104,73 @@
 
             ws.onopen = () => {
                 console.log('WebSocket connection established.');
-                if (conversationStatus) {
-                     conversationStatus.textContent = 'Connected'; // Update UI status
-                     // Note: Mic button will be enabled only after 'session_ready' from backend
-                }
-
-                // If we are on the AI conversation page when the connection opens,
-                // send the start_session message immediately.
-                // This handles cases where the user navigated to the AI page before WS connected
-                // or if the WS reconnected while on the AI page.
+                // Update UI status if on the AI conversation page
                 if (document.getElementById('aiConversationPage').classList.contains('active')) {
-                     if (selectedAvatar && ws && ws.readyState === WebSocket.OPEN) {
-                          console.log(`Sending start_session for avatar: ${selectedAvatar.id}`);
-                          ws.send(JSON.stringify({
-                               type: 'start_session',
-                               userId: 'user123', // Replace with actual user ID if implemented
-                               avatarId: selectedAvatar.id
-                          }));
-                          if (conversationStatus) conversationStatus.textContent = 'Starting session...';
-                     } else {
-                          console.warn("WebSocket opened, but not on AI page or no avatar selected. Session not started automatically.");
-                           if (conversationStatus) conversationStatus.textContent = 'Ready (Disconnected)'; // Indicate ready state but potential issue
-                     }
+                   if (conversationStatus) {
+                       conversationStatus.textContent = 'Connected';
+                   }
+                   // Send start_session message
+                    if (selectedAvatar && ws && ws.readyState === WebSocket.OPEN) {
+                       console.log(`Sending start_session for avatar: ${selectedAvatar.id}`);
+                       ws.send(JSON.stringify({
+                            type: 'start_session',
+                            userId: 'user123', // Replace with actual user ID if implemented
+                            avatarId: selectedAvatar.id
+                       }));
+                       if (conversationStatus) conversationStatus.textContent = 'Starting session...';
+                    } else {
+                       console.warn("WebSocket opened, but not on AI page or no avatar selected. Session not started automatically.");
+                        if (conversationStatus) conversationStatus.textContent = 'Ready (Disconnected)'; // Indicate ready state but potential issue
+                    }
+                } else {
+                     console.log("WebSocket connected, but AI conversation page is not active.");
+                     // Connection is open, but we don't send start_session until the user navigates to the AI page
                 }
             };
 
             ws.onmessage = (event) => {
                 // Handle incoming messages from the backend AI chat handler
-                // console.log('WebSocket message received:', event.data); // Too verbose for binary data
-                handleWebSocketMessage(event.data); // Process different message types
+                // Binary data needs different handling than JSON
+                if (typeof event.data === 'string') {
+                     console.log('WebSocket JSON message received.'); // Assume string is JSON
+                     handleWebSocketMessage(event.data); // Process JSON messages
+                } else {
+                     console.log('WebSocket binary message received (audio chunk?).');
+                      // If backend sends binary audio chunks, handle them here
+                      // For XTTS v2 via Replicate, backend usually sends a URL in a JSON message,
+                      // so this binary case might not be used directly for audio output chunks
+                      // unless your backend implements chunked streaming differently.
+                      // If needed: playAudioChunk(event.data);
+                }
             };
 
             ws.onerror = (error) => {
                 console.error('WebSocket error:', error);
-                if (conversationStatus) conversationStatus.textContent = 'Connection Error';
-                if (micButton) micButton.disabled = true; // Disable mic on error
-                 micButton.style.opacity = 0.5;
-                 micButton.classList.remove('listening');
+                 // Check if on AI page before updating AI status
+                if (document.getElementById('aiConversationPage').classList.contains('active') && conversationStatus) {
+                    conversationStatus.textContent = 'Connection Error';
+                     if (micButton) { micButton.disabled = true; micButton.style.opacity = 0.5; micButton.classList.remove('listening'); }
+                } else {
+                     console.error("WebSocket error occurred outside AI conversation page.");
+                }
                 // TODO: Implement retry logic or show persistent error message
             };
 
             ws.onclose = (event) => {
                 console.log(`WebSocket connection closed. Code: ${event.code}, Reason: ${event.reason || 'N/A'}`);
-                if (conversationStatus) conversationStatus.textContent = 'Disconnected';
-                if (micButton) micButton.disabled = true; // Disable mic on close
-                 micButton.style.opacity = 0.5;
-                 micButton.classList.remove('listening');
+                 // Check if on AI page before updating AI status
+                if (document.getElementById('aiConversationPage').classList.contains('active') && conversationStatus) {
+                     conversationStatus.textContent = 'Disconnected';
+                     if (micButton) { micButton.disabled = true; micButton.style.opacity = 0.5; micButton.classList.remove('listening'); }
+                } else {
+                     console.log("WebSocket closed outside AI conversation page.");
+                }
                  stopAudioPlayback(); // Stop any ongoing audio
 
                 // Attempt to reconnect on unexpected closures (e.g., not user-initiated close '1000')
                 if (event.code !== 1000 && event.code !== 1001) { // 1000 = Normal, 1001 = Going Away
                      console.warn("Attempting to reconnect WebSocket in 5 seconds...");
-                     setTimeout(connectWebSocket, 5000);
+                     setTimeout(connectWebSocket, 5000); // Retry connection after a delay
                 }
             };
         }
@@ -2116,26 +2178,13 @@
         // Function to handle different WebSocket message types from backend
         function handleWebSocketMessage(message) {
              try {
-                 // First, try parsing as JSON for command messages
-                 let data;
-                 try {
-                     data = JSON.parse(message);
-                     console.log('WebSocket JSON message:', data);
-                 } catch (e) {
-                     // If parsing fails, it might be binary data (audio chunk)
-                     console.log('WebSocket potentially binary message (audio)');
-                      // Handle binary data separately if needed for audio streaming
-                      // For now, assuming audio comes as URL or specific type in JSON
-                     return; // Stop processing if not JSON
-                 }
-
+                 const data = JSON.parse(message); // Assume messages are JSON
 
                  // Check if we are on the AI conversation page before updating UI specific to it
-                 // This prevents updates if the user navigated away while processing was happening
-                 if (!document.getElementById('aiConversationPage').classList.contains('active') && data.type !== 'ai_error') {
-                      console.warn(`Received WebSocket message type ${data.type} but not on AI conversation page. Ignoring UI update.`);
-                      // Still process non-UI logic if needed (e.g., session data update)
-                      return; // Stop if not on the AI page and not a critical error
+                 // Allow 'ai_error' messages to be processed even if not active, maybe for a global notification
+                 if (!document.getElementById('aiConversationPage').classList.contains('active') && data.type !== 'ai_error' && data.type !== 'connected') {
+                      console.warn(`Received WebSocket message type ${data.type} but not on active AI conversation page. Ignoring UI update.`);
+                      return; // Stop if not on the AI page and not a critical/connection message
                  }
 
 
@@ -2172,13 +2221,13 @@
                              micButton.style.opacity = 0.5;
                              micButton.classList.remove('listening');
                          }
-                          stopAudioPlayback(); // Stop any previous audio just in case
+                          stopAudioPlayback(); // Stop any previous audio before AI starts
                          // Now wait for the audio URL or chunks...
                          break;
                      case 'ai_audio_url': // Backend sends a pre-signed URL for the full audio file (XTTS v2 default)
                          console.log('Received audio URL:', data.url);
                          if (data.url) {
-                              playAudioFromUrl(data.url);
+                              playAudioFromUrl(data.url); // Play the audio from the URL
                          } else {
                              console.error("Received ai_audio_url message but URL is missing.");
                              // Handle case where URL is missing
@@ -2190,9 +2239,13 @@
                       case 'ai_audio_chunk': // Backend sends audio in chunks (requires Web Audio API)
                           console.log('Received audio chunk (binary/base64).');
                           // TODO: This requires complex Web Audio API buffering and playback
-                          // For a simpler approach like XTTS v2, the 'ai_audio_url' method is used.
-                          // Implementing this would involve converting data.audioChunk (Base64 or ArrayBuffer)
-                          // into AudioBufferSourceNode and playing it. This is beyond basic implementation.
+                          // If backend sends Base64 data.audioChunk:
+                          // const binaryString = window.atob(data.audioChunk);
+                          // const len = binaryString.length;
+                          // const bytes = new Uint8Array(len);
+                          // for (let i = 0; i < len; i++) { bytes[i] = binaryString.charCodeAt(i); }
+                          // playAudioChunk(bytes.buffer); // Pass ArrayBuffer to playAudioChunk
+
                           console.warn("Received audio chunk, but Web Audio API chunk handling is not fully implemented in frontend.");
                           // As a fallback, if using XTTS, this case might not even be hit,
                           // or you might need a different Replicate model/version.
@@ -2210,16 +2263,23 @@
                          break;
                      case 'ai_error':
                          console.error('AI error:', data.message);
-                         if (conversationStatus) conversationStatus.textContent = `Error: ${data.message}`;
-                         if (micButton) {
-                             // Decide if mic should be ready or disabled after an error
-                             micButton.disabled = false; // Enable mic so user can try again
-                             micButton.style.opacity = 1;
-                             micButton.classList.remove('listening');
+                          // Update status only if on AI page or if it's a persistent global error notification
+                         if (document.getElementById('aiConversationPage').classList.contains('active') && conversationStatus) {
+                             conversationStatus.textContent = `Error: ${data.message}`;
+                              if (micButton) {
+                                   // Decide if mic should be ready or disabled after an error
+                                   micButton.disabled = false; // Enable mic so user can try again
+                                   micButton.style.opacity = 1;
+                                   micButton.classList.remove('listening');
+                              }
+                         } else {
+                              // Maybe show a global error notification if not on AI page
+                             console.error("AI Error received outside active conversation.");
                          }
                           stopAudioPlayback(); // Stop any ongoing audio on error
                           // TODO: Show error message in chat area?
-                         handleWebSocketMessage(JSON.stringify({ type: 'ai_finished_speaking' })); // Reset state
+                         // Trigger finish speaking state to reset UI, but maybe not immediately Ready if error is persistent
+                         // handleWebSocketMessage(JSON.stringify({ type: 'ai_finished_speaking' })); // This might set status to Ready too quickly after an error
                          break;
                       case 'audio_text_chunk': // Received partial or final text from STT (if backend provides)
                            // This might be useful for live transcription display
@@ -2236,13 +2296,15 @@
                          console.warn('Received unknown WebSocket message type:', data.type, data);
                  }
              } catch (e) {
-                 console.error("Error processing WebSocket message:", e, "Original data:", message);
+                 console.error("Error processing WebSocket message (JSON parse failed?):", e, "Original data:", message);
                   // Attempt to reset state on unexpected message errors
-                 if (conversationStatus) conversationStatus.textContent = 'Protocol Error';
-                 if (micButton) {
-                      micButton.disabled = false;
-                      micButton.style.opacity = 1;
-                      micButton.classList.remove('listening');
+                 if (document.getElementById('aiConversationPage').classList.contains('active') && conversationStatus) {
+                      conversationStatus.textContent = 'Protocol Error';
+                      if (micButton) {
+                           micButton.disabled = false;
+                           micButton.style.opacity = 1;
+                           micButton.classList.remove('listening');
+                      }
                  }
              }
         }
@@ -2269,9 +2331,9 @@
                   activeAvatarVideo.play().catch(e => console.warn("Conversation video autoplay failed:", e));
              }
 
-             // Set initial status
+             // Set initial status on the UI
              if (conversationStatus) {
-                  conversationStatus.textContent = 'Connecting...'; // Initial state before WS connection
+                  conversationStatus.textContent = ws && ws.readyState === WebSocket.OPEN ? 'Connected, Starting session...' : 'Connecting...'; // Show connecting initially
                   micButton.disabled = true;
                   micButton.style.opacity = 0.5;
                   micButton.classList.remove('listening');
@@ -2289,7 +2351,20 @@
 
              // Establish WebSocket connection. The onopen handler will send 'start_session'
              // once the connection is ready and if the AI page is active.
+             // We also send start_session here if the connection is already open.
              connectWebSocket(); // Call connectWebSocket to initiate connection
+
+             // If WebSocket is already open when we call startAiConversation (because DOMContentLoaded already called connectWebSocket),
+             // send the start_session message now. Otherwise, it will be sent by the ws.onopen handler.
+             if (ws && ws.readyState === WebSocket.OPEN) {
+                  console.log(`WebSocket already open when entering AI page, sending start_session for avatar: ${selectedAvatar.id}`);
+                  ws.send(JSON.stringify({
+                       type: 'start_session',
+                       userId: 'user123', // Replace with actual user ID
+                       avatarId: selectedAvatar.id
+                  }));
+                  if (conversationStatus) conversationStatus.textContent = 'Starting session...';
+             }
 
 
              // Add event listeners for conversation controls (Mic and End Call)
@@ -2408,7 +2483,7 @@
                  }
 
                   // TODO: **Implement actual browser STT/MediaRecorder start**
-                  // This STT should capture audio/text and send it via WebSocket
+                  // This STT should capture audio/text and send it via ws.send() as 'audio_chunk' or similar type.
                   // Example: Using Web Speech API or MediaRecorder + a library like @picovoice/web-voice-processor
                   // As STT produces text/audio chunks, send them via ws.send({ type: 'audio_chunk', data: ... })
                   // or ws.send({ type: 'audio_text_chunk', text: ... })
