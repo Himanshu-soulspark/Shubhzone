@@ -1,4 +1,5 @@
-// File: index.js (Complete Backend for Video App + AI Avatar Data & WebSocket Framework)
+
+// File: index.js (Complete Backend for Video App + AI Avatar Data & WebSocket Server)
 
 // ======== Required Libraries ========
 const express = require('express'); // For handling HTTP requests (API routes)
@@ -8,6 +9,7 @@ const { Server } = require('ws'); // WebSocket server library (for real-time AI 
 const admin = require('firebase-admin'); // Firebase Admin SDK (for Firestore)
 const { getPresignedUrl, generateUploadUrl } = require('./wasabi.js'); // Existing functions for Wasabi interaction
 const { pool, initializeDatabase } = require('./db.js'); // Existing functions for PostgreSQL DB interaction
+const aiChatHandler = require('./ai_chat.js'); // *** NEW: Import the AI chat message handler ***
 
 // dotenv configuration (Load environment variables from .env file in local development)
 // This line should be near the top. In production (like Render), variables are loaded by the environment.
@@ -22,10 +24,12 @@ const PORT = process.env.PORT || 3001; // Define the port the server will listen
 // Initialize the Firebase Admin SDK using the service account key stored in Environment Variables.
 // This is necessary to interact with Firebase services like Firestore from the backend.
 let dbFirestore; // Variable to hold the initialized Firestore instance
+let firebaseInitialized = false; // Flag to track successful initialization
 
 try {
     // Get the Base64 encoded service account key from environment variables
     const serviceAccountBase64 = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
+    const databaseURLFirebase = process.env.DATABASE_URL_FIREBASE; // Although optional for Firestore, good practice to include if available
 
     if (!serviceAccountBase64) {
         throw new Error('FIREBASE_SERVICE_ACCOUNT_BASE64 environment variable is not set.');
@@ -37,15 +41,21 @@ try {
     // Parse the JSON string into a JavaScript object
     const serviceAccount = JSON.parse(serviceAccountJsonString);
 
-    // Initialize Firebase Admin SDK
-    // The databaseURL is often not needed for Firestore, but include if you use other Firebase services or want to be explicit.
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-        // databaseURL: process.env.DATABASE_URL_FIREBASE // Optional: Add if using RTDB or need explicit URL
-    });
+    // Check if Firebase app is already initialized (important for hot-reloading environments, less critical on Render)
+    if (admin.apps.length === 0) {
+         admin.initializeApp({
+             credential: admin.credential.cert(serviceAccount),
+             databaseURL: databaseURLFirebase // Optional: Add if using RTDB or need explicit URL
+         });
+    } else {
+         // If already initialized, use the default app
+         admin.app();
+    }
+
 
     // Get the Firestore database instance
     dbFirestore = admin.firestore();
+    firebaseInitialized = true; // Set flag to true
     console.log('Firebase Admin SDK and Firestore initialized successfully.');
 
 } catch (error) {
@@ -56,6 +66,19 @@ try {
     // process.exit(1); // Uncomment this line if you want the server to stop if Firebase fails
     // For now, we will allow the server to start but Firestore operations will likely fail.
 }
+
+// Pass initialized Firestore and Wasabi functions to the AI chat handler
+// This makes these resources available within ai_chat.js without needing to re-initialize
+aiChatHandler.setDependencies({
+    dbFirestore: dbFirestore,
+    firebaseInitialized: firebaseInitialized, // Pass the flag too
+    getPresignedUrl: getPresignedUrl, // For getting avatar asset URLs in chat
+    wasabiBucketName: process.env.WASABI_BUCKET_NAME // Pass bucket name if needed in ai_chat
+    // Add other dependencies needed by ai_chat.js here, e.g., API keys
+    // openrouterApiKey: process.env.OPENROUTER_API_KEY, // Will be needed in ai_chat.js
+    // replicateApiToken: process.env.REPLICATE_API_TOKEN, // Will be needed in ai_chat.js
+    // Add STT related API keys here too if not using browser STT
+});
 
 
 // ======== Middleware ========
@@ -251,24 +274,34 @@ app.get('/api/home-content', async (req, res) => {
 // Define the collection name for AI avatars in Firestore
 const AVATARS_COLLECTION = 'ai_avatars';
 // Define the collection name for conversation history
-const CONVERSATIONS_COLLECTION = 'conversations';
+const CONVERSATIONS_COLLECTION = 'conversations'; // Although conversation logic is in ai_chat.js, collection name is defined here
+
+// Helper to check if Firebase is initialized before attempting Firestore operations
+const checkFirebaseInitialized = (res) => {
+    if (!firebaseInitialized || !dbFirestore) {
+        const errorMsg = "Firebase Firestore is not initialized.";
+        console.error(`Firestore Operation Failed: ${errorMsg}`);
+        res.status(500).json({ success: false, message: 'Database not available. Firebase initialization failed on the server.' });
+        return false;
+    }
+    return true;
+};
 
 
 // POST /api/avatars - Endpoint to save a new AI avatar's metadata to Firestore.
 // Used by the development upload form on the frontend.
 app.post('/api/avatars', async (req, res) => {
     // Check if Firestore was successfully initialized
-    if (!dbFirestore) {
-        console.error("Firestore not initialized. Cannot save avatar.");
-        return res.status(500).json({ success: false, message: 'Database not available. Firebase initialization failed on the server.' });
-    }
+    if (!checkFirebaseInitialized(res)) return;
 
     // Extract avatar metadata from the request body
-    const { name, personalityPrompt, image_key, video_key } = req.body;
+    // Added voice_sample_key based on frontend update
+    const { name, personalityPrompt, image_key, video_key, voice_sample_key } = req.body;
 
     // Perform basic validation of required fields
-    if (!name || !personalityPrompt || !image_key || !video_key) {
-        return res.status(400).json({ success: false, message: 'Request body must contain "name", "personalityPrompt", "image_key", and "video_key".' });
+    // Added voice_sample_key to validation
+    if (!name || !personalityPrompt || !image_key || !video_key || !voice_sample_key) {
+        return res.status(400).json({ success: false, message: 'Request body must contain "name", "personalityPrompt", "image_key", "video_key", and "voice_sample_key".' });
     }
 
     try {
@@ -283,10 +316,11 @@ app.post('/api/avatars', async (req, res) => {
             id: newAvatarRef.id, // Store the auto-generated document ID within the document
             name: name,
             personalityPrompt: personalityPrompt,
-            image_key: image_key, // Wasabi key for the image asset
-            video_key: video_key, // Wasabi key for the main video loop (talking/idle/etc.)
+            image_key: image_key, // Wasabi key for the image asset (1:1)
+            video_key: video_key, // Wasabi key for the main video loop (talking/idle/etc. - 9:16)
+            voice_sample_key: voice_sample_key, // Wasabi key for the voice sample (MP3)
             created_at: admin.firestore.FieldValue.serverTimestamp() // Add a server-side timestamp for creation time
-            // You can add more fields here later, like voiceSampleKey, other video_keys (idle, listening), etc.
+            // You can add more fields here later, like other video_keys (idle, listening), etc.
         };
 
         // Save the data to Firestore
@@ -310,13 +344,10 @@ app.post('/api/avatars', async (req, res) => {
 
 
 // GET /api/avatars - Endpoint to get all AI avatars from Firestore, including pre-signed URLs for assets.
-// Used by the frontend Package page to display the list of avatars.
+// Used by the frontend Package page to display the list of avatars and by the AI chat handler.
 app.get('/api/avatars', async (req, res) => {
     // Check if Firestore was successfully initialized
-    if (!dbFirestore) {
-        console.error("Firestore not initialized. Cannot fetch avatars.");
-        return res.status(500).json({ success: false, message: 'Database not available. Firebase initialization failed on the server.' });
-    }
+    if (!checkFirebaseInitialized(res)) return;
 
     try {
         // Get a reference to the Firestore collection and order by creation time
@@ -329,33 +360,38 @@ app.get('/api/avatars', async (req, res) => {
             return res.status(200).json({ success: true, avatars: [], message: 'No AI avatars found.' });
         }
 
-        // Process each avatar document to prepare data for the frontend
+        // Process each avatar document to prepare data for the frontend/AI chat
         // Use Promise.all since getPresignedUrl is asynchronous
         const avatars = await Promise.all(snapshot.docs.map(async doc => {
             const avatarData = doc.data(); // Get the data from the document
 
-            // Generate pre-signed URLs for the image and video assets using Wasabi function
+            // Generate pre-signed URLs for the image, video, and voice sample assets using Wasabi function
             // Handle potential errors during URL generation gracefully by returning null
-            const imageUrl = avatarData.image_key ? await getPresignedUrl(avatarData.image_key).catch(err => {
-                 console.error(`Failed to get presigned URL for avatar image key ${avatarData.image_key}: ${err.message}`);
-                 return null; // Return null URL on error
-            }) : null; // Return null if image_key is missing
+            const getSafePresignedUrl = async (key, assetType) => {
+                 if (!key) return null;
+                 try {
+                     return await getPresignedUrl(key);
+                 } catch (err) {
+                     console.error(`Failed to get presigned URL for ${assetType} key ${key}: ${err.message}`);
+                     return null; // Return null URL on error
+                 }
+            };
 
-             const videoUrl = avatarData.video_key ? await getPresignedUrl(avatarData.video_key).catch(err => {
-                 console.error(`Failed to get presigned URL for avatar video key ${avatarData.video_key}: ${err.message}`);
-                 return null; // Return null URL on error
-            }) : null; // Return null if video_key is missing
+            const imageUrl = await getSafePresignedUrl(avatarData.image_key, 'image');
+            const videoUrl = await getSafePresignedUrl(avatarData.video_key, 'video');
+            const voiceSampleUrl = await getSafePresignedUrl(avatarData.voice_sample_key, 'voice sample'); // Get URL for voice sample
 
-
-            // Return a structured object for the frontend
+            // Return a structured object
             return {
                 id: avatarData.id, // Document ID
                 name: avatarData.name,
                 personalityPrompt: avatarData.personalityPrompt,
                 image_key: avatarData.image_key, // Optionally include keys
                 video_key: avatarData.video_key,
+                voice_sample_key: avatarData.voice_sample_key, // Optionally include key
                 imageUrl: imageUrl, // The generated URL for the image (or null)
-                videoUrl: videoUrl // The generated URL for the video (or null)
+                videoUrl: videoUrl, // The generated URL for the video (or null)
+                voiceSampleUrl: voiceSampleUrl // The generated URL for the voice sample (or null)
                 // You would add other asset URLs here as you add them (idle_loop_url, talking_loop_url, etc.)
             };
         }));
@@ -381,9 +417,8 @@ app.get('*', (req, res) => {
 });
 
 
-// ======== AI Avatar Real-time Conversation (WebSocket Framework) ========
-// This section sets up the WebSocket server and the framework for real-time AI interaction.
-// The WebSocket server needs to run on the same HTTP server instance as the Express app.
+// ======== AI Avatar Real-time Conversation (WebSocket Server Setup) ========
+// This section sets up the WebSocket server and passes connections to the AI chat handler.
 
 // Create an HTTP server instance and have the Express app handle requests on it.
 // This replaces the simple `app.listen(PORT, ...)` if you were using that before.
@@ -402,386 +437,31 @@ console.log(`WebSocket Server started on port ${PORT}`);
 wss.on('connection', (ws) => {
     console.log('New client connected to WebSocket.');
 
-    // === State specific to THIS connection ===
-    // Each user's conversation state should be kept separate.
-    let currentConversationHistory = []; // Array to store conversation text for this session [{ role: 'user', content: '...' }, { role: 'assistant', content: '...' }]
-    let isProcessing = false; // Flag to indicate if the server is currently processing a user's speech (LLM/TTS)
-    let llmCallInProgress = null; // Placeholder to store reference to an ongoing LLM call (for potential cancellation on interruption)
-    let ttsCallInProgress = null; // Placeholder to store reference to an ongoing TTS call (for potential cancellation)
-    let currentUserId = 'anonymous'; // Default user ID; replace with real authentication later
-    let currentAvatarId = null; // ID of the AI avatar the user is currently talking to
+    // Send initial connection message to the client
+    ws.send(JSON.stringify({ type: 'connected', message: 'Connected to backend WebSocket.' }));
 
-
-    // === Message Handling from THIS client ===
-    // This event fires when a message is received from this specific client.
-    ws.on('message', async (message) => {
-        try {
-            // Parse the incoming message (assuming it's JSON stringified)
-            const data = JSON.parse(message);
-            console.log('Received message from client:', data.type);
-
-            // --- Handle Different Message Types from Frontend ---
-
-            if (data.type === 'start_session') {
-                 // Client signals the start of a new conversation session.
-                 // This happens when the user selects an avatar and starts the chat.
-                 currentUserId = data.userId || 'anonymous'; // Set the user ID for this session
-                 currentAvatarId = data.avatarId; // Set the avatar ID for this session
-                 console.log(`Conversation session started for user: ${currentUserId}, avatar: ${currentAvatarId}.`);
-
-                 // --- Load Conversation History ---
-                 // TODO: Implement logic to load previous conversation history from Firebase Firestore
-                 // Query the CONVERSATIONS_COLLECTION for messages/sessions related to this currentUserId and currentAvatarId.
-                 // Filter history to include only messages within the last 1 day (as per your requirement).
-                 // Format the loaded history into an array like [{ role: 'user', content: '...' }, { role: 'assistant', content: '...' }].
-                 // Store the loaded history in the `currentConversationHistory` variable for this connection.
-                 // Example placeholder:
-                 // currentConversationHistory = await loadConversationHistory(currentUserId, currentAvatarId, { duration: '1d' }); // Need to implement loadConversationHistory
-
-                 console.log("Loaded initial conversation history (placeholder logic).");
-
-                 // Send a confirmation back to the frontend that the session is ready
-                 ws.send(JSON.stringify({ type: 'session_ready' }));
-
-            } else if (data.type === 'audio_text_chunk') {
-                // Received a chunk of transcribed text from the browser's Speech API.
-                // data.text will contain the partial or final text.
-                const textChunk = data.text;
-                // console.log('Received text chunk:', textChunk); // Uncomment for verbose logging of chunks
-
-                // --- Process Text Chunks (Optional for simple loop, important for showing text) ---
-                // If you want to show the user's text appearing as they speak on the frontend,
-                // you would process these chunks here and potentially send them back to the client
-                // or update a state variable for the full text.
-                // For the core listen->process->speak loop, we primarily need the `end_of_speech` event with full text.
-
-            } else if (data.type === 'end_of_speech') {
-                // User finished speaking (detected by silence from the browser's Speech API).
-                // data.fullText should contain the complete transcribed text for this utterance.
-                const fullText = data.fullText;
-                console.log('End of speech detected. Full text:', fullText);
-
-                // Ignore empty or whitespace-only input
-                if (!fullText || fullText.trim() === '') {
-                    console.log("Received empty speech, ignoring.");
-                     // Send a signal back to frontend to indicate processing is done (even though nothing happened)
-                     ws.send(JSON.stringify({ type: 'ai_finished_speaking' }));
-                    return; // Stop processing this message
-                }
-
-                // Prevent processing new speech if the server is already busy
-                if (isProcessing) {
-                    console.warn("Received new speech before previous processing finished. Ignoring this input.");
-                     // Send a signal back to frontend to indicate readiness for next input
-                     ws.send(JSON.stringify({ type: 'ai_finished_speaking' }));
-                    return; // Stop processing this message
-                }
-
-                // Set the processing flag
-                isProcessing = true;
-                console.log("Starting AI processing for user input.");
-
-                // Signal the frontend that the AI is thinking
-                ws.send(JSON.stringify({ type: 'ai_thinking' }));
-
-                // ======== AI Processing Pipeline (Core Logic - NEEDS IMPLEMENTATION) ========
-                // This is the heart of the AI conversation. You need to fill in the details here.
-
-                try {
-                    // 1. Get AI Avatar's Personality Prompt and other details (e.g., voice sample key)
-                    // Load the selected avatar's full data from Firestore based on the `currentAvatarId` set in `start_session`.
-                    // This requires a Firestore query by document ID.
-                    if (!dbFirestore || !currentAvatarId) {
-                         throw new Error("Firestore not available or no avatar selected for this session.");
-                    }
-                    const avatarDoc = await dbFirestore.collection(AVATARS_COLLECTION).doc(currentAvatarId).get();
-
-                    if (!avatarDoc.exists) {
-                         throw new Error(`AI Avatar with ID "${currentAvatarId}" not found in the database.`);
-                    }
-                    const avatarData = avatarDoc.data();
-                    const personalityPrompt = avatarData.personalityPrompt; // Get the personality prompt text
-                    // You might also need avatarData.voiceSampleKey or a direct URL if you stored it.
-
-                    // 2. Format Conversation History for the LLM
-                    // Add the user's current input to the history array for this session.
-                    currentConversationHistory.push({ role: 'user', content: fullText });
-
-                    // Prepare the messages array in the format required by the LLM API (OpenRouter).
-                    // This typically includes:
-                    // - A 'system' message containing the `personalityPrompt`.
-                    // - Previous messages from `currentConversationHistory` (alternating 'user' and 'assistant' roles).
-                    // - The current user message.
-                    // It's crucial to manage the history size to stay within the LLM's token limit.
-                    // You might slice the `currentConversationHistory` array to get only the most recent N messages.
-
-                    const messagesForLlm = [
-                        { role: 'system', content: personalityPrompt },
-                        // TODO: Add recent conversation history here from `currentConversationHistory`.
-                        // Example: ...currentConversationHistory.slice(-10), // Get the last 10 messages (adjust as needed for token limits)
-                        { role: 'user', content: fullText } // Add the current user message
-                    ];
-                     console.log("Prepared messages for LLM API:", messagesForLlm);
-
-
-                    // 3. Call OpenRouter LLM API to get AI's text response
-                    // Use a suitable Node.js library for OpenRouter (like the official OpenAI library pointed to OpenRouter).
-                    // Request a streaming response (`stream: true`) so you get the text word by word or token by token.
-                    // This allows you to start TTS as soon as the first text arrives.
-
-                     // TODO: Add OpenRouter API call implementation here.
-                     // Example using OpenAI SDK (configured for OpenRouter):
-                    // import OpenAI from 'openai'; // Need to require/import if using SDK
-                    // const openai = new OpenAI({
-                    //     baseURL: "https://openrouter.ai/api/v1", // OpenRouter base URL
-                    //     apiKey: process.env.OPENROUTER_API_KEY, // Your OpenRouter Key from Env Vars
-                    // });
-                    // llmCallInProgress = await openai.chat.completions.create({
-                    //     model: "openrouter/auto", // Replace with the actual model you want to use (e.g., "openai/gpt-4o", "mistralai/mistral-7b-instruct", check OpenRouter docs for available models)
-                    //     messages: messagesForLlm,
-                    //     stream: true, // Request streaming response
-                    // });
-
-                     // --- Simulate LLM Stream (REMOVE THIS SECTION IN ACTUAL IMPLEMENTATION) ---
-                     // This simulation replaces the actual OpenRouter call for testing the framework.
-                     console.log("Simulating LLM response stream...");
-                     const simulatedLlmResponse = `नमस्ते! "${fullText.substring(0, Math.min(fullText.length, 30))}" के बारे में पूछने के लिए धन्यवाद। मैं ${avatarData.name} हूँ और मैं आपकी मदद करने के लिए यहाँ हूँ। मुझे बताओ कि तुम क्या जानना चाहते हो।`; // A placeholder response
-                     const simulatedLlmChunks = simulatedLlmResponse.split(' '); // Split into words or chunks
-                     let simulatedFullResponse = '';
-                     // Signal frontend that AI is speaking as soon as we have some text
-                     ws.send(JSON.stringify({ type: 'ai_speaking' })); // Should be sent when LLM starts responding
-
-                     for (const chunk of simulatedLlmChunks) {
-                          await new Promise(resolve => setTimeout(resolve, 70)); // Simulate time delay between chunks
-                          const textChunk = chunk + ' '; // Add space back
-                          simulatedFullResponse += textChunk;
-                          // In a real scenario, you would feed this `textChunk` (or accumulating sentence/phrase) to the TTS API.
-                          // console.log("Simulated LLM Chunk for TTS:", textChunk);
-                           // --- Simulate TTS Streaming (REMOVE THIS SECTION IN ACTUAL IMPLEMENTATION) ---
-                           // In a real implementation, Replicate would return audio chunks.
-                           // You would send those audio chunks to the frontend here.
-                           // ws.send(JSON.stringify({ type: 'ai_audio_stream', audioChunk: Buffer.from('...', 'binary') })); // Example
-                           // For simulation, we just pretend audio is being streamed.
-                     }
-                     console.log("Simulated LLM stream finished.");
-                     // --- End Simulate LLM Stream ---
-
-
-                    // 4. Process LLM Text Stream and Call Replicate TTS API (Streaming)
-                    // As text arrives from the LLM stream (from OpenRouter):
-                    // - You need to accumulate the text into sentences or phrases.
-                    // - For each sentence/phrase, call the Replicate XTTS-v2 API.
-                    // - You'll need the Wasabi URL for the avatar's 5-10 second voice sample (`avatarData.voiceSampleKey` -> `getPresignedUrl`).
-                    // - Check Replicate's documentation if XTTS-v2 supports streaming output. If yes, process and forward audio chunks immediately. If not, you'll have to wait for the full audio and send it. Streaming is preferred for responsiveness.
-                    // - As you get audio chunks from Replicate:
-                    //   - Send them to the frontend via `ws.send(JSON.stringify({ type: 'ai_audio_stream', audioChunk: audioDataBuffer }))`. The frontend JavaScript needs to buffer and play these.
-
-                    // TODO: Add Replicate XTTS-v2 API call and audio streaming logic here.
-                    // Example using Replicate SDK:
-                    // const Replicate = require('replicate'); // Need to require if using SDK
-                    // const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN }); // Your Replicate Token from Env Vars
-                    // const voiceSampleUrl = await getPresignedUrl(avatarData.voiceSampleKey); // Assuming voice sample key is stored in avatarData
-
-                    // ttsCallInProgress = replicate.run(
-                    //     "replicate/xtts-v2:4b1bf2f3c1c929c64cb59b3b24fc21c5893aa84463a3e6033ad887c636b886a6", // XTTS-v2 model ID
-                    //     {
-                    //         input: {
-                    //             text: simulatedFullResponse, // Or the sentence/phrase chunk from LLM
-                    //             speaker_wav: voiceSampleUrl, // URL to the 5-10 second voice sample
-                    //             language: "hi", // Specify Hindi
-                    //             // Add other parameters like temperature, speed as needed
-                    //         },
-                    //         // TODO: Check Replicate documentation for streaming output options or webhooks
-                    //     }
-                    // );
-                    // // If Replicate returns a stream or uses webhooks, listen for audio chunks and send them via `ws.send({ type: 'ai_audio_stream', audioChunk: ... })`.
-
-
-                    // 5. Handle Completion and Save Conversation History
-                    // This logic runs AFTER the AI has finished generating the full text response and all TTS audio has been processed/streamed.
-
-                    // Add the AI's full response to the history array for this session.
-                    currentConversationHistory.push({ role: 'assistant', content: simulatedFullResponse }); // Use the actual full response text from LLM stream
-
-                    // TODO: Save the updated `currentConversationHistory` to Firebase Firestore.
-                    // Design your Firestore structure. A common approach is one document per conversation session,
-                    // identified by user ID and avatar ID, perhaps with a session ID or timestamp.
-                    // This will require implementing a function like `saveConversationHistory`.
-                    // await saveConversationHistory(currentUserId, currentAvatarId, currentConversationHistory); // Need to implement saveConversationHistory
-
-                     console.log("Conversation history updated and saved (placeholder logic).");
-
-
-                    // Signal the frontend that the AI has finished speaking
-                    ws.send(JSON.stringify({ type: 'ai_finished_speaking' }));
-
-                } catch (aiProcessingError) {
-                    // Handle any errors that occur within the AI processing pipeline (LLM, TTS, DB loading)
-                    console.error("Error during AI processing pipeline:", aiProcessingError);
-                    // Send an error signal or a fallback text message to the frontend
-                    ws.send(JSON.stringify({ type: 'ai_error', message: 'Sorry, I encountered an error while processing.' }));
-                    // Ensure the frontend UI resets even if an error occurred
-                    ws.send(JSON.stringify({ type: 'ai_finished_speaking' }));
-                } finally {
-                    // Reset processing state regardless of success or failure
-                    isProcessing = false;
-                    llmCallInProgress = null; // Clear references to ongoing API calls
-                    ttsCallInProgress = null;
-                }
-
-            } else if (data.type === 'user_interrupted') {
-                 // Frontend detects that the user started speaking while the AI was speaking.
-                 console.log("User interruption detected. Stopping ongoing AI processes.");
-
-                 // --- Implement Interruption Logic ---
-                 // This is a critical part of the natural conversation flow.
-                 // You need to stop any ongoing asynchronous operations like LLM text generation or TTS audio generation for THIS connection.
-                 // The specific way to cancel depends on the Node.js libraries/SDKs you are using for OpenRouter and Replicate.
-                 // Look for cancellation tokens or abort methods in their documentation.
-
-                 if (llmCallInProgress) {
-                     console.log("Attempting to cancel ongoing LLM call...");
-                     // TODO: Call the cancellation method provided by your LLM SDK/API client
-                     // Example: llmCallInProgress.cancel(); // Depends on the SDK
-                     llmCallInProgress = null; // Clear the reference after attempting cancellation
-                 }
-                  if (ttsCallInProgress) {
-                     console.log("Attempting to cancel ongoing TTS call...");
-                      // TODO: Call the cancellation method provided by your TTS SDK/API client
-                      // Example: ttsCallInProgress.abort(); // Depends on the SDK
-                     ttsCallInProgress = null; // Clear the reference after attempting cancellation
-                 }
-
-                 // Reset the processing flag to allow the user's new speech to be processed
-                 isProcessing = false;
-
-                 // The frontend should already be transitioning to the 'listening' state and sending new 'audio_text_chunk' messages.
-
-            } else {
-                // Log any message types that are not recognized
-                console.warn('Received unknown message type from client:', data.type, data);
-            }
-
-        } catch (parseError) {
-            // Handle errors if the incoming message is not valid JSON
-            console.error('Error parsing WebSocket message:', parseError);
-            // Send an error back to the client
-            ws.send(JSON.stringify({ type: 'error', message: 'Invalid message format received.' }));
-        }
+    // === Delegate Message Handling to ai_chat.js ===
+    // When a message is received from this specific client, pass it to the handler.
+    ws.on('message', (message) => {
+        // console.log(`Received message of type ${JSON.parse(message)?.type} from client.`); // Log message type
+        aiChatHandler.handleMessage(ws, message); // Let ai_chat.js process the message
     });
 
-    // === WebSocket Connection Closing Handling ===
-    // This event fires when a client disconnects.
+    // === Delegate Connection Closing Handling ===
+    // When a client disconnects, inform the handler.
     ws.on('close', (code, reason) => {
         console.log(`Client disconnected from WebSocket. Code: ${code}, Reason: ${reason || 'N/A'}`);
-        // --- Clean up state specific to this connection ---
-        // Cancel any ongoing API calls for this connection when it closes
-         if (llmCallInProgress) {
-             console.log("Connection closed. Cancelling ongoing LLM call.");
-             // TODO: Call cancellation method
-             llmCallInProgress = null;
-         }
-          if (ttsCallInProgress) {
-             console.log("Connection closed. Cancelling ongoing TTS call.");
-              // TODO: Call cancellation method
-             ttsCallInProgress = null;
-         }
-
-        // --- Save Final Conversation History ---
-        // TODO: Save the final state of `currentConversationHistory` to Firebase Firestore.
-        // This might need to be done asynchronously or managed in a way that doesn't block the close handler.
-        // await saveConversationHistory(currentUserId, currentAvatarId, currentConversationHistory); // Requires async close handler or saving periodically
-
-         console.log("Conversation state cleaned up for disconnected client.");
+        aiChatHandler.handleClose(ws, code, reason); // Let ai_chat.js handle cleanup
     });
 
-    // === WebSocket Error Handling ===
-    // This event fires if an error occurs on the WebSocket connection.
+    // === Delegate WebSocket Error Handling ===
+    // If an error occurs on the WebSocket connection, inform the handler.
     ws.on('error', (error) => {
         console.error('WebSocket error:', error);
-        // Log the error. The 'close' event will likely follow.
-        // Attempting to close the connection might also be necessary depending on the error.
-        // ws.close(1011, 'Internal Server Error'); // 1011 is a standard WebSocket error code
+        aiChatHandler.handleError(ws, error); // Let ai_chat.js handle the error
     });
 
-    // --- Initial message to the client ---
-    // Optional: Send a message to the frontend as soon as the connection is established.
-    ws.send(JSON.stringify({ type: 'connected', message: 'Connected to backend WebSocket.' }));
 });
-
-
-// === Helper functions for Firebase Conversation History (NEEDS IMPLEMENTATION) ===
-// These functions are placeholders. You need to write the actual code to interact with Firestore.
-
-// Function to load previous conversation history from Firestore
-// async function loadConversationHistory(userId, avatarId, options = {}) {
-//     if (!dbFirestore) {
-//          console.error("Firestore not available. Cannot load history.");
-//          return [];
-//     }
-//     console.log(`Loading conversation history for user "${userId}" and avatar "${avatarId}" (placeholder).`);
-//
-//     // TODO: Implement Firestore query logic here:
-//     // - Query the CONVERSATIONS_COLLECTION.
-//     // - Filter by userId and avatarId.
-//     // - Order by timestamp.
-//     // - Implement filtering for the last 1 day (or specified duration in options).
-//     // - Fetch the documents.
-//     // - Reconstruct the history array from the documents. You might have one document per session,
-//     //   or one document per day, or append messages to a single document. Choose a suitable structure.
-//
-//     // Example query (assumes docs have userId, avatarId, and timestamp fields):
-//     // const historySnapshot = await dbFirestore.collection(CONVERSATIONS_COLLECTION)
-//     //     .where('userId', '==', userId)
-//     //     .where('avatarId', '==', avatarId)
-//     //     // Add time filtering here, e.g., .where('timestamp', '>=', timestampYesterday)
-//     //     .orderBy('timestamp', 'asc')
-//     //     .get();
-//
-//     // let loadedHistory = [];
-//     // historySnapshot.forEach(doc => {
-//     //     // Process each history document and add messages to loadedHistory
-//     // });
-//
-//     // return loadedHistory; // Return the loaded history array
-//      return []; // Placeholder return
-// }
-
-// Function to save current conversation history to Firestore
-// async function saveConversationHistory(userId, avatarId, history) {
-//     if (!dbFirestore) {
-//         console.error("Firestore not available. Cannot save history.");
-//         return;
-//     }
-//     // Only save if there's history to save
-//     if (!history || history.length === 0) {
-//         console.log("No conversation history to save.");
-//         return;
-//     }
-//     console.log(`Saving conversation history for user "${userId}" and avatar "${avatarId}" (placeholder). History length: ${history.length}`);
-//
-//     // TODO: Implement Firestore save logic here:
-//     // - Decide how to structure conversations (e.g., one document per session, append to a daily document, etc.).
-//     // - Get a reference to the relevant document(s) in the CONVERSATIONS_COLLECTION based on userId, avatarId, and perhaps a session identifier.
-//     // - Save the current `history` array (or the latest message) to Firestore.
-//     // - Ensure atomicity if updating existing documents concurrently.
-//
-//     // Example (saving the entire session history to one doc, might hit doc size limits for long chats):
-//     // const sessionId = 'some_unique_session_id'; // You need to generate/manage session IDs
-//     // const conversationDocRef = dbFirestore.collection(CONVERSATIONS_COLLECTION).doc(`${userId}_${avatarId}_${sessionId}`);
-//     // await conversationDocRef.set({
-//     //     userId: userId,
-//     //     avatarId: avatarId,
-//     //     history: history, // Save the entire array
-//     //     timestamp: admin.firestore.FieldValue.serverTimestamp(),
-//     //     // Add other relevant metadata
-//     // });
-//
-//     // Example (appending latest message - more complex but avoids doc size limits):
-//      // Need to design how messages are structured and queried
-//
-//     console.log("History saved (placeholder logic).");
-// }
 
 
 // ======== Server Initialization ========
@@ -816,6 +496,8 @@ process.on('SIGTERM', () => {
         // Close WebSocket connections gracefully (sends a closing frame to clients)
         wss.clients.forEach(client => {
              try {
+                 // Inform the ai_chat handler that this connection is closing
+                 aiChatHandler.handleClose(client, 1000, 'Server shutting down'); // Use 1000 for normal closure
                  client.close(1000, 'Server shutting down'); // 1000 is Normal Closure code
              } catch (e) {
                  console.warn('Error closing WebSocket client:', e);
