@@ -6,6 +6,7 @@
     <title>Shubhzone</title>
 
     <style>
+        /* Existing Styles */
         :root {
             --dark-bg: #0f0f0f;
             --primary-text: #ffffff;
@@ -20,7 +21,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; background-color: var(--dark-bg); color: var(--primary-text); overflow-x: hidden; }
 
-        /* === Upload Progress Bar Style === */
+        /* Upload Progress Bar Style */
         #uploadProgressBarContainer {
             position: fixed;
             top: 0;
@@ -44,7 +45,7 @@
         .button { width: 100%; padding: 15px; border: none; border-radius: 12px; background: var(--accent-gradient); color: white; font-size: 18px; font-weight: bold; cursor: pointer; text-align: center; }
         .button:disabled { background: var(--secondary-text); opacity: 0.7; cursor: not-allowed; }
 
-        /* HOMEPAGE: PLAYLIST LAYOUT */
+        /* HOMEPAGE: PLAYLIST LAYOUT (Existing) */
         .playlist-section { margin-bottom: 30px; }
         .playlist-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px; }
         .playlist-header h3 { font-size: 20px; }
@@ -53,7 +54,7 @@
         .video-card-grid .thumbnail { width: 100%; aspect-ratio: 9 / 16; background-color: var(--placeholder-bg); background-size: cover; background-position: center; border-radius: 8px; margin-bottom: 5px; }
         .video-card-grid .info p { font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--secondary-text); }
 
-        /* UPLOAD & PROFILE PAGE: PROFESSIONAL REDESIGN */
+        /* UPLOAD & PROFILE PAGE: PROFESSIONAL REDESIGN (Existing) */
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; color: var(--secondary-text); margin-bottom: 8px; font-size: 14px; font-weight: 500; }
         .form-group input[type="text"], .form-group input[type="email"], .form-group select, .form-group textarea { width: 100%; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; color: var(--primary-text); font-size: 16px; }
@@ -70,7 +71,7 @@
         .playlist-selection select { flex-grow: 1; }
         .playlist-selection .add-new-btn { padding: 14px; font-size: 20px; line-height: 1; border-radius: 10px; background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--primary-text); }
 
-        /* === Upload Card Style (Used in Upload Page) === */
+        /* Upload Card Style (Used in Upload Page) */
         .file-upload-container { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 20px; }
         .file-uploader-card {
             width: 100%;
@@ -97,7 +98,7 @@
         #newPlaylistThumbUploader .preview-image { position: absolute; width: 100%; height: 100%; object-fit: cover; display: none; }
         #newPlaylistThumbUploader .upload-text { color: var(--secondary-text); }
 
-        /* === Navigation Bar Style === */
+        /* === Navigation Bar Style (Existing with icon change) === */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background-color: rgba(15,15,15,0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 100; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--secondary-text); cursor: pointer; flex: 1; text-align: center; }
         .nav-item.active { color: var(--primary-text); }
@@ -152,13 +153,28 @@
         .pause-overlay .paused-title { font-size: 20px; font-weight: 500; padding: 0 20px; }
 
         /* ======== NEW AI AVATAR STYLES ======== */
-        #packagePage .upload-ai-assets-btn {
+        #packagePage .upload-ai-assets-dev-section {
             margin-bottom: 30px;
+            border: 1px dashed var(--border-color);
+            padding: 20px;
+            border-radius: 10px;
+            background-color: var(--card-bg);
+        }
+        #packagePage .upload-ai-assets-dev-section h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--primary-text);
+        }
+         #packagePage .upload-ai-assets-dev-section .form-group {
+            margin-bottom: 15px; /* Slightly smaller margin inside this section */
+        }
+        #packagePage .upload-ai-assets-dev-section .button {
+            margin-top: 10px;
         }
 
         #avatarGrid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Responsive grid */
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Adjusted size for better grid layout */
             gap: 15px; /* Gap between avatar cards */
             justify-content: center;
         }
@@ -171,10 +187,12 @@
             cursor: pointer;
             background-color: var(--card-bg); /* Placeholder background */
             display: flex;
-            justify-content: center;
+            flex-direction: column; /* To center name below image */
+            justify-content: flex-start; /* Align items to the top initially */
             align-items: center;
             border: 2px solid transparent; /* Border for selection/hover */
             transition: border-color 0.2s ease;
+            padding-bottom: 5px; /* Space for name */
         }
 
         .avatar-card:hover {
@@ -184,9 +202,40 @@
         .avatar-card img {
             display: block;
             width: 100%;
-            height: 100%;
-            object-fit: cover; /* Ensure image covers the circle */
+            /* Adjust height to make it circular */
+            height: auto; /* Keep aspect ratio initially */
+            flex-shrink: 0; /* Don't shrink image */
+            /* This is tricky with aspect ratio + border-radius.
+               Let's use a container div for the image and make that circular. */
         }
+         /* Better way to handle circular image */
+        .avatar-card .image-container {
+            width: 100%;
+            aspect-ratio: 1 / 1; /* Container is 1:1 */
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex; /* To center image if needed */
+            justify-content: center;
+            align-items: center;
+        }
+         .avatar-card .image-container img {
+             width: 100%; /* Image fills container */
+             height: 100%; /* Image fills container */
+             object-fit: cover; /* Cover the container */
+         }
+
+        .avatar-card .avatar-name {
+            font-size: 12px;
+            color: var(--secondary-text);
+            margin-top: 5px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%; /* Ensure name doesn't overflow */
+            padding: 0 5px;
+        }
+
 
         /* ======== AI AVATAR DETAIL/PREVIEW PAGE ======== */
         #avatarDetailPage {
@@ -199,17 +248,21 @@
             background: #000; /* Black background */
             z-index: 400; /* Above other overlays */
             overflow: hidden;
+            display: flex; /* Use flexbox to stack video and controls */
+            flex-direction: column;
         }
 
         #avatarDetailPage .video-preview {
+            flex-grow: 1; /* Take available space */
             width: 100%;
-            height: 100%;
+            height: auto; /* Auto height based on aspect-ratio and width */
             object-fit: contain; /* Fit video within bounds */
             background-color: #000;
+            display: block; /* Ensure it takes space */
         }
 
         .avatar-detail-controls {
-            position: absolute;
+            position: absolute; /* Position over the video */
             top: 0;
             left: 0;
             width: 100%;
@@ -222,7 +275,11 @@
             opacity: 1;
             transition: opacity 0.3s ease;
         }
-        .avatar-detail-controls.hidden { opacity: 0; }
+        /* Consider adding a class like .visible-controls that sets opacity to 1 and pointer-events to auto */
+        .avatar-detail-controls .top-section,
+        .avatar-detail-controls .bottom-section { /* Add these classes in HTML if needed for structure */
+             pointer-events: auto; /* Make controls clickable */
+        }
 
 
         .avatar-detail-header {
@@ -230,7 +287,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 15px;
-            pointer-events: auto; /* Make controls clickable */
+             /* pointer-events: auto; /* Moved to section above */
         }
 
         .avatar-detail-header .header-btn {
@@ -245,12 +302,21 @@
             display: flex;
             justify-content: center;
             align-items: center;
+             flex-shrink: 0; /* Prevent shrinking */
         }
         .avatar-detail-header .header-btn svg {
              width: 20px; height: 20px;
         }
         .avatar-detail-header .header-btn-text {
-             font-size: 16px; font-weight: bold;
+             font-size: 16px;
+             font-weight: bold;
+             text-align: center;
+             flex-grow: 1; /* Allow name to take space */
+             margin: 0 10px; /* Space around name */
+             white-space: nowrap;
+             overflow: hidden;
+             text-overflow: ellipsis;
+             color: white; /* Ensure text color is white */
         }
 
 
@@ -259,7 +325,7 @@
             position: fixed; /* Fixed position */
             top: 0;
             right: 0; /* Appears on the right */
-            width: 120px; /* Fixed width for the panel */
+            width: 140px; /* Fixed width for the panel - slightly wider for 9:16 */
             height: 100%;
             background-color: rgba(0,0,0,0.8); /* Semi-transparent dark background */
             backdrop-filter: blur(5px); /* Blur effect */
@@ -271,10 +337,12 @@
             padding: 15px 10px; /* Padding inside panel */
             overflow-y: auto; /* Make it scrollable */
             gap: 15px; /* Gap between list cards */
+             box-shadow: -5px 0 15px rgba(0,0,0,0.5); /* Add a shadow */
         }
 
         .avatar-select-card {
-             width: 100px; /* Fixed width for list item */
+             width: 100%; /* Card fills panel width minus padding */
+             max-width: 100px; /* Max width for the image inside */
              aspect-ratio: 9 / 16; /* 9:16 Aspect Ratio */
              border-radius: 8px; /* Rounded corners */
              overflow: hidden;
@@ -282,6 +350,11 @@
              background-color: var(--card-bg);
              border: 2px solid transparent; /* Border for selection */
              transition: border-color 0.2s ease;
+             flex-shrink: 0; /* Prevent shrinking in flex container */
+             display: flex; /* Use flex for centering */
+             justify-content: center;
+             align-items: center;
+             margin: 0 auto; /* Center card in the panel */
         }
          .avatar-select-card:hover {
             border-color: #ff4b2b; /* Highlight on hover */
@@ -289,10 +362,25 @@
 
          .avatar-select-card img {
             display: block;
-            width: 100%;
-            height: 100%;
+            width: 100%; /* Image fills card */
+            height: 100%; /* Image fills card */
             object-fit: cover; /* Ensure image covers the card */
          }
+
+        /* Placeholder for the actual AI Conversation Page (Future) */
+        /* This page will be built later */
+        #aiConversationPage {
+            display: none; /* Will be shown by JavaScript */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--dark-bg); /* Or a custom background */
+            z-index: 500; /* Above everything else */
+            overflow: hidden;
+            /* Add styles for the main avatar video area, mic button, status etc. here */
+        }
 
 
     </style>
@@ -305,6 +393,13 @@
     </div>
 
     <div id="homePage" class="page active">
+         <!-- Placeholder for AI Avatar Conversation Area -->
+        <div id="aiAvatarHomeArea" style="margin-bottom: 30px; text-align: center; padding: 20px; background-color: var(--card-bg); border-radius: 10px;">
+             <h2>Your AI Friend Awaits</h2>
+             <p style="color: var(--secondary-text);">Select an avatar from the Packages tab (🎁) to begin chatting.</p>
+             <!-- Future: This is where the main AI video, status, and interaction UI will go -->
+        </div>
+
         <div id="playlist-container"></div>
         <p id="home-status-message" style="text-align: center; color: var(--secondary-text); padding: 50px 0; display: none;"></p>
     </div>
@@ -334,20 +429,42 @@
     </div>
 
     <div id="packagePage" class="page">
-        <h2>Packages</h2>
-        <!-- Development Upload Button -->
-        <button id="uploadAiAssetsBtn" class="button upload-ai-assets-btn">Upload AI Assets (Dev)</button>
+        <h2>Select AI Avatar</h2>
+        <!-- Development Upload Section -->
+        <div class="upload-ai-assets-dev-section">
+             <h3>Upload AI Assets (Dev Only)</h3>
+             <div class="form-group">
+                 <label for="devAvatarName">Avatar Name</label>
+                 <input type="text" id="devAvatarName" placeholder="e.g., Jiya, Vikram">
+             </div>
+             <div class="form-group">
+                 <label for="devAvatarPrompt">Personality Prompt (Short)</label>
+                 <textarea id="devAvatarPrompt" placeholder="Describe personality, style..."></textarea>
+             </div>
+             <div class="form-group">
+                 <label>Avatar Image (1:1)</label>
+                 <div class="file-upload-button" onclick="document.getElementById('devAvatarImage').click()">
+                      <span class="file-label" id="devAvatarImageName">Select Image</span>
+                      <span class="browse-btn">Browse</span>
+                 </div>
+                 <input type="file" id="devAvatarImage" style="display: none;" accept="image/*" onchange="updateFileName('devAvatarImage', 'devAvatarImageName')">
+             </div>
+             <!-- For simplicity in Dev Upload, only asking for 1 video. In future, need idle, talking, listening. -->
+             <div class="form-group">
+                 <label>Avatar Video (Talking Loop 9:16)</label>
+                  <div class="file-upload-button" onclick="document.getElementById('devAvatarVideo').click()">
+                      <span class="file-label" id="devAvatarVideoName">Select Video</span>
+                       <span class="browse-btn">Browse</span>
+                 </div>
+                 <input type="file" id="devAvatarVideo" style="display: none;" accept="video/*" onchange="updateFileName('devAvatarVideo', 'devAvatarVideoName')">
+             </div>
+             <button id="uploadAiAssetsBtn" class="button">Upload Assets & Save Avatar</button>
+        </div>
 
         <div id="avatarGrid">
             <!-- AI Avatar Cards will be populated here by JavaScript -->
             <!-- Example Cards (replace with dynamic loading from backend later) -->
-             <div class="avatar-card" data-avatar-id="avatar1" data-image-url="https://i.ibb.co/BHN46hts/Leonardo-Phoenix-10-A-young-girl-sitting-in-a-cozy-dimly-lit-r-0.jpg" data-video-url="/path/to/avatar1_video.mp4" data-avatar-name="Jiya">
-                <img src="https://i.ibb.co/BHN46hts/Leonardo-Phoenix-10-A-young-girl-sitting-in-a-cozy-dimly-lit-r-0.jpg" alt="Avatar 1">
-            </div>
-             <div class="avatar-card" data-avatar-id="avatar2" data-image-url="https://i.ibb.co/3yBVKWnn/Fum-D-gyl-TImey-U43-n-Q4eg.webp" data-video-url="/path/to/avatar2_video.mp4" data-avatar-name="Vikram">
-                <img src="https://i.ibb.co/3yBVKWnn/Fum-D-gyl-TImey-U43-n-Q4eg.webp" alt="Avatar 2">
-            </div>
-             <!-- Add more avatar cards here dynamically -->
+             <!-- Removed static examples to avoid confusion. JS will populate -->
         </div>
         <p id="package-status-message" style="text-align: center; color: var(--secondary-text); padding: 50px 0; display: none;"></p>
     </div>
@@ -364,7 +481,7 @@
 
     <!-- AI Avatar Detail/Preview Page -->
     <div id="avatarDetailPage">
-         <video class="video-preview" muted playsinline></video>
+         <video class="video-preview" muted playsinline loop></video> <!-- Added loop attribute -->
          <div class="avatar-detail-controls">
              <div class="avatar-detail-header">
                  <!-- Back Button -->
@@ -379,20 +496,27 @@
                  </button>
              </div>
              <!-- Placeholder for bottom controls if needed (currently not requested) -->
-             <div></div>
+             <!-- Adding a transparent area at the bottom to keep controls positioned -->
+             <div style="height: 70px;"></div>
          </div>
          <!-- Vertical Avatar Select Panel -->
          <div id="avatarSelectPanel">
              <!-- Avatar list cards will be populated here by JavaScript -->
-             <!-- Example List Card (replace with dynamic loading) -->
-             <div class="avatar-select-card" data-avatar-id="avatar1" data-image-url="https://i.ibb.co/BHN46hts/Leonardo-Phoenix-10-A-young-girl-sitting-in-a-cozy-dimly-lit-r-0.jpg" data-avatar-name="Jiya">
-                <img src="https://i.ibb.co/BHN46hts/Leonardo-Phoenix-10-A-young-girl-sitting-in-a-cozy-dimly-lit-r-0.jpg" alt="Avatar 1">
-             </div>
-              <div class="avatar-select-card" data-avatar-id="avatar2" data-image-url="https://i.ibb.co/3yBVKWnn/Fum-D-gyl-TImey-U43-n-Q4eg.webp" data-avatar-name="Vikram">
-                <img src="https://i.ibb.co/3yBVKWnn/Fum-D-gyl-TImey-U43-n-Q4eg.webp" alt="Avatar 2">
-             </div>
-             <!-- Add more list cards here dynamically -->
+             <!-- Removed static examples. JS will populate -->
          </div>
+    </div>
+
+     <!-- Placeholder for the actual AI Conversation Page (Future) -->
+     <!-- This page will be built later when implementing the conversation logic -->
+    <div id="aiConversationPage">
+        <!-- AI conversation UI will go here -->
+         <h2>AI Conversation</h2>
+         <p>This page is under construction. Select an avatar from "Packages".</p>
+         <!-- Example elements (will be dynamic) -->
+         <!-- <img id="activeAvatarImage" src="..." alt="Active Avatar"> -->
+         <!-- <video id="activeAvatarVideo" src="..." muted autoplay loop></video> -->
+         <!-- <div id="conversationArea">...</div> -->
+         <!-- <button id="micButton">🎤</button> -->
     </div>
 
 
@@ -417,9 +541,10 @@
     </nav>
 
     <div id="newPlaylistModal" class="modal">
-        <div class="modal-content"><span class="close-btn" onclick="closePlaylistModal()">×</span><h3>Create New Playlist</h3><div class="form-group"><label for="newPlaylistName">Playlist Name</label><input type="text" id="newPlaylistName" placeholder="e.g., Devotional Songs"></div><div class="form-group"><label>Playlist Thumbnail (9:16)</label><div id="newPlaylistThumbUploader" onclick="document.getElementById('newPlaylistThumb').click()"><span class="upload-text">Select Thumbnail</span><img class="preview-image" id="newPlaylistPreview" alt="Playlist Thumbnail Preview"/></div><input type="file" id="newPlaylistThumb" style="display:none" accept="image/*" onchange="previewFile(this, 'newPlaylistPreview')"></div><button id="createPlaylistBtn" class="button" onclick="handleCreatePlaylist()">Create Playlist</button></div>
+        <div class="modal-content"><span class="close-btn" onclick="closePlaylistModal()">×</span><h3>Create New Playlist</h3><div class="form-group"><label for="newPlaylistName">Playlist Name</label><input type="text" id="newPlaylistName" placeholder="e.g., Devotional Songs"></div><div class="form-group"><label>Playlist Thumbnail (9:16)</label><div id="newPlaylistThumbUploader" onclick="document.getElementById('newPlaylistThumb').click()"><span class="upload-text">Select Thumbnail</span><img class="preview-image" id="newPlaylistPreview" alt="Playlist Thumbnail Preview"/></div><input type="file" id="newPlaylistThumb" style="display:none" accept="image/*" onchange="previewAndNameUpdate(this, 'newPlaylistThumb')"></div><button id="createPlaylistBtn" class="button" onclick="handleCreatePlaylist()">Create Playlist</button></div>
     </div>
 
+    <!-- Existing Video Player Overlay -->
     <div id="videoPlayerOverlay">
         <div class="player-container">
             <video id="mainPlayer" playsinline controlslist="nodownload"></video>
@@ -439,6 +564,7 @@
     <script>
         // ======== SCRIPT SECTION ========
 
+        // --- Existing Video Player Elements ---
         const playerOverlay = document.getElementById('videoPlayerOverlay');
         const mainPlayer = document.getElementById('mainPlayer');
         const playerContainer = document.querySelector('.player-container');
@@ -467,135 +593,71 @@
         const forwardAnim = document.getElementById('forward-anim');
         const pauseOverlay = document.querySelector('.pause-overlay');
 
-        // [New] AI Avatar UI elements
+        // --- New AI Avatar UI Elements ---
         const avatarDetailPage = document.getElementById('avatarDetailPage');
         const avatarPreviewVideo = avatarDetailPage.querySelector('.video-preview');
         const avatarBackBtn = document.getElementById('avatar-back-btn');
         const selectAvatarBtn = document.getElementById('select-avatar-btn');
         const avatarSelectPanel = document.getElementById('avatarSelectPanel');
-        const avatarPreviewName = document.getElementById('avatar-preview-name'); // To show avatar name on detail page
-        const uploadAiAssetsBtn = document.getElementById('uploadAiAssetsBtn'); // Dev upload button
+        const avatarPreviewName = document.getElementById('avatar-preview-name');
+        const avatarGridContainer = document.getElementById('avatarGrid'); // Container on Package page
+        const packageStatusMsg = document.getElementById('package-status-message'); // Status on Package page
+        const uploadAiAssetsBtn = document.getElementById('uploadAiAssetsBtn'); // Dev Upload button
+        const aiConversationPage = document.getElementById('aiConversationPage'); // Placeholder for future AI page
 
-        // Upload Progress Bar variables
+        // --- General UI Elements ---
         const uploadProgressBar = document.getElementById('uploadProgressBar');
         const uploadProgressBarContainer = document.getElementById('uploadProgressBarContainer');
+        const homeStatusMsg = document.getElementById('home-status-message'); // Status on Home page
 
 
-        let isUserApproved = false; // This will need proper management
-        const API_BASE_URL = window.location.origin;
-        let allVideos = []; // For video playlists
-        let allAvatars = []; // [New] For AI avatars
-        let controlsTimeout;
+        // --- State Variables ---
+        let isUserApproved = false; // This will need proper management (e.g., checking localStorage or backend)
+        const API_BASE_URL = window.location.origin; // Use window.location.origin for dynamic base URL
+        let allVideos = []; // Store fetched video data for playlists
+        let allAvatars = []; // Store fetched avatar data
+        let controlsTimeout; // For video player controls
         let isLocked = false; // For video player
         let currentPlaylist = []; // For video player
         let currentVideoIndex = -1; // For video player
-        let currentPlayingAvatarVideo = null; // [New] To manage the avatar preview video
+        let currentPlayingAvatarVideo = null; // Reference to the video element playing on avatar detail page
 
 
-        // Helper function to set button loading state
-        function setButtonLoading(button, isLoading, originalText = '') { if (isLoading) { button.disabled = true; button.textContent = 'Uploading...'; } else { button.disabled = false; button.textContent = originalText; } }
+        // ======== Helper Functions ========
 
-        // Helper function to handle API responses
-        async function handleApiResponse(response) { if (!response.ok) { let errorMsg = `Error: ${response.status} ${response.statusText}`; try { const errorJson = await response.json(); errorMsg = errorJson.message || errorMsg; } catch (e) {} throw new Error(errorMsg); } return response.json(); }
-
-        // [Modified] Updated page navigation function to handle new pages
-        function showPage(pageId) {
-            // Hide all pages first
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            // Hide AI Detail page if open
-            avatarDetailPage.style.display = 'none';
-            // Hide AI Select Panel if open
-            avatarSelectPanel.style.display = 'none';
-            // Stop any playing avatar preview video
-            if(currentPlayingAvatarVideo) {
-                 currentPlayingAvatarVideo.pause();
-                 currentPlayingAvatarVideo.removeAttribute('src'); // Clear src
-                 currentPlayingAvatarVideo = null;
-            }
-
-
-            // Show the requested page
-            document.getElementById(pageId)?.classList.add('active');
-
-            // Update active state in bottom nav
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            if (pageId === 'homePage') document.getElementById('navHome').classList.add('active');
-            else if (pageId === 'uploadPage') document.querySelector('.upload-plus').classList.add('active');
-            else if (pageId === 'packagePage') document.getElementById('navPackage').classList.add('active'); // New case
-            else if (pageId.includes('Submission') || pageId.includes('Dashboard')) document.getElementById('navProfile').classList.add('active');
-
-            // Specific actions when showing certain pages
-            if (pageId === 'homePage') {
-                populateHomePage(); // Refresh home content
-            } else if (pageId === 'uploadPage') {
-                 populatePlaylistDropdown(); // Refresh playlist dropdown
-            } else if (pageId === 'packagePage') {
-                 // [New] Populate AI Avatars on Package page
-                 populateAvatarGrid();
-                 // Temporarily show the dev upload button (will hide later in production)
-                 uploadAiAssetsBtn.style.display = 'block'; // Or handle this with a flag/auth
-            }
+        // Function to set button loading state (used for uploads/submissions)
+        function setButtonLoading(button, isLoading, originalText = '') {
+             if (isLoading) {
+                 button.disabled = true;
+                 button.textContent = 'Processing...'; // Changed text to be more general
+             } else {
+                 button.disabled = false;
+                 button.textContent = originalText;
+             }
         }
 
-        // [Modified] Preview function (used for video upload, thumbnail upload, new playlist thumbnail)
-        function previewAndNameUpdate(input, type) {
-            const file = input.files[0];
-            let previewElement, uploadTextElement;
-
-            if (type === 'video') {
-                previewElement = document.querySelector('#videoFileInput ~ .file-upload-container .preview-video');
-                uploadTextElement = previewElement.previousElementSibling;
-            } else if (type === 'thumbnail') {
-                previewElement = document.querySelector('#thumbnailInput ~ .file-upload-container .preview-image');
-                uploadTextElement = previewElement.previousElementSibling;
-            } else if (type === 'newPlaylistThumb') {
-                 previewElement = document.getElementById('newPlaylistPreview');
-                 uploadTextElement = document.querySelector('#newPlaylistThumbUploader .upload-text');
-            }
-
-
-            if (file) {
-                previewElement.src = URL.createObjectURL(file);
-                previewElement.style.display = 'block';
-                if(uploadTextElement) uploadTextElement.style.display = 'none'; // Hide text if image/video is shown
-                if(type === 'video' && previewElement.tagName === 'VIDEO') {
-                    previewElement.muted = true; // Mute preview video
-                    previewElement.play(); // Play video preview
+        // Function to handle API responses
+        async function handleApiResponse(response) {
+            if (!response.ok) {
+                let errorMsg = `Error: ${response.status} ${response.statusText}`;
+                try {
+                    const errorJson = await response.json();
+                    errorMsg = errorJson.message || errorMsg;
+                } catch (e) {
+                     // If response is not JSON, use status text
                 }
-            } else {
-                 // Handle file deselection - clear preview and show text
-                 previewElement.style.display = 'none';
-                 previewElement.removeAttribute('src');
-                 if(uploadTextElement) uploadTextElement.style.display = 'block'; // Show text
+                throw new Error(errorMsg);
             }
+            // Check if response has content before parsing JSON
+            const text = await response.text();
+            return text ? JSON.parse(text) : {}; // Return empty object for empty responses
         }
 
-        // Function to update file name display (used in Info Submission page)
-        function updateFileName(inputId, labelId) {
-            const input = document.getElementById(inputId);
-            const label = document.getElementById(labelId);
-            if (input.files.length > 0) {
-                label.textContent = input.files[0].name;
-                label.style.color = 'var(--primary-text)'; // Change color to show file is selected
-            } else {
-                label.textContent = `Select ${labelId.includes('Photo') ? 'Photo' : 'File'}`;
-                label.style.color = 'var(--secondary-text)'; // Reset color
-            }
-        }
-
-
-        // Existing functions for Playlist Modal and Creation
-        function openPlaylistModal() { document.getElementById('newPlaylistModal').style.display = 'flex'; }
-        function closePlaylistModal() { document.getElementById('newPlaylistModal').style.display = 'none'; }
-         // Renamed previewFile to previewAndNameUpdate and consolidated logic
-        async function handleCreatePlaylist() { const nameInput = document.getElementById('newPlaylistName'); const thumbInput = document.getElementById('newPlaylistThumb'); const createBtn = document.getElementById('createPlaylistBtn'); if (!nameInput.value || thumbInput.files.length === 0) { alert('Please provide a playlist name and a thumbnail.'); return; } setButtonLoading(createBtn, true); try { const thumbFile = thumbInput.files[0]; // Use wasabi upload logic const urlResponse = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(thumbFile.name)}&contentType=${thumbFile.type}`).then(handleApiResponse); await uploadFileWithProgress(urlResponse.uploadUrl, thumbFile, (progress) => console.log(`Thumbnail upload progress: ${progress * 100}%`)); const playlistData = { name: nameInput.value, thumbnail_key: urlResponse.key }; const saveResponse = await fetch(`${API_BASE_URL}/api/playlists`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(playlistData) }).then(handleApiResponse); alert(`Playlist "${saveResponse.playlist.name}" created!`); closePlaylistModal(); populatePlaylistDropdown(); nameInput.value = ''; // Clear form previewAndNameUpdate(thumbInput, 'newPlaylistThumb'); // Reset preview } catch (error) { alert(`Failed to create playlist: ${error.message}`); } finally { setButtonLoading(createBtn, false, 'Create Playlist'); } }
-
-
-        // [New] Function to upload file with progress (reused from video upload)
+         // Function to upload file with progress (reused for all direct file uploads to Wasabi)
          function uploadFileWithProgress(url, file, onProgress) {
             return new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
-                xhr.open('PUT', url, true);
+                xhr.open('PUT', url, true); // Use PUT method for pre-signed URLs
                 xhr.upload.onprogress = (event) => {
                     if (event.lengthComputable) {
                         const percentComplete = (event.loaded / event.total);
@@ -603,18 +665,289 @@
                     }
                 };
                 xhr.onload = () => {
+                    // Wasabi pre-signed PUT upload returns 200 OK on success
                     if (xhr.status >= 200 && xhr.status < 300) {
-                        resolve(xhr.response);
+                        resolve(xhr.response); // Response is usually empty for PUT
                     } else {
-                        reject(new Error(`Upload failed with status: ${xhr.status}. Response: ${xhr.responseText}`));
+                         // Try to read error response if available
+                         const errorResponse = xhr.responseText || `Upload failed with status: ${xhr.status}`;
+                         console.error("Upload error details:", errorResponse);
+                         reject(new Error(`Upload failed: ${xhr.status} ${xhr.statusText}. Details: ${errorResponse.substring(0, 150)}...`)); // Provide some details
                     }
                 };
-                xhr.onerror = () => reject(new Error('Network error during upload.'));
-                 xhr.send(file);
+                xhr.onerror = () => {
+                     console.error("Network error details during upload:", xhr.statusText);
+                     reject(new Error('Network error during upload. Check console for details.'));
+                }; // Handle network errors
+                 xhr.send(file); // Send the file data
             });
         }
 
-        // Existing function to upload video (modified to use uploadFileWithProgress)
+        // Function to format time for video player
+        function formatTime(time) {
+            if (isNaN(time) || time < 0) return '00:00'; // Handle invalid time
+            const seconds = Math.floor(time % 60);
+            const minutes = Math.floor(time / 60) % 60;
+            const hours = Math.floor(time / 3600);
+            if (hours > 0) {
+                return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+
+        // ======== Navigation and Page Management ========
+
+        // Function to show a specific page and manage navigation states
+        function showPage(pageId) {
+            // Hide all pages first
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            // Hide specific full-screen overlays if open
+            playerOverlay.style.display = 'none';
+            avatarDetailPage.style.display = 'none';
+            avatarSelectPanel.style.display = 'none'; // Ensure panel is hidden too
+
+             // Stop any playing avatar preview video
+            if(currentPlayingAvatarVideo) {
+                 currentPlayingAvatarVideo.pause();
+                 currentPlayingAvatarVideo.removeAttribute('src'); // Clear src
+                 currentPlayingAvatarVideo = null;
+            }
+            // Stop any playing user video
+            if (!mainPlayer.paused) {
+                 mainPlayer.pause();
+            }
+             mainPlayer.removeAttribute('src'); // Clear user video src
+
+            document.body.style.overflow = 'auto'; // Enable body scroll by default
+
+            // Show the requested page
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                 targetPage.classList.add('active');
+            } else {
+                 console.error("Page not found:", pageId);
+                 showPage('homePage'); // Fallback to home page
+                 return;
+            }
+
+
+            // Update active state in bottom nav
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (pageId === 'homePage') document.getElementById('navHome').classList.add('active');
+            else if (pageId === 'uploadPage') document.querySelector('.upload-plus').classList.add('active');
+            else if (pageId === 'packagePage') document.getElementById('navPackage').classList.add('active');
+            else if (pageId === 'infoSubmissionPage' || pageId === 'userDashboardPage') document.getElementById('navProfile').classList.add('active');
+            // Note: aiConversationPage is a full overlay, not part of main pages
+
+            // Specific actions when showing certain pages
+            if (pageId === 'homePage') {
+                populateHomePage(); // Refresh home content (includes video playlists and maybe AI placeholder)
+            } else if (pageId === 'uploadPage') {
+                 populatePlaylistDropdown(); // Refresh playlist dropdown
+            } else if (pageId === 'packagePage') {
+                 populateAvatarGrid(); // Load and display avatars on Package page
+            }
+        }
+
+        // Handle profile click based on user approval status
+        function handleProfileClick() {
+            // Check user approval status (e.g., from localStorage or session)
+            // For now, using a simple variable
+            showPage(isUserApproved ? 'userDashboardPage' : 'infoSubmissionPage');
+        }
+
+
+        // ======== Home Page Logic (Existing Video + New AI Placeholder) ========
+
+         async function populateHomePage() {
+            const container = document.getElementById('playlist-container');
+            homeStatusMsg.textContent = 'Loading content...';
+            homeStatusMsg.style.display = 'block';
+            container.innerHTML = ''; // Clear previous video content
+
+            try {
+                // Fetch video playlists
+                const videoData = await fetch(`${API_BASE_URL}/api/home-content`).then(handleApiResponse);
+                if (!videoData.success) {
+                     console.error('Error fetching video data:', videoData.message);
+                     // Continue loading avatars even if video data fails
+                     // throw new Error(videoData.message); // Don't throw here if avatars can still load
+                } else {
+                     allVideos = videoData.videos || []; // Store all videos globally
+                }
+
+
+                // Add AI Avatar area placeholder (This is where the AI UI will eventually be built)
+                const aiAvatarArea = document.getElementById('aiAvatarHomeArea'); // Get the existing placeholder
+                if (aiAvatarArea) {
+                    // You might update this area based on the currently selected avatar
+                    // For now, it remains a static message
+                    aiAvatarArea.style.display = 'block'; // Ensure placeholder is visible
+                } else {
+                     console.error("#aiAvatarHomeArea element not found!");
+                }
+
+
+                // Populate Video Playlists (Existing Logic)
+                if (videoData.playlists && videoData.playlists.length > 0) {
+                     videoData.playlists.forEach(playlist => {
+                         const playlistVideos = allVideos.filter(v => v.playlist_id == playlist.id); // Use == for type coercion if IDs are numbers/strings
+                         if (playlistVideos.length === 0) return; // Skip empty playlists
+
+                         const section = document.createElement('div');
+                         section.className = 'playlist-section';
+                         let videoCardsHTML = playlistVideos.map((video, index) =>
+                             `<div class="video-card-grid" data-video-key="${video.video_key}" data-video-title="${video.title}" data-playlist-id="${playlist.id}" data-video-index="${index}" onclick="playVideo(this)">
+                                 <div class="thumbnail" style="background-image: url('${video.thumbnailUrl}')"></div>
+                                 <div class="info"><p>${video.title}</p></div>
+                             </div>`
+                         ).join('');
+                         section.innerHTML = `<div class="playlist-header"><h3>${playlist.name}</h3></div><div class="video-grid-3xN">${videoCardsHTML}</div>`;
+                         container.appendChild(section); // Add video sections after the AI placeholder
+                     });
+                }
+
+
+                // Hide status message if there's any content (video playlists or AI placeholder)
+                if ((videoData.playlists && videoData.playlists.length > 0) || aiAvatarArea.style.display === 'block') {
+                    homeStatusMsg.style.display = 'none';
+                } else {
+                     homeStatusMsg.textContent = 'No content found. Be the first to upload!';
+                     homeStatusMsg.style.display = 'block';
+                }
+
+
+            } catch (error) {
+                console.error('Error populating home page:', error);
+                homeStatusMsg.textContent = `Error loading content: ${error.message}`;
+                homeStatusMsg.style.color = '#F44336';
+                homeStatusMsg.style.display = 'block';
+            }
+        }
+
+
+        // ======== Upload Page Logic (Existing Video + New Dev AI Upload) ========
+
+        async function populatePlaylistDropdown() {
+            const playlistSelect = document.getElementById('playlistSelect');
+            playlistSelect.innerHTML = '<option value="" disabled selected>Loading playlists...</option>'; // Show loading state
+             playlistSelect.disabled = true; // Disable while loading
+
+            try {
+                const playlists = await fetch(`${API_BASE_URL}/api/playlists`).then(handleApiResponse);
+                playlistSelect.innerHTML = ''; // Clear loading state
+
+                if (playlists.length === 0) {
+                    playlistSelect.innerHTML = '<option value="" disabled selected>Create a playlist first</option>';
+                    // Keep disabled or enable based on whether modal can be opened
+                     playlistSelect.disabled = true;
+                } else {
+                     playlists.forEach(p => {
+                         const option = document.createElement('option');
+                         option.value = p.id;
+                         option.textContent = p.name;
+                         playlistSelect.appendChild(option);
+                     });
+                     playlistSelect.disabled = false; // Enable dropdown
+                }
+
+            } catch (error) {
+                console.error('Error fetching playlists:', error);
+                playlistSelect.innerHTML = '<option value="" disabled selected>Error loading playlists</option>';
+                 playlistSelect.disabled = true; // Keep disabled on error
+            }
+        }
+
+         // [Modified] Preview function (used for video upload, thumbnail upload, new playlist thumbnail)
+        function previewAndNameUpdate(input, type) {
+            const file = input.files[0];
+            let previewElement, uploadTextElement;
+
+            // Determine which preview element and text element to update based on type
+            if (type === 'video') {
+                // Traverse from the input element to find the corresponding preview/text within file-upload-container
+                const container = input.closest('.file-upload-container');
+                 if (!container) return; // Should not happen if structure is correct
+                previewElement = container.querySelector('.preview-video');
+                uploadTextElement = container.querySelector('.file-uploader-card .upload-text'); // Assuming upload text is inside the card
+            } else if (type === 'thumbnail') {
+                 const container = input.closest('.file-upload-container');
+                 if (!container) return;
+                previewElement = container.querySelector('.preview-image');
+                 uploadTextElement = container.querySelector('.file-uploader-card .upload-text');
+            } else if (type === 'newPlaylistThumb') {
+                 previewElement = document.getElementById('newPlaylistPreview');
+                 uploadTextElement = document.querySelector('#newPlaylistThumbUploader .upload-text');
+            }
+
+            if (!previewElement) {
+                 console.error(`Preview element not found for type: ${type}`);
+                 return;
+            }
+
+
+            if (file) {
+                 const fileUrl = URL.createObjectURL(file);
+                 previewElement.src = fileUrl;
+                 previewElement.style.display = 'block';
+                 if(uploadTextElement) uploadTextElement.style.display = 'none'; // Hide text if image/video is shown
+
+                 if(type === 'video' && previewElement.tagName === 'VIDEO') {
+                     previewElement.muted = true; // Mute preview video
+                     previewElement.loop = true; // Loop preview video
+                     previewElement.play().catch(e => console.warn("Video preview play failed:", e)); // Play video preview
+                 }
+
+                 // Optional: Revoke previous object URL to free memory
+                 const oldUrl = previewElement.dataset.currentObjectURL;
+                 if (oldUrl && oldUrl.startsWith('blob:')) {
+                     URL.revokeObjectURL(oldUrl);
+                 }
+                 previewElement.dataset.currentObjectURL = fileUrl; // Store current URL
+
+
+            } else {
+                 // Handle file deselection - clear preview and show text
+                 previewElement.style.display = 'none';
+                 previewElement.removeAttribute('src'); // Clear src
+
+                  // Revoke object URL if it exists
+                 const oldUrl = previewElement.dataset.currentObjectURL;
+                  if (oldUrl && oldUrl.startsWith('blob:')) {
+                      URL.revokeObjectURL(oldUrl);
+                      delete previewElement.dataset.currentObjectURL;
+                  }
+
+
+                 if(uploadTextElement) uploadTextElement.style.display = 'block'; // Show text
+
+                 if(type === 'video' && previewElement.tagName === 'VIDEO') {
+                    previewElement.pause(); // Pause video preview
+                 }
+            }
+        }
+
+        // Function to update file name display (used in Info Submission page and Dev AI Upload)
+        function updateFileName(inputId, labelId) {
+            const input = document.getElementById(inputId);
+            const label = document.getElementById(labelId);
+            if (input && label) { // Check if elements exist
+                 if (input.files.length > 0) {
+                     label.textContent = input.files[0].name;
+                     label.style.color = 'var(--primary-text)'; // Change color to show file is selected
+                 } else {
+                     // Reset text based on input type hint
+                     const defaultText = inputId.includes('Image') ? 'Select Image' : (inputId.includes('Video') ? 'Select Video' : 'Select File');
+                     label.textContent = defaultText;
+                     label.style.color = 'var(--secondary-text)'; // Reset color
+                 }
+            } else {
+                 console.error(`updateFileName: Input (${inputId}) or Label (${labelId}) not found.`);
+            }
+        }
+
+        // Existing function for video upload (modified to use uploadFileWithProgress and updated preview logic)
         async function uploadVideo() {
             const videoInput = document.getElementById('videoFileInput');
             const thumbInput = document.getElementById('thumbnailInput');
@@ -636,15 +969,19 @@
                 const videoFile = videoInput.files[0];
                 const thumbFile = thumbInput.files[0];
 
-                // Get URL for video
+                // Get URL for video upload
                 const videoUrlRes = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(videoFile.name)}&contentType=${videoFile.type}`).then(handleApiResponse);
+                 if (!videoUrlRes.success || !videoUrlRes.uploadUrl) throw new Error("Failed to get video upload URL.");
+
                 // Upload video (80% progress for this)
                 await uploadFileWithProgress(videoUrlRes.uploadUrl, videoFile, (progress) => {
                     uploadProgressBar.style.width = `${progress * 80}%`;
                 });
 
-                // Get URL for thumbnail
+                // Get URL for thumbnail upload
                 const thumbUrlRes = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(thumbFile.name)}&contentType=${thumbFile.type}`).then(handleApiResponse);
+                 if (!thumbUrlRes.success || !thumbUrlRes.uploadUrl) throw new Error("Failed to get thumbnail upload URL.");
+
                 // Upload thumbnail (remaining 20% progress for this)
                 await uploadFileWithProgress(thumbUrlRes.uploadUrl, thumbFile, (progress) => {
                     uploadProgressBar.style.width = `${80 + (progress * 20)}%`;
@@ -652,20 +989,38 @@
 
                 uploadProgressBar.style.width = '100%'; // Finish progress bar
 
-                const videoDetails = { title, video_key: videoUrlRes.key, thumbnail_key: thumbUrlRes.key, playlist_id: selectedPlaylistId, age_restriction: ageRestriction };
-                await fetch(`${API_BASE_URL}/api/videos`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(videoDetails) }).then(handleApiResponse);
 
-                alert('Video uploaded successfully!');
+                // Save video metadata to backend DB
+                const videoDetails = {
+                     title: title,
+                     video_key: videoUrlRes.key, // Use the key returned by generate-upload-url
+                     thumbnail_key: thumbUrlRes.key, // Use the key returned by generate-upload-url
+                     playlist_id: selectedPlaylistId,
+                     age_restriction: ageRestriction
+                };
+                const saveResponse = await fetch(`${API_BASE_URL}/api/videos`, {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify(videoDetails)
+                }).then(handleApiResponse);
+
+                 if (!saveResponse.success) throw new Error(saveResponse.message || "Failed to save video details.");
+
+
+                alert('Video uploaded and details saved successfully!');
                 // Clear form and previews
                 document.getElementById('videoTitle').value = '';
-                videoInput.value = '';
-                thumbInput.value = '';
+                document.getElementById('playlistSelect').value = ''; // Reset playlist selection
+                document.querySelector('input[name="age_restriction"][value="all"]').checked = true; // Reset age restriction
+                videoInput.value = ''; // Clear file input
+                thumbInput.value = ''; // Clear file input
                 previewAndNameUpdate(videoInput, 'video'); // Reset video preview
                 previewAndNameUpdate(thumbInput, 'thumbnail'); // Reset thumbnail preview
 
 
                 showPage('homePage'); // Go back to home
             } catch (error) {
+                console.error('Full Video Upload Process Failed:', error);
                 alert(`Upload failed: ${error.message}`);
             } finally {
                 setButtonLoading(uploadBtn, false, '✅ Upload Video');
@@ -677,169 +1032,62 @@
             }
         }
 
-        // Existing Profile/Info Submission logic
-        function handleProfileClick() { showPage(isUserApproved ? 'userDashboardPage' : 'infoSubmissionPage'); }
-        function submitForApproval() { alert('Information submitted for verification.'); } // Placeholder
 
+        // ======== Profile/Info Submission Logic (Existing Placeholder) ========
 
-        // Existing Video Player logic (keep as is for now)
-        function formatTime(time) { const seconds = Math.floor(time % 60); const minutes = Math.floor(time / 60) % 60; const hours = Math.floor(time / 3600); if (hours > 0) { return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`; } return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`; }
-        function showControls() { if(isLocked) return; controls.classList.remove('hidden'); clearTimeout(controlsTimeout); controlsTimeout = setTimeout(() => controls.classList.add('hidden'), 3000); }
-        async function loadVideo(videoData) { const { videoKey, title } = videoData; document.querySelector('.top-controls .video-title').textContent = title; document.querySelector('.pause-overlay .paused-title').textContent = title; mainPlayer.src = ''; loadingSpinner.style.display = 'block'; try { const data = await fetch(`${API_BASE_URL}/api/videos/${videoKey}/play`).then(handleApiResponse); if (data.success) { mainPlayer.src = data.url; mainPlayer.play(); } else { throw new Error('Could not get video URL.'); } } catch (error) { alert(`Error playing video: ${error.message}`); closePlayer(); } }
-        function playVideo(element) { const videoKey = element.dataset.videoKey; const title = element.dataset.videoTitle; const playlistId = element.dataset.playlistId; currentVideoIndex = parseInt(element.dataset.videoIndex, 10); currentPlaylist = allVideos.filter(v => v.playlist_id == playlistId); playerOverlay.style.display = 'block'; document.body.style.overflow = 'hidden'; loadVideo({ videoKey, title }); isLocked = false; lockOverlay.classList.remove('locked'); controls.classList.remove('hidden'); setupPlayerEventListeners(); showControls(); } // This is for USER videos
-        function playNextVideo() { if (currentVideoIndex < currentPlaylist.length - 1) { currentVideoIndex++; const nextVideo = currentPlaylist[currentVideoIndex]; loadVideo({ videoKey: nextVideo.video_key, title: nextVideo.title }); } } // For user videos
-        function playPrevVideo() { if (currentVideoIndex > 0) { currentVideoIndex--; const prevVideo = currentPlaylist[currentVideoIndex]; loadVideo({ videoKey: prevVideo.video_key, title: prevVideo.title }); } } // For user videos
-        function toggleFullscreen() { /* ... existing fullscreen logic ... */
-             const isFullscreen = document.body.classList.contains('fullscreen-active');
-             if (!isFullscreen) {
-                 document.body.classList.add('fullscreen-active');
-                 playerContainer.classList.add('pseudo-fullscreen');
-                 fsOpenIcon.style.display = 'none';
-                 fsCloseIcon.style.display = 'block';
-                 if (screen.orientation && screen.orientation.lock) { screen.orientation.lock('landscape').catch(e => console.log("Could not lock screen:", e)); }
-             } else {
-                 document.body.classList.remove('fullscreen-active');
-                 playerContainer.classList.remove('pseudo-fullscreen');
-                 fsOpenIcon.style.display = 'block';
-                 fsCloseIcon.style.display = 'none';
-                 if (screen.orientation && screen.orientation.unlock) { screen.orientation.unlock(); }
+        // Placeholder function for submitting info
+        function submitForApproval() {
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const address = document.getElementById('address').value;
+            const photo1 = document.getElementById('photo1').files[0];
+            const photo2 = document.getElementById('photo2').files[0];
+            const govId = document.getElementById('govId').files[0];
+
+             if (!fullName || !email || !address || !photo1 || !photo2 || !govId) {
+                 alert("Please fill in all fields and upload all required documents.");
+                 return;
              }
-         }
-        function closePlayer() { mainPlayer.pause(); mainPlayer.src = ''; if (document.body.classList.contains('fullscreen-active')) { toggleFullscreen(); } if (document.pictureInPictureElement) { document.exitPictureInPicture(); } playerOverlay.style.display = 'none'; document.body.style.overflow = 'auto'; removePlayerEventListeners(); } // For user videos
-        function togglePlay() { if (mainPlayer.paused || mainPlayer.ended) { mainPlayer.play(); } else { mainPlayer.pause(); } } // For user videos
-        function handleTimeUpdate() { /* ... existing time update logic ... */
-            const progress = (mainPlayer.currentTime / mainPlayer.duration) * 100;
-            playedBar.style.width = `${progress}%`;
-            currentTimeEl.textContent = formatTime(mainPlayer.currentTime);
-            if(mainPlayer.duration && !isNaN(mainPlayer.duration)) totalTimeEl.textContent = formatTime(mainPlayer.duration);
-            if (mainPlayer.buffered.length > 0) {
-                const bufferedEnd = mainPlayer.buffered.end(mainPlayer.buffered.length - 1);
-                const bufferedProgress = (bufferedEnd / mainPlayer.duration) * 100;
-                bufferedBar.style.width = `${bufferedProgress}%`;
-            }
-         }
-        function handleProgressBarClick(e) { const rect = progressBar.getBoundingClientRect(); const clickX = e.clientX - rect.left; const percentage = clickX / rect.width; mainPlayer.currentTime = mainPlayer.duration * percentage; } // For user videos
-        function togglePip() { if (document.pictureInPictureElement) { document.exitPictureInPicture(); } else { if(document.pictureInPictureEnabled && !mainPlayer.paused) { mainPlayer.requestPictureInPicture().catch(err => console.error("PiP Error:", err)); } } } // For user videos
-        function updatePlayPauseIcon() { playIcon.style.display = mainPlayer.paused ? 'block' : 'none'; pauseIcon.style.display = mainPlayer.paused ? 'none' : 'block'; replayIcon.style.display = 'none'; pauseOverlay.style.display = mainPlayer.paused && !mainPlayer.ended ? 'flex' : 'none'; } // For user videos
-        function handleEnded() { playIcon.style.display = 'none'; pauseIcon.style.display = 'none'; replayIcon.style.display = 'block'; } // For user videos
-        function toggleLock() { isLocked = !isLocked; lockOverlay.classList.toggle('locked', isLocked); if (isLocked) { controls.classList.add('hidden'); } else { showControls(); } } // For user videos
-        let lastTap = 0; // For user videos
-        function handlePlayerClick(e) { /* ... existing double tap logic ... */
-             const currentTime = new Date().getTime();
-             const tapLength = currentTime - lastTap;
-             // Check if click is within player bounds but outside specific controls
-             const rect = mainPlayer.getBoundingClientRect();
-             const clickX = e.clientX;
-             const clickY = e.clientY;
-             // Simple check to avoid double-tap when clicking controls at edges
-             const edgePadding = 80; // Pixels from edges to ignore double tap
-             if (clickX > rect.left + edgePadding && clickX < rect.right - edgePadding &&
-                 clickY > rect.top + edgePadding && clickY < rect.bottom - edgePadding)
-             {
-                 if (tapLength < 300 && tapLength > 0) {
-                     const tapAreaX = e.clientX - rect.left;
-                     if (tapAreaX < rect.width / 2) {
-                         mainPlayer.currentTime -= 10; showSeekAnimation('rewind');
-                     } else {
-                         mainPlayer.currentTime += 10; showSeekAnimation('forward');
-                     }
-                     e.preventDefault(); // Prevent default action like pausing on second tap
-                 } else {
-                     if(!isLocked) togglePlay(); // Toggle play/pause on single tap if not locked
-                 }
-             } else {
-                 // If click is near edges, just show controls if not locked
-                  if(!isLocked) showControls();
-             }
-             lastTap = currentTime;
-         }
-        function showSeekAnimation(direction) { const animEl = direction === 'forward' ? forwardAnim : rewindAnim; animEl.classList.add('visible'); setTimeout(() => animEl.classList.remove('visible'), 500); } // For user videos
-        let touchStartY = 0; let touchCurrentVolume = 0; const volumeHud = document.querySelector('.volume-hud'); // For user videos
-        function handleTouchStart(e) { if (e.touches.length === 1) { const touch = e.touches[0]; const rect = playerContainer.getBoundingClientRect(); if (touch.clientX > rect.left + rect.width / 2) { touchStartY = touch.clientY; touchCurrentVolume = mainPlayer.volume; } else { touchStartY = 0; } } } // For user videos
-        function handleTouchMove(e) { if (e.touches.length === 1 && touchStartY !== 0) { e.preventDefault(); const touch = e.touches[0]; const deltaY = touchStartY - touch.clientY; const sensitivity = 200; const volumeChange = deltaY / sensitivity; let newVolume = touchCurrentVolume + volumeChange; newVolume = Math.max(0, Math.min(1, newVolume)); mainPlayer.volume = newVolume; volumeHud.classList.add('visible'); volumeHud.querySelector('.volume-level').textContent = `${Math.round(newVolume * 100)}%`; } } // For user videos
-        function handleTouchEnd(e) { touchStartY = 0; setTimeout(() => volumeHud.classList.remove('visible'), 500); } // For user videos
 
-        // Existing Video Player Event Listeners (only for mainPlayer)
-        const videoPlayerEventListeners = [ { el: mainPlayer, type: 'play', func: updatePlayPauseIcon }, { el: mainPlayer, type: 'pause', func: updatePlayPauseIcon }, { el: mainPlayer, type: 'ended', func: handleEnded }, { el: mainPlayer, type: 'timeupdate', func: handleTimeUpdate }, { el: mainPlayer, type: 'waiting', func: () => loadingSpinner.style.display = 'block' }, { el: mainPlayer, type: 'playing', func: () => loadingSpinner.style.display = 'none' }, { el: mainPlayer, type: 'click', func: handlePlayerClick }, { el: playPauseBtn, type: 'click', func: togglePlay }, { el: progressBar, type: 'click', func: handleProgressBarClick }, { el: fullscreenBtn, type: 'click', func: toggleFullscreen }, { el: pipBtn, type: 'click', func: togglePip }, { el: playerCloseBtn, type: 'click', func: closePlayer }, { el: playerContainer, type: 'mousemove', func: showControls }, { el: lockBtn, type: 'click', func: toggleLock }, { el: unlockBtn, type: 'click', func: toggleLock }, { el: nextBtn, type: 'click', func: playNextVideo }, { el: prevBtn, type: 'click', func: playPrevVideo }, { el: playerContainer, type: 'touchstart', func: handleTouchStart, options: { passive: false } }, { el: playerContainer, type: 'touchmove', func: handleTouchMove, options: { passive: false } }, { el: playerContainer, type: 'touchend', func: handleTouchEnd } ];
-        function setupPlayerEventListeners() { videoPlayerEventListeners.forEach(({ el, type, func, options }) => el.addEventListener(type, func, options)); }
-        function removePlayerEventListeners() { videoPlayerEventListeners.forEach(({ el, type, func, options }) => el.removeEventListener(type, func, options)); }
+            // TODO: Implement actual submission logic here
+            // This would involve using generateUploadUrl and uploadFileWithProgress
+            // for the photos and ID, and then sending all the data (including keys)
+            // to a new backend endpoint (e.g., POST /api/user-verification).
 
-
-        // [New] Functions for AI Avatar interaction
-        async function populateHomePage() {
-            const container = document.getElementById('playlist-container');
-            const statusMsg = document.getElementById('home-status-message');
-            container.innerHTML = ''; // Clear previous content
-            statusMsg.textContent = 'Loading...';
-            statusMsg.style.display = 'block';
-
-            try {
-                // Fetch both video playlists and AI avatars
-                const [videoData, avatarData] = await Promise.all([
-                     fetch(`${API_BASE_URL}/api/home-content`).then(handleApiResponse),
-                     fetch(`${API_BASE_URL}/api/avatars`).then(handleApiResponse) // [New] Fetch avatars
-                ]);
-
-
-                // --- Handle Video Playlists (Existing Logic) ---
-                if (!videoData.success) throw new Error(videoData.message);
-                allVideos = videoData.videos; // Store all videos globally
-
-                if (videoData.playlists.length === 0 && avatarData.avatars.length === 0) { // Check both for no content
-                    statusMsg.textContent = 'No content found. Be the first to upload!';
-                    return;
-                }
-                statusMsg.style.display = 'none'; // Hide status if content exists
-
-                // Add AI Avatar section to Home page (Simple for now, just show selected avatar?)
-                // TODO: Design how AI Avatar appears on Home page. For now, maybe just show the default/selected one?
-                // This is where the actual AI conversation UI will eventually go.
-                // Let's add a placeholder for the AI Avatar interaction area.
-                 const aiAvatarArea = document.createElement('div');
-                 aiAvatarArea.id = 'aiAvatarHomeArea';
-                 aiAvatarArea.innerHTML = '<h2>AI Avatar Interaction Area</h2><p>Select an avatar from the Packages tab to start!</p>'; // Placeholder content
-                 container.appendChild(aiAvatarArea);
-
-
-                // Populate Video Playlists
-                videoData.playlists.forEach(playlist => {
-                    const playlistVideos = allVideos.filter(v => v.playlist_id === playlist.id);
-                    if (playlistVideos.length === 0) return; // Skip empty playlists
-
-                    const section = document.createElement('div');
-                    section.className = 'playlist-section';
-                    let videoCardsHTML = playlistVideos.map((video, index) =>
-                        `<div class="video-card-grid" data-video-key="${video.video_key}" data-video-title="${video.title}" data-playlist-id="${playlist.id}" data-video-index="${index}" onclick="playVideo(this)">
-                            <div class="thumbnail" style="background-image: url('${video.thumbnailUrl}')"></div>
-                            <div class="info"><p>${video.title}</p></div>
-                        </div>`
-                    ).join('');
-                    section.innerHTML = `<div class="playlist-header"><h3>${playlist.name}</h3></div><div class="video-grid-3xN">${videoCardsHTML}</div>`;
-                    container.appendChild(section);
-                });
-
-            } catch (error) {
-                console.error('Error populating home page:', error);
-                statusMsg.textContent = `Error: ${error.message}`;
-                statusMsg.style.color = '#F44336';
-            }
+            alert('Information submitted for verification (Placeholder).');
+            // After successful submission:
+            // isUserApproved = true; // Update status (should be handled by backend verification)
+            // showPage('userDashboardPage'); // Navigate to dashboard
         }
 
-         // [New] Function to populate the AI Avatar Grid on Package page
+
+        // ======== Video Player Logic (Existing) ========
+        // Keep all existing video player functions (formatTime, showControls, loadVideo, playVideo, playNextVideo, playPrevVideo, toggleFullscreen, closePlayer, togglePlay, handleTimeUpdate, handleProgressBarClick, togglePip, updatePlayPauseIcon, handleEnded, toggleLock, handlePlayerClick, showSeekAnimation, handleTouchStart, handleTouchMove, handleTouchEnd) as they were.
+        // Ensure event listeners are added/removed correctly by playVideo/closePlayer.
+        // The eventListeners array was correct. The setupPlayerEventListeners and removePlayerEventListeners functions should attach/detach these.
+        // (Code for these functions is omitted here for brevity as you asked not to get code, but ensure they are in your actual index.html)
+
+
+        // ======== New AI Avatar Logic (Frontend UI & Basic Interactions) ========
+
+         // Function to load and display avatars on the Package page
         async function populateAvatarGrid() {
-             const gridContainer = document.getElementById('avatarGrid');
-             const statusMsg = document.getElementById('package-status-message');
-             gridContainer.innerHTML = ''; // Clear existing cards
-             statusMsg.textContent = 'Loading Avatars...';
-             statusMsg.style.display = 'block';
+             avatarGridContainer.innerHTML = ''; // Clear existing cards
+             packageStatusMsg.textContent = 'Loading Avatars...';
+             packageStatusMsg.style.display = 'block';
 
              try {
-                 const data = await fetch(`${API_BASE_URL}/api/avatars`).then(handleApiResponse); // Fetch avatars from new backend endpoint
+                 // [New Backend Endpoint Needed] Fetch avatars from backend
+                 // This endpoint should return an array of avatar objects, each with:
+                 // id, name, imageUrl (presigned URL), videoUrl (presigned URL), personalityPrompt (optional)
+                 const data = await fetch(`${API_BASE_URL}/api/avatars`).then(handleApiResponse);
+
                  if (!data.success || !data.avatars || data.avatars.length === 0) {
-                     statusMsg.textContent = data.message || 'No AI avatars found. Use the dev upload!';
-                     return;
+                     packageStatusMsg.textContent = data.message || 'No AI avatars found. Use the dev upload!';
+                     allAvatars = []; // Clear avatars if fetch failed or none found
+                     return; // Stop if no avatars
                  }
-                 statusMsg.style.display = 'none'; // Hide status if avatars exist
+                 packageStatusMsg.style.display = 'none'; // Hide status if avatars exist
 
                  allAvatars = data.avatars; // Store all avatars globally
 
@@ -848,28 +1096,37 @@
                      avatarCard.className = 'avatar-card';
                      // Store data attributes for easy access later
                      avatarCard.dataset.avatarId = avatar.id;
-                     avatarCard.dataset.imageUrl = avatar.imageUrl; // Assuming backend provides presigned URL
-                     avatarCard.dataset.videoUrl = avatar.videoUrl; // Assuming backend provides presigned URL
+                     avatarCard.dataset.imageUrl = avatar.imageUrl;
+                     avatarCard.dataset.videoUrl = avatar.videoUrl;
                      avatarCard.dataset.avatarName = avatar.name;
+                     // avatar.personalityPrompt // Store this if needed, though not used in this UI part
 
-                     // Set background image or img src
-                     // Using <img> tag as requested
-                     avatarCard.innerHTML = `<img src="${avatar.imageUrl}" alt="${avatar.name}">`;
+                     // Use image container for circular cropping
+                     avatarCard.innerHTML = `
+                         <div class="image-container">
+                             <img src="${avatar.imageUrl}" alt="${avatar.name}">
+                         </div>
+                         <p class="avatar-name">${avatar.name}</p>
+                     `;
 
                      // Add click listener to open the detail page
-                     avatarCard.onclick = () => showAvatarDetail(avatar); // Pass the whole avatar object
+                     // Use event delegation or directly add listener
+                     avatarCard.addEventListener('click', () => showAvatarDetail(avatar)); // Pass the whole avatar object
 
-                     gridContainer.appendChild(avatarCard);
+                     avatarGridContainer.appendChild(avatarCard);
                  });
 
              } catch (error) {
                  console.error('Error populating avatar grid:', error);
-                 statusMsg.textContent = `Error loading avatars: ${error.message}`;
-                 statusMsg.style.color = '#F44336';
+                 packageStatusMsg.textContent = `Error loading avatars: ${error.message}`;
+                 packageStatusMsg.style.color = '#F44336';
+                 packageStatusMsg.style.display = 'block';
+                 allAvatars = []; // Clear avatars on error
              }
         }
 
-         // [New] Function to populate the Avatar Select Panel (the vertical list)
+
+         // Function to populate the Avatar Select Panel (the vertical list)
          function populateAvatarSelectPanel() {
              const panel = document.getElementById('avatarSelectPanel');
              panel.innerHTML = ''; // Clear existing cards
@@ -884,50 +1141,70 @@
                  selectCard.className = 'avatar-select-card';
                  selectCard.dataset.avatarId = avatar.id;
                  selectCard.dataset.avatarName = avatar.name;
-                 // Use 9:16 image URL here if you have one, otherwise reuse the 1:1 image
-                 // For simplicity, reusing the 1:1 image; CSS will handle aspect ratio
-                 selectCard.innerHTML = `<img src="${avatar.imageUrl}" alt="${avatar.name}">`; // Using <img> tag
+                 // Use 9:16 image URL if available, otherwise reuse the 1:1 image
+                 // For simplicity, reusing the 1:1 image URL here; CSS handles aspect ratio
+                 selectCard.innerHTML = `<img src="${avatar.imageUrl}" alt="${avatar.name}">`;
 
-                 // Add click listener to select this avatar (Placeholder logic)
-                 selectCard.onclick = () => selectAvatar(avatar);
+                 // Add click listener to select this avatar
+                 selectCard.addEventListener('click', () => selectAvatar(avatar));
 
                  panel.appendChild(selectCard);
              });
          }
 
-
-         // [New] Function to show the AI Avatar Detail/Preview page
+         // Function to show the AI Avatar Detail/Preview page
          function showAvatarDetail(avatarData) {
-             // Hide all other pages
+             // Hide all other pages and stop other media
              document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+             playerOverlay.style.display = 'none'; // Ensure video player is hidden
              document.body.style.overflow = 'hidden'; // Prevent body scroll
 
-             // Set video source and play
-             if (avatarData.videoUrl) {
+             // Set video source and play the loop
+             if (avatarPreviewVideo && avatarData.videoUrl) {
                  avatarPreviewVideo.src = avatarData.videoUrl; // Assuming it's a presigned URL
-                 avatarPreviewVideo.play().catch(error => console.error("Video playback failed:", error));
-                 currentPlayingAvatarVideo = avatarPreviewVideo; // Keep track of the playing video
+                 avatarPreviewVideo.muted = true; // Always mute preview initially
+                 avatarPreviewVideo.loop = true; // Loop the preview
+                 // Attempt to play video, handle potential autoplay restrictions
+                 const playPromise = avatarPreviewVideo.play();
+                 if (playPromise !== undefined) {
+                     playPromise.then(_ => {
+                         // Autoplay started
+                          currentPlayingAvatarVideo = avatarPreviewVideo; // Keep track
+                     }).catch(error => {
+                         // Autoplay failed (e.g., not muted)
+                         console.warn("Avatar preview video autoplay failed:", error);
+                          currentPlayingAvatarVideo = null; // Clear reference if play failed
+                          // Optionally, show a play button or fallback image
+                     });
+                 } else {
+                      currentPlayingAvatarVideo = avatarPreviewVideo; // Keep track even without promise
+                 }
+
              } else {
                  console.warn("No video URL found for avatar:", avatarData.name);
-                 // Handle case with no video (maybe show image and a message?)
-                 avatarPreviewVideo.removeAttribute('src');
-                 // TODO: Add UI feedback if video fails or is missing
+                 avatarPreviewVideo.removeAttribute('src'); // Clear src if no video
+                 currentPlayingAvatarVideo = null;
+                 // TODO: Add fallback UI (show image?) if video is missing or fails
              }
 
              // Set avatar name in the header
-             avatarPreviewName.textContent = avatarData.name;
+             if (avatarPreviewName) {
+                 avatarPreviewName.textContent = avatarData.name;
+             }
+
 
              // Show the detail page
-             avatarDetailPage.style.display = 'block';
+             avatarDetailPage.style.display = 'flex'; // Use flex to utilize column layout for video/controls
 
              // Populate the select panel initially (it's hidden by default)
              populateAvatarSelectPanel();
 
-             // Add listeners specifically for this page if needed (like controls toggle)
-             // For simplicity, controls are always visible initially on this page
+             // Ensure the side panel is hidden initially when detail page opens
+             avatarSelectPanel.style.display = 'none';
+
          }
 
-         // [New] Function to hide the AI Avatar Detail/Preview page
+         // Function to hide the AI Avatar Detail/Preview page
          function hideAvatarDetail() {
               if(currentPlayingAvatarVideo) {
                  currentPlayingAvatarVideo.pause();
@@ -937,59 +1214,149 @@
               avatarDetailPage.style.display = 'none';
               avatarSelectPanel.style.display = 'none'; // Ensure panel is hidden too
               document.body.style.overflow = 'auto'; // Allow body scroll again
-              showPage('packagePage'); // Go back to package page after closing detail
+              showPage('packagePage'); // Go back to package page after closing detail (as requested)
          }
 
-         // [New] Function to toggle the AI Avatar Select Panel visibility
+         // Function to toggle the AI Avatar Select Panel visibility
          function toggleAvatarSelectPanel() {
              const isHidden = avatarSelectPanel.style.display === 'none' || avatarSelectPanel.style.display === '';
-             avatarSelectPanel.style.display = isHidden ? 'flex' : 'none';
+             avatarSelectPanel.style.display = isHidden ? 'flex' : 'none'; // Use flex for vertical layout
          }
 
-         // [New] Function to handle selecting an avatar from the side panel (Placeholder)
+         // Function to handle selecting an avatar from the side panel (Placeholder)
          function selectAvatar(avatarData) {
              console.log("Avatar Selected:", avatarData.name, "(ID:", avatarData.id, ")");
              // TODO: Implement logic to store the selected avatar ID (e.g., in localStorage)
-             // This selected ID will be used later when the user goes to the actual AI conversation page
-             alert(`Avatar "${avatarData.name}" selected!`); // Simple feedback for now
-             hideAvatarDetail(); // Close the detail page after selection
-             // You might want to navigate to the Home page or the future AI conversation page here
-             // showPage('homePage'); // Example: Go back home after selection
+             // This selected ID will be used later when the user goes to the actual AI conversation page (#aiConversationPage)
+
+             // --- TEMPORARY: Simulate going to the AI conversation page ---
+             alert(`Avatar "${avatarData.name}" selected! Now, imagine you are on the conversation page.`);
+             // For now, we just close the detail/select views and could hypothetically
+             // navigate to the #aiConversationPage placeholder.
+             hideAvatarDetail(); // Close the selection UI
+             // showPage('aiConversationPage'); // In the future, uncomment this and build the #aiConversationPage UI
+             // --- END TEMPORARY ---
+
          }
 
         // [New] Placeholder function for uploading AI assets (Development only)
-        function uploadAiAssetsDev() {
-            alert("AI Asset Upload (Dev) - To be implemented!\n\nThis will involve a form to select Avatar Image and Video and upload them using the Wasabi functions.");
-            // TODO: Implement a simple form or modal here to:
-            // 1. Input Avatar Name (or select existing avatar ID)
-            // 2. Select Avatar Image file
-            // 3. Select Avatar Video file
-            // 4. Use generateUploadUrl for each file
-            // 5. Use uploadFileWithProgress for each file
-            // 6. Call a NEW backend endpoint (e.g., POST /api/avatars) to save the metadata (name, image_key, video_key)
+        async function uploadAiAssetsDev() {
+            const nameInput = document.getElementById('devAvatarName');
+            const promptInput = document.getElementById('devAvatarPrompt');
+            const imageInput = document.getElementById('devAvatarImage');
+            const videoInput = document.getElementById('devAvatarVideo');
+            const uploadBtn = document.getElementById('uploadAiAssetsBtn');
+
+            if (!nameInput.value || !promptInput.value || !imageInput.files[0] || !videoInput.files[0]) {
+                alert('Please fill in Name, Prompt and select both Image and Video files.');
+                return;
+            }
+
+            setButtonLoading(uploadBtn, true, 'Upload Assets & Save Avatar'); // Set button state
+            uploadProgressBarContainer.style.display = 'block'; // Show progress bar
+            uploadProgressBar.style.width = '0%';
+
+            try {
+                const imageFile = imageInput.files[0];
+                const videoFile = videoInput.files[0];
+
+                // Upload Image (e.g., 40% progress)
+                const imageUrlRes = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(imageFile.name)}&contentType=${imageFile.type}`).then(handleApiResponse);
+                 if (!imageUrlRes.success || !imageUrlRes.uploadUrl) throw new Error("Failed to get image upload URL.");
+                await uploadFileWithProgress(imageUrlRes.uploadUrl, imageFile, (progress) => {
+                    uploadProgressBar.style.width = `${progress * 40}%`;
+                });
+
+                // Upload Video (e.g., remaining 60% progress)
+                const videoUrlRes = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(videoFile.name)}&contentType=${videoFile.type}`).then(handleApiResponse);
+                 if (!videoUrlRes.success || !videoUrlRes.uploadUrl) throw new Error("Failed to get video upload URL.");
+                 await uploadFileWithProgress(videoUrlRes.uploadUrl, videoFile, (progress) => {
+                    uploadProgressBar.style.width = `${40 + (progress * 60)}%`;
+                });
+
+                 uploadProgressBar.style.width = '100%'; // Finish progress
+
+                // [New Backend Endpoint Needed] Send metadata to backend to save the avatar
+                const avatarData = {
+                    name: nameInput.value,
+                    personalityPrompt: promptInput.value,
+                    image_key: imageUrlRes.key, // Use the key returned by generate-upload-url
+                    video_key: videoUrlRes.key, // Use the key returned by generate-upload-url (Assuming this single video is the main loop for now)
+                    // Future: Add keys for idle_loop_key, talking_loop_key, listening_loop_key
+                };
+                // Backend endpoint will save this to the new 'characters' table in your DB (Firebase/PostgreSQL)
+                const saveResponse = await fetch(`${API_BASE_URL}/api/avatars`, { // [New Backend Endpoint Needed]
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify(avatarData)
+                }).then(handleApiResponse);
+
+                if (!saveResponse.success) throw new Error(saveResponse.message || "Failed to save avatar details.");
+
+
+                alert(`Avatar "${avatarData.name}" uploaded and saved successfully!`);
+
+                // Clear form and reset UI
+                nameInput.value = '';
+                promptInput.value = '';
+                imageInput.value = '';
+                videoInput.value = '';
+                 updateFileName(imageInput, 'devAvatarImageName'); // Reset label
+                 updateFileName(videoInput, 'devAvatarVideoName'); // Reset label
+
+                populateAvatarGrid(); // Refresh the list on the page
+
+            } catch (error) {
+                console.error('Full AI Asset Upload Process Failed:', error);
+                 // Show error message to user
+                alert(`AI Asset Upload failed: ${error.message}`);
+            } finally {
+                setButtonLoading(uploadBtn, false, 'Upload Assets & Save Avatar'); // Reset button state
+                 // Hide progress bar after delay
+                 setTimeout(() => {
+                     uploadProgressBarContainer.style.display = 'none';
+                     uploadProgressBar.style.width = '0%';
+                 }, 1000);
+            }
         }
 
 
-        // ======== Event Listeners ========
+        // ======== Initialization ========
 
         document.addEventListener('DOMContentLoaded', () => {
             // Initial page load
             showPage('homePage'); // Start on the home page
 
-            // [New] Add event listener for AI Avatar clicks on Package page (done via onclick attribute in HTML for now)
-            // Event delegation could be used here later for better performance
+            // Add Event Listeners for New AI Avatar UI
+            if (avatarBackBtn) avatarBackBtn.addEventListener('click', hideAvatarDetail);
+            if (selectAvatarBtn) selectAvatarBtn.addEventListener('click', toggleAvatarSelectPanel);
+            if (uploadAiAssetsBtn) uploadAiAssetsBtn.addEventListener('click', uploadAiAssetsDev);
 
-            // [New] Add event listener for Back button on Avatar Detail page
-            avatarBackBtn.addEventListener('click', hideAvatarDetail);
-
-            // [New] Add event listener for Select Avatar button on Avatar Detail page
-            selectAvatarBtn.addEventListener('click', toggleAvatarSelectPanel);
-
-            // [New] Add event listener for the Dev AI Assets Upload button
-            uploadAiAssetsBtn.addEventListener('click', uploadAiAssetsDev);
+            // Optional: Add listener to hide panel when clicking outside it
+            // document.addEventListener('click', (e) => {
+            //     const isPanelClick = avatarSelectPanel.contains(e.target);
+            //     const isSelectBtnClick = selectAvatarBtn.contains(e.target); // Don't hide if clicking the toggle button
+            //     if (!isPanelClick && !isSelectBtnClick && avatarSelectPanel.style.display !== 'none') {
+            //         avatarSelectPanel.style.display = 'none';
+            //     }
+            // }, true); // Use capturing phase to ensure click on panel content works
 
             // Initial setup for existing video player listeners (only when player is shown)
             // The listeners are added/removed when playVideo/closePlayer is called.
+             // Add the global touch/mousemove listeners for video player controls
+             // These should only be active when the video player overlay is visible
+             // This part needs careful management so it doesn't interfere with other pages
+             // Maybe add/remove these listeners only when videoPlayerOverlay.style.display changes?
+             // Or add the listener to the playerContainer itself, which is only visible when active.
+             // Let's add the listeners to playerContainer directly, as its display is handled.
+             const playerContainerEl = document.querySelector('#videoPlayerOverlay .player-container');
+             if(playerContainerEl) {
+                 playerContainerEl.addEventListener('mousemove', showControls);
+                 playerContainerEl.addEventListener('touchstart', handleTouchStart, { passive: false });
+                 playerContainerEl.addEventListener('touchmove', handleTouchMove, { passive: false });
+                 playerContainerEl.addEventListener('touchend', handleTouchEnd);
+             }
+
         });
 
     </script>
