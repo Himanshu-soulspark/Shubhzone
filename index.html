@@ -1958,7 +1958,7 @@
                         micButton.style.opacity = 1;
                    }
                    // TODO: Send 'start_session' message to backend via WebSocket
-                    // ws.send(JSON.stringify({ type: 'start_session', userId: 'user123', avatarId: avatarData.id }));
+                    // ws.send(JSON.stringify({ type: 'start_session', userId: 'user123', avatarId: selectedAvatar.id }));
              }, 2000); // Simulate connection delay
 
 
@@ -2062,8 +2062,18 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Initial page load
             // Check localStorage for initial page, e.g., last page visited
-             const lastPage = localStorage.getItem('lastPage') || 'homePage';
-            showPage(lastPage); // Start on the home page or last visited
+            let lastPage = localStorage.getItem('lastPage');
+
+            // === MODIFIED INITIATION LOGIC ===
+            // Always start on the Home Page regardless of what was saved,
+            // unless the saved page is specifically one of the main navigation pages.
+            const validMainPages = ['homePage', 'uploadPage', 'packagePage', 'infoSubmissionPage', 'userDashboardPage'];
+            if (!lastPage || !validMainPages.includes(lastPage)) {
+                 lastPage = 'homePage';
+            }
+             // ===============================
+
+            showPage(lastPage); // Start on the determined page
 
             // Load selected avatar from localStorage on startup
              const storedAvatar = localStorage.getItem('selectedAvatar');
@@ -2083,14 +2093,12 @@
             // Save current page to localStorage when leaving the page (optional)
              window.addEventListener('beforeunload', () => {
                  const activePageElement = document.querySelector('.page.active');
-                 if (activePageElement && activePageElement.id !== 'aiConversationPage' && activePageElement.id !== 'videoPlayerOverlay') {
-                     // Only save the page if it's a 'main' page and not an overlay
+                 if (activePageElement && activePageElement.id !== 'aiConversationPage' && activePageElement.id !== 'videoPlayerOverlay' && activePageElement.id !== 'avatarDetailPage') {
+                     // Only save the page if it's a 'main' page and not an overlay like video player or conversation or avatar detail
                      localStorage.setItem('lastPage', activePageElement.id);
-                 } else if (avatarDetailPage.style.display === 'flex') {
-                      // If on avatar detail page, save the package page as last page
-                     localStorage.setItem('lastPage', 'packagePage');
                  }
-                 // Don't save if leaving from video player or conversation overlay
+                 // If leaving from an overlay, don't save it as the last page.
+                 // The previous logic already handled this partially, but explicitly checking avatarDetailPage too.
              });
 
 
