@@ -1555,8 +1555,8 @@
             { el: fullscreenBtn, type: 'click', func: toggleFullscreen },
             { el: pipBtn, type: 'click', func: togglePip },
             { el: playerCloseBtn, type: 'click', func: closePlayer },
-            { el: lockBtn, type: 'click', func: toggleLock },
-            { el: unlockBtn, type: 'click', func: toggleLock },
+            { el: lockBtn, type: 'click', toggleLock },
+            { el: unlockBtn, type: 'click', toggleLock },
             { el: nextBtn, type: 'click', func: playNextVideo },
             { el: prevBtn, type: 'click', func: playPrevVideo },
             // Touch/Mouse listeners added to playerContainer below
