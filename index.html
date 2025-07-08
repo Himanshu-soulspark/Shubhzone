@@ -633,7 +633,7 @@
                  </div>
                  <input type="file" id="devVoiceSample" style="display: none;" accept="audio/mpeg,audio/wav" onchange="updateFileName('devVoiceSample', 'devVoiceSampleName')">
              </div>
-             <button id="uploadAiAssetsBtn" class="button">Upload Assets & Save Avatar</button>
+             <button id="uploadAiAssetsBtn" class="button" onclick="uploadAiAssetsDev()">Upload Assets & Save Avatar</button> <!-- Added onclick handler -->
         </div>
 
         <div id="avatarGrid">
@@ -763,7 +763,7 @@
         const playPauseBtn = document.getElementById('play-pause-btn'); // Video player play/pause
         const playIcon = playPauseBtn.querySelector('.play-icon');
         const pauseIcon = playPauseBtn.querySelector('.pause-icon');
-        const replayIcon = playPauseBtn.querySelector('.replay-icon');
+        const replayIcon = replayBtn.querySelector('.replay-icon'); // Corrected ID
         const progressBar = document.querySelector('.progress-bar'); // Video player progress
         const playedBar = progressBar.querySelector('.played');
         const bufferedBar = progressBar.querySelector('.buffered');
@@ -854,23 +854,28 @@
 
         // Function to handle API responses
         async function handleApiResponse(response) {
+            console.log(`[API] Handling response for ${response.url}`);
             if (!response.ok) {
                 let errorMsg = `Error: ${response.status} ${response.statusText}`;
                 try {
                     const errorJson = await response.json();
                     errorMsg = errorJson.message || errorMsg;
+                     console.error("[API] Error response body:", errorJson);
                 } catch (e) {
                      // If response is not JSON, use status text
+                     console.error("[API] Failed to parse error response body:", e);
                 }
-                 console.error("API Error:", errorMsg, response); // Log the full response for debugging
+                 console.error("[API] Full API Error:", errorMsg, response); // Log the full response for debugging
                 throw new Error(errorMsg);
             }
             // Check if response has content before parsing JSON
             const text = await response.text();
             try {
-                return text ? JSON.parse(text) : {}; // Return empty object for empty responses
+                 const jsonData = text ? JSON.parse(text) : {};
+                 console.log("[API] Successful response body:", jsonData);
+                 return jsonData; // Return empty object for empty responses
             } catch (e) {
-                 console.error("Failed to parse JSON response:", text, e);
+                 console.error("[API] Failed to parse JSON response:", text, e);
                  throw new Error("Invalid JSON response from server.");
             }
         }
@@ -878,9 +883,10 @@
          // Function to upload file with progress (reused for all direct file uploads to Wasabi)
          // NOTE: Progress bar related logic has been removed from this function to match HTML changes.
          function uploadFileWithProgress(url, file, onProgress = (p) => {}) { // Added default empty function for onProgress
+             console.log(`[Upload] Starting upload for ${file.name} to URL: ${url.substring(0, 50)}...`);
             return new Promise((resolve, reject) => {
                 if (!url || !file) {
-                     reject(new Error("Upload URL or file is missing."));
+                     reject(new Error("[Upload] Upload URL or file is missing."));
                      return;
                 }
 
@@ -896,16 +902,17 @@
                 xhr.onload = () => {
                     // Wasabi pre-signed PUT upload usually returns 200 OK with empty body on success
                     if (xhr.status >= 200 && xhr.status < 300) {
+                        console.log(`[Upload] Upload successful for ${file.name}. Status: ${xhr.status}`);
                         resolve(xhr.response); // Response is usually empty for PUT
                     } else {
                          // Try to read error response if available
                          const errorResponse = xhr.responseText || `Upload failed with status: ${xhr.status}`;
-                         console.error(`Upload failed for ${file.name}:`, xhr.status, xhr.statusText, errorResponse);
+                         console.error(`[Upload] Upload failed for ${file.name}:`, xhr.status, xhr.statusText, errorResponse);
                          reject(new Error(`Upload failed for ${file.name}: ${xhr.status} ${xhr.statusText}. Details: ${errorResponse.substring(0, 150)}...`)); // Provide some details
                     }
                 };
                 xhr.onerror = () => {
-                     console.error(`Network error during upload for ${file.name}:`, xhr.statusText);
+                     console.error(`[Upload] Network error during upload for ${file.name}:`, xhr.statusText);
                      reject(new Error(`Network error during upload for ${file.name}. Check console.`));
                 }; // Handle network errors
 
@@ -933,6 +940,7 @@
 
         // Function to show a specific page and manage navigation states
         function showPage(pageId) {
+             console.log(`[Nav] Attempting to show page: ${pageId}`);
             // Hide all main pages
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             // Hide specific full-screen overlays if open
@@ -943,22 +951,35 @@
 
              // Stop any playing media on overlays
             if(currentPlayingAvatarVideo) {
+                 console.log("[Nav] Stopping avatar preview video.");
                  currentPlayingAvatarVideo.pause();
                  currentPlayingAvatarVideo.removeAttribute('src'); // Clear src
                  currentPlayingAvatarVideo = null;
             }
-            if (!mainPlayer.paused) {
+            if (mainPlayer && !mainPlayer.paused) {
+                 console.log("[Nav] Stopping main video player.");
                  mainPlayer.pause();
             }
-             mainPlayer.removeAttribute('src'); // Clear user video src
+             if(mainPlayer) mainPlayer.removeAttribute('src'); // Clear user video src
 
             // Stop video on AI Conversation page if active
-            if (activeAvatarVideo) {
+            if (activeAvatarVideo && activeAvatarVideo.closest('.page.active')) {
+                 console.log("[Nav] Stopping active avatar conversation video.");
                 activeAvatarVideo.pause();
                 activeAvatarVideo.removeAttribute('src');
             }
             // Stop any ongoing audio playback (AI speaking)
              stopAudioPlayback(); // Call the stop audio function
+
+             // Ensure WebSocket connection is closed if leaving the AI Conversation page
+             if (ws && ws.readyState === WebSocket.OPEN && ['aiConversationPage', 'avatarDetailPage'].includes(document.querySelector('.page.active')?.id)) {
+                  // This check happens *before* changing the active page, so the old active page is still queryable
+                  console.log("[Nav] Leaving AI page, closing WebSocket.");
+                  endAiConversation(false); // Call end conversation logic, but maybe don't navigate away again
+                  // Note: endAiConversation already calls showPage('homePage'), we need to avoid double navigation
+             } else if (ws && ws.readyState === WebSocket.OPEN) {
+                  console.log("[Nav] Navigating between non-AI pages, keeping WebSocket open.");
+             }
 
 
             document.body.style.overflow = 'auto'; // Enable body scroll by default
@@ -968,6 +989,7 @@
             const targetPage = document.getElementById(pageId);
             if (targetPage) {
                  targetPage.classList.add('active');
+                 console.log(`[Nav] Page "${pageId}" is now active.`);
                  // Specific action for conversation page - keep body overflow hidden
                  if (pageId === 'aiConversationPage') {
                      document.body.style.overflow = 'hidden';
@@ -975,14 +997,17 @@
                       if (selectedAvatar) {
                            startAiConversation(selectedAvatar); // Start the conversation logic
                       } else {
-                           console.error("Cannot start conversation: No avatar selected.");
+                           console.error("[Nav] Cannot start conversation: No avatar selected.");
                            alert("Please select an AI avatar from the Packages tab first.");
                            showPage('packagePage'); // Fallback if somehow AI page is accessed without selected avatar
                            return; // Prevent showing AI page
                       }
+                 } else if (pageId === 'avatarDetailPage') {
+                      document.body.style.overflow = 'hidden'; // Keep hidden for detail overlay
+                      // startAiConversation is NOT called here, only video preview plays
                  }
             } else {
-                 console.error("Page element not found:", pageId);
+                 console.error("[Nav] Page element not found:", pageId);
                  showPage('homePage'); // Fallback to home page
                  return;
             }
@@ -1019,6 +1044,7 @@
 
         // Handle profile click based on user approval status
         function handleProfileClick() {
+             console.log("[Nav] Profile icon clicked.");
             // Check user approval status (e.g., from localStorage or session).
             // For now, `isUserApproved` is a simple frontend variable.
             // In a real app, this status would come from backend after verification.
@@ -1029,15 +1055,17 @@
         // ======== Home Page Logic (Existing Video + New AI Placeholder) ========
 
          async function populateHomePage() {
+             console.log("[Home] Populating home page content.");
             const container = document.getElementById('playlist-container');
             homeStatusMsg.textContent = 'Loading content...';
             homeStatusMsg.style.display = 'block';
             container.innerHTML = ''; // Clear previous video content
 
             try {
-                // Fetch video playlists
+                 console.log("[Home] Fetching /api/home-content");
+                // Fetch video playlists and videos
                 const videoData = await fetch(`${API_BASE_URL}/api/home-content`).then(handleApiResponse).catch(err => {
-                     console.error('Error fetching video data:', err);
+                     console.error('[Home] Error fetching video data:', err);
                      // Don't throw here, allow avatar section to potentially load
                      return { success: false, message: "Failed to load video content.", playlists: [], videos: [] };
                 });
@@ -1050,10 +1078,14 @@
 
                 // Populate Video Playlists (Existing Logic)
                 if (videoData.success && videoData.playlists && videoData.playlists.length > 0) {
+                     console.log(`[Home] Found ${videoData.playlists.length} playlists.`);
                      videoData.playlists.forEach(playlist => {
                          // Ensure comparison works regardless of type
                          const playlistVideos = allVideos.filter(v => v.playlist_id == playlist.id); // Use == for type coercion if IDs are numbers/strings
-                         if (playlistVideos.length === 0) return; // Skip empty playlists
+                         if (playlistVideos.length === 0) {
+                             console.log(`[Home] Skipping empty playlist: ${playlist.name}`);
+                             return; // Skip empty playlists
+                         }
 
                          const section = document.createElement('div');
                          section.className = 'playlist-section';
@@ -1066,6 +1098,8 @@
                          section.innerHTML = `<div class="playlist-header"><h3>${playlist.name}</h3></div><div class="video-grid-3xN">${videoCardsHTML}</div>`;
                          container.appendChild(section); // Add video sections after the AI placeholder
                      });
+                } else if (videoData.success) {
+                     console.log("[Home] No playlists found in data.");
                 }
 
 
@@ -1083,7 +1117,7 @@
 
 
             } catch (error) {
-                console.error('Critical error during populateHomePage:', error); // Log critical errors
+                console.error('[Home] Critical error during populateHomePage:', error); // Log critical errors
                 homeStatusMsg.textContent = `Critical Error loading content: ${error.message}`;
                 homeStatusMsg.style.color = '#F44336';
                 homeStatusMsg.style.display = 'block';
@@ -1092,31 +1126,34 @@
 
          // Function to update the AI cards on the home page based on selected avatar
          function updateHomeAiCards() {
+             console.log("[Home] Updating AI Home cards.");
              // Retrieve selected avatar from localStorage
              const storedAvatar = localStorage.getItem('selectedAvatar');
 
              if (storedAvatar) {
                  try {
                      selectedAvatar = JSON.parse(storedAvatar);
+                     console.log("[Home] Selected avatar found in localStorage:", selectedAvatar.name);
                      // Update the "Talk to AI Friend" card
                      talkToAiCardTitle.textContent = `Talk to ${selectedAvatar.name}`;
                      talkToAiCardText.textContent = `Your selected AI companion. Click below to start your conversation.`;
                      startConversationButton.disabled = false; // Enable the button
                      talkToAiCard.classList.add('active'); // Add visual highlight
 
-                     // Add click listener to the 'Talk to AI Friend' button/card
+                     // Add click listener to the 'Start Conversation' button/card
                      // Ensure we don't add multiple listeners
                      startConversationButton.removeEventListener('click', startConversationClickHandler); // Remove existing
                      startConversationButton.addEventListener('click', startConversationClickHandler); // Add new
 
                  } catch (e) {
-                     console.error("Failed to parse selected avatar from localStorage:", e);
+                     console.error("[Home] Failed to parse selected avatar from localStorage:", e);
                      // Reset if parsing fails
                      selectedAvatar = null;
                      resetTalkToAiCard();
                  }
              } else {
                  // No avatar selected
+                 console.log("[Home] No selected avatar found in localStorage.");
                  selectedAvatar = null;
                  resetTalkToAiCard();
              }
@@ -1127,6 +1164,7 @@
 
         // Helper function to reset the "Talk to AI Friend" card state
         function resetTalkToAiCard() {
+             console.log("[Home] Resetting Talk to AI Card.");
              talkToAiCardTitle.textContent = `Talk to AI Friend`;
              talkToAiCardText.textContent = `Select an avatar from Packages tab to start.`;
              startConversationButton.disabled = true; // Disable the button
@@ -1138,9 +1176,11 @@
 
         // Click handler function for the 'Start Conversation' button
         function startConversationClickHandler() {
+            console.log("[Home] Start Conversation button clicked.");
             if (selectedAvatar) {
                 showPage('aiConversationPage'); // Navigate to the AI Conversation Page
             } else {
+                 console.warn("[Home] Start Conversation clicked but no avatar selected.");
                  alert("Please select an AI avatar from the Packages tab first.");
                  showPage('packagePage'); // Guide user to package page
             }
@@ -1150,22 +1190,26 @@
         // ======== Upload Page Logic (Existing Video + New Dev AI Upload) ========
 
         async function populatePlaylistDropdown() {
+             console.log("[Upload] Populating playlist dropdown.");
             const playlistSelect = document.getElementById('playlistSelect');
             if (!playlistSelect) { // Safety check
-                 console.error("Playlist select element not found.");
+                 console.error("[Upload] Playlist select element not found.");
                  return;
             }
             playlistSelect.innerHTML = '<option value="" disabled selected>Loading playlists...</option>'; // Show loading state
              playlistSelect.disabled = true; // Disable while loading
 
             try {
+                 console.log("[Upload] Fetching /api/playlists");
                 const playlists = await fetch(`${API_BASE_URL}/api/playlists`).then(handleApiResponse);
                 playlistSelect.innerHTML = ''; // Clear loading state
 
                 if (playlists.length === 0) {
+                     console.log("[Upload] No playlists found.");
                     playlistSelect.innerHTML = '<option value="" disabled selected>Create a playlist first</option>';
                      playlistSelect.disabled = true; // Keep disabled if no playlists to select
                 } else {
+                     console.log(`[Upload] Found ${playlists.length} playlists.`);
                      playlists.forEach(p => {
                          const option = document.createElement('option');
                          option.value = p.id;
@@ -1176,7 +1220,7 @@
                 }
 
             } catch (error) {
-                console.error('Error fetching playlists for dropdown:', error);
+                console.error('[Upload] Error fetching playlists for dropdown:', error);
                 playlistSelect.innerHTML = '<option value="" disabled selected>Error loading playlists</option>';
                  playlistSelect.disabled = true; // Keep disabled on error
             }
@@ -1184,6 +1228,7 @@
 
          // Preview function (used for video upload, thumbnail upload, new playlist thumbnail)
         function previewAndNameUpdate(input, type) {
+             console.log(`[Upload] Previewing file for type: ${type}`);
             const file = input.files[0];
             let previewElement, uploadTextElement;
 
@@ -1202,28 +1247,29 @@
             } else if (type === 'devAvatarImage') { // Added for Dev AI Image
                  // This needs a preview element specific to the dev form if you want one.
                  // For now, just updating the file name label is sufficient based on updateFileName.
-                 console.log("Preview update called for devAvatarImage - no visual preview element defined.");
+                 console.log("[Upload] Preview update called for devAvatarImage - no visual preview element defined, updating label.");
                  updateFileName(input.id, input.id + 'Name'); // Just update the label
                  return; // Stop here if no visual preview element
             } else if (type === 'devAvatarVideo') { // Added for Dev AI Video
                  // Similar to image, no visual preview element defined for the dev form.
-                 console.log("Preview update called for devAvatarVideo - no visual preview element defined.");
+                 console.log("[Upload] Preview update called for devAvatarVideo - no visual preview element defined, updating label.");
                  updateFileName(input.id, input.id + 'Name'); // Just update the label
                  return; // Stop here
             } else if (type === 'devVoiceSample') { // Added for Dev Voice Sample
-                 console.log("Preview update called for devVoiceSample - no visual preview or text update needed beyond label.");
+                 console.log("[Upload] Preview update called for devVoiceSample - no visual preview or text update needed beyond label.");
                  updateFileName(input.id, input.id + 'Name'); // Just update the label
                  return; // Stop here
             }
 
 
             if (!previewElement) {
-                 console.error(`Preview element not found for type: ${type}`);
+                 console.error(`[Upload] Preview element not found for type: ${type}`);
                  return;
             }
 
 
             if (file) {
+                 console.log(`[Upload] File selected: ${file.name}`);
                  const fileUrl = URL.createObjectURL(file);
                  previewElement.src = fileUrl;
                  previewElement.style.display = 'block';
@@ -1232,7 +1278,7 @@
                  if(type === 'video' && previewElement.tagName === 'VIDEO') {
                      previewElement.muted = true; // Mute preview video
                      previewElement.loop = true; // Loop preview video
-                     previewElement.play().catch(e => console.warn("Video preview play failed:", e)); // Play video preview
+                     previewElement.play().catch(e => console.warn("[Upload] Video preview play failed:", e)); // Play video preview
                  }
 
                  // Optional: Revoke previous object URL to free memory
@@ -1244,6 +1290,7 @@
 
 
             } else {
+                 console.log(`[Upload] No file selected for type: ${type}. Resetting preview.`);
                  // Handle file deselection - clear preview and show text
                  previewElement.style.display = 'none';
                  previewElement.removeAttribute('src'); // Clear src
@@ -1270,6 +1317,7 @@
 
         // Function to update file name display (used in Info Submission page and Dev AI Upload)
         function updateFileName(inputId, labelId) {
+             console.log(`[Upload] Updating file name display for input: ${inputId}, label: ${labelId}`);
             const input = document.getElementById(inputId);
             const label = document.getElementById(labelId);
             if (input && label) { // Check if elements exist
@@ -1289,24 +1337,31 @@
                      label.style.color = 'var(--secondary-text)'; // Reset color
                  }
             } else {
-                 console.error(`updateFileName: Input (${inputId}) or Label (${labelId}) not found.`);
+                 console.error(`[Upload] updateFileName: Input (${inputId}) or Label (${labelId}) not found.`);
             }
         }
 
         // Existing functions for Playlist Modal and Creation
-        function openPlaylistModal() { document.getElementById('newPlaylistModal').style.display = 'flex'; }
-        function closePlaylistModal() { document.getElementById('newPlaylistModal').style.display = 'none'; }
+        function openPlaylistModal() {
+            console.log("[Modal] Opening playlist modal.");
+            document.getElementById('newPlaylistModal').style.display = 'flex';
+        }
+        function closePlaylistModal() {
+            console.log("[Modal] Closing playlist modal.");
+            document.getElementById('newPlaylistModal').style.display = 'none';
+        }
         async function handleCreatePlaylist() {
+            console.log("[Modal] Create playlist button clicked.");
             const nameInput = document.getElementById('newPlaylistName');
             const thumbInput = document.getElementById('newPlaylistThumb');
             const createBtn = document.getElementById('createPlaylistBtn');
 
             if (!nameInput || !thumbInput || !createBtn) { // Safety check
-                 console.error("Playlist modal elements not found.");
+                 console.error("[Modal] Playlist modal elements not found.");
                  return;
             }
 
-            if (!nameInput.value || thumbInput.files.length === 0) {
+            if (!nameInput.value.trim() || thumbInput.files.length === 0) {
                 alert('Please provide a playlist name and a thumbnail.');
                 return;
             }
@@ -1319,10 +1374,12 @@
 
             try {
                 const thumbFile = thumbInput.files[0];
+                 console.log(`[Modal] Generating upload URL for thumbnail: ${thumbFile.name}`);
                 // Use wasabi upload logic
                 const urlResponse = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(thumbFile.name)}&contentType=${thumbFile.type}`).then(handleApiResponse);
-                 if (!urlResponse.success || !urlResponse.uploadUrl || !urlResponse.key) throw new Error("Failed to get thumbnail upload URL or key.");
+                 if (!urlResponse.success || !urlResponse.uploadUrl || !urlResponse.key) throw new Error(`Failed to get thumbnail upload URL or key: ${urlResponse.message || ''}`);
 
+                 console.log(`[Modal] Uploading thumbnail to Wasabi key: ${urlResponse.key}`);
                 await uploadFileWithProgress(urlResponse.uploadUrl, thumbFile, (progress) => {
                      // --- REMOVED: Progress bar update call ---
                      // uploadProgressBar.style.width = `${progress * 100}%`; // Full progress for this small file
@@ -1332,7 +1389,8 @@
                  // uploadProgressBar.style.width = '100%'; // Finish progress bar
 
 
-                const playlistData = { name: nameInput.value, thumbnail_key: urlResponse.key };
+                const playlistData = { name: nameInput.value.trim(), thumbnail_key: urlResponse.key };
+                 console.log("[Modal] Saving playlist metadata to backend:", playlistData);
                 const saveResponse = await fetch(`${API_BASE_URL}/api/playlists`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(playlistData) }).then(handleApiResponse);
 
                 if (!saveResponse.success) throw new Error(saveResponse.message || "Failed to create playlist.");
@@ -1346,7 +1404,7 @@
 
 
             } catch (error) {
-                console.error('Playlist creation failed:', error);
+                console.error('[Modal] Playlist creation failed:', error);
                 alert(`Failed to create playlist: ${error.message}`);
             } finally {
                 setButtonLoading(createBtn, false, 'Create Playlist');
@@ -1362,6 +1420,7 @@
         // Existing function for video upload (modified to use uploadFileWithProgress and updated preview logic)
         // NOTE: Progress bar related logic has been removed from this function to match HTML changes.
         async function uploadVideo() {
+             console.log("[Upload] Upload video button clicked.");
             const videoInput = document.getElementById('videoFileInput');
             const thumbInput = document.getElementById('thumbnailInput');
             const title = document.getElementById('videoTitle').value;
@@ -1370,13 +1429,13 @@
             const uploadBtn = document.getElementById('uploadButton');
 
              if (!videoInput || !thumbInput || !title || !selectedPlaylistId || !ageRestriction || !uploadBtn) {
-                 console.error("Upload video elements not found.");
+                 console.error("[Upload] Upload video elements not found.");
                  alert("An internal error occurred (missing form elements).");
                  return;
              }
 
 
-            if (!videoInput.files[0] || !thumbInput.files[0] || !title || !selectedPlaylistId) {
+            if (!videoInput.files[0] || !thumbInput.files[0] || !title.trim() || !selectedPlaylistId) {
                 alert('Please fill all fields: Title, Playlist, Video, and Thumbnail.');
                 return;
             }
@@ -1390,20 +1449,24 @@
                 const videoFile = videoInput.files[0];
                 const thumbFile = thumbInput.files[0];
 
+                 console.log(`[Upload] Generating URL for video: ${videoFile.name}`);
                 // Get URL for video upload
                 const videoUrlRes = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(videoFile.name)}&contentType=${videoFile.type}`).then(handleApiResponse);
-                 if (!videoUrlRes.success || !videoUrlRes.uploadUrl || !videoUrlRes.key) throw new Error("Failed to get video upload URL or key.");
+                 if (!videoUrlRes.success || !videoUrlRes.uploadUrl || !videoUrlRes.key) throw new Error(`Failed to get video upload URL or key: ${videoUrlRes.message || ''}`);
 
+                 console.log(`[Upload] Uploading video to Wasabi key: ${videoUrlRes.key}`);
                 // Upload video (80% progress for this)
                 await uploadFileWithProgress(videoUrlRes.uploadUrl, videoFile, (progress) => {
                      // --- REMOVED: Progress bar update call ---
                     // uploadProgressBar.style.width = `${progress * 80}%`;
                 });
 
+                 console.log(`[Upload] Generating URL for thumbnail: ${thumbFile.name}`);
                 // Get URL for thumbnail upload
                 const thumbUrlRes = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(thumbFile.name)}&contentType=${thumbFile.type}`).then(handleApiResponse);
-                 if (!thumbUrlRes.success || !thumbUrlRes.uploadUrl || !thumbUrlRes.key) throw new Error("Failed to get thumbnail upload URL or key.");
+                 if (!thumbUrlRes.success || !thumbUrlRes.uploadUrl || !thumbUrlRes.key) throw new Error(`Failed to get thumbnail upload URL or key: ${thumbUrlRes.message || ''}`);
 
+                 console.log(`[Upload] Uploading thumbnail to Wasabi key: ${thumbUrlRes.key}`);
                 // Upload thumbnail (remaining 20% progress for this)
                 await uploadFileWithProgress(thumbUrlRes.uploadUrl, thumbFile, (progress) => {
                      // --- REMOVED: Progress bar update call ---
@@ -1416,12 +1479,13 @@
 
                 // Save video metadata to backend DB
                 const videoDetails = {
-                     title: title,
+                     title: title.trim(),
                      video_key: videoUrlRes.key, // Use the key returned by generate-upload-url
                      thumbnail_key: thumbUrlRes.key, // Use the key returned by generate-upload-url
                      playlist_id: parseInt(selectedPlaylistId, 10), // Ensure playlist_id is integer
                      age_restriction: ageRestriction
                 };
+                 console.log("[Upload] Saving video metadata to backend:", videoDetails);
                 const saveResponse = await fetch(`${API_BASE_URL}/api/videos`, {
                      method: 'POST',
                      headers: { 'Content-Type': 'application/json' },
@@ -1432,6 +1496,7 @@
 
 
                 alert('Video uploaded and details saved successfully!');
+                console.log("[Upload] Video saved successfully.");
                 // Clear form and previews
                 document.getElementById('videoTitle').value = '';
                 // document.getElementById('playlistSelect').value = ''; // Reset playlist selection - better to keep the last selected one? Or reset to default empty? Resetting for now.
@@ -1447,7 +1512,7 @@
 
                 showPage('homePage'); // Go back to home
             } catch (error) {
-                console.error('Full Video Upload Process Failed:', error);
+                console.error('[Upload] Full Video Upload Process Failed:', error);
                  // Show error message to user
                 alert(`Video Upload failed: ${error.message}`);
             } finally {
@@ -1466,6 +1531,7 @@
         // Placeholder function for submitting info
         // NOTE: Progress bar related logic has been removed from this function to match HTML changes.
         function submitForApproval() {
+             console.log("[Profile] Submit for approval button clicked.");
             const fullName = document.getElementById('fullName')?.value;
             const email = document.getElementById('email')?.value;
             const address = document.getElementById('address')?.value;
@@ -1475,7 +1541,7 @@
             const submitBtn = document.querySelector('#infoSubmissionPage .button'); // Assuming the button has 'button' class
 
              if (!fullName || !email || !address || !photo1Input || !photo2Input || !govIdInput || !submitBtn) {
-                 console.error("Info submission elements not found.");
+                 console.error("[Profile] Info submission elements not found.");
                  alert("An internal error occurred (missing form elements).");
                  return;
              }
@@ -1503,9 +1569,9 @@
             // --- Placeholder for Uploads and API Call ---
             // This section needs actual implementation similar to uploadVideo,
             // but uploading 3 files and then calling a different backend endpoint.
-            console.log("Placeholder: Attempting to submit info for approval...");
+            console.log("[Profile] Placeholder: Attempting to submit info for approval...");
             setTimeout(() => {
-                 console.log("Placeholder: Info submission simulated.");
+                 console.log("[Profile] Placeholder: Info submission simulated.");
                  alert('Information submitted for verification (Placeholder).');
 
                  // --- REMOVED: Progress bar hide call ---
@@ -1549,9 +1615,9 @@
             { el: mainPlayer, type: 'pause', func: updatePlayPauseIcon },
             { el: mainPlayer, type: 'ended', func: handleEnded },
             { el: mainPlayer, type: 'timeupdate', func: handleTimeUpdate },
-            { el: mainPlayer, type: 'waiting', func: () => { if(playerOverlay.style.display !== 'none') loadingSpinner.style.display = 'block'; } }, // Only show if player is visible
-            { el: mainPlayer, type: 'playing', func: () => { loadingSpinner.style.display = 'none'; } },
-            { el: mainPlayer, type: 'error', func: (e) => { console.error("Video Player Error:", e); alert("Error playing video."); loadingSpinner.style.display = 'none'; closePlayer(); }},
+            { el: mainPlayer, type: 'waiting', func: () => { console.log("[Player] Waiting..."); if(playerOverlay.style.display !== 'none') loadingSpinner.style.display = 'block'; } }, // Only show if player is visible
+            { el: mainPlayer, type: 'playing', func: () => { console.log("[Player] Playing..."); loadingSpinner.style.display = 'none'; } },
+            { el: mainPlayer, type: 'error', func: (e) => { console.error("[Player] Video Player Error:", e); alert("Error playing video."); loadingSpinner.style.display = 'none'; closePlayer(); }},
             { el: playPauseBtn, type: 'click', func: togglePlay },
             { el: progressBar, type: 'click', func: handleProgressBarClick },
             { el: fullscreenBtn, type: 'click', func: toggleFullscreen },
@@ -1565,9 +1631,11 @@
          ];
 
         function setupPlayerEventListeners() {
+             console.log("[Player] Setting up player event listeners.");
              videoPlayerEventListeners.forEach(({ el, type, func, options }) => el.addEventListener(type, func, options));
         }
         function removePlayerEventListeners() {
+             console.log("[Player] Removing player event listeners.");
              videoPlayerEventListeners.forEach(({ el, type, func, options }) => el.removeEventListener(type, func, options));
         }
 
@@ -1575,377 +1643,7 @@
          // This listener is added ONCE to the playerContainer, not added/removed with other controls
          const playerContainerEl = document.querySelector('#videoPlayerOverlay .player-container');
          if(playerContainerEl) {
-             playerContainerEl.addEventListener('click', handlePlayerClick); // Single/Double tap logic
-             playerContainerEl.addEventListener('mousemove', showControls); // Show controls on mouse move
-              // Add touch listeners for volume/brightness (if implemented) or controls
-             playerContainerEl.addEventListener('touchstart', handleTouchStart, { passive: false });
-             playerContainerEl.addEventListener('touchmove', handleTouchMove, { passive: false });
-             playerContainerEl.addEventListener('touchend', handleTouchEnd);
-         }
-
-
-        // ======== New AI Avatar Logic (Frontend UI & Basic Interactions) ========
-
-         // Function to load and display avatars on the Package page
-        async function populateAvatarGrid() {
-             if (!avatarGridContainer || !packageStatusMsg) {
-                 console.error("Avatar grid elements not found.");
-                 return;
-             }
-             avatarGridContainer.innerHTML = ''; // Clear existing cards
-             packageStatusMsg.textContent = 'Loading Avatars...';
-             packageStatusMsg.style.display = 'block';
-
-             try {
-                 // [New Backend Endpoint Needed] Fetch avatars from backend
-                 // This endpoint should be GET /api/avatars
-                 // It should return an array of avatar objects, each with:
-                 // id, name, imageUrl (presigned URL), videoUrl (presigned URL), voiceSampleUrl (presigned URL), personalityPrompt (optional)
-                 const data = await fetch(`${API_BASE_URL}/api/avatars`).then(handleApiResponse);
-
-                 if (!data.success || !data.avatars || data.avatars.length === 0) {
-                     packageStatusMsg.textContent = data.message || 'No AI avatars found. Use the dev upload above!';
-                     packageStatusMsg.style.color = data.success ? 'var(--secondary-text)' : '#F44336';
-                     allAvatars = []; // Clear avatars if fetch failed or none found
-                     return; // Stop if no avatars
-                 }
-                 packageStatusMsg.style.display = 'none'; // Hide status if avatars exist
-
-                 allAvatars = data.avatars; // Store all avatars globally
-
-                 allAvatars.forEach(avatar => {
-                     const avatarCard = document.createElement('div');
-                     avatarCard.className = 'avatar-card';
-                     // Store data attributes for easy access later
-                     // Store the entire avatar object for easier access
-                     avatarCard.dataset.avatarData = JSON.stringify(avatar);
-
-
-                     // Use image container for circular cropping
-                     avatarCard.innerHTML = `
-                         <div class="image-container">
-                             <img src="${avatar.imageUrl || 'placeholder.png'}" alt="${avatar.name || 'Avatar'}">
-                         </div>
-                         <p class="avatar-name">${avatar.name || 'Unnamed Avatar'}</p>
-                     `;
-
-                     // Add click listener to open the detail page
-                     // Delegation on parent grid handles this now
-
-                     avatarGridContainer.appendChild(avatarCard);
-                 });
-
-             } catch (error) {
-                 console.error('Error populating avatar grid:', error);
-                 packageStatusMsg.textContent = `Error loading avatars: ${error.message}`;
-                 packageStatusMsg.style.color = '#F44336';
-                 packageStatusMsg.style.display = 'block';
-                 allAvatars = []; // Clear avatars on error
-             }
-        }
-
-
-         // Function to populate the Avatar Select Panel (the vertical list)
-         function populateAvatarSelectPanel() {
-             const panel = document.getElementById('avatarSelectPanel');
-              if (!panel) { // Safety check
-                  console.error("Avatar select panel element not found.");
-                  return;
-              }
-             panel.innerHTML = ''; // Clear existing cards
-
-             if (!allAvatars || allAvatars.length === 0) {
-                 panel.innerHTML = '<p style="color:var(--secondary-text); text-align:center; font-size:12px; padding: 10px;">No avatars loaded.</p>';
-                 return;
-             }
-
-             allAvatars.forEach(avatar => {
-                 const selectCard = document.createElement('div');
-                 selectCard.className = 'avatar-select-card';
-                 // Store the entire avatar object for easier access
-                 selectCard.dataset.avatarData = JSON.stringify(avatar);
-
-
-                 // Use 9:16 image URL if available, otherwise reuse the 1:1 image
-                 // For simplicity, reusing the 1:1 image URL here; CSS handles aspect ratio
-                 selectCard.innerHTML = `<img src="${avatar.imageUrl || 'placeholder.png'}" alt="${avatar.name || 'Avatar'}">`;
-
-                 // Add click listener to select this avatar
-                 // Delegation on parent panel handles this now
-
-                 panel.appendChild(selectCard);
-             });
-         }
-
-         // Function to show the AI Avatar Detail/Preview page
-         function showAvatarDetail(avatarData) {
-             if (!avatarDetailPage || !avatarPreviewVideo || !avatarPreviewName) { // Safety checks
-                 console.error("Avatar detail page elements not found.");
-                 return;
-             }
-
-             // Hide all other pages and stop other media
-             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-             playerOverlay.style.display = 'none'; // Ensure video player is hidden
-             document.body.style.overflow = 'hidden'; // Prevent body scroll
-
-
-             // Set video source and play the loop
-             if (avatarData.videoUrl) {
-                 avatarPreviewVideo.src = avatarData.videoUrl; // Assuming this is the main talking loop video
-                 avatarPreviewVideo.muted = true; // Always mute preview initially
-                 avatarPreviewVideo.loop = true; // Loop the preview
-
-                 // Attempt to play video, handle potential autoplay restrictions
-                 const playPromise = avatarPreviewVideo.play();
-                 if (playPromise !== undefined) {
-                     playPromise.then(_ => {
-                         // Autoplay started
-                          currentPlayingAvatarVideo = avatarPreviewVideo; // Keep track
-                     }).catch(error => {
-                         // Autoplay failed (e.g., browser blocked, not muted, etc.)
-                         console.warn("Avatar preview video autoplay failed for", avatarData.name, ":", error);
-                          currentPlayingAvatarVideo = null; // Clear reference if play failed
-                          // TODO: Optionally, show a play button or fallback image/message
-                          // console.log("Autoplay failed. You might need a user gesture to start playback.");
-                     });
-                 } else {
-                      // Fallback for browsers that don't return a Promise
-                      console.warn("Browser does not support play() returning a Promise for avatar preview.");
-                      currentPlayingAvatarVideo = avatarPreviewVideo; // Keep track even without promise
-                      // The video *might* play if muted, depending on browser policy
-                 }
-
-             } else {
-                 console.warn("No video URL found for avatar:", avatarData.name);
-                 avatarPreviewVideo.removeAttribute('src'); // Clear src if no video
-                 currentPlayingAvatarVideo = null;
-                 // TODO: Add fallback UI (show image?) if video is missing or fails
-             }
-
-             // Set avatar name in the header
-             avatarPreviewName.textContent = avatarData.name || 'Unnamed Avatar';
-
-
-             // Show the detail page
-             avatarDetailPage.style.display = 'flex'; // Use flex to utilize column layout for video/controls
-
-             // Populate the select panel initially (it's hidden by default)
-             populateAvatarSelectPanel();
-
-             // Ensure the side panel is hidden initially when detail page opens
-             avatarSelectPanel.style.display = 'none';
-
-         }
-
-         // Function to hide the AI Avatar Detail/Preview page
-         function hideAvatarDetail() {
-              if (!avatarDetailPage || !avatarSelectPanel || !avatarPreviewVideo) { // Safety checks
-                  console.error("Avatar detail hide failed: elements not found.");
-                  return;
-              }
-              if(currentPlayingAvatarVideo) {
-                 currentPlayingAvatarVideo.pause();
-                 currentPlayingAvatarVideo.removeAttribute('src'); // Clear src
-                 currentPlayingAvatarVideo = null;
-              }
-              avatarDetailPage.style.display = 'none';
-              avatarSelectPanel.style.display = 'none'; // Ensure panel is hidden too
-              document.body.style.overflow = 'auto'; // Allow body scroll again
-              showPage('packagePage'); // Go back to package page after closing detail (as requested)
-         }
-
-         // Function to toggle the AI Avatar Select Panel visibility
-         function toggleAvatarSelectPanel() {
-              if (!avatarSelectPanel) { // Safety check
-                  console.error("Avatar select panel element not found for toggle.");
-                  return;
-              }
-             const isHidden = avatarSelectPanel.style.display === 'none' || avatarSelectPanel.style.display === '';
-             avatarSelectPanel.style.display = isHidden ? 'flex' : 'none'; // Use flex for vertical layout
-         }
-
-         // Function to handle selecting an avatar from the side panel
-         function selectAvatar(avatarData) {
-              if (!avatarData) {
-                  console.error("selectAvatar called without avatar data.");
-                  return;
-              }
-             console.log("Avatar Selected:", avatarData.name, "(ID:", avatarData.id, ")");
-
-             selectedAvatar = avatarData; // Store the selected avatar in a global variable
-             try {
-                  localStorage.setItem('selectedAvatar', JSON.stringify(avatarData)); // Save to localStorage
-                  console.log("Selected avatar saved to localStorage.");
-             } catch (e) {
-                  console.error("Failed to save selected avatar to localStorage:", e);
-             }
-
-             // Update the Home page AI card display immediately
-             updateHomeAiCards();
-
-             // Close the detail/select views after selection
-             hideAvatarDetail();
-
-             // Optionally, show a confirmation to the user
-             alert(`Avatar "${avatarData.name}" selected! You can now start a conversation from the Home tab.`);
-         }
-
-        // [New] Placeholder function for uploading AI assets (Development only)
-        // NOTE: Progress bar related logic has been removed from this function to match HTML changes.
-        async function uploadAiAssetsDev() {
-            // Get form inputs (Checked by ID for safety)
-            const nameInput = document.getElementById('devAvatarName');
-            const promptInput = document.getElementById('devAvatarPrompt');
-            const imageInput = document.getElementById('devAvatarImage');
-            const videoInput = document.getElementById('devAvatarVideo');
-            const voiceSampleInput = document.getElementById('devVoiceSample'); // Get voice sample input
-            const uploadBtn = document.getElementById('uploadAiAssetsBtn');
-
-            if (!nameInput || !promptInput || !imageInput || !videoInput || !voiceSampleInput || !uploadBtn) {
-                console.error("Dev upload form elements not found.");
-                 alert("An internal error occurred (missing form elements).");
-                 return;
-            }
-
-
-            if (!nameInput.value.trim() || !promptInput.value.trim() || !imageInput.files[0] || !videoInput.files[0] || !voiceSampleInput.files[0]) {
-                alert('Please fill in Name, Prompt and select Image, Video, and Voice Sample files.');
-                return;
-            }
-
-            const originalButtonText = 'Upload Assets & Save Avatar';
-            setButtonLoading(uploadBtn, true, originalButtonText); // Set button state
-            // --- REMOVED: Progress bar display call ---
-            // uploadProgressBarContainer.style.display = 'block';
-            // uploadProgressBar.style.width = '0%';
-
-
-            try {
-                const imageFile = imageInput.files[0];
-                const videoFile = videoInput.files[0];
-                const voiceSampleFile = voiceSampleInput.files[0]; // Get the voice sample file
-
-                // Get URL for Image Upload
-                const imageUrlRes = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(imageFile.name)}&contentType=${imageFile.type}`).then(handleApiResponse);
-                 if (!imageUrlRes.success || !imageUrlRes.uploadUrl || !imageUrlRes.key) throw new Error(`Failed to get image upload URL: ${imageUrlRes.message || ''}`);
-
-                // Upload Image (e.g., 30% progress)
-                await uploadFileWithProgress(imageUrlRes.uploadUrl, imageFile); // Removed progress tracking call here for simplicity
-                 console.log("Image uploaded successfully to Wasabi.");
-
-
-                // Get URL for Video Upload
-                const videoUrlRes = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(videoFile.name)}&contentType=${videoFile.type}`).then(handleApiResponse);
-                 if (!videoUrlRes.success || !videoUrlRes.uploadUrl || !videoUrlRes.key) throw new Error(`Failed to get video upload URL: ${videoUrlRes.message || ''}`);
-
-
-                 // Upload Video (e.g., 30% progress)
-                 await uploadFileWithProgress(videoUrlRes.uploadUrl, videoFile); // Removed progress tracking call here
-                 console.log("Video uploaded successfully to Wasabi.");
-
-                // Get URL for Voice Sample Upload
-                 const voiceUrlRes = await fetch(`${API_BASE_URL}/api/generate-upload-url?fileName=${encodeURIComponent(voiceSampleFile.name)}&contentType=${voiceSampleFile.type}`).then(handleApiResponse);
-                  if (!voiceUrlRes.success || !voiceUrlRes.uploadUrl || !voiceUrlRes.key) throw new Error(`Failed to get voice sample upload URL: ${voiceUrlRes.message || ''}`);
-
-                 // Upload Voice Sample (e.g., 40% progress)
-                 await uploadFileWithProgress(voiceUrlRes.uploadUrl, voiceSampleFile); // Removed progress tracking call here
-                  console.log("Voice sample uploaded successfully to Wasabi.");
-
-
-                 // --- REMOVED: Progress bar finish call ---
-                 // uploadProgressBar.style.width = '100%'; // Finish progress
-
-
-                // [New Backend Endpoint Needed] Send metadata to backend to save the avatar
-                // This should be POST /api/avatars
-                const avatarData = {
-                    name: nameInput.value.trim(),
-                    personalityPrompt: promptInput.value.trim(),
-                    image_key: imageUrlRes.key, // Use the key returned by generate-upload-url
-                    video_key: videoUrlRes.key, // Use the key returned by generate-upload-url (Assuming this single video is the main loop for now)
-                    voice_sample_key: voiceUrlRes.key, // Include voice sample key
-                    // Future: Add keys for idle_loop_key, talking_loop_key, listening_loop_key if different files are used
-                };
-                 console.log("Sending avatar metadata to backend:", avatarData);
-                const saveResponse = await fetch(`${API_BASE_URL}/api/avatars`, { // [New Backend Endpoint Needed]
-                     method: 'POST',
-                     headers: { 'Content-Type': 'application/json' },
-                     body: JSON.stringify(avatarData)
-                }).then(handleApiResponse);
-
-                if (!saveResponse.success) throw new Error(saveResponse.message || "Failed to save avatar details to database.");
-
-                console.log("Avatar details saved to DB:", saveResponse.avatar);
-                alert(`Avatar "${avatarData.name}" uploaded and saved successfully!`);
-
-                // Clear form and reset UI
-                nameInput.value = '';
-                promptInput.value = '';
-                imageInput.value = ''; // Clear file input
-                videoInput.value = ''; // Clear file input
-                voiceSampleInput.value = ''; // Clear file input for voice sample
-                 updateFileName(imageInput, 'devAvatarImageName'); // Reset label
-                 updateFileName(videoInput, 'devAvatarVideoName'); // Reset label
-                 updateFileName(voiceSampleInput, 'devVoiceSampleName'); // Reset label
-
-
-                populateAvatarGrid(); // Refresh the list on the Package page
-
-
-            } catch (error) {
-                console.error('Full AI Asset Upload Process Failed:', error);
-                 // Show error message to user
-                alert(`AI Asset Upload failed: ${error.message}`);
-            } finally {
-                setButtonLoading(uploadBtn, false, originalButtonText); // Reset button state
-                 // --- REMOVED: Progress bar hide call ---
-                 // setTimeout(() => {
-                 //     uploadProgressBarContainer.style.display = 'none';
-                 //     uploadProgressBar.style.width = '0%';
-                 // }, 1000);
-            }
-        }
-
-
-        // ======== Video Player Logic (Existing) ========
-        // Keep all existing video player functions (formatTime, showControls, loadVideo, playVideo, playNextVideo, playPrevVideo, toggleFullscreen, closePlayer, togglePlay, handleTimeUpdate, handleProgressBarClick, togglePip, updatePlayPauseIcon, handleEnded, toggleLock, handlePlayerClick, showSeekAnimation, handleTouchStart, handleTouchMove, handleTouchEnd) as they were.
-        // Ensure event listeners are added/removed correctly by playVideo/closePlayer.
-        // The eventListeners array was correct. The setupPlayerEventListeners and removePlayerEventListeners functions should attach/detach these.
-        // (Code for these functions is omitted here for brevity as you only asked for HTML, but ensure they are in your actual index.html script block)
-
-         // Re-including essential video player logic structure for clarity on event listeners
-         const videoPlayerEventListeners = [
-            { el: mainPlayer, type: 'play', func: updatePlayPauseIcon },
-            { el: mainPlayer, type: 'pause', func: updatePlayPauseIcon },
-            { el: mainPlayer, type: 'ended', func: handleEnded },
-            { el: mainPlayer, type: 'timeupdate', func: handleTimeUpdate },
-            { el: mainPlayer, type: 'waiting', func: () => { if(playerOverlay.style.display !== 'none') loadingSpinner.style.display = 'block'; } }, // Only show if player is visible
-            { el: mainPlayer, type: 'playing', func: () => { loadingSpinner.style.display = 'none'; } },
-            { el: mainPlayer, type: 'error', func: (e) => { console.error("Video Player Error:", e); alert("Error playing video."); loadingSpinner.style.display = 'none'; closePlayer(); }},
-            { el: playPauseBtn, type: 'click', func: togglePlay },
-            { el: progressBar, type: 'click', func: handleProgressBarClick },
-            { el: fullscreenBtn, type: 'click', func: toggleFullscreen },
-            { el: pipBtn, type: 'click', func: togglePip },
-            { el: playerCloseBtn, type: 'click', func: closePlayer },
-            { el: lockBtn, type: 'click', toggleLock },
-            { el: unlockBtn, type: 'click', toggleLock },
-            { el: nextBtn, type: 'click', func: playNextVideo },
-            { el: prevBtn, type: 'click', func: playPrevVideo },
-            // Touch/Mouse listeners added to playerContainer below
-         ];
-
-        function setupPlayerEventListeners() {
-             videoPlayerEventListeners.forEach(({ el, type, func, options }) => el.addEventListener(type, func, options));
-        }
-        function removePlayerEventListeners() {
-             videoPlayerEventListeners.forEach(({ el, type, func, options }) => el.removeEventListener(type, func, options));
-        }
-
-         // Add the click listener for the main video player area (for play/pause/double tap)
-         // This listener is added ONCE to the playerContainer, not added/removed with other controls
-         const playerContainerEl = document.querySelector('#videoPlayerOverlay .player-container');
-         if(playerContainerEl) {
+             console.log("[Player] Setting up general player container event listeners.");
              playerContainerEl.addEventListener('click', handlePlayerClick); // Single/Double tap logic
              playerContainerEl.addEventListener('mousemove', showControls); // Show controls on mouse move
               // Add touch listeners for volume/brightness (if implemented) or controls
@@ -1965,64 +1663,74 @@
         function initAudioContext() {
             if (!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                console.log("AudioContext initialized.");
+                console.log("[Audio] AudioContext initialized.");
             }
         }
 
         // Function to play audio from a URL (Used for XTTS v2)
         function playAudioFromUrl(url) {
+             console.log("[Audio] Attempting to play audio from URL.");
              if (!url) {
-                 console.error("No audio URL provided for playback.");
+                 console.error("[Audio] No audio URL provided for playback.");
                  return;
              }
              // Stop any currently playing audio before starting new one
              stopAudioPlayback();
 
-             console.log("Attempting to play audio from URL:", url);
+             console.log(`[Audio] Playing audio from URL: ${url.substring(0, 50)}...`);
 
              const audio = new Audio(url);
 
              audio.onplay = () => {
-                 console.log("Audio playback started from URL.");
+                 console.log("[Audio] Audio playback started.");
                  // Status should already be 'Speaking...' from backend message
              };
 
              audio.onended = () => {
-                 console.log("Audio playback ended from URL.");
+                 console.log("[Audio] Audio playback ended.");
                  // Backend sends ai_finished_speaking, which handles final UI updates
+                 // Note: This onended might fire *before* the WebSocket ai_finished_speaking message arrives,
+                 // depending on network latency. Rely on the WS message for state transition.
              };
 
              audio.onerror = (e) => {
-                 console.error("Audio playback error from URL:", e);
+                 console.error("[Audio] Audio playback error from URL:", e);
                  // Handle audio errors, perhaps show a message or transition state
                  if (conversationStatus) conversationStatus.textContent = 'Audio Playback Error';
-                 // Optionally, trigger ai_finished_speaking state reset
-                 handleWebSocketMessage(JSON.stringify({ type: 'ai_finished_speaking' }));
+                 // Trigger finish speaking state as no audio will play
+                 handleWebSocketMessage(JSON.stringify({ type: 'ai_finished_speaking' })); // Use the handler to process the state change
              };
 
              // Play the audio
              audio.play().catch(e => {
-                 console.error("Audio playback failed (play promise rejected):", e);
+                 console.error("[Audio] Audio playback failed (play promise rejected):", e);
                  // Handle autoplay restrictions, user gesture required etc.
                  if (conversationStatus) conversationStatus.textContent = 'Audio Play Failed';
-                 // Optionally, trigger ai_finished_speaking state reset
-                 handleWebSocketMessage(JSON.stringify({ type: 'ai_finished_speaking' }));
+                 // Trigger finish speaking state
+                 handleWebSocketMessage(JSON.stringify({ type: 'ai_finished_speaking' })); // Use the handler to process the state change
              });
         }
 
         // Function to play audio chunks (More complex, requires backend to send binary data or Base64 chunks)
         // This is a simplified placeholder; full implementation is complex.
         async function playAudioChunk(audioChunkData) {
+             console.log("[Audio] Received audio chunk.");
              if (!audioContext) initAudioContext(); // Ensure AudioContext is ready
              if (!audioContext) {
-                 console.error("AudioContext not available for chunk playback.");
+                 console.error("[Audio] AudioContext not available for chunk playback.");
+                 // TODO: Handle this failure gracefully
                  return;
              }
 
+             // TODO: Implement actual chunk buffering and playback logic here
+             console.warn("[Audio] Audio chunk playback logic not fully implemented in frontend.");
+
+             // Example placeholder logic for Web Audio API (requires decoding the chunk data)
+             /*
              try {
                  // Assuming audioChunkData is an ArrayBuffer or can be converted to one
                  // If backend sends Base64, you'd need to decode it first:
-                 // const binaryString = window.atob(audioChunkData);
+                 // const binaryString = window.atob(data.audioChunk);
                  // const len = binaryString.length;
                  // const bytes = new Uint8Array(len);
                  // for (let i = 0; i < len; i++) { bytes[i] = binaryString.charCodeAt(i); }
@@ -2036,35 +1744,37 @@
                  audioSourceNode.connect(audioContext.destination);
 
                  audioSourceNode.onended = () => {
-                     console.log("Audio chunk playback ended.");
+                     console.log("[Audio] Audio chunk playback ended.");
                      audioSourceNode = null; // Clear reference
-                     // If using a queue, play the next chunk here
+                     // TODO: If using a queue, play the next chunk here
                  };
 
                  audioSourceNode.start(); // Play the chunk
-                 console.log("Playing audio chunk.");
+                 console.log("[Audio] Playing audio chunk.");
 
              } catch (e) {
-                 console.error("Error decoding or playing audio chunk:", e);
+                 console.error("[Audio] Error decoding or playing audio chunk:", e);
                   // Handle error, maybe clear queue and reset state
                   audioQueue = []; // Clear queue on error
                   if (conversationStatus) conversationStatus.textContent = 'Audio Chunk Error';
                   handleWebSocketMessage(JSON.stringify({ type: 'ai_finished_speaking' })); // Reset state
              }
+             */
         }
 
 
          // Function to stop any currently playing audio
          function stopAudioPlayback() {
-             console.log("Attempting to stop any ongoing audio playback.");
+             console.log("[Audio] Attempting to stop any ongoing audio playback.");
              // Stop URL-based audio (find any <audio> elements created by playAudioFromUrl)
              const audioElements = document.querySelectorAll('audio');
              audioElements.forEach(audio => {
                  if (!audio.paused) {
-                      console.log("Stopping HTML Audio element.");
+                      console.log("[Audio] Stopping HTML Audio element.");
                       audio.pause();
-                      audio.removeAttribute('src'); // Clear source
-                      audio.load(); // Reset audio element to stop download/buffering
+                      // Keep src? Or remove? Removing is safer to stop buffering.
+                      // audio.removeAttribute('src'); // Clear source
+                      // audio.load(); // Reset audio element to stop download/buffering
                  }
                   // Optional: Remove the element from DOM
                   // audio.remove();
@@ -2074,23 +1784,24 @@
              if (audioSourceNode) {
                  try {
                      audioSourceNode.stop();
-                     console.log("Stopping Web Audio API node.");
+                     console.log("[Audio] Stopping Web Audio API node.");
                  } catch (e) {
-                     console.warn("Error stopping audio source node:", e);
+                     console.warn("[Audio] Error stopping audio source node:", e);
                  }
                  audioSourceNode = null; // Clear reference
              }
              // Clear any pending audio chunks in the queue
              audioQueue = [];
-             console.log("Audio playback stopped and queue cleared.");
+             console.log("[Audio] Audio playback stopped and queue cleared.");
          }
 
 
         // Function to establish WebSocket connection
         function connectWebSocket() {
+            console.log("[WS] connectWebSocket called.");
             // Check if connection already exists or is in a connecting state
             if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
-                console.log("WebSocket already open or connecting.");
+                console.log("[WS] WebSocket already open or connecting.");
                 return;
             }
 
@@ -2098,20 +1809,20 @@
             // Use window.location.host to get the correct host for both local and Render
             const wsUrl = window.location.protocol === 'https:' ? `wss://${window.location.host}` : `ws://${window.location.host}`;
 
-            console.log(`Attempting to connect WebSocket to: ${wsUrl}`);
+            console.log(`[WS] Attempting to connect WebSocket to: ${wsUrl}`);
 
             ws = new WebSocket(wsUrl);
 
             ws.onopen = () => {
-                console.log('WebSocket connection established.');
+                console.log('[WS] WebSocket connection established.');
                 // Update UI status if on the AI conversation page
                 if (document.getElementById('aiConversationPage').classList.contains('active')) {
                    if (conversationStatus) {
-                       conversationStatus.textContent = 'Connected';
+                       conversationStatus.textContent = 'Connected'; // Update UI status
                    }
                    // Send start_session message
                     if (selectedAvatar && ws && ws.readyState === WebSocket.OPEN) {
-                       console.log(`Sending start_session for avatar: ${selectedAvatar.id}`);
+                       console.log(`[WS] Sending start_session for avatar: ${selectedAvatar.id}`);
                        ws.send(JSON.stringify({
                             type: 'start_session',
                             userId: 'user123', // Replace with actual user ID if implemented
@@ -2119,11 +1830,15 @@
                        }));
                        if (conversationStatus) conversationStatus.textContent = 'Starting session...';
                     } else {
-                       console.warn("WebSocket opened, but not on AI page or no avatar selected. Session not started automatically.");
-                        if (conversationStatus) conversationStatus.textContent = 'Ready (Disconnected)'; // Indicate ready state but potential issue
+                       console.warn("[WS] WebSocket opened, but not on AI page or no avatar selected. Session not started automatically.");
+                       // If we are on the AI page but couldn't send start_session (e.g. no avatar), indicate ready state but a potential issue
+                        if (document.getElementById('aiConversationPage').classList.contains('active') && conversationStatus) {
+                             conversationStatus.textContent = 'Ready (Disconnected)';
+                             if (micButton) { micButton.disabled = true; micButton.style.opacity = 0.5; micButton.classList.remove('listening'); }
+                        }
                     }
                 } else {
-                     console.log("WebSocket connected, but AI conversation page is not active.");
+                     console.log("[WS] WebSocket connected, but AI conversation page is not active.");
                      // Connection is open, but we don't send start_session until the user navigates to the AI page
                 }
             };
@@ -2132,10 +1847,10 @@
                 // Handle incoming messages from the backend AI chat handler
                 // Binary data needs different handling than JSON
                 if (typeof event.data === 'string') {
-                     console.log('WebSocket JSON message received.'); // Assume string is JSON
+                     // console.log('[WS] WebSocket JSON message received.'); // Assume string is JSON
                      handleWebSocketMessage(event.data); // Process JSON messages
                 } else {
-                     console.log('WebSocket binary message received (audio chunk?).');
+                     console.log('[WS] WebSocket binary message received (audio chunk?).');
                       // If backend sends binary audio chunks, handle them here
                       // For XTTS v2 via Replicate, backend usually sends a URL in a JSON message,
                       // so this binary case might not be used directly for audio output chunks
@@ -2145,31 +1860,31 @@
             };
 
             ws.onerror = (error) => {
-                console.error('WebSocket error:', error);
+                console.error('[WS] WebSocket error:', error);
                  // Check if on AI page before updating AI status
                 if (document.getElementById('aiConversationPage').classList.contains('active') && conversationStatus) {
                     conversationStatus.textContent = 'Connection Error';
                      if (micButton) { micButton.disabled = true; micButton.style.opacity = 0.5; micButton.classList.remove('listening'); }
                 } else {
-                     console.error("WebSocket error occurred outside AI conversation page.");
+                     console.error("[WS] WebSocket error occurred outside AI conversation page.");
                 }
                 // TODO: Implement retry logic or show persistent error message
             };
 
             ws.onclose = (event) => {
-                console.log(`WebSocket connection closed. Code: ${event.code}, Reason: ${event.reason || 'N/A'}`);
+                console.log(`[WS] WebSocket connection closed. Code: ${event.code}, Reason: ${event.reason || 'N/A'}`);
                  // Check if on AI page before updating AI status
                 if (document.getElementById('aiConversationPage').classList.contains('active') && conversationStatus) {
                      conversationStatus.textContent = 'Disconnected';
                      if (micButton) { micButton.disabled = true; micButton.style.opacity = 0.5; micButton.classList.remove('listening'); }
                 } else {
-                     console.log("WebSocket closed outside AI conversation page.");
+                     console.log("[WS] WebSocket closed outside AI conversation page.");
                 }
                  stopAudioPlayback(); // Stop any ongoing audio
 
                 // Attempt to reconnect on unexpected closures (e.g., not user-initiated close '1000')
                 if (event.code !== 1000 && event.code !== 1001) { // 1000 = Normal, 1001 = Going Away
-                     console.warn("Attempting to reconnect WebSocket in 5 seconds...");
+                     console.warn("[WS] Attempting to reconnect WebSocket in 5 seconds...");
                      setTimeout(connectWebSocket, 5000); // Retry connection after a delay
                 }
             };
@@ -2180,21 +1895,24 @@
              try {
                  const data = JSON.parse(message); // Assume messages are JSON
 
+                 console.log(`[WS:MSG] Received type: ${data.type}`); // Log message type
+
                  // Check if we are on the AI conversation page before updating UI specific to it
                  // Allow 'ai_error' messages to be processed even if not active, maybe for a global notification
                  if (!document.getElementById('aiConversationPage').classList.contains('active') && data.type !== 'ai_error' && data.type !== 'connected') {
-                      console.warn(`Received WebSocket message type ${data.type} but not on active AI conversation page. Ignoring UI update.`);
+                      console.warn(`[WS:MSG] Received message type ${data.type} but not on active AI conversation page. Ignoring UI update.`);
+                      // Still process non-UI logic if needed (e.g., session data update)
                       return; // Stop if not on the AI page and not a critical/connection message
                  }
 
 
                  switch (data.type) {
                      case 'connected':
-                         console.log('Backend says:', data.message);
+                         console.log('[WS:MSG] Backend says:', data.message);
                          // Status updated in ws.onopen
                          break;
                      case 'session_ready':
-                         console.log('AI Session Ready.');
+                         console.log('[WS:MSG] AI Session Ready.');
                          if (conversationStatus) conversationStatus.textContent = 'Ready';
                          if (micButton) {
                              micButton.disabled = false; // Enable mic
@@ -2203,7 +1921,7 @@
                          // TODO: Possibly start idle animation here
                          break;
                      case 'ai_thinking':
-                         console.log('AI is thinking...');
+                         console.log('[WS:MSG] AI is thinking...');
                          if (conversationStatus) conversationStatus.textContent = 'Thinking...';
                          // TODO: Change avatar video to thinking loop?
                          if (micButton) { // Ensure mic is disabled while AI is thinking/speaking
@@ -2213,7 +1931,7 @@
                          }
                          break;
                      case 'ai_speaking':
-                         console.log('AI is speaking...');
+                         console.log('[WS:MSG] AI is speaking...');
                          if (conversationStatus) conversationStatus.textContent = 'Speaking...';
                          // TODO: Change avatar video to speaking loop?
                          if (micButton) { // Ensure mic is disabled while AI is thinking/speaking
@@ -2225,11 +1943,11 @@
                          // Now wait for the audio URL or chunks...
                          break;
                      case 'ai_audio_url': // Backend sends a pre-signed URL for the full audio file (XTTS v2 default)
-                         console.log('Received audio URL:', data.url);
+                         console.log('[WS:MSG] Received audio URL.');
                          if (data.url) {
                               playAudioFromUrl(data.url); // Play the audio from the URL
                          } else {
-                             console.error("Received ai_audio_url message but URL is missing.");
+                             console.error("[WS:MSG] Received ai_audio_url message but URL is missing.");
                              // Handle case where URL is missing
                               if (conversationStatus) conversationStatus.textContent = 'Audio URL Missing';
                               // Trigger finish speaking state as no audio will play
@@ -2237,7 +1955,7 @@
                          }
                          break;
                       case 'ai_audio_chunk': // Backend sends audio in chunks (requires Web Audio API)
-                          console.log('Received audio chunk (binary/base64).');
+                          console.log('[WS:MSG] Received audio chunk (binary/base64).');
                           // TODO: This requires complex Web Audio API buffering and playback
                           // If backend sends Base64 data.audioChunk:
                           // const binaryString = window.atob(data.audioChunk);
@@ -2246,12 +1964,12 @@
                           // for (let i = 0; i < len; i++) { bytes[i] = binaryString.charCodeAt(i); }
                           // playAudioChunk(bytes.buffer); // Pass ArrayBuffer to playAudioChunk
 
-                          console.warn("Received audio chunk, but Web Audio API chunk handling is not fully implemented in frontend.");
+                          console.warn("[WS:MSG] Received audio chunk, but Web Audio API chunk handling is not fully implemented in frontend.");
                           // As a fallback, if using XTTS, this case might not even be hit,
                           // or you might need a different Replicate model/version.
                          break;
                      case 'ai_finished_speaking':
-                         console.log('AI finished speaking.');
+                         console.log('[WS:MSG] AI finished speaking.');
                          stopAudioPlayback(); // Ensure audio stops if it wasn't already (e.g. error)
                          if (conversationStatus) conversationStatus.textContent = 'Ready';
                           if (micButton) {
@@ -2262,7 +1980,7 @@
                          // TODO: Change avatar video back to idle loop?
                          break;
                      case 'ai_error':
-                         console.error('AI error:', data.message);
+                         console.error('[WS:MSG] AI error:', data.message);
                           // Update status only if on AI page or if it's a persistent global error notification
                          if (document.getElementById('aiConversationPage').classList.contains('active') && conversationStatus) {
                              conversationStatus.textContent = `Error: ${data.message}`;
@@ -2274,7 +1992,7 @@
                               }
                          } else {
                               // Maybe show a global error notification if not on AI page
-                             console.error("AI Error received outside active conversation.");
+                             console.error("[WS:MSG] AI Error received outside active conversation.");
                          }
                           stopAudioPlayback(); // Stop any ongoing audio on error
                           // TODO: Show error message in chat area?
@@ -2288,15 +2006,15 @@
                            // If data.isFinal is true, add it as a user message to chat history display
                            break;
                       case 'user_interrupted_ack': // Backend acknowledges user interruption
-                           console.log('Backend acknowledged user interruption.');
+                           console.log('[WS:MSG] Backend acknowledged user interruption.');
                            // Frontend should already be in listening state and ready for new input
                            break;
                       // Add other cases for future message types (e.g., system messages, avatar state changes)
                      default:
-                         console.warn('Received unknown WebSocket message type:', data.type, data);
+                         console.warn('[WS:MSG] Received unknown WebSocket message type:', data.type, data);
                  }
              } catch (e) {
-                 console.error("Error processing WebSocket message (JSON parse failed?):", e, "Original data:", message);
+                 console.error("[WS:MSG] Error processing WebSocket message (JSON parse failed?):", e, "Original data:", message);
                   // Attempt to reset state on unexpected message errors
                  if (document.getElementById('aiConversationPage').classList.contains('active') && conversationStatus) {
                       conversationStatus.textContent = 'Protocol Error';
@@ -2311,8 +2029,9 @@
 
         // Modified startAiConversation to correctly initiate WebSocket communication
         function startAiConversation(avatarData) {
+             console.log("[AI Chat] startAiConversation called.");
              if (!avatarData || !avatarData.videoUrl) {
-                  console.error("Cannot start conversation: Invalid avatar data or missing video URL.");
+                  console.error("[AI Chat] Cannot start conversation: Invalid avatar data or missing video URL.");
                   alert("Failed to load avatar data for conversation.");
                   showPage('homePage'); // Fallback
                   return;
@@ -2325,10 +2044,11 @@
 
              // Set the avatar video source and play (this should be the idle loop, will switch later)
              if (activeAvatarVideo) {
+                  console.log("[AI Chat] Setting avatar video source:", avatarData.videoUrl);
                   activeAvatarVideo.src = avatarData.videoUrl; // Assuming this is the main visual loop
                   activeAvatarVideo.muted = true; // Keep background video muted unless it has intended ambient sound
                   activeAvatarVideo.loop = true;
-                  activeAvatarVideo.play().catch(e => console.warn("Conversation video autoplay failed:", e));
+                  activeAvatarVideo.play().catch(e => console.warn("[AI Chat] Conversation video autoplay failed:", e));
              }
 
              // Set initial status on the UI
@@ -2341,6 +2061,7 @@
 
              // Clear previous chat history display (placeholder)
              if (conversationChatArea) {
+                  console.log("[AI Chat] Clearing previous chat history display.");
                   conversationChatArea.innerHTML = '';
                    // Optional: Add a loading or welcome message
                    // const loadingMsg = document.createElement('p');
@@ -2357,7 +2078,7 @@
              // If WebSocket is already open when we call startAiConversation (because DOMContentLoaded already called connectWebSocket),
              // send the start_session message now. Otherwise, it will be sent by the ws.onopen handler.
              if (ws && ws.readyState === WebSocket.OPEN) {
-                  console.log(`WebSocket already open when entering AI page, sending start_session for avatar: ${selectedAvatar.id}`);
+                  console.log(`[AI Chat] WebSocket already open when entering AI page, sending start_session for avatar: ${selectedAvatar.id}`);
                   ws.send(JSON.stringify({
                        type: 'start_session',
                        userId: 'user123', // Replace with actual user ID
@@ -2371,37 +2092,44 @@
              if (micButton) {
                  micButton.removeEventListener('click', toggleMicrophone); // Prevent multiple listeners
                  micButton.addEventListener('click', toggleMicrophone);
+                 console.log("[AI Chat] Mic button event listener added.");
              }
               if (endCallButton) {
                  endCallButton.removeEventListener('click', endAiConversation); // Prevent multiple listeners
                  endCallButton.addEventListener('click', endAiConversation);
+                 console.log("[AI Chat] End Call button event listener added.");
              }
 
              // TODO: Implement Speech-to-Text (STT) listener setup here or triggered by button click
              // This STT listener needs to capture audio and send it via ws.send() as 'audio_chunk' or similar type.
              // setupSTT(); // Need to implement actual browser STT or a library
+
+             console.log("[AI Chat] startAiConversation finished.");
         }
 
         // Modified endAiConversation to use the actual WebSocket connection and cleanup
         function endAiConversation() {
-             console.log("Ending AI conversation session.");
+             console.log("[AI Chat] Ending AI conversation session.");
              // Stop any ongoing processes (audio, STT)
              stopAudioPlayback();
              // TODO: Stop browser STT/MediaRecorder if active
 
              // Send a 'end_session' message to backend (optional, backend might infer from WS close)
              if (ws && ws.readyState === WebSocket.OPEN) {
+                 console.log("[AI Chat] Sending end_session message.");
                  ws.send(JSON.stringify({ type: 'end_session' }));
                  // Close WebSocket connection gracefully
+                 console.log("[AI Chat] Closing WebSocket connection.");
                  ws.close(1000, 'User ended conversation'); // 1000 is Normal Closure code
              } else {
-                  console.warn("WebSocket not open, cannot send end_session or close gracefully.");
+                  console.warn("[AI Chat] WebSocket not open, cannot send end_session or close gracefully.");
                    // Force cleanup if WS wasn't open
                   if (ws) ws = null; // Clear reference
              }
 
              // Stop background video playback
              if (activeAvatarVideo) {
+                 console.log("[AI Chat] Stopping active avatar conversation video.");
                  activeAvatarVideo.pause();
                  activeAvatarVideo.removeAttribute('src');
              }
@@ -2412,9 +2140,18 @@
                   micButton.disabled = true;
                   micButton.style.opacity = 0.5;
                   micButton.classList.remove('listening');
+                  // Remove listeners to prevent calls on a disconnected session
+                   micButton.removeEventListener('click', toggleMicrophone);
              }
+              if (endCallButton) {
+                  endCallButton.removeEventListener('click', endAiConversation);
+              }
              // Clear chat area (optional)
-             if (conversationChatArea) conversationChatArea.innerHTML = '';
+             if (conversationChatArea) {
+                  console.log("[AI Chat] Clearing chat history display.");
+                  conversationChatArea.innerHTML = '';
+             }
+
 
              // Clear selected avatar state
              selectedAvatar = null;
@@ -2422,19 +2159,21 @@
              updateHomeAiCards(); // Update home page UI
 
              // Navigate back to the Home page
+             console.log("[AI Chat] Navigating back to homePage.");
              showPage('homePage');
         }
 
         // Modified toggleMicrophone to send message via WebSocket (placeholder for STT data)
         function toggleMicrophone() {
+             console.log("[AI Chat] Microphone button clicked.");
              if (!selectedAvatar) {
-                 console.warn("Cannot toggle mic: No avatar selected.");
+                 console.warn("[AI Chat] Cannot toggle mic: No avatar selected.");
                  alert("Please select an AI avatar first.");
                  return;
              }
 
              if (!ws || ws.readyState !== WebSocket.OPEN) {
-                  console.warn("WebSocket is not open. Cannot toggle mic.");
+                  console.warn("[AI Chat] WebSocket is not open. Cannot toggle mic.");
                   if (conversationStatus) conversationStatus.textContent = 'Error: Not Connected';
                   // Mic button state should already reflect this (disabled)
                   return;
@@ -2443,7 +2182,7 @@
 
              if (isListening) {
                  // --- Stop Listening ---
-                 console.log("Stopping microphone input.");
+                 console.log("[AI Chat] Stopping microphone input.");
                  isListening = false;
                  micButton.classList.remove('listening'); // Remove visual class
 
@@ -2455,18 +2194,33 @@
 
                  // Send 'end_of_speech' signal with final user text (placeholder text)
                  if (ws && ws.readyState === WebSocket.OPEN) {
-                      const userFinalText = "नमस्ते, आप कैसे हैं?"; // Replace with actual transcription result from STT
-                      console.log("Simulating sending final user text:", userFinalText);
-                      ws.send(JSON.stringify({ type: 'end_of_speech', fullText: userFinalText }));
-                       // Add the final user message to the chat display (optional but good for UI)
-                       addUserMessageToChat(userFinalText);
+                      // Replace with actual transcription result from your STT implementation
+                      const userFinalText = prompt("Simulated STT: Enter your final transcribed text:"); // Use prompt for simulation
+                      if (userFinalText !== null && userFinalText.trim() !== "") {
+                           console.log("[WS] Sending end_of_speech with simulated text:", userFinalText);
+                           ws.send(JSON.stringify({ type: 'end_of_speech', fullText: userFinalText.trim() }));
+                            // Add the final user message to the chat display (optional but good for UI)
+                            addUserMessageToChat(userFinalText.trim());
+                      } else {
+                          console.log("[AI Chat] No simulated text entered or text was empty.");
+                           // If no text, maybe reset state to ready?
+                           if (conversationStatus) conversationStatus.textContent = 'Ready';
+                           micButton.classList.remove('listening');
+                           isListening = false; // Ensure state is correct
+                      }
+
+                 } else {
+                     console.error("[AI Chat] WebSocket not open, cannot send end_of_speech.");
+                     if (conversationStatus) conversationStatus.textContent = 'Error: WS Closed';
+                     micButton.classList.remove('listening');
+                     isListening = false; // Ensure state is correct
                  }
 
 
              } else {
                  // --- Start Listening ---
-                  console.log("Starting microphone input.");
-                 // Check mic permission first in a real app!
+                  console.log("[AI Chat] Starting microphone input.");
+                 // Check mic permission first in a real app! (Requires browser API or library)
                  isListening = true;
                  micButton.classList.add('listening'); // Add visual indication
 
@@ -2475,7 +2229,7 @@
 
                  // If AI was speaking, send interruption signal BEFORE starting STT
                  if (conversationStatus && conversationStatus.textContent === 'Speaking...') {
-                      console.log("User interrupted. Sending user_interrupted signal.");
+                      console.log("[AI Chat] User interrupted. Sending user_interrupted signal.");
                       stopAudioPlayback(); // Immediately stop AI audio
                       if (ws && ws.readyState === WebSocket.OPEN) {
                           ws.send(JSON.stringify({ type: 'user_interrupted' }));
@@ -2483,50 +2237,65 @@
                  }
 
                   // TODO: **Implement actual browser STT/MediaRecorder start**
-                  // This STT should capture audio/text and send it via ws.send() as 'audio_chunk' or similar type.
+                  // This STT should capture audio/text and send it via WebSocket
                   // Example: Using Web Speech API or MediaRecorder + a library like @picovoice/web-voice-processor
                   // As STT produces text/audio chunks, send them via ws.send({ type: 'audio_chunk', data: ... })
                   // or ws.send({ type: 'audio_text_chunk', text: ... })
+                  console.warn("[AI Chat] Browser STT/Audio capture logic is a placeholder.");
+                  // For testing, you can remove the isListening=true and status update,
+                  // and instead just have the button trigger a prompt for text input directly,
+                  // then send end_of_speech.
              }
         }
 
         // Placeholder for adding AI response text/audio to chat area (Keep this, update styling later)
         function addAiMessageToChat(text, audioUrl = null) {
+            console.log("[Chat] Adding AI message to display.");
             const messageElement = document.createElement('div');
             // Basic text, replace with actual bubble HTML later
             messageElement.textContent = `AI: ${text}`;
-            // TODO: Handle audioUrl for playback if backend sends it this way
+            // TODO: Handle audioUrl for playback if backend sends it this way (playAudioFromUrl is separate)
              conversationChatArea.appendChild(messageElement);
-             conversationChatArea.scrollTop = conversationChatArea.scrollHeight; // Auto-scroll
+             // Scroll to the bottom to show the latest message
+             conversationChatArea.scrollTop = conversationChatArea.scrollHeight;
         }
 
         // Placeholder for adding user message text to chat area (Keep this, update styling later)
         function addUserMessageToChat(text) {
+             console.log("[Chat] Adding User message to display.");
             const messageElement = document.createElement('div');
             // Basic text, replace with actual bubble HTML later
             messageElement.textContent = `User: ${text}`;
             conversationChatArea.appendChild(messageElement);
-            conversationChatArea.scrollTop = conversationChatArea.scrollHeight; // Auto-scroll
+             // Scroll to the bottom to show the latest message
+            conversationChatArea.scrollTop = conversationChatArea.scrollHeight;
         }
 
 
         // ======== Initialization ========
 
         document.addEventListener('DOMContentLoaded', () => {
+             console.log("DOM Content Loaded. Initializing frontend.");
             // Initial page load
             // Check localStorage for initial page, e.g., last page visited
             let lastPage = localStorage.getItem('lastPage');
+             console.log("Last page from localStorage:", lastPage);
+
 
             // === MODIFIED INITIATION LOGIC ===
             // Always start on the Home Page by default.
             // Only load a non-home page from localStorage if it's a valid main navigation page.
             const validMainPages = ['homePage', 'uploadPage', 'packagePage', 'infoSubmissionPage', 'userDashboardPage'];
             if (!lastPage || !validMainPages.includes(lastPage)) {
+                 console.log(`Invalid or overlay page (${lastPage}) saved. Defaulting to homePage.`);
                  lastPage = 'homePage'; // Default to home page if lastPage is invalid or an overlay page
+            } else {
+                 console.log(`Loading valid page from localStorage: ${lastPage}`);
             }
              // ===============================
 
-            showPage(lastPage); // Start on the determined page
+            // Show the determined initial page
+            showPage(lastPage);
 
             // Load selected avatar from localStorage on startup
              const storedAvatar = localStorage.getItem('selectedAvatar');
@@ -2535,7 +2304,7 @@
                       selectedAvatar = JSON.parse(storedAvatar);
                       console.log("Loaded selected avatar from localStorage:", selectedAvatar.name);
                   } catch (e) {
-                      console.error("Failed to load selected avatar from localStorage:", e);
+                      console.error("Failed to parse selected avatar from localStorage:", e);
                       selectedAvatar = null; // Clear invalid data
                       localStorage.removeItem('selectedAvatar');
                   }
@@ -2545,50 +2314,80 @@
 
             // Save current page to localStorage when leaving the page (optional)
              window.addEventListener('beforeunload', () => {
+                  console.log("Window beforeunload event.");
                  const activePageElement = document.querySelector('.page.active');
                  if (activePageElement && activePageElement.id && !['aiConversationPage', 'videoPlayerOverlay', 'avatarDetailPage'].includes(activePageElement.id)) {
                      // Only save the ID if it's a main page and exists
+                      console.log(`Saving last page to localStorage: ${activePageElement.id}`);
                      localStorage.setItem('lastPage', activePageElement.id);
                  } else {
                      // If on an overlay or no active page found, save the home page as default
+                      console.log("On an overlay page or no active page, defaulting lastPage to homePage.");
                      localStorage.setItem('lastPage', 'homePage');
+                 }
+
+                 // Ensure WebSocket is closed on page unload to prevent lingering connections
+                 if (ws && ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+                     console.log("[WS] Closing WebSocket on beforeunload.");
+                      // Use a code indicating going away, not normal closure
+                      ws.close(1001, 'Browser/Tab closed');
                  }
              });
 
 
             // Add Event Listeners for New AI Avatar UI (Check if elements exist)
-            if (avatarBackBtn) avatarBackBtn.addEventListener('click', hideAvatarDetail);
-            if (selectAvatarBtn) selectAvatarBtn.addEventListener('click', toggleAvatarSelectPanel);
-            if (uploadAiAssetsBtn) uploadAiAssetsBtn.addEventListener('click', uploadAiAssetsDev);
+            if (avatarBackBtn) {
+                 avatarBackBtn.addEventListener('click', hideAvatarDetail);
+                 console.log("Event listener added for avatarBackBtn.");
+            }
+            if (selectAvatarBtn) {
+                 selectAvatarBtn.addEventListener('click', toggleAvatarSelectPanel);
+                 console.log("Event listener added for selectAvatarBtn.");
+            }
+            // Dev Upload button handler is added directly in HTML onclick="uploadAiAssetsDev()"
 
              // Add click listener to avatar cards using delegation on the grid container (#packagePage)
              if (avatarGridContainer) {
                  avatarGridContainer.addEventListener('click', (e) => {
                      const avatarCard = e.target.closest('.avatar-card');
-                     if (avatarCard && avatarCard.dataset.avatarData) {
-                         try {
-                             const avatarData = JSON.parse(avatarCard.dataset.avatarData);
-                             showAvatarDetail(avatarData); // Pass the parsed object
-                         } catch (e) {
-                             console.error("Failed to parse avatar data from grid card:", e);
+                     if (avatarCard) { // Check if a card was clicked or a descendant
+                         console.log("[Package] Avatar card clicked.");
+                         if (avatarCard.dataset.avatarData) {
+                             try {
+                                 const avatarData = JSON.parse(avatarCard.dataset.avatarData);
+                                 console.log("[Package] Displaying detail for avatar:", avatarData.name);
+                                 showAvatarDetail(avatarData); // Pass the parsed object
+                             } catch (e) {
+                                 console.error("[Package] Failed to parse avatar data from grid card:", e);
+                             }
+                         } else {
+                             console.warn("[Package] Clicked card has no avatar data.");
                          }
                      }
                  });
+                 console.log("Event listener added for avatarGridContainer (delegation).");
              }
 
              // Add click listener to avatar select cards using delegation on the panel container (#avatarDetailPage side panel)
               if (avatarSelectPanel) {
                   avatarSelectPanel.addEventListener('click', (e) => {
                       const selectCard = e.target.closest('.avatar-select-card');
-                      if (selectCard && selectCard.dataset.avatarData) {
-                          try {
-                               const avatarData = JSON.parse(selectCard.dataset.avatarData);
-                               selectAvatar(avatarData); // Pass the parsed object
-                          } catch (e) {
-                              console.error("Failed to parse avatar data from select card:", e);
-                          }
+                       if (selectCard) { // Check if a card was clicked or a descendant
+                           console.log("[Detail Panel] Avatar select card clicked.");
+                           if (selectCard.dataset.avatarData) {
+                                try {
+                                   const avatarData = JSON.parse(selectCard.dataset.avatarData);
+                                   console.log("[Detail Panel] Selecting avatar:", avatarData.name);
+                                   selectAvatar(avatarData); // Pass the parsed object
+                                } catch (e) {
+                                   console.error("[Detail Panel] Failed to parse avatar data from select card:", e);
+                                }
+                           } else {
+                                console.warn("[Detail Panel] Clicked select card has no avatar data.");
+                           }
                       }
                   });
+                  console.log("Event listener added for avatarSelectPanel (delegation).");
               }
 
              // Existing video player event listeners are set up/removed by playVideo/closePlayer
@@ -2596,7 +2395,25 @@
 
             // === Initiate WebSocket connection when the page loads ===
             // This is crucial for the AI chat functionality to be ready.
-            connectWebSocket(); // Start the WebSocket connection process early
+            // It will attempt to connect immediately. If the user navigates to the AI page
+            // while it's connecting or already connected, startAiConversation will
+            // use the existing connection and send the 'start_session' message.
+            connectWebSocket();
+             console.log("WebSocket connection initiation triggered.");
+
+
+             // === Add placeholder STT listener (if not already present) ===
+             // This is a very basic simulation. Actual STT requires browser APIs or a library.
+             // The toggleMicrophone function currently uses a prompt for simulation.
+             // A real STT implementation would listen to the microphone and trigger messages.
+             // Ensure you handle browser microphone permissions!
+             // if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+             //     console.log("Web Speech API detected.");
+             //     // TODO: Implement Web Speech API logic
+             // } else {
+             //     console.warn("Web Speech API not supported in this browser.");
+             //     // TODO: Provide fallback or disable mic button with message
+             // }
 
         });
 
