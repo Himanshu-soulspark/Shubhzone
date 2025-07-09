@@ -1,0 +1,12 @@
+# requirements.txt
+
+fastapi             # The web framework
+uvicorn[standard]   # ASGI server to run FastAPI
+requests            # To make HTTP requests to external APIs (OpenRouter, Replicate, TTS, STT)
+boto3               # AWS SDK for Python (used to interact with Wasabi - S3 compatible)
+python-dotenv       # To load variables from .env file locally (not needed on Render)
+
+# You might need to add more packages here depending on the specific
+# Transcription (STT) and Text-to-Speech (TTS) libraries/APIs you use.
+# Example (if using OpenAI Python client):
+# openai
