@@ -1,5 +1,22 @@
-# Dependencies
-node_modules
+# .gitignore
 
 # Environment variables
 .env
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Virtual environment
+venv/
+.venv/
+
+# Editor files (optional)
+.vscode/
+.idea/
+
+# Log files
+*.log
+
+# Database files (if using SQLite)
+*.sqlite3
