@@ -1,6 +1,8 @@
+# requirements.txt (updated)
 fastapi
 uvicorn[standard]
 requests
 boto3
 python-dotenv
 python-multipart
+jinja2
