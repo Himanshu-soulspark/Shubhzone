@@ -4,13 +4,13 @@
   "description": "Shubhzone static frontend files.",
   "main": "index.html",
   "scripts": {
-    "start": "echo 'No server needed for static files'",
-    "build": "echo 'No build process needed for static files'"
+    "start": "npx serve .",  // <-- CHANGE THIS
+    "build": "echo 'No build process needed'" 
   },
   "keywords": [],
   "author": "Your Name",
   "license": "ISC",
   "dependencies": {
-    "serve": "^14.0.0"
+    "serve": "^14.0.0" 
     }
 }
