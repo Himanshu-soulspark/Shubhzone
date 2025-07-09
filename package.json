@@ -4,7 +4,8 @@
   "description": "Shubhzone static frontend files.",
   "main": "index.html",
   "scripts": {
-    "start": "npx serve .",  // <-- CHANGE THIS
+    "start": "npx serve .",  
+    
     "build": "echo 'No build process needed'" 
   },
   "keywords": [],
