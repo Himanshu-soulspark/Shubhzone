@@ -2,9 +2,8 @@
 
 import os
 from fastapi import FastAPI, UploadFile, File, HTTPException, status, Request
-from fastapi.responses import HTMLResponse # HTMLResponse import karein
-from fastapi.staticfiles import StaticFiles # StaticFiles import karein
-from fastapi.templating import Jinja2Templates # Templates import karein
+from fastapi.responses import HTMLResponse # यह लाइन index.html दिखाने के लिए ज़रूरी है
+from fastapi.templating import Jinja2Templates # यह लाइन index.html दिखाने के लिए ज़रूरी है
 from fastapi.middleware.cors import CORSMiddleware
 import requests
 import boto3
@@ -14,12 +13,13 @@ load_dotenv()
 
 app = FastAPI()
 
-# --- NEW: Serve Static Files (index.html) ---
-# Tell FastAPI where to find the template files (our index.html)
-# The directory "." means the root of the project where main.py is.
+# --- नया कोड: index.html दिखाने के लिए ---
+# FastAPI को बताओ कि तुम्हारी index.html फाइल कहाँ रखी है।
+# "." का मतलब है उसी फोल्डर में जहाँ main.py है।
 templates = Jinja2Templates(directory=".")
+# --- नया कोड खत्म ---
 
-# CORS settings (no change)
+# CORS सेटिंग्स (कोई बदलाव नहीं)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -28,7 +28,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Environment Variables (no change)
+# एनवायरमेंट वेरिएबल्स (कोई बदलाव नहीं)
 REPLICATE_API_TOKEN = os.getenv("REPLICATE_API_TOKEN")
 WASABI_ACCESS_KEY = os.getenv("WASABI_ACCESS_KEY")
 WASABI_SECRET_KEY = os.getenv("WASABI_SECRET_KEY")
@@ -37,7 +37,7 @@ WASABI_REGION = os.getenv("WASABI_REGION")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 BUNNY_PULL_ZONE_URL = os.getenv("BUNNY_PULL_ZONE_URL")
 
-# Wasabi Client (no change)
+# Wasabi क्लाइंट (कोई बदलाव नहीं)
 try:
     s3_client = boto3.client(
         's3',
@@ -50,19 +50,19 @@ except Exception as e:
     print(f"Warning: Failed to initialize Wasabi S3 client: {e}")
     s3_client = None
 
-# --- NEW: Root Endpoint to Serve index.html ---
-# We are replacing the old root endpoint with this one.
-# This endpoint will now serve your index.html file whenever someone visits the root URL.
-# The `response_class=HTMLResponse` is important to tell the browser it's an HTML page.
+# --- बदला हुआ कोड: ऐप खुलने पर index.html दिखाओ ---
+# यह तुम्हारे ऐप का मुख्य पेज दिखाएगा।
+# response_class=HTMLResponse ब्राउज़र को बताता है कि यह एक HTML पेज है।
 @app.get("/", response_class=HTMLResponse)
 async def serve_index(request: Request):
     """
-    This endpoint serves the main index.html file.
+    यह फंक्शन मुख्य index.html फाइल को सर्व करता है।
     """
-    # The "index.html" must be in the same directory as main.py
     return templates.TemplateResponse("index.html", {"request": request})
+# --- बदला हुआ कोड खत्म ---
 
-# --- AI Interaction API Endpoint (no change) ---
+
+# --- AI इंटरेक्शन API (कोई बदलाव नहीं) ---
 @app.post("/ai/interact/")
 async def ai_interact(audio_file: UploadFile = File(...)):
     print("Received request to /ai/interact/")
@@ -145,7 +145,7 @@ async def ai_interact(audio_file: UploadFile = File(...)):
     print("Sending response to frontend:", response_payload)
     return response_payload
 
-# --- Placeholder for future User Media Upload API ---
+# --- वीडियो अपलोड API (कोई बदलाव नहीं) ---
 @app.post("/media/upload/")
 async def upload_user_media(file: UploadFile = File(...)):
     print("User upload endpoint hit (placeholder).")
