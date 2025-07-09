@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -13,41 +14,35 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
     
     <style>
-        /* --- थीम वेरिएबल्स --- */
+        /* All your existing styles are kept as they are */
         :root, body[data-theme="default"] { --bg-color: #121212; --page-bg: rgba(0, 0, 0, 0.7); --text-color: #ffffff; --text-muted: #aaa; --header-bg: rgba(25, 25, 25, 0.75); --card-bg: #1e1e1e; --input-bg: #2a2a2a; --border-color: #444; --nav-bg: rgba(31, 31, 31, 0.5); --accent-color: #3f51b5; --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; --shadow-color: rgba(0,0,0,0.5); }
         body[data-theme="hacker"] { --bg-color: #000; --page-bg: rgba(0, 20, 0, 0.7); --text-color: #0f0; --text-muted: #0a0; --header-bg: rgba(0, 30, 0, 0.75); --card-bg: #050505; --input-bg: #111; --border-color: #0f0; --nav-bg: rgba(0, 0, 0, 0.5); --accent-color: #0f0; --font-main: 'Courier New', Courier, monospace; --shadow-color: rgba(0, 255, 0, 0.3); }
         body[data-theme="instagram"] { --bg-color: #fafafa; --page-bg: #ffffff; --text-color: #000000; --text-muted: #8e8e8e; --header-bg: #ffffff; --card-bg: #ffffff; --input-bg: #efefef; --border-color: #dbdbdb; --nav-bg: rgba(255, 255, 255, 0.5); --accent-color: #0095f6; --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; --shadow-color: rgba(0,0,0,0.1); }
         body[data-theme="romantic"] { --bg-color: #2c001e; --page-bg: rgba(44, 0, 30, 0.7); --text-color: #fceded; --text-muted: #ffb8b8; --header-bg: rgba(86, 11, 62, 0.75); --card-bg: #4d002f; --input-bg: #5e003b; --border-color: #e5398d; --nav-bg: rgba(59, 0, 39, 0.5); --accent-color: #ff4d9e; --font-main: 'Georgia', serif; --shadow-color: rgba(229, 57, 141, 0.3); }
         body[data-theme="ocean"] { --bg-color: #0c1f3e; --page-bg: rgba(12, 31, 62, 0.7); --text-color: #e0f7fa; --text-muted: #b3e5fc; --header-bg: rgba(0, 77, 128, 0.75); --card-bg: #003c66; --input-bg: #004c80; --border-color: #4fc3f7; --nav-bg: rgba(0, 43, 77, 0.5); --accent-color: #29b6f6; --font-main: 'Verdana', sans-serif; --shadow-color: rgba(79, 195, 247, 0.3); }
         body[data-theme="forest"] { --bg-color: #1b2e1a; --page-bg: rgba(27, 46, 26, 0.7); --text-color: #e8f5e9; --text-muted: #c8e6c9; --header-bg: rgba(46, 82, 45, 0.75); --card-bg: #274c26; --input-bg: #356834; --border-color: #81c784; --nav-bg: rgba(19, 34, 18, 0.5); --accent-color: #66bb6a; --font-main: 'Tahoma', sans-serif; --shadow-color: rgba(129, 199, 132, 0.3); }
-
-        /* --- बेसिक स्टाइल और रीसेट --- */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
         body { background-color: var(--bg-color); color: var(--text-color); overflow: hidden; transition: background-color 0.3s, color 0.3s; }
-        
-        /* --- ऐप कंटेनर और साइड पैनल --- */
         .app-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
         .main-content { flex-grow: 1; overflow-y: auto; padding-bottom: 75px; }
-        .side-panel { position: fixed; top: 0; left: -45vw; width: 45vw; height: 100%; background-color: var(--nav-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 1001; padding: 20px; transition: left 0.3s ease-in-out; box-shadow: 2px 0 10px var(--shadow-color); display: flex; flex-direction: column;}
+        .side-panel { position: fixed; top: 0; left: -45vw; width: 45vw; height: 100%; background-color: var(--nav-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 1001; padding: 20px; transition: left 0.3s ease-in-out; box-shadow: 2px 0 10px var(--shadow-color); display: flex; flex-direction: column; gap: 15px;}
         .side-panel.active { left: 0; }
         .panel-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; display: none; }
         .panel-overlay.active { display: block; }
         .side-panel-card { background-color: var(--card-bg); border-radius: 12px; padding: 10px; cursor: pointer; border: 1px solid var(--border-color); box-shadow: 0 4px 8px var(--shadow-color); }
-        .side-panel-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; }
-        
-        /* --- पेज मैनेजमेंट --- */
+        .side-panel-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; display: block;}
         .page { display: none; padding: 15px; background-color: var(--page-bg); min-height: 100%; animation: fadeIn 0.5s; flex-direction: column; }
         .page.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        /* --- पेज हेडर --- */
         .page-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; margin-bottom: 15px; background-color: var(--header-bg); border-radius: 8px; border: 1px solid var(--border-color); flex-shrink: 0; z-index: 10; }
         .page-header .page-title { font-size: 18px; font-weight: bold; }
         .header-btn { background: none; border: none; color: var(--text-color); font-size: 16px; font-weight: bold; cursor: pointer; padding: 5px 10px; }
         .header-btn.back-icon { font-size: 24px; }
         .header-btn.menu-icon svg { width: 24px; height: 24px; }
-        
-        /* --- होम पेज लेआउट --- */
+        #trending-card-container { width: 100%; aspect-ratio: 16 / 9; margin: 15px 0; border-radius: 12px; background-color: var(--card-bg); background-size: cover; background-position: center; position: relative; overflow: hidden; box-shadow: 0 8px 25px var(--shadow-color); transition: background-image 0.5s ease-in-out, opacity 0.5s ease-in-out; opacity: 1; }
+        #trending-card-container.fade-out { opacity: 0; }
+        #trending-card-container::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 50%; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
+        .trending-card-title { position: absolute; bottom: 10px; left: 15px; z-index: 2; font-size: 16px; font-weight: bold; color: #fff; text-shadow: 1px 1px 3px #000; }
         .home-grid-container { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; padding: 10px 0; }
         .home-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; flex: 1 1 calc(50% - 23px); max-width: calc(50% - 23px); min-width: 150px; transition: transform 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 4px 15px var(--shadow-color); }
         .home-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px var(--shadow-color); }
@@ -56,8 +51,6 @@
         .home-full-width-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; width: 100%; margin-top: 15px; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 4px 15px var(--shadow-color); }
         .home-full-width-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px var(--shadow-color); }
         .home-full-width-card img { width: 100%; border-radius: 8px; object-fit: cover; }
-        
-        /* --- बॉटम नेविगेशन बार --- */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background-color: var(--nav-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border-color); flex-shrink: 0; }
         .nav-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: var(--text-muted); font-size: 12px; }
         .nav-icon.active { color: var(--accent-color); font-weight: bold; }
@@ -70,8 +63,26 @@
         body[data-theme="default"] #nav-profile-svg { color: #ffa726; }
         body:not([data-theme="default"]) .nav-icon:not(.active) svg { color: var(--text-muted); }
         body:not([data-theme="default"]) .nav-icon.active svg { color: var(--accent-color); }
-
-        /* --- स्टोरी पेज स्टाइल --- */
+        .feature-list { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; flex-grow: 1; }
+        .feature-item { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .feature-item-details { flex-grow: 1; }
+        .feature-item-details .price { color: var(--accent-color); font-weight: bold; margin-top: 4px; }
+        .feature-item .checkbox { transform: scale(1.5); margin-left: 20px; accent-color: var(--accent-color); }
+        .payment-footer { margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); }
+        .total-display { display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin-bottom: 15px; }
+        .profile-view-header { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 25px; }
+        .profile-view-pic { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-color); }
+        .profile-view-user { display: flex; align-items: center; gap: 15px; }
+        .profile-view-user h2 { font-size: 22px; }
+        .logout-btn { background-color: #d32f2f; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        .profile-video-list-container { flex-grow: 1; overflow-y: auto; }
+        .profile-video-item { display: flex; align-items: center; gap: 15px; background-color: var(--card-bg); padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+        .profile-video-item img { width: 100px; aspect-ratio: 16/9; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+        .profile-video-details { flex-grow: 1; min-width: 0; }
+        .profile-video-actions { display: flex; gap: 8px; align-items: center; }
+        .profile-video-actions button { background: none; border: 1px solid var(--border-color); color: var(--text-muted); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold;}
+        .profile-video-actions .edit-btn { border-color: #ffa000; color: #ffa000; }
+        .profile-video-actions .delete-btn { border-color: #d32f2f; color: #d32f2f; }
         .story-header { background: rgba(0,0,0,0.3); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 12px; margin: -15px -15px 20px -15px; text-align: center; font-size: 20px; font-weight: bold; border-bottom: 1px solid var(--border-color); }
         .story-grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
         .story-card { aspect-ratio: 9 / 16; background-color: var(--card-bg); border-radius: 10px; border: 1px solid var(--border-color); display: flex; justify-content: center; align-items: flex-end; padding: 10px; background-size: cover; background-position: center; position: relative; overflow: hidden; box-shadow: 0 5px 15px var(--shadow-color); transition: transform 0.3s ease, box-shadow 0.3s ease; }
@@ -87,12 +98,94 @@
         @keyframes pulse { 0% { box-shadow: 0 0 15px var(--accent-color); transform: scale(1); } 50% { box-shadow: 0 0 25px var(--accent-color); transform: scale(1.05); } 100% { box-shadow: 0 0 15px var(--accent-color); transform: scale(1); } }
         .read-option { font-size: 18px; font-weight: bold; cursor: pointer; color: var(--text-muted); transition: color 0.2s; background: var(--input-bg); padding: 10px 20px; border-radius: 25px; border: 1px solid var(--border-color); }
         .read-option:hover { color: var(--text-color); border-color: var(--accent-color); }
-        
-        /* --- बाकी मूल CSS (अपरिवर्तित) --- */
+        #read-story-page .page-header { background-color: var(--header-bg) !important; position: relative !important; }
+        #read-story-content { flex-grow: 1; overflow-y: auto; background-color: var(--card-bg); padding: 20px; border-radius: 12px; line-height: 1.8; font-size: 16px; white-space: pre-wrap; }
+        .profit-header-extra { display: flex; align-items: center; gap: 10px; }
+        .profit-total-box { background-color: var(--input-bg); color: #4CAF50; padding: 8px 15px; border-radius: 8px; font-size: 18px; font-weight: bold; border: 1px solid var(--border-color); }
+        .profit-video-list { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; }
+        .profit-video-item { background-color: var(--card-bg); border-radius: 10px; padding: 10px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--border-color); }
+        .profit-video-item img { width: 80px; height: 45px; object-fit: cover; border-radius: 5px; }
+        .profit-video-info { flex-grow: 1; }
+        .profit-video-info h4 { font-size: 14px; margin: 0; }
+        .profit-video-info p { font-size: 12px; color: var(--text-muted); margin: 2px 0; }
+        .profit-video-checkbox { transform: scale(1.5); margin: 0 15px; cursor: pointer; }
         .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .theme-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; aspect-ratio: 1 / 1; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; transition: transform 0.2s; }
         .theme-card:hover { transform: scale(1.05); }
-        .ai-character-card { width: 100%; aspect-ratio: 9 / 16; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .ai-character-card { 
+            width: 100%; 
+            max-width: 400px; /* Added max-width to match story card */
+            aspect-ratio: 9 / 16; 
+            background-color: var(--card-bg); 
+            border: 1px solid var(--border-color); 
+            border-radius: 12px; 
+            display: flex; /* Use flexbox for centering content */
+            flex-direction: column; /* Stack children vertically */
+            align-items: center; 
+            justify-content: center; 
+            font-size: 20px;
+            position: relative; /* Needed for absolute positioning of children */
+            overflow: hidden; /* Hide anything outside the card boundaries */
+        }
+        /* --- NEW CSS for AI Character Visuals --- */
+        .ai-character-card video,
+        .ai-character-card img {
+            position: absolute; /* Position relative to the card */
+            top: 0;
+            left: 0;
+            width: 100%; /* Make image/video fill the card */
+            height: 100%; /* Make image/video fill the card */
+            object-fit: cover; /* Cover the area without stretching */
+            border-radius: 12px; /* Match card border radius */
+            display: none; /* Hide by default, JS will show */
+        }
+        /* Ensure the placeholder text is hidden when content is active */
+        .ai-character-card.active-content .ai-placeholder-text {
+            display: none;
+        }
+
+        /* Style for the AI response text */
+        #ai-response-text {
+            position: absolute;
+            bottom: 10px; /* Position near the bottom */
+            left: 10px;
+            right: 10px;
+            z-index: 5; /* Above video/image */
+            color: white; /* Text color */
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8); /* Add shadow for readability */
+            font-size: 14px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            padding: 5px 10px;
+            border-radius: 8px;
+            max-height: 30%; /* Limit height */
+            overflow-y: auto; /* Add scroll if text is long */
+            display: none; /* Hide by default */
+        }
+
+        /* Style for the interaction button */
+        #ai-interaction-button {
+            margin-top: 20px; /* Space below the card */
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--accent-color), #8e24aa);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s ease;
+        }
+        #ai-interaction-button:disabled {
+             background: var(--text-muted); /* Dim when disabled */
+             cursor: not-allowed;
+        }
+        /* --- END NEW CSS --- */
+
+
         .input-group { margin-bottom: 20px; position: relative; }
         .input-group label { display: block; margin-bottom: 8px; font-size: 14px; color: var(--text-muted); }
         .input-field, .custom-select-wrapper select, textarea.input-field { width: 100%; padding: 12px; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-size: 16px; }
@@ -102,10 +195,17 @@
         .ai-header-btn { text-align: center; cursor: pointer; }
         .ai-header-btn span:first-child { font-size: 24px; }
         .ai-header-btn span:last-child { display: block; font-size: 10px; }
-        .ai-character-display { flex-grow: 1; display: flex; align-items: center; justify-content: center; }
+        .ai-character-display { 
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column; /* Stack card and button */
+            align-items: center; 
+            justify-content: flex-start; /* Align to top of available space */
+            padding-top: 20px; /* Add some space from the header */
+        }
         .ai-char-panel { position: fixed; top: 0; right: -50vw; width: 50vw; height: 100%; background-color: var(--nav-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 1001; padding: 15px; transition: right 0.3s ease-in-out; box-shadow: -2px 0 10px rgba(0,0,0,0.5); overflow-y: auto; }
         .ai-char-panel.active { right: 0; }
-        .ai-char-card { aspect-ratio: 9 / 16; background-color: var(--card-bg); border-radius: 8px; margin-bottom: 10px; }
+        .ai-char-card { aspect-ratio: 9 / 16; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; }
         .video-page-header { display: flex; align-items: center; justify-content: center; gap: 10px; flex-grow: 1; }
         .header-icon-circle { background-color: rgba(255,255,255,0.1); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
         .header-icon-circle svg { width: 20px; height: 20px; color: #ef5350; }
@@ -165,6 +265,9 @@
         <div class="side-panel-card" onclick="showPage('theme-page'); closeAllPanels();">
             <img src="https://i.ibb.co/Pvjwsd3q/Leonardo-Phoenix-10-A-hyperrealistic-futuristic-cityscape-set-3.jpg" alt="Change Theme">
         </div>
+        <div class="side-panel-card" onclick="showPage('profit-page'); closeAllPanels();">
+             <img src="https://i.ibb.co/zWHfyNn6/dc-sbv-Ax-Tv-S68z-XDYse-EVg.webp" alt="Your Profit">
+        </div>
     </div>
     <div id="ai-char-panel" class="ai-char-panel"></div>
 
@@ -177,133 +280,154 @@
                     <h2 class="page-title">Home 🏠</h2>
                     <span style="width:44px;"></span>
                 </div>
+                <!-- RESTORED: Trending card with placeholder data -->
+                <div id="trending-card-container">
+                    <h3 id="trending-card-title" class="trending-card-title"></h3>
+                </div>
                 <div class="home-grid-container">
                     <div class="home-card"><img src="https://i.ibb.co/HTjy6Cjd/Leonardo-Phoenix-10-A-young-girl-sitting-in-a-cozy-dimly-lit-r-0.jpg" alt="AI Friend"><button class="home-card-btn" onclick="showPage('ai-friend-page')">AI Friend</button></div>
-                    <div class="home-card"><img src="https://i.ibb.co/Q3ZP5KzD/Fum-D-gyl-TImey-U43-n-Q4eg.webp" alt="Upgrade"><button class="home-card-btn" onclick="showPage('upload-page-1')">Update</button></div>
+                    <div class="home-card"><img src="https://i.ibb.co/Q3ZP5KzD/Fum-D-gyl-TImey-U43-n-Q4eg.webp" alt="Upgrade"><button class="home-card-btn" onclick="showPage('features-page')">Update</button></div>
                 </div>
                 <div class="home-full-width-card" onclick="showPage('guideline-page')"><img src="https://i.ibb.co/0pZX9Yyq/IMG-20250708-134304.jpg" alt="Guidelines"></div>
             </div>
 
-            <!-- AI Friend पेज -->
+            <!-- FEATURES PAGE -->
+            <div id="features-page" class="page">
+                <div class="page-header">
+                    <button class="header-btn back-icon" onclick="showPage('home-page')">←</button>
+                    <h2 class="page-title">Buy Features ✨</h2>
+                    <span></span>
+                </div>
+                <div id="feature-list" class="feature-list"></div>
+                <div class="payment-footer">
+                    <div class="total-display">
+                        <span>Total:</span>
+                        <span id="features-total-price">₹ 0</span>
+                    </div>
+                    <button class="button" onclick="payForFeatures()">Pay Now</button>
+                </div>
+            </div>
+
+            <!-- PROFILE VIEW PAGE (After Approval) -->
+            <div id="profile-view-page" class="page">
+                <div class="page-header" style="justify-content: center;"><h2 class="page-title">My Profile</h2></div>
+                <div class="profile-view-header">
+                    <img id="profile-view-pic-elem" src="https://i.ibb.co/7j5R0y6/profile-placeholder.jpg" alt="User Pic" class="profile-view-pic">
+                    <div class="profile-view-user">
+                        <h2 id="profile-view-name-elem">User Name</h2>
+                        <button class="logout-btn" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+                <h3>My Videos</h3>
+                <!-- RESTORED: Profile video list with placeholder data -->
+                <div id="profile-video-list-container" class="profile-video-list-container"></div>
+            </div>
+
+            <!-- PROFIT PAGE -->
+            <div id="profit-page" class="page">
+                <div class="page-header"><button class="header-btn back-icon" onclick="showPage('home-page')">←</button><h2 class="page-title">Your Profit 💵</h2><div class="profit-header-extra"><div id="profit-total-display" class="profit-total-box">₹ 0</div></div></div>
+                <!-- RESTORED: Profit video list with placeholder data -->
+                <div id="profit-video-list" class="profit-video-list" style="flex-grow: 1; overflow-y: auto;"></div>
+                <button class="button" onclick="showPage('payment-request-page')">Submit</button>
+            </div>
+
+            <!-- PAYMENT REQUEST PAGE -->
+            <div id="payment-request-page" class="page">
+                <div class="page-header"><button class="header-btn back-icon" onclick="showPage('profit-page')">←</button><h2 class="page-title">Payment Details 💳</h2><span></span></div>
+                <div class="input-group"><label for="upi-id">UPI ID</label><input type="text" id="upi-id" class="input-field" placeholder="Enter your UPI ID"></div>
+                <div class="input-group"><label for="mobile-no">Mobile Number</label><input type="tel" id="mobile-no" class="input-field" placeholder="Enter your mobile number"></div>
+                <button class="button" onclick="submitPaymentRequest()">Request</button>
+            </div>
+
+            <!-- AI Friend PAGE -->
             <div id="ai-friend-page" class="page">
-                 <div class="page-header">
+                <div class="page-header">
                     <button class="header-btn back-icon" onclick="showPage('home-page')">←</button>
                     <h2 class="page-title">Your AI Friend</h2>
                     <div class="ai-header-btn" onclick="toggleAiCharacterPanel()"><span>🦾</span><span>More AI</span></div>
                 </div>
-                <div class="ai-character-display"><div class="ai-character-card">AI Character Display</div></div>
+                <div class="ai-character-display">
+                    <!-- AI Character Card: Container for AI visuals -->
+                    <div id="ai-character-card" class="ai-character-card">
+                         <!-- NEW: Elements to display AI visuals -->
+                         <!-- These elements are added inside the existing .ai-character-card div -->
+                        <img id="ai-visual-image" src="" alt="AI Character Idle" style="display: none;">
+                        <video id="ai-visual-video" src="" loop muted playsinline style="display: none;"></video>
+                        <p class="ai-placeholder-text">Loading AI Character...</p> <!-- Keep placeholder text -->
+                         <!-- NEW: Element to display AI text response -->
+                        <div id="ai-response-text" style="display: none;"></div> 
+                    </div>
+                    <!-- NEW: Button to start/stop voice interaction -->
+                    <!-- This button is added outside the .ai-character-card div but inside .ai-character-display -->
+                    <button id="ai-interaction-button" onclick="window.toggleVoiceInput()">
+                        <span id="interaction-button-icon">🎙️</span> <!-- Microphone icon -->
+                        <span id="interaction-button-text">Tap to Talk</span>
+                    </button>
+                </div>
+                 <!-- NEW: Audio element for AI voice response -->
+                 <!-- This audio element is added outside the .ai-character-display div -->
+                 <!-- Set playsinline to allow playback without entering fullscreen on some mobile browsers -->
+                <audio id="ai-response-audio" preload="auto" playsinline style="display: none;"></audio> 
             </div>
             
-            <!-- थीम चेंजर पेज -->
-            <div id="theme-page" class="page">
-                <div class="page-header"><button class="header-btn back-icon" onclick="showPage('home-page')">←</button><h2 class="page-title">Themes 🎨</h2><span></span></div>
-                <div class="theme-grid">
-                    <div class="theme-card" onclick="applyTheme('default')"><div class="icon-preview">🌙</div><h3>Default Dark</h3></div>
-                    <div class="theme-card" onclick="applyTheme('hacker')"><div class="icon-preview">💻</div><h3>Hacker Theme</h3></div>
-                    <div class="theme-card" onclick="applyTheme('instagram')"><div class="icon-preview">☀️</div><h3>Instagram Feel</h3></div>
-                    <div class="theme-card" onclick="applyTheme('romantic')"><div class="icon-preview">💖</div><h3>Romantic Red</h3></div>
-                    <div class="theme-card" onclick="applyTheme('ocean')"><div class="icon-preview">🌊</div><h3>Ocean Blue</h3></div>
-                    <div class="theme-card" onclick="applyTheme('forest')"><div class="icon-preview">🌲</div><h3>Forest Green</h3></div>
-                </div>
-            </div>
+            <!-- THEME CHANGER PAGE -->
+            <div id="theme-page" class="page"><div class="page-header"><button class="header-btn back-icon" onclick="showPage('home-page')">←</button><h2 class="page-title">Themes 🎨</h2><span></span></div><div class="theme-grid"><div class="theme-card" onclick="applyTheme('default')"><div class="icon-preview">🌙</div><h3>Default Dark</h3></div><div class="theme-card" onclick="applyTheme('hacker')"><div class="icon-preview">💻</div><h3>Hacker Theme</h3></div><div class="theme-card" onclick="applyTheme('instagram')"><div class="icon-preview">☀️</div><h3>Instagram Feel</h3></div><div class="theme-card" onclick="applyTheme('romantic')"><div class="icon-preview">💖</div><h3>Romantic Red</h3></div><div class="theme-card" onclick="applyTheme('ocean')"><div class="icon-preview">🌊</div><h3>Ocean Blue</h3></div><div class="theme-card" onclick="applyTheme('forest')"><div class="icon-preview">🌲</div><h3>Forest Green</h3></div></div></div>
 
-            <!-- वीडियो पेज -->
+            <!-- VIDEO PAGE -->
             <div id="video-page" class="page">
-                 <div class="page-header"><div class="video-page-header"><div class="header-icon-circle"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M0 12V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm6.79-6.907A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z"/></svg></div><h2 class="page-title">Videos</h2></div></div>
-                <div class="search-container"><input type="text" placeholder="Search videos or playlists..."><button>Search</button></div>
+                <div class="page-header">
+                    <div class="video-page-header">
+                        <div class="header-icon-circle"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M0 12V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm6.79-6.907A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z"/></svg></div>
+                        <h2 class="page-title">Videos</h2>
+                    </div>
+                </div>
+                <div class="search-container">
+                    <input type="text" id="video-search-input" placeholder="Search videos or playlists...">
+                    <button onclick="searchVideos()">Search</button>
+                </div>
                 <div id="video-page-content" style="flex-grow: 1; overflow-y: auto;"></div>
             </div>
 
-            <!-- स्टोरी पेज -->
-            <div id="story-page" class="page">
-                <div class="story-header">
-                    Story 📖
-                </div>
-                <div class="story-grid-container" id="story-grid">
-                    <!-- Stories will be loaded here by JavaScript -->
-                </div>
-            </div>
+            <!-- STORY PAGE -->
+            <div id="story-page" class="page"><div class="story-header">Story 📖</div><div id="story-grid" class="story-grid-container"></div></div>
 
-            <!-- स्टोरी डिटेल पेज -->
-            <div id="story-detail-page" class="page">
+            <!-- STORY DETAIL PAGE -->
+            <div id="story-detail-page" class="page"><div class="page-header"><button class="header-btn back-icon" onclick="showPage('story-page')">←</button><span></span><span></span></div><div class="story-detail-card-wrapper"><div id="story-detail-card" class="story-detail-card"></div></div><div class="story-controls"><button id="story-play-btn" class="play-btn" onclick="toggleStoryAudio()">▶️</button><span class="read-option" onclick="showReadStoryPage()">Read</span></div><audio id="story-audio" preload="auto"></audio></div>
+            
+            <!-- READ STORY PAGE -->
+            <div id="read-story-page" class="page">
                 <div class="page-header">
-                    <button class="header-btn back-icon" onclick="showPage('story-page')">←</button>
-                    <!-- This header is transparent and acts as an overlay -->
-                    <span></span><span></span>
+                    <button class="header-btn back-icon" onclick="showPage('story-detail-page')">←</button>
+                    <h2 id="read-story-title" class="page-title">Story Title</h2>
+                    <span></span>
                 </div>
-                <div class="story-detail-card-wrapper">
-                    <div id="story-detail-card" class="story-detail-card" style="background-size: cover; background-position: center;"></div>
-                </div>
-                <div class="story-controls">
-                    <button id="story-play-btn" class="play-btn" onclick="toggleStoryAudio()">▶️</button>
-                    <span class="read-option" onclick="alert('Read feature coming soon!')">Read</span>
-                </div>
-                <audio id="story-audio" preload="auto"></audio>
+                <div id="read-story-content"></div>
             </div>
 
-            <!-- प्रोफाइल पेज -->
+            <!-- PROFILE PAGE (Before Approval) -->
             <div id="profile-page" class="page">
                 <div class="page-header"><h2 class="page-title">Your Profile 🖋️</h2></div>
-                <div class="input-group"><label>Full Name</label><input type="text" class="input-field" placeholder="Enter your full name"></div>
-                <div class="input-group"><label>Primary Mobile</label><input type="tel" class="input-field" placeholder="Enter your mobile number"></div>
-                <div class="input-group"><label>Secondary Mobile (Optional)</label><input type="tel" class="input-field" placeholder="Enter another mobile number"></div>
-                <label>Photos</label>
-                <div class="profile-photo-upload">
-                    <div class="photo-box"><p>Profile<br>Photo</p></div>
-                    <div class="photo-box"><p>Cover<br>Photo</p></div>
+                <div id="profile-pending-notice" style="display:none; text-align:center; padding: 20px; background:var(--input-bg); border-radius:8px; margin-bottom:20px; color: #ffa726; border: 1px solid #ffa726;">
+                    Your profile is pending approval. Please wait for the admin to review your details.
                 </div>
-                <div class="input-group"><label>ID Proof (e.g., Aadhar)</label><div class="upload-card" style="aspect-ratio: 16/10; padding:10px;"><p>Upload ID Document</p></div></div>
-                <div class="input-group"><label>Address</label><textarea class="input-field" rows="3" placeholder="Enter your full address"></textarea></div>
-                <button class="button">Approve</button>
+                <div id="profile-form-container">
+                    <div class="input-group"><label for="profile-fullName">Full Name</label><input type="text" id="profile-fullName" class="input-field" placeholder="Enter your full name"></div>
+                    <div class="input-group"><label for="profile-primaryMobile">Primary Mobile</label><input type="tel" id="profile-primaryMobile" class="input-field" placeholder="Enter your mobile number"></div>
+                    <div class="input-group"><label for="profile-secondaryMobile">Secondary Mobile (Optional)</label><input type="tel" id="profile-secondaryMobile" class="input-field" placeholder="Enter another mobile number"></div>
+                    <label>Photos</label><div class="profile-photo-upload"><div class="photo-box"><p>Profile<br>Photo</p></div><div class="photo-box"><p>Cover<br>Photo</p></div></div>
+                    <div class="input-group"><label>ID Proof (e.g., Aadhar)</label><div class="upload-card" style="aspect-ratio: 16/10; padding:10px;"><p>Upload ID Document</p></div></div>
+                    <div class="input-group"><label for="profile-address">Address</label><textarea id="profile-address" class="input-field" rows="3" placeholder="Enter your full address"></textarea></div>
+                    <button class="button" onclick="submitProfileForApproval()">Submit for Approval</button>
+                </div>
             </div>
 
-            <!-- अपलोड पेज 1 -->
-            <div id="upload-page-1" class="page">
-                <div class="page-header"><button class="header-btn back-icon" onclick="showPage('home-page')">←</button><h2 class="page-title">Plan</h2><button class="header-btn" onclick="showPage('upload-page-2')">Skip</button></div>
-                <div class="transparent-bar">Please read carefully</div>
-                <div class="golden-plate"><h2>Investment (Per 20 min video)</h2><div class="cost-item"><span>Storage cost per year:</span> <span>100 Rs</span></div><div class="cost-item"><span>As a member of my app:</span> <span>(-50 Rs)</span></div><div class="cost-item"><span>As a support:</span> <span>(-10 Rs)</span></div><div class="total"><span>Total:</span><span>40 Rs</span></div></div>
-                <div class="golden-plate"><h2>Return of Investment</h2><div class="cost-item"><span>1000 Views:</span> <span>4500 Rs</span></div><p style="text-align: center; margin-top: 10px; font-weight: bold;">for your video</p></div>
-                <div class="horizontal-scroll-wrapper"><button class="scroll-nav-btn left" onclick="scrollContent(this, -150)">←</button><div class="horizontal-scroll-container"><div class="small-plate"><h3>Bonus: 200 Rs</h3><p>"Reached 1,000 within 12 months."</p><div class="bonus-total">Total: 4700 Rs</div></div><div class="small-plate"><h3>Bonus: 500 Rs</h3><p>"Reached 1,000 within 11 months."</p><div class="bonus-total">Total: 5000 Rs</div></div><div class="small-plate"><h3>Bonus: 700 Rs</h3><p>"Reached 1,000 within 10 months."</p><div class="bonus-total">Total: 5200 Rs</div></div><div class="small-plate"><h3>Bonus: 900 Rs</h3><p>"Reached 1,000 within 5 months."</p><div class="bonus-total">Total: 5400 Rs</div></div><div class="small-plate"><h3>Bonus: 1000 Rs</h3><p>"Reached 1,000 within 4 months."</p><div class="bonus-total">Total: 5500 Rs</div></div><div class="small-plate"><h3>Bonus: 1500 Rs</h3><p>"Reached 1,000 within 3 months."</p><div class="bonus-total">Total: 6000 Rs</div></div><div class="small-plate"><h3>Bonus: 2000 Rs</h3><p>"Reached 1,000 within 1 month."</p><div class="bonus-total">Total: 6500 Rs</div></div><div class="small-plate"><h3>Bonus: 3500 Rs</h3><p>"Reached 1,000 within 10 days."</p><div class="bonus-total">Total: 8000 Rs</div></div></div><button class="scroll-nav-btn right" onclick="scrollContent(this, 150)">→</button></div>
-                <div class="info-card"><div class="info-card-header">⭐ Important Information</div><div class="info-card-text" id="info-text-container"></div></div>
-                <div class="language-selector"><button id="lang-hi" class="lang-btn active" onclick="changeLanguage('hi')">हिन्दी</button><button id="lang-en" class="lang-btn" onclick="changeLanguage('en')">English</button></div>
-                <button class="button" onclick="showPage('upload-page-2')">OK</button>
-            </div>
-
-            <!-- अपलोड पेज 2 -->
-            <div id="upload-page-2" class="page">
-                <div class="page-header"><button class="header-btn back-icon" onclick="showPage('upload-page-1')">←</button><h2 class="page-title">Payment 🪙</h2><button class="header-btn" onclick="showPage('upload-page-3')">Skip</button></div>
-                <h2>Calculate Your Cost</h2>
-                <div class="input-group"><label for="video-duration">Video Duration (in minutes)</label><input type="number" id="video-duration" class="input-field" placeholder="For every 20 min block, Rs 40 will be charged."></div>
-                <div class="input-group"><label for="video-size">Video Size (in MB)</label><input type="number" id="video-size" class="input-field" placeholder="Ideal size for 20min is 720MB. +Re 1 per 100MB over."></div>
-                <div id="payment-summary"><p>Total Payment Required</p><div id="calculated-amount">₹ 0</div></div>
-                <button class="button" onclick="processPayment()">Pay with Razorpay</button>
-            </div>
-            
-            <!-- अपलोड पेज 3 -->
-            <div id="upload-page-3" class="page">
-                <div class="page-header"><button class="header-btn back-icon" onclick="showPage('upload-page-2')">←</button><h2 class="page-title">Upload Video 📱</h2><button class="header-btn" onclick="showPage('home-page')">Skip</button></div>
-                <div class="input-group"><label for="video-name">Video Name</label><input type="text" id="video-name" class="input-field" placeholder="Enter video title"></div>
-                <div class="input-group"><label>Audience</label><div class="radio-group"><label><input type="radio" name="audience" value="all" checked> For All Audiences</label><label><input type="radio" name="audience" value="18+"> For 18+ Only</label></div></div>
-                <div class="input-group"><label>Playlist</label><div class="custom-select-wrapper"><div class="playlist-selected-value" onclick="togglePlaylistOptions()"><span id="selected-playlist-name">Select a playlist</span></div><div class="playlist-options-list" id="playlist-options"></div></div><div id="custom-playlist-input-group" style="display:none;"><input type="text" id="custom-playlist-input" class="input-field" placeholder="Enter new playlist name..."><button class="save-btn" onclick="saveCustomPlaylist()">Save</button></div></div>
-                <div class="input-group"><label for="video-category">Category</label><div class="custom-select-wrapper"><select id="video-category" class="input-field"><option>Select a category</option></select></div></div>
-                <label>Video Thumbnail (16:9)</label><input type="file" id="thumbnail-file-input" style="display: none;" accept="image/*"><div class="upload-card ratio-16-9" onclick="document.getElementById('thumbnail-file-input').click()"><p>Click to upload</p></div>
-                <label>Video File</label><input type="file" id="video-file-input" style="display: none;" accept="video/*"><div class="upload-card ratio-16-9" onclick="document.getElementById('video-file-input').click()"><p>Click to upload</p></div>
-                <div class="input-group"><label>Uploader Name</label><input type="text" class="input-field" placeholder="Enter your name"></div>
-                <button class="button" onclick="alert('Video Uploaded Successfully!'); showPage('home-page');">Upload</button>
-            </div>
-
-            <!-- प्लेलिस्ट थंबनेल पेज -->
-            <div id="playlist-thumb-page" class="page">
-                <div class="page-header"><button class="header-btn back-icon" onclick="showPage('upload-page-3')">←</button><h2 class="page-title">Thumbnail</h2><button class="header-btn" onclick="savePlaylistThumbnail()">Save</button></div>
-                <p style="text-align:center; margin-bottom: 20px;">Upload a new thumbnail for your playlist.</p><input type="file" id="playlist-thumbnail-input" style="display:none" accept="image/*">
-                <div class="upload-card ratio-9-16" onclick="document.getElementById('playlist-thumbnail-input').click()"><p>Click to Upload</p></div>
-            </div>
-
-            <!-- गाइडलाइन पेज -->
-            <div id="guideline-page" class="page">
-                <div class="page-header"><button class="header-btn back-icon" onclick="showPage('home-page')">←</button><h2 class="page-title">Guideline 📚</h2><div class="language-selector"><button id="guideline-lang-hi" class="lang-btn active" onclick="changeGuidelineLanguage('hi')">हिन्दी</button><button id="guideline-lang-en" class="lang-btn" onclick="changeGuidelineLanguage('en')">English</button></div></div>
-                <div class="guideline-content" id="guideline-content-container"></div>
-            </div>
+            <!-- Other pages (Upload, Edit, etc.) are kept as they are -->
+            <div id="upload-page-1" class="page"><div class="page-header"><button class="header-btn back-icon" onclick="showPage('home-page')">←</button><h2 class="page-title">Plan</h2><button class="header-btn" onclick="showPage('upload-page-2')">Skip</button></div><div class="transparent-bar">Please read carefully</div><div class="golden-plate"><h2>Investment (Per 20 min video)</h2><div class="cost-item"><span>Storage cost per year:</span> <span>100 Rs</span></div><div class="cost-item"><span>As a member of my app:</span> <span>(-50 Rs)</span></div><div class="cost-item"><span>As a support:</span> <span>(-10 Rs)</span></div><div class="total"><span>Total:</span><span>40 Rs</span></div></div><div class="golden-plate"><h2>Return of Investment</h2><div class="cost-item"><span>1000 Views:</span> <span>4500 Rs</span></div><p style="text-align: center; margin-top: 10px; font-weight: bold;">for your video</p></div><div class="horizontal-scroll-wrapper"><button class="scroll-nav-btn left" onclick="scrollContent(this, -150)">←</button><div class="horizontal-scroll-container"><div class="small-plate"><h3>Bonus: 200 Rs</h3><p>"Reached 1,000 within 12 months."</p><div class="bonus-total">Total: 4700 Rs</div></div><div class="small-plate"><h3>Bonus: 500 Rs</h3><p>"Reached 1,000 within 11 months."</p><div class="bonus-total">Total: 5000 Rs</div></div><div class="small-plate"><h3>Bonus: 700 Rs</h3><p>"Reached 1,000 within 10 months."</p><div class="bonus-total">Total: 5200 Rs</div></div><div class="small-plate"><h3>Bonus: 900 Rs</h3><p>"Reached 1,000 within 5 months."</p><div class="bonus-total">Total: 5400 Rs</div></div><div class="small-plate"><h3>Bonus: 1000 Rs</h3><p>"Reached 1,000 within 4 months."</p><div class="bonus-total">Total: 5500 Rs</div></div><div class="small-plate"><h3>Bonus: 1500 Rs</h3><p>"Reached 1,000 within 3 months."</p><div class="bonus-total">Total: 6000 Rs</div></div><div class="small-plate"><h3>Bonus: 2000 Rs</h3><p>"Reached 1,000 within 1 month."</p><div class="bonus-total">Total: 6500 Rs</div></div><div class="small-plate"><h3>Bonus: 3500 Rs</h3><p>"Reached 1,000 within 10 days."</p><div class="bonus-total">Total: 8000 Rs</div></div></div><button class="scroll-nav-btn right" onclick="scrollContent(this, 150)">→</button></div><div class="info-card"><div class="info-card-header">⭐ Important Information</div><div class="info-card-text" id="info-text-container"></div></div><div class="language-selector"><button id="lang-hi" class="lang-btn active" onclick="changeLanguage('hi')">हिन्दी</button><button id="lang-en" class="lang-btn" onclick="changeLanguage('en')">English</button></div><button class="button" onclick="showPage('upload-page-2')">OK</button></div>
+            <div id="upload-page-2" class="page"><div class="page-header"><button class="header-btn back-icon" onclick="showPage('upload-page-1')">←</button><h2 class="page-title">Payment 🪙</h2><button class="header-btn" onclick="showPage('upload-page-3')">Skip</button></div><h2>Calculate Your Cost</h2><div class="input-group"><label for="video-duration">Video Duration (in minutes)</label><input type="number" id="video-duration" class="input-field" placeholder="For every 20 min block, Rs 40 will be charged."></div><div class="input-group"><label for="video-size">Video Size (in MB)</label><input type="number" id="video-size" class="input-field" placeholder="Ideal size for 20min is 720MB. +Re 1 per 100MB over."></div><div id="payment-summary"><p>Total Payment Required</p><div id="calculated-amount">₹ 0</div></div><button class="button" onclick="processPayment()">Pay with Razorpay</button></div>
+            <div id="upload-page-3" class="page"><div class="page-header"><button class="header-btn back-icon" onclick="showPage('upload-page-2')">←</button><h2 class="page-title">Upload Video 📱</h2><button class="header-btn" onclick="showPage('home-page')">Skip</button></div><div class="input-group"><label for="video-name">Video Name</label><input type="text" id="video-name" class="input-field" placeholder="Enter video title"></div><div class="input-group"><label>Audience</label><div class="radio-group"><label><input type="radio" name="audience" value="all" checked> For All Audiences</label><label><input type="radio" name="audience" value="18+"> For 18+ Only</label></div></div><div class="input-group"><label>Playlist</label><div class="custom-select-wrapper"><div class="playlist-selected-value" onclick="togglePlaylistOptions()"><span id="selected-playlist-name">Select a playlist</span></div><div class="playlist-options-list" id="playlist-options"></div></div><div id="custom-playlist-input-group" style="display:none;"><input type="text" id="custom-playlist-input" class="input-field" placeholder="Enter new playlist name..."><button class="save-btn" onclick="saveCustomPlaylist()">Save</button></div></div><div class="input-group"><label for="video-category">Category</label><div class="custom-select-wrapper"><select id="video-category" class="input-field"><option>Select a category</option></select></div></div><label>Video Thumbnail (16:9)</label><input type="file" id="thumbnail-file-input" style="display: none;" accept="image/*"><div class="upload-card ratio-16-9" onclick="document.getElementById('thumbnail-file-input').click()"><p>Click to upload</p></div><label>Video File</label><input type="file" id="video-file-input" style="display: none;" accept="video/*"><div class="upload-card ratio-16-9" onclick="document.getElementById('video-file-input').click()"><p>Click to upload</p></div><div class="input-group"><label>Uploader Name</label><input type="text" class="input-field" placeholder="Enter your name"></div><button class="button" onclick="alert('Video Uploaded Successfully!'); showPage('home-page');">Upload</button></div>
+            <div id="edit-video-page" class="page"><div class="page-header"><button class="header-btn back-icon" onclick="showPage('profile-view-page')">←</button><h2 class="page-title">Edit Video 📝</h2><span></span></div><div class="input-group"><label for="edit-video-name">Video Name</label><input type="text" id="edit-video-name" class="input-field" placeholder="Enter video title"></div><div class="input-group"><label>Audience</label><div class="radio-group"><label><input type="radio" name="edit-audience" value="all"> For All Audiences</label><label><input type="radio" name="edit-audience" value="18+"> For 18+ Only</label></div></div><div class="input-group"><label>Playlist</label><div class="custom-select-wrapper"><div class="playlist-selected-value" onclick="togglePlaylistOptions()"><span id="edit-selected-playlist-name">Select a playlist</span></div></div></div><div class="input-group"><label for="edit-video-category">Category</label><div class="custom-select-wrapper"><select id="edit-video-category" class="input-field"><option>Select a category</option></select></div></div><label>Video Thumbnail (16:9)</label><input type="file" id="edit-thumbnail-file-input" style="display: none;" accept="image/*"><div class="upload-card ratio-16-9" onclick="document.getElementById('edit-thumbnail-file-input').click()"><p>Click to upload new thumbnail</p></div><label>Video File</label><input type="file" id="edit-video-file-input" style="display: none;" accept="video/*"><div class="upload-card ratio-16-9" onclick="document.getElementById('edit-video-file-input').click()"><p>Click to upload new video file</p></div><div class="input-group"><label>Uploader Name</label><input type="text" id="edit-uploader-name" class="input-field" placeholder="Enter your name"></div><button class="button" onclick="alert('Placeholder: Video changes saved locally. This will not affect any database.')">Save Changes</button></div>
+            <div id="playlist-thumb-page" class="page"><div class="page-header"><button class="header-btn back-icon" onclick="showPage('upload-page-3')">←</button><h2 class="page-title">Thumbnail</h2><button class="header-btn" onclick="savePlaylistThumbnail()">Save</button></div><p style="text-align:center; margin-bottom: 20px;">Upload a new thumbnail for your playlist.</p><input type="file" id="playlist-thumbnail-input" style="display:none" accept="image/*"><div class="upload-card ratio-9-16" onclick="document.getElementById('playlist-thumbnail-input').click()"><p>Click to Upload</p></div></div>
+            <div id="guideline-page" class="page"><div class="page-header"><button class="header-btn back-icon" onclick="showPage('home-page')">←</button><h2 class="page-title">Guideline 📚</h2><div class="language-selector"><button id="guideline-lang-hi" class="lang-btn active" onclick="changeGuidelineLanguage('hi')">हिन्दी</button><button id="guideline-lang-en" class="lang-btn" onclick="changeGuidelineLanguage('en')">English</button></div></div><div class="guideline-content" id="guideline-content-container"></div></div>
 
         </main>
         
@@ -312,7 +436,7 @@
             <div id="nav-video" class="nav-icon" onclick="showPage('video-page')"><svg id="nav-video-svg" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M0 12V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm6.79-6.907A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z"/></svg><span>Video</span></div>
             <div id="nav-home" class="nav-icon active" onclick="showPage('home-page')"><svg id="nav-home-svg" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M6.5 14.5v-3.505c0-.245.25-.495.5-.495h2c.25 0 .5.25.5.5v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5z"/></svg><span>Home</span></div>
             <div id="nav-story" class="nav-icon" onclick="showPage('story-page')"><svg id="nav-story-svg" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4.5 2a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-1 0V2.5a.5.5 0 0 1 .5-.5z"/><path d="M11.293 1.293a1 1 0 0 1 1.414 0l2 2a1 1 0 0 1 0 1.414l-2 2a1 1 0 0 1-1.414-1.414L12.586 5H5.5a.5.5 0 0 1 0-1h7.086L11.293 2.707a1 1 0 0 1 0-1.414zM2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h5a.5.5 0 0 1 0 1H2a3 3 0 0 1-3-3V3a3 3 0 0 1 3-3h5a.5.5 0 0 1 0 1H2z"/></svg><span>Story</span></div>
-            <div id="nav-profile" class="nav-icon" onclick="showPage('profile-page')"><svg id="nav-profile-svg" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/></svg><span>Profile</span></div>
+            <div id="nav-profile" class="nav-icon" onclick="checkProfileStatusAndShowPage()"><svg id="nav-profile-svg" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/></svg><span>Profile</span></div>
         </nav>
     </div>
 
@@ -330,14 +454,27 @@
         };
 
         const app = firebase.initializeApp(firebaseConfig);
-        const analytics = firebase.analytics();
         const auth = firebase.auth();
         const db = firebase.firestore();
-        const storage = firebase.storage();
         
-        console.log("Firebase Initialized Successfully");
-        
-        // --- DOM एलिमेंट्स ---
+        // --- GLOBAL VARIABLES and State ---
+        let trendingCardInterval; // Keep for placeholder slider
+        let currentEditingVideoId = null;
+        let currentStoryData = null;
+        let cachedStories = null; // To cache stories after loading
+
+        // --- NEW: AI Friend Variables ---
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+        // !!! IMPORTANT: REPLACE WITH YOUR RENDER BACKEND URL !!!
+        // This is the URL where your Python backend (main.py) is deployed on Render.
+        // Example: "https://my-ai-backend-abc123.onrender.com"
+        const BACKEND_API_URL = "YOUR_RENDER_BACKEND_URL_HERE"; 
+        // !!! Make sure it ends WITHOUT a trailing slash !!!
+
+
+        // --- DOM Elements ---
         const pages = document.querySelectorAll('.page');
         const navIcons = document.querySelectorAll('.nav-icon');
         const sidePanel = document.getElementById('side-panel');
@@ -347,225 +484,963 @@
         const guidelineContentContainer = document.getElementById('guideline-content-container');
         const videoPageContent = document.getElementById('video-page-content');
         const categorySelect = document.getElementById('video-category');
+        const editCategorySelect = document.getElementById('edit-video-category');
         const playlistOptionsContainer = document.getElementById('playlist-options');
         const storyGrid = document.getElementById('story-grid');
         const storyDetailCard = document.getElementById('story-detail-card');
         const storyAudio = document.getElementById('story-audio');
         const storyPlayBtn = document.getElementById('story-play-btn');
+        const trendingCardContainer = document.getElementById('trending-card-container');
+        const trendingCardTitle = document.getElementById('trending-card-title');
+        const readStoryTitle = document.getElementById('read-story-title');
+        const readStoryContent = document.getElementById('read-story-content');
+        const featureListContainer = document.getElementById('feature-list');
+        const profitVideoListContainer = document.getElementById('profit-video-list'); // Get profit video list container
+        const profitTotalDisplay = document.getElementById('profit-total-display'); // Get profit total display
 
-        // --- डेटा (पूर्ण कंटेंट के साथ) ---
+        // --- NEW: AI Friend DOM Elements ---
+        // Get the elements added in the HTML body section for the AI Friend page
+        const aiCharacterCard = document.getElementById('ai-character-card');
+        const aiVisualImage = document.getElementById('ai-visual-image');
+        const aiVisualVideo = document.getElementById('ai-visual-video');
+        const aiResponseAudio = document.getElementById('ai-response-audio');
+        const aiInteractionButton = document.getElementById('ai-interaction-button');
+        const interactionButtonIcon = document.getElementById('interaction-button-icon');
+        const interactionButtonText = document.getElementById('interaction-button-text');
+         const aiResponseTextElement = document.getElementById('ai-response-text'); // Element to show AI's text response
+
+
+        // --- RESTORED: Placeholder data for video pages to avoid empty look ---
+        let dummyUserVideos = [
+            { id: 1, title: "My First Video (Placeholder)", thumb: "https://i.ibb.co/680xQ8r/vlog-thumb.jpg", views: 101, daysSinceUpload: 5, category: "Vlogs", playlist: "My Vlogs", uploader: "Your Name" },
+            { id: 2, title: "Gaming Moments (Placeholder)", thumb: "https://i.ibb.co/yBNgC39/gaming-thumb.jpg", views: 250, daysSinceUpload: 12, category: "Gaming", playlist: "Gameplay", uploader: "Your Name" },
+             // Add more placeholder videos if you like
+             { id: 3, title: "Cooking Demo (Placeholder)", thumb: "https://i.ibb.co/kHnZysV/cook-thumb.jpg", views: 75, daysSinceUpload: 3, category: "Lifestyle", playlist: "Cooking", uploader: "Your Name" },
+             { id: 4, title: "Unboxing Gadget (Placeholder)", thumb: "https://i.ibb.co/3sS7jDB/tech-thumb.jpg", views: 500, daysSinceUpload: 20, category: "Tech", playlist: "Unboxing", uploader: "Your Name" },
+        ];
+        
+        // --- Static Data (As requested, these are not removed) ---
         let userPlaylists = [ { id: 1, name: "Goa Trip", thumb: "https://i.ibb.co/680xQ8r/vlog-thumb.jpg", category: "Vlogs" }, { id: 7, name: "Manali Vlog", thumb: "https://i.ibb.co/yBNgC39/gaming-thumb.jpg", category: "Vlogs"}, { id: 8, name: "Mumbai Streets", thumb: "https://i.ibb.co/3sS7jDB/tech-thumb.jpg", category: "Vlogs"}, { id: 9, name: "Kerala Backwaters", thumb: "https://i.ibb.co/kHnZysV/cook-thumb.jpg", category: "Vlogs"}, { id: 10, name: "Rajasthan Forts", thumb: "https://i.ibb.co/JqT2S9b/comedy-thumb.jpg", category: "Vlogs"}, { id: 2, name: "Unboxing", thumb: "https://i.ibb.co/3sS7jDB/tech-thumb.jpg", category: "Tech" }, { id: 3, name: "Cooking", thumb: "https://i.ibb.co/kHnZysV/cook-thumb.jpg", category: "Lifestyle" }, {id: 4, name: "Gameplay", thumb: "https://i.ibb.co/yBNgC39/gaming-thumb.jpg", category: "Gaming"}, {id: 5, name: "Stand Up", thumb: "https://i.ibb.co/JqT2S9b/comedy-thumb.jpg", category: "Comedy"}, {id: 6, name: "New Songs", thumb: "https://i.ibb.co/z5N0dYv/music-thumb.jpg", category: "Music"} ];
         const categories = ["Vlogs", "Tech", "Lifestyle", "Gaming", "Comedy", "Music", "Education", "Science", "Movies", "News"];
-        const dummyStories = [
-            { id: '1', title: 'Story 1', imageUrl: 'https://i.ibb.co/6H8m9rJ/story1.jpg', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
-            { id: '2', title: 'Story 2', imageUrl: 'https://i.ibb.co/N1F28d2/story2.jpg', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
-            { id: '3', title: 'Story 3', imageUrl: 'https://i.ibb.co/HTjy6Cjd/Leonardo-Phoenix-10-A-young-girl-sitting-in-a-cozy-dimly-lit-r-0.jpg', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
-            { id: '4', title: 'Story 4', imageUrl: 'https://i.ibb.co/Q3ZP5KzD/Fum-D-gyl-TImey-U43-n-Q4eg.webp', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
-            { id: '5', title: 'Story 5', imageUrl: 'https://i.ibb.co/3sS7jDB/tech-thumb.jpg', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' },
-            { id: '6', title: 'Story 6', imageUrl: 'https://i.ibb.co/kHnZysV/cook-thumb.jpg', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' },
-            { id: '7', title: 'Story 7', imageUrl: 'https://i.ibb.co/JqT2S9b/comedy-thumb.jpg', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3' },
-            { id: '8', title: 'Story 8', imageUrl: 'https://i.ibb.co/z5N0dYv/music-thumb.jpg', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3' },
-            { id: '9', title: 'Story 9', imageUrl: 'https://i.ibb.co/680xQ8r/vlog-thumb.jpg', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3' },
-        ];
-        const textContent = { 
-            hi: `गणना को आपके लिए आसान बनाने के लिए, हम भुगतान हर 100, 1,000 या 10,000 व्यूज़ के आधार पर करेंगे — ताकि आपको हर एक व्यू की गिनती या हिसाब रखने की चिंता न करनी पड़े।<br><br>आप जब चाहें, भुगतान का अनुरोध कर सकते हैं — चाहे आपके कुल व्यूज़ 1,758 ही क्यों न हों, क्योंकि आपकी मेहनत हमारे लिए मायने रखती है।<br><br>यह मंच आपकी कड़ी मेहनत की सच्चे दिल से सराहना करता है और इसे पूरी तरह से आपकी सुविधा और संतुष्टि को ध्यान में रखते हुए बनाया गया है। हमने इस प्रणाली को सरल, पारदर्शी और लचीला बनाया है — ताकि आप निश्चिंत होकर सिर्फ़ अपने कंटेंट पर ध्यान दें, बाक़ी सब हम संभाल लेंगे। हम हमेशा आपके साथ हैं।`, 
-            en: `To make calculations easier for you, we will process payments based on every 100, 1,000, or 10,000 views — so you don't have to worry about counting or keeping track of every single view.<br><br>You can request a payout whenever you want — even if your total views are just 1,758, because your hard work matters to us.<br><br>This platform genuinely appreciates your hard work and is designed with your complete convenience and satisfaction in mind. We have made this system simple, transparent, and flexible — so you can focus on your content without any worries, and we will handle the rest. We are always with you.` 
-        };
-        const guidelineTexts = { 
-            hi: `<h1>📜 Shubhzone ऐप उपयोग एवं कंटेंट नीति</h1><p>📱 ऐप का नाम: Shubhzone<br>📧 संपर्क: udbhavscience12@gmail.com<br>🔞 वयस्क (Adult) कंटेंट केवल 18+ उपयोगकर्ताओं के लिए उपलब्ध है</p><hr><h2>🔰 1. ऐप का उद्देश्य (App Purpose)</h2><p>Shubhzone एक मनोरंजन ऐप है, जो उपयोगकर्ताओं को भावनात्मक, रोमांटिक और कल्पनात्मक कहानियाँ, वीडियो, ऑडियो और चैट स्टोरीज़ जैसे कंटेंट उपलब्ध कराता है। यह ऐप विशेष रूप से प्रीमियम उपयोगकर्ताओं के लिए तैयार किया गया है, और इसमें मौजूद वयस्क (Adult) कंटेंट केवल 18 वर्ष या उससे अधिक आयु वाले उपयोगकर्ताओं के लिए ही अनुमत है।</p><hr><h2>👤 2. सभी उपयोगकर्ताओं के लिए नियम (General Users)</h2><h3>✅ क्या करें (Allowed):</h3><ul><li>ऐप का प्रयोग मनोरंजन और निजी उपयोग हेतु करें।</li><li>अपनी उम्र की पुष्टि (Age Confirmation) ईमानदारी से करें।</li><li>किसी भी कंटेंट को देखकर असहज लगने पर उसे रिपोर्ट करें।</li><li>किसी अन्य व्यक्ति के प्रति अपमानजनक भाषा का प्रयोग न करें।</li></ul><h3>❌ क्या न करें (Forbidden):</h3><ul><li>अभद्र भाषा, गाली-गलौज, जातीय या धार्मिक टिप्पणी ❌</li><li>किसी अन्य उपयोगकर्ता को परेशान करना, धमकाना ❌</li><li>किसी भी प्रकार की अश्लील या पोर्नोग्राफिक सामग्री साझा करना ❌</li><li>ऐप के कंटेंट को बिना अनुमति किसी अन्य जगह अपलोड करना ❌</li></ul><hr><h2>🔞 3. 18+ कंटेंट (केवल वयस्क उपयोगकर्ताओं हेतु)</h2><p>Shubhzone ऐप में मौजूद वयस्क कंटेंट केवल उन उपयोगकर्ताओं को दिखाया जाता है जो 18 वर्ष या उससे अधिक आयु के हैं और ऐप में Age Confirmation और प्रीमियम सदस्यता प्रक्रिया पूरी कर चुके हैं।</p><h3>🟢 अनुमत कंटेंट (Allowed for 18+):</h3><ul><li>✔️ रोमांटिक और कल्पनात्मक लघु फिल्में</li><li>✔️ इशारों में रोमांस वाले दृश्य (Suggestive only)</li><li>✔️ सेंसुअल वॉइस स्टोरीज़ / चैट आधारित स्टोरीज़</li><li>✔️ रिलेशनशिप आधारित भावनात्मक नाटक</li><li>✔️ बोल्ड लेकिन मर्यादित डायलॉग्स</li><li>✔️ ग्लैमरस ड्रेस-अप, लेकिन अश्लीलता नहीं</li></ul><h3>🔴 निषिद्ध कंटेंट (Strictly Forbidden):</h3><ul><li>⛔ नग्नता (पूर्ण या आंशिक)</li><li>⛔ कोई भी यौन क्रिया या उसका स्पष्ट प्रदर्शन</li><li>⛔ सेक्स साउंड्स, मूनिंग, या भद्दी आवाज़ें</li><li>⛔ 18 वर्ष से कम पात्रों का उपयोग या संदर्भ</li><li>⛔ गैरकानूनी, कॉपीराइट या चोरी किया गया कंटेंट</li><li>⛔ अश्लील थंबनेल या पोस्टर</li><li>⛔ किसी अन्य पोर्न वेबसाइट या लिंक का प्रचार</li></ul><hr><h2>🧑‍🎨 4. कंटेंट क्रिएटर्स के लिए निर्देश</h2><ul><li>केवल अपना स्वतः निर्मित कंटेंट अपलोड करें।</li><li>कंटेंट में कोई भी यौन स्पष्टता या नग्नता नहीं होनी चाहिए।</li><li>“यह एक काल्पनिक रचना है, मनोरंजन हेतु” – ऐसा डिस्क्लेमर ज़रूर लगाएं।</li><li>थंबनेल और विज़ुअल्स साफ, गरिमामय और नियमों के अनुसार हों।</li><li>किसी भी बाहरी लिंक, पोर्न साइट या वल्गर रेफरेंस से बचें।</li></ul><hr><h2>🛡️ 5. ऐप सुरक्षा और गोपनीयता नीति</h2><p>सभी उपयोगकर्ताओं की जानकारी सुरक्षित रखी जाती है। ऐप में किया गया व्यवहार मॉनिटर किया जा सकता है। कोई भी नियम उल्लंघन होने पर कंटेंट हटाया जा सकता है या अकाउंट बंद किया जा सकता है।</p><hr><h2>📢 6. रिपोर्ट व सहायता (Support)</h2><p>यदि आपको कोई आपत्तिजनक कंटेंट, उपयोगकर्ता या व्यवहार दिखाई देता है तो:</p><ul><li>📩 ईमेल करें: udbhavscience12@gmail.com</li><li>📍 रिपोर्ट बटन का प्रयोग करें (वीडियो या चैट के नीचे)</li><li>🕒 हमारी टीम 24 से 48 घंटे के भीतर कार्रवाई करेगी</li></ul><hr><h2>📘 7. अस्वीकरण (Disclaimer)</h2><blockquote>Shubhzone ऐप में प्रदर्शित सभी कहानियाँ, पात्र और दृश्य पूर्णतः काल्पनिक हैं। इनका उद्देश्य केवल मनोरंजन है। यह ऐप कोई भी पोर्नोग्राफ़ी या अश्लीलता को समर्थन नहीं देता। सभी उपयोगकर्ताओं से अपेक्षा की जाती है कि वे नियमों का पालन करें और एक स्वस्थ डिजिटल अनुभव बनाए रखें।</blockquote><hr><h2>✔️ 8. उपयोगकर्ता की सहमति (User Consent)</h2><p>✅ Shubhzone ऐप का उपयोग करने का अर्थ है कि आपने उपरोक्त सभी नियमों को पढ़ा, समझा और स्वीकार किया है।</p>`, 
-            en: `<h1>📜 Shubhzone – App Usage & Content Policy</h1><p>📱 App Name: Shubhzone<br>📧 Contact: udbhavscience12@gmail.com<br>🔞 Adult content is strictly for users aged 18 and above</p><hr><h2>🔰 1. Purpose of the App</h2><p>Shubhzone is an entertainment-focused platform offering users emotional, romantic, fictional stories, videos, audio content, and chat-based storytelling. The app is designed specifically for premium members, with adult content strictly restricted to users aged 18 years or older.</p><hr><h2>👤 2. General Guidelines (All Users)</h2><h3>✅ What is Allowed:</h3><ul><li>Use the app only for personal entertainment purposes.</li><li>Provide honest age confirmation during sign-up or content access.</li><li>Report any uncomfortable or suspicious content using the "Report" button.</li><li>Maintain respectful and appropriate behavior at all times.</li></ul><h3>❌ What is Not Allowed:</h3><ul><li>Use of vulgar language, hate speech, or abusive comments ❌</li><li>Harassment, threats, or intimidation of any kind ❌</li><li>Uploading or sharing any pornographic or explicit content ❌</li><li>Republishing app content without permission ❌</li></ul><hr><h2>🔞 3. 18+ Content (Premium Zone Guidelines)</h2><p>Adult content on Shubhzone is accessible only to verified users aged 18+ who have either completed age verification and subscribed to a premium membership.</p><h3>🟢 Permitted 18+ Content:</h3><ul><li>✔️ Romantic and fictional short films</li><li>✔️ Suggestive/implied intimacy (no nudity or sexual activity)</li><li>✔️ Sensual voice/audio stories</li><li>✔️ Chat-based adult fiction (without vulgarity)</li><li>✔️ Emotion-driven relationship drama</li><li>✔️ Bold themes with respectful dialogues</li><li>✔️ Glamorous looks, dress-ups (non-explicit)</li></ul><h3>🔴 Prohibited Content (Even in Premium Zone):</h3><ul><li>⛔ Any form of nudity (partial or full)</li><li>⛔ Sexual activity or pornographic scenes</li><li>⛔ Moaning sounds or obscene sexual audio</li><li>⛔ Minors (under 18) involved in any adult setup</li><li>⛔ Copied, stolen, or copyrighted content</li><li>⛔ Vulgar thumbnails, posters, or banners</li><li>⛔ Redirecting to external pornographic websites or apps</li></ul><hr><h2>🧑‍🎨 4. Guidelines for Content Creators</h2><p>If you're creating or uploading content for Shubhzone, follow these mandatory rules:</p><ul><li>Only original content that you own or have full rights to.</li><li>No direct nudity or sexual visuals in your content.</li><li>Always include a disclaimer like: <blockquote>"This is a work of fiction, meant only for entertainment."</blockquote></li><li>Ensure thumbnails and visuals are safe, clean, and within guidelines.</li><li>Do not link or refer to any external porn or adult website.</li></ul><hr><h2>🛡️ 5. Safety & Privacy Policy</h2><p>All user data is stored securely. User behavior may be moderated and monitored. In case of a violation, content may be removed or the account suspended.</p><hr><h2>📢 6. Reporting & Support</h2><p>If you come across any inappropriate content or user behavior:</p><ul><li>📩 Email Us: udbhavscience12@gmail.com</li><li>📍 Use the "Report" button below the content or profile</li><li>🕒 Our moderation team reviews and takes action within 24–48 hours</li></ul><hr><h2>📘 7. Disclaimer</h2><blockquote>All characters, stories, and visuals shown in the Shubhzone app are fictional and purely for entertainment purposes. This app does not promote pornography or obscene content of any kind. Users are expected to behave responsibly and within legal & community guidelines.</blockquote><hr><h2>✔️ 8. User Agreement</h2><p>✅ By using the Shubhzone app, you confirm that: You are above 18 years of age (for accessing premium content) and you have read, understood, and agree to the content policy above.</p>`
-        };
-
-        // --- Firebase से डेटा प्राप्त करने वाले फंक्शन ---
-        async function fetchStories() {
-            try {
-                // For now, we use dummy data. Replace with Firebase fetch when ready.
-                // const snapshot = await db.collection('stories').get();
-                // if (snapshot.empty) {
-                //     console.log('No stories found, using dummy data.');
-                //     return dummyStories; 
-                // }
-                // return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                console.log('Using dummy stories for demonstration.');
-                return Promise.resolve(dummyStories);
-            } catch (error) {
-                console.error("Error fetching stories: ", error);
-                return dummyStories; // Fallback to dummy data on error
-            }
-        }
+        const textContent = { hi: `गणना को आपके लिए आसान बनाने के लिए, हम भुगतान हर 100, 1,000 या 10,000 व्यूज़ के आधार पर करेंगे — ताकि आपको हर एक व्यू की गिनती या हिसाब रखने की चिंता न करनी पड़े।<br><br>आप जब चाहें, भुगतान का अनुरोध कर सकते हैं — चाहे आपके कुल व्यूज़ 1,758 ही क्यों न हों, क्योंकि आपकी मेहनत हमारे लिए मायने रखती है।<br><br>यह मंच आपकी कड़ी मेहनत की सच्चे दिल से सराहना करता है और इसे पूरी तरह से आपकी सुविधा और संतुष्टि को ध्यान में रखते हुए बनाया गया है। हमने इस प्रणाली को सरल, पारदर्शी और लचीला बनाया है — ताकि आप निश्चिंत होकर सिर्फ़ अपने कंटेंट पर ध्यान दें, बाक़ी सब हम संभाल लेंगे। हम हमेशा आपके साथ हैं।`, en: `To make calculations easier for you, we will process payments based on every 100, 1,000, or 10,000 views — so you don't have to worry about counting or keeping track of every single view.<br><br>You can request a payout whenever you want — even if your total views are just 1,758, because your hard work matters to us.<br><br>This platform genuinely appreciates your hard work and is designed with your complete convenience and satisfaction in mind. We have made this system simple, transparent, and flexible — so you can focus on your content without any worries, and we will handle the rest. We are always with you.` };
+        const guidelineTexts = { hi: `<h1>📜 Shubhzone ऐप उपयोग एवं कंटेंट नीति</h1><p>📱 ऐप का नाम: Shubhzone<br>📧 संपर्क: udbhavscience12@gmail.com<br>🔞 वयस्क (Adult) कंटेंट केवल 18+ उपयोगकर्ताओं के लिए उपलब्ध है</p><hr><h2>🔰 1. ऐप का उद्देश्य (App Purpose)</h2><p>Shubhzone एक मनोरंजन ऐप है, जो उपयोगकर्ताओं को भावनात्मक, रोमांटिक और कल्पनात्मक कहानियाँ, वीडियो, ऑडियो और चैट स्टोरीज़ जैसे कंटेंट उपलब्ध कराता है। यह ऐप विशेष रूप से प्रीमियम उपयोगकर्ताओं के लिए तैयार किया गया है, और इसमें मौजूद वयस्क (Adult) कंटेंट केवल 18 वर्ष या उससे अधिक आयु वाले उपयोगकर्ताओं के लिए ही अनुमत है।</p><h3>✅ क्या करें (Allowed):</h3><ul><li>ऐप का प्रयोग मनोरंजन और निजी उपयोग हेतु करें।</li><li>अपनी उम्र की पुष्टि (Age Confirmation) ईमानदारी से करें।</li><li>किसी भी कंटेंट को देखकर असहज लगने पर उसे रिपोर्ट करें।</li><li>किसी अन्य व्यक्ति के प्रति अपमानजनक भाषा का प्रयोग न करें।</li></ul><h3>❌ क्या न करें (Forbidden):</h3><ul><li>अभद्र भाषा, गाली-गलौज, जातीय या धार्मिक टिप्पणी ❌</li><li>किसी अन्य उपयोगकर्ता को परेशान करना, धमकाना ❌</li><li>किसी भी प्रकार की अश्लील या पोर्नोग्राफिक सामग्री साझा करना ❌</li><li>ऐप के कंटेंट को बिना अनुमति किसी अन्य जगह अपलोड करना ❌</li></ul><hr><h2>🔞 3. 18+ कंटेंट (केवल वयस्क उपयोगकर्ताओं हेतु)</h2><p>Shubhzone ऐप में मौजूद वयस्क कंटेंट केवल उन उपयोगकर्ताओं को दिखाया जाता है जो 18 वर्ष या उससे अधिक आयु के हैं और ऐप में Age Confirmation और प्रीमियम सदस्यता प्रक्रिया पूरी कर चुके हैं।</p><h3>🟢 अनुमत कंटेंट (Allowed for 18+):</h3><ul><li>✔️ रोमांटिक और कल्पनात्मक लघु फिल्में</li><li>✔️ इशारों में रोमांस वाले दृश्य (Suggestive only)</li><li>✔️ सेंसुअल वॉइस स्टोरीज़ / चैट आधारित स्टोरीज़</li><li>✔️ रिलेशनशिप आधारित भावनात्मक नाटक</li><li>✔️ बोल्ड लेकिन मर्यादित डायलॉग्स</li><li>✔️ ग्लैमरस ड्रेस-अप, लेकिन अश्लीलता नहीं</li></ul><h3>🔴 निषिद्ध कंटेंट (Strictly Forbidden):</h3><ul><li>⛔ नग्नता (पूर्ण या आंशिक)</li><li>⛔ कोई भी यौन क्रिया या उसका स्पष्ट प्रदर्शन</li><li>⛔ सेक्स साउंड्स, मूनिंग, या भद्दी आवाज़ें</li><li>⛔ 18 वर्ष से कम पात्रों का उपयोग या संदर्भ</li><li>⛔ गैरकानूनी, कॉपीराइट या चोरी किया गया कंटेंट</li><li>⛔ अश्लील थंबनेल या पोस्टर</li><li>⛔ किसी अन्य पोर्न वेबसाइट या लिंक का प्रचार</li></ul><hr><h2>🧑‍🎨 4. कंटेंट क्रिएटर्स के लिए निर्देश</h2><p>If you're creating or uploading content for Shubhzone, follow these mandatory rules:</p><ul><li>Only original content that you own or have full rights to.</li><li>No direct nudity or sexual visuals in your content.</li><li>Always include a disclaimer like: <blockquote>"This is a work of fiction, meant only for entertainment."</blockquote></li><li>Ensure thumbnails and visuals are safe, clean, and within guidelines.</li><li>Do not link or refer to any external porn or adult website.</li></ul><hr><h2>🛡️ 5. ऐप सुरक्षा और गोपनीयता नीति</h2><p>All user data is stored securely. User behavior may be moderated and monitored. In case of a violation, content may be removed or the account suspended.</p><hr><h2>📢 6. रिपोर्ट व सहायता (Support)</h2><p>If you come across any inappropriate content or user behavior:</p><ul><li>📩 Email Us: udbhavscience12@gmail.com</li><li>📍 Report button का प्रयोग करें (वीडियो या चैट के नीचे)</li><li>🕒 हमारी टीम 24 to 48 hours के भीतर कार्रवाई करेगी</li></ul><hr><h2>📘 7. अस्वीकरण (Disclaimer)</h2><blockquote>Shubhzone ऐप में प्रदर्शित सभी कहानियाँ, पात्र और दृश्य पूर्णतः काल्पनिक हैं। इनका उद्देश्य केवल मनोरंजन है। यह ऐप कोई भी पोर्नोग्राफ़ी या अश्लीलता को समर्थन नहीं देता। सभी उपयोगकर्ताओं से अपेक्षा की जाती है कि वे नियमों का पालन करें और एक स्वस्थ digital experience बनाए रखें।</blockquote><hr><h2>✔️ 8. उपयोगकर्ता की सहमति (User Consent)</h2><p>✅ Shubhzone ऐप का उपयोग करने का अर्थ है कि आपने उपरोक्त सभी नियमों को पढ़ा, समझा और स्वीकार किया है।</p>`, en: `<h1>📜 Shubhzone App Usage and Content Policy</h1><p>📱 App Name: Shubhzone<br>📧 Contact: udbhavscience12@gmail.com<br>🔞 Adult content is available only to 18+ users</p><hr><h2>🔰 1. App Purpose</h2><p>Shubhzone is an entertainment app that provides users with content such as emotional, romantic, and imaginative stories, videos, audio, and chat stories. The app is specifically designed for premium users, and the adult content within it is permitted only for users aged 18 or above.</p><h3>✅ Do's (Allowed):</h3><ul><li>Use the app for entertainment and personal use.</li><li>Honestly confirm your age.</li><li>Report any content that makes you uncomfortable.</li><li>Do not use abusive language towards any other user.</li></ul><h3>❌ Don'ts (Forbidden):</h3><ul><li>Abusive language, cursing, racial, or religious comments ❌</li><li>Harassing, threatening any other user ❌</li><li>Sharing any kind of obscene or pornographic material ❌</li><li>Uploading app content elsewhere without permission ❌</li></ul><hr><h2>🔞 3. 18+ Content (For Adult Users Only)</h2><p>Adult content in the Shubhzone app is shown only to users who are 18 years of age or older and have completed the Age Confirmation and premium subscription process within the app.</p><h3>🟢 Permitted Content (Allowed for 18+):</h3><ul><li>✔️ Romantic and imaginative short films</li><li>✔️ Suggestive only romantic scenes</li><li>✔️ Sensual voice stories / chat based stories</li><li>✔️ Relationship based emotional dramas</li><li>✔️ Bold but decent dialogues</li><li>✔️ Glamorous dress-up, but not obscenity</li></ul><h3>🔴 Strictly Forbidden Content:</h3><ul><li>⛔ Nudity (full or partial)</li><li>⛔ Any sexual acts or explicit depictions</li><li>⛔ Sex sounds, moaning, or vulgar noises</li><li>⛔ 18 वर्ष से कम पात्रों का उपयोग या संदर्भ</li><li>⛔ Illegal, copyrighted, or stolen content</li><li>⛔ Obscene thumbnails or posters</li><li>⛔ Promotion of any other pornographic website or link</li></ul><hr><h2>🧑‍🎨 4. Content Creator Guidelines</h2><p>If you're creating or uploading content for Shubhzone, follow these mandatory rules:</p><ul><li>Only original content that you own or have full rights to.</li><li>No direct nudity or sexual visuals in your content.</li><li>Always include a disclaimer like: <blockquote>"This is a work of fiction, meant only for entertainment."</blockquote></li><li>Ensure thumbnails and visuals are safe, clean, and within guidelines.</li><li>Do not link or refer to any external porn or adult website.</li></ul><hr><h2>🛡️ 5. App Security and Privacy Policy</h2><p>All user data is stored securely. User behavior may be moderated and monitored. In case of a violation, content may be removed or the account suspended.</p><hr><h2>📢 6. Report & Support</h2><p>If you come across any inappropriate content or user behavior:</p><ul><li>📩 Email Us: udbhavscience12@gmail.com</li><li>📍 Use the Report button (below video or chat)</li><li>🕒 Our team will take action within 24 to 48 hours</li></ul><hr><h2>📘 7. Disclaimer</h2><blockquote>All stories, characters, and scenes shown in the Shubhzone app are purely fictional. Their purpose is solely entertainment. This app does not support any form of pornography or obscenity. All users से अपेक्षा की जाती है कि वे नियमों का पालन करें और एक स्वस्थ digital experience बनाए रखें।</blockquote><hr><h2>✔️ 8. उपयोगकर्ता की सहमति (User Consent)</h2><p>✅ Shubhzone ऐप का उपयोग करने का अर्थ है कि आपने उपरोक्त सभी नियमों को पढ़ा, समझा और स्वीकार किया है।</p>`};
         
-        // --- फंक्शन्स को window ऑब्जेक्ट पर अटैच करें ताकि onclick काम करे ---
+        // --- FUNCTIONS ---
+
+        // Page Navigation and Panel Functions
         window.openSidePanel = () => { sidePanel.classList.add('active'); panelOverlay.classList.add('active'); };
         window.closeAllPanels = () => { sidePanel.classList.remove('active'); panelOverlay.classList.remove('active'); aiCharPanel.classList.remove('active'); };
         window.toggleAiCharacterPanel = () => { aiCharPanel.classList.toggle('active'); panelOverlay.classList.add('active'); };
         window.applyTheme = (themeName) => { document.body.setAttribute('data-theme', themeName); localStorage.setItem('appTheme', themeName); };
 
         window.showPage = (pageId) => {
+            clearInterval(trendingCardInterval); // Stop slider when leaving home
+
+            // Pause audio/video if leaving AI or Story detail page
+            // Check if AI elements exist before pausing
+            if (aiResponseAudio && !aiResponseAudio.paused) aiResponseAudio.pause();
+            if (aiVisualVideo && !aiVisualVideo.paused) aiVisualVideo.pause(); // Pause AI video
+             // Also pause story audio if playing
             const storyDetailPage = document.getElementById('story-detail-page');
-            // If we are navigating away from the story detail page, stop the audio.
-            if (storyDetailPage.classList.contains('active') && pageId !== 'story-detail-page') {
-                if (storyAudio && !storyAudio.paused) {
-                    storyAudio.pause();
-                    storyAudio.currentTime = 0;
-                    storyPlayBtn.textContent = '▶️';
-                }
+            if (storyDetailPage && storyDetailPage.classList.contains('active') && pageId !== 'story-detail-page' && pageId !== 'read-story-page') {
+                if (storyAudio && !storyAudio.paused) { storyAudio.pause(); storyAudio.currentTime = 0; storyPlayBtn.textContent = '▶️'; }
+                currentStoryData = null;
             }
+
 
             pages.forEach(page => page.classList.remove('active'));
             const targetPage = document.getElementById(pageId);
             if (targetPage) targetPage.classList.add('active');
-            
+
+            // Update active navigation icon
             let navId = `nav-${pageId.split('-')[0]}`;
-            if (pageId.startsWith('upload')) navId = 'nav-upload';
-            if (pageId.startsWith('guideline') || pageId.startsWith('theme') || pageId.startsWith('ai-friend')) navId = 'nav-home';
-            if (pageId.startsWith('story')) navId = 'nav-story';
+            if (['upload-page-1', 'upload-page-2', 'upload-page-3'].includes(pageId)) navId = 'nav-upload';
+             // Assign profit page nav to home for simplicity
+            if (['guideline', 'theme', 'ai-friend', 'payment-request', 'features'].includes(pageId.split('-')[0]) || pageId === 'profit-page') navId = 'nav-home';
+            if (pageId.startsWith('story') || pageId === 'read-story-page') navId = 'nav-story';
+            if (pageId.startsWith('profile') || pageId === 'edit-video-page') navId = 'nav-profile'; // Assign profile and edit to profile nav
+
             navIcons.forEach(icon => icon.classList.remove('active'));
             const activeNav = document.getElementById(navId);
             if (activeNav) activeNav.classList.add('active');
             
-            if(pageId === 'video-page') window.populateVideoPage();
-            if(pageId === 'story-page' && (storyGrid.innerHTML.trim() === '' || storyGrid.innerHTML.includes('<!--'))) {
-                fetchStories().then(window.populateStoryGrid);
+            // Load data specifically for the activated tab/page
+            if(pageId === 'home-page') window.startTrendingCardSlider(); // Use window. prefix
+            if(pageId === 'features-page') window.populateFeaturesPage(); // Use window. prefix
+            if(pageId === 'profile-view-page') window.populateProfileViewPage(); // Use window. prefix
+            if(pageId === 'profit-page') window.populateProfitPage(); // Use window. prefix
+            if(pageId === 'video-page') window.populateVideoPage(); // Use window. prefix
+            if(pageId === 'story-page') { // Only load stories if not cached
+                if (!cachedStories) {
+                    window.loadAndPopulateStories(); // Use window. prefix
+                } else {
+                    window.populateStoryGrid(cachedStories); // Use window. prefix
+                }
+            }
+            // NEW: Initialize AI Friend page display when shown
+            if(pageId === 'ai-friend-page') {
+                 window.initAiFriendPage(); 
+            }
+
+
+            closeAllPanels();
+        };
+
+
+        // --- Story Fetching and Display Functions (Using more reliable proxy method) ---
+        window.fetchStoryLinks = async () => { // Defined on window
+            try {
+                // Fetch links from Firestore (this part is reliable)
+                const snapshot = await db.collection('storyLinks').orderBy('createdAt', 'desc').get();
+                if (snapshot.empty) return [];
+                return snapshot.docs.map(doc => doc.data().url);
+            } catch (error) {
+                console.error("Error fetching story links from Firestore: ", error);
+                return [];
             }
         };
 
-        window.populateStoryGrid = (stories) => {
-            storyGrid.innerHTML = ''; // Clear existing stories
-            if (!stories || stories.length === 0) {
-                storyGrid.innerHTML = '<p>No stories available right now.</p>';
-                return;
+        window.loadAllStories = async () => { // Defined on window
+            storyGrid.innerHTML = '<p style="text-align:center;">Loading stories...</p>';
+            const links = await window.fetchStoryLinks(); // Use window. prefix
+            if (links.length === 0) {
+                storyGrid.innerHTML = '<p style="text-align:center;">No story links found in Firestore.</p>';
+                return [];
             }
-            stories.forEach(story => {
-                const card = document.createElement('div');
-                card.className = 'story-card';
-                card.style.backgroundImage = `url('${story.imageUrl}')`;
-                
-                const button = document.createElement('button');
-                button.className = 'story-card-btn';
-                button.textContent = 'Open';
-                button.onclick = () => window.openStoryDetail(story);
-                
-                card.appendChild(button);
-                storyGrid.appendChild(card);
-            });
-        };
+            
+            const storyPromises = links.map(async (url) => {
+                console.log(`Attempting to fetch story from: ${url} via proxy`);
 
-        window.populateVideoPage = () => {
-            videoPageContent.innerHTML = '';
-            categories.forEach(category => {
-                const playlistsInCategory = userPlaylists.filter(p => p.category === category);
-                if (playlistsInCategory.length > 0) {
-                    const section = document.createElement('div');
-                    section.className = 'category-section';
-                    let playlistHTML = '';
-                    playlistsInCategory.forEach(pl => {
-                        playlistHTML += `<div class="playlist-card-small"><img src="${pl.thumb}" alt="${pl.name}"></div>`;
-                    });
-                    section.innerHTML = `<h3 class="category-title">${category}</h3><div class="horizontal-scroll-wrapper"><button class="scroll-nav-btn left" onclick="scrollContent(this, -150)">←</button><div class="horizontal-scroll-container">${playlistHTML}</div><button class="scroll-nav-btn right" onclick="scrollContent(this, 150)">→</button></div>`;
-                    videoPageContent.appendChild(section);
+                try {
+                    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+                    const proxyResponse = await fetch(proxyUrl);
+
+                    if (!proxyResponse.ok) {
+                         const errorText = await proxyResponse.text();
+                         console.error(`Proxy fetch failed for ${url} via ${proxyUrl} with status: ${proxyResponse.status}`, errorText.substring(0, 200) + '...');
+                         return null;
+                    }
+
+                    const rawProxyText = await proxyResponse.text(); // Read as text first
+                    console.log(`Raw proxy response text for ${url}:`, rawProxyText.substring(0, 500) + '...');
+
+                    let proxyData;
+                    try {
+                         // Attempt to parse the outer proxy response JSON
+                        proxyData = JSON.parse(rawProxyText); 
+                         console.log(`Parsed proxy response structure for ${url}:`, proxyData);
+
+                         // Check if the 'contents' field exists and is a string
+                         if (proxyData.contents && typeof proxyData.contents === 'string') {
+                              console.log(`Attempting to parse content string from proxy for ${url}:`, proxyData.contents.substring(0, 200) + '...');
+                             try {
+                                  // Attempt to parse the actual story JSON string within 'contents'
+                                 const storyData = JSON.parse(proxyData.contents);
+
+                                  // Validate that the parsed data is an array and contains objects with required fields
+                                 if (Array.isArray(storyData) && storyData.every(item => 
+                                     typeof item === 'object' && item !== null && 
+                                     'title' in item && 'imageUrl' in item && 'audioUrl' in item && 'readText' in item
+                                 )) {
+                                      console.log(`Successfully parsed story data for ${url}:`, storyData);
+                                     return storyData; // Return the array of story objects
+                                 } else {
+                                      console.error(`Parsed content is not a valid story array with required fields for ${url}`, storyData);
+                                     return null;
+                                 }
+                             } catch (e) {
+                                  console.error(`Failed to parse JSON content string from proxy response for ${url}:`, e, proxyData.contents.substring(0, 200) + '...');
+                                 return null;
+                             }
+                         } else {
+                             console.error(`Proxy response missing 'contents' property or contents is not a string for ${url}:`, proxyData);
+                             return null;
+                         }
+
+                    } catch (e) {
+                         // Catch errors specifically from JSON.parse(rawProxyText)
+                         console.error(`Failed to parse raw proxy text for ${url} (outer JSON structure):`, e, rawProxyText.substring(0, 200) + '...');
+                        return null;
+                    }
+
+                } catch (error) {
+                    // This catches errors during the initial fetch
+                    console.error(`General fetch error for ${url}:`, error);
+                    return null;
                 }
             });
+
+            const results = await Promise.all(storyPromises);
+
+            // Filter out null results and flatten the arrays of stories into a single array
+            const validStories = results
+                .filter(item => item !== null) // Remove nulls from failed fetches/parses
+                .flat(); // Flatten the array of arrays into a single array
+
+            console.log("Final list of successfully loaded stories:", validStories);
+
+            return validStories;
         };
         
-        window.scrollContent = (button, amount) => {
-            const container = button.parentElement.querySelector('.horizontal-scroll-container');
-            container.scrollBy({ left: amount, behavior: 'smooth' });
+        window.loadAndPopulateStories = async () => { // Defined on window
+            try {
+                const stories = await window.loadAllStories(); // Use window. prefix
+                cachedStories = stories; // Cache the loaded stories
+                window.populateStoryGrid(stories); // Use window. prefix
+            } catch (error) {
+                console.error("Error loading all stories:", error);
+                storyGrid.innerHTML = '<p style="text-align:center; color:red;">Could not load stories. Please try again later.</p>';
+            }
         };
+        
+        window.populateStoryGrid = (stories) => { // Defined on window
+             console.log("Populating story grid with stories:", stories); // Log stories received
+            storyGrid.innerHTML = ''; 
+            if (!stories || !Array.isArray(stories) || stories.length === 0) { // Added Array check
+                storyGrid.innerHTML = '<p style="text-align:center;">No stories available right now.</p>'; 
+                return; 
+            } 
+            stories.forEach(story => { 
+                 // Re-validate before displaying each story (extra safety)
+                if (!story || typeof story !== 'object' || !story.title || !story.imageUrl || !story.audioUrl || !story.readText) {
+                    console.warn("Skipping malformed individual story data:", story);
+                    return; // Skip this story if required fields are missing
+                }
 
-        window.openStoryDetail = (story) => {
-            storyDetailCard.style.backgroundImage = `url('${story.imageUrl}')`;
-            storyAudio.src = story.audioUrl;
-            storyPlayBtn.textContent = '▶️'; // Reset button state
-            storyAudio.load(); // Preload audio for faster playback
-            window.showPage('story-detail-page');
+                const card = document.createElement('div'); 
+                card.className = 'story-card'; 
+                card.style.backgroundImage = `url('${story.imageUrl}')`; 
+                card.style.backgroundSize = 'cover'; 
+                card.style.backgroundPosition = 'center'; 
+                card.style.display = 'flex'; // Use flex to position title/button
+                card.style.flexDirection = 'column';
+                card.style.justifyContent = 'flex-end'; // Align items to bottom
+                card.style.alignItems = 'center';
+                card.style.padding = '10px';
+                card.style.position = 'relative'; // For overlay
+
+                 // Add gradient overlay
+                const overlay = document.createElement('div');
+                overlay.style.position = 'absolute';
+                overlay.style.bottom = '0';
+                overlay.style.left = '0';
+                overlay.style.right = '0';
+                overlay.style.height = '60%'; // Make gradient taller
+                overlay.style.background = 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)'; // Darker gradient
+                 overlay.style.borderRadius = '0 0 10px 10px'; // Match card border radius at bottom
+                card.appendChild(overlay);
+
+                const titleElement = document.createElement('h3');
+                 titleElement.style.position = 'relative'; // Needs position relative for z-index to work reliably with overlay
+                 titleElement.style.zIndex = '2'; // Make sure title is above overlay
+                 titleElement.style.fontSize = '14px';
+                 titleElement.style.fontWeight = 'bold';
+                 titleElement.style.color = '#fff';
+                 titleElement.style.textShadow = '1px 1px 3px #000';
+                 titleElement.style.textAlign = 'center';
+                 titleElement.style.wordBreak = 'break-word';
+                 titleElement.style.marginBottom = '10px'; // Space below title
+                 titleElement.textContent = story.title;
+                 card.appendChild(titleElement);
+
+                const button = document.createElement('button'); 
+                button.className = 'story-card-btn'; 
+                button.textContent = 'Open'; 
+                button.style.position = 'relative'; // Needs position relative for z-index
+                button.style.zIndex = '2'; // Make sure button is above overlay
+                 button.onclick = () => window.openStoryDetail(story); 
+                 card.appendChild(button);
+
+                storyGrid.appendChild(card);
+            }); 
         };
-
-        window.toggleStoryAudio = () => {
-            if (storyAudio.paused) {
-                storyAudio.play().catch(e => console.error("Audio play failed:", e));
-                storyPlayBtn.textContent = '⏸️';
+        
+        window.openStoryDetail = (story) => { // Defined on window
+            currentStoryData = story; 
+            storyDetailCard.style.backgroundImage = `url('${story.imageUrl}')`; 
+            storyDetailCard.style.backgroundSize = 'cover'; 
+            storyDetailCard.style.backgroundPosition = 'center'; 
+            storyAudio.src = story.audioUrl; 
+            storyPlayBtn.textContent = '▶️'; 
+            storyAudio.load(); 
+            window.showPage('story-detail-page'); 
+        };
+        
+        window.showReadStoryPage = () => { // Defined on window
+            if (currentStoryData && currentStoryData.readText) { 
+                readStoryTitle.textContent = currentStoryData.title || "Story"; 
+                readStoryContent.textContent = currentStoryData.readText; 
+                showPage('read-story-page'); 
+            } else { 
+                alert('Sorry, the text for this story is not available.'); 
+            } 
+        };
+        
+        window.toggleStoryAudio = () => { // Defined on window
+            if (storyAudio.paused) { 
+                storyAudio.play().catch(e => console.error("Story audio play failed:", e)); 
+                storyPlayBtn.textContent = '⏸️'; 
+            } else { 
+                storyAudio.pause(); 
+                storyPlayBtn.textContent = '▶️'; 
+            } 
+        };
+        
+        // --- User Profile and Authentication Functions ---
+        
+        window.submitProfileForApproval = async () => { // Defined on window
+            const user = auth.currentUser; 
+            if (!user) { 
+                alert("You must be logged in to submit a profile. Please restart the app."); 
+                return; 
+            } 
+            const fullName = document.getElementById('profile-fullName').value.trim(); 
+            const primaryMobile = document.getElementById('profile-primaryMobile').value.trim(); 
+            if (!fullName || !primaryMobile) { 
+                alert("Please fill in at least your Full Name and Primary Mobile number."); 
+                return; 
+            } 
+            const profileData = { 
+                fullName: fullName, 
+                primaryMobile: primaryMobile, 
+                secondaryMobile: document.getElementById('profile-secondaryMobile').value.trim(), 
+                address: document.getElementById('profile-address').value.trim(), 
+                status: 'pending', 
+                email: user.email || 'N/A', 
+                submittedAt: firebase.firestore.FieldValue.serverTimestamp() 
+            }; 
+            try { 
+                await db.collection('users').doc(user.uid).set(profileData, { merge: true }); 
+                alert('Profile submitted for approval! You will be notified once the admin reviews it.'); 
+                document.getElementById('profile-form-container').style.display = 'none'; 
+                document.getElementById('profile-pending-notice').style.display = 'block'; 
+            } catch (error) { 
+                console.error("Error submitting profile: ", error); 
+                alert("An error occurred. Please try again. " + error.message); 
+            } 
+        };
+        
+        window.checkProfileStatusAndShowPage = async () => { // Defined on window
+            const user = auth.currentUser; 
+            if (!user) { 
+                // If no user is signed in, sign in anonymously and then show profile page for form submission
+                auth.signInAnonymously().catch(e => console.error("Anonymous sign-in failed", e)); 
+                showPage('profile-page'); 
+                document.getElementById('profile-form-container').style.display = 'block'; 
+                document.getElementById('profile-pending-notice').style.display = 'none'; 
+                return; 
+            } 
+            try { 
+                const userDoc = await db.collection('users').doc(user.uid).get(); 
+                if (userDoc.exists) { 
+                    const userData = userDoc.data(); 
+                    if (userData.status === 'approved') { 
+                        showPage('profile-view-page'); 
+                        document.getElementById('profile-view-name-elem').textContent = userData.fullName || "User"; 
+                        document.getElementById('profile-view-pic-elem').src = userData.profilePhotoUrl || 'https://i.ibb.co/7j5R0y6/profile-placeholder.jpg'; 
+                         // Populate profile with placeholder videos when approved profile is shown
+                        window.populateProfileViewPage(); // Use window. prefix
+                    } else if (userData.status === 'pending') { 
+                        showPage('profile-page'); 
+                        document.getElementById('profile-form-container').style.display = 'none'; 
+                        document.getElementById('profile-pending-notice').style.display = 'block'; 
+                    } else { 
+                         // 'rejected' or other status implies they need to resubmit
+                        showPage('profile-page'); 
+                        document.getElementById('profile-form-container').style.display = 'block'; 
+                        document.getElementById('profile-pending-notice').style.display = 'none';
+                         // Add a message for rejected status if needed
+                    } 
+                } else { 
+                    // User document doesn't exist, meaning they haven't submitted profile yet
+                    showPage('profile-page'); 
+                    document.getElementById('profile-form-container').style.display = 'block'; 
+                    document.getElementById('profile-pending-notice').style.display = 'none'; 
+                } 
+            } catch (error) { 
+                console.error("Error checking profile status: ", error); 
+                alert("Could not check your profile status. Please try again."); 
+                showPage('home-page'); // Fallback to home page
+            } 
+        };
+        
+        window.logout = () => { // Defined on window
+            auth.signOut().then(() => { 
+                alert('You have been logged out.'); 
+                showPage('home-page'); 
+            }).catch(error => { 
+                console.error('Logout failed:', error); 
+            }); 
+        };
+        
+        // --- Other Functions (Restored placeholder data) ---
+        
+        window.fetchFeatures = async () => { // Defined on window
+            try { 
+                // You would fetch features from Firestore here
+                const snapshot = await db.collection('features').get(); 
+                if (snapshot.empty) return []; 
+                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); 
+            } catch (error) { 
+                console.error("Error fetching features:", error); 
+                return []; 
+            } 
+        };
+        
+        window.populateFeaturesPage = async () => { // Defined on window
+            featureListContainer.innerHTML = '<p>Loading features...</p>'; 
+            const features = await window.fetchFeatures(); // Use window. prefix
+            featureListContainer.innerHTML = ''; 
+            if (features.length === 0) { 
+                featureListContainer.innerHTML = '<p>No features available for purchase at the moment.</p>'; 
+                return; 
+            } 
+            features.forEach(feature => { 
+                const itemHTML = `<div class="feature-item"><div class="feature-item-details"><h4>${feature.name}</h4><p class="price">₹ ${feature.price}</p></div><input type="checkbox" class="checkbox feature-checkbox" data-price="${feature.price}" onchange="calculateFeaturesTotal()"></div>`; 
+                featureListContainer.innerHTML += itemHTML; 
+            }); 
+            window.calculateFeaturesTotal(); // Use window. prefix
+        };
+        
+        window.calculateFeaturesTotal = () => { // Defined on window
+            let total = 0; 
+            document.querySelectorAll('.feature-checkbox:checked').forEach(checkbox => { 
+                total += parseFloat(checkbox.dataset.price); 
+            }); 
+            document.getElementById('features-total-price').textContent = `₹ ${total}`; 
+        };
+        
+        window.payForFeatures = () => { // Defined on window
+            const total = parseFloat(document.getElementById('features-total-price').textContent.replace('₹ ', '')); 
+            if (total > 0) { 
+                window.open('https://rzp.io/l/6g7v7Qk', '_blank'); // Placeholder payment link
+            } else { 
+                alert('Please select a feature to purchase.'); 
+            } 
+        };
+        
+        // FIX 4: Added a working search function (Placeholder)
+        window.searchVideos = () => { // Defined on window
+            const query = document.getElementById('video-search-input').value.trim();
+            if (query) {
+                alert(`Searching for: "${query}"\n(This is a placeholder. You can add your Wasabi search logic here.)`);
             } else {
-                storyAudio.pause();
-                storyPlayBtn.textContent = '▶️';
+                alert("Please enter something to search.");
+            }
+        };
+
+        // RESTORED: Placeholder functions for profit calculation, edit/delete
+        window.calculateBonus = (views, days) => { // Defined on window
+             // Placeholder calculation
+            if (views < 100) return 0; // Add a minimum view threshold for placeholder calculation
+            const daysBonus = (365 - Math.min(days, 365)) / 365; // Bonus based on days (faster = more bonus)
+            const viewRate = 4.5; // Base rate per 1000 views
+            const baseProfit = (views / 1000) * viewRate;
+             // Simple bonus calculation: 0 to 3500 depending on speed (placeholder logic)
+             const bonus = Math.min(3500, Math.max(0, Math.round(daysBonus * 4000))); // Max bonus 3500
+
+            return bonus;
+        };
+        
+        window.updateTotalProfit = () => { // Defined on window
+            let totalProfit = 0; 
+            const checkboxes = document.querySelectorAll('.profit-video-checkbox:checked'); 
+            checkboxes.forEach(checkbox => { 
+                const videoId = parseInt(checkbox.dataset.videoId); 
+                 // Find the video from the dummy data
+                const video = dummyUserVideos.find(v => v.id === videoId); 
+                if (video) { 
+                    const basePrice = (video.views || 0) * (4.5 / 1000); // Assuming 4.5 Rs per 1000 views for calculation
+                    const bonus = window.calculateBonus(video.views || 0, video.daysSinceUpload || 366); // Use dummy daysSinceUpload, default to 366 if missing
+                    totalProfit += basePrice + bonus; 
+                } 
+            }); 
+            profitTotalDisplay.textContent = `₹ ${Math.round(totalProfit)}`; 
+             console.log("Total profit updated (placeholder calculation).");
+        };
+
+
+        window.populateProfileViewPage = () => { // Defined on window
+            const container = document.getElementById('profile-video-list-container');
+            container.innerHTML = ''; // Clear previous content
+            
+            if (dummyUserVideos.length === 0) {
+                container.innerHTML = '<p>You have not uploaded any videos yet (placeholder).</p>';
+                return;
+            }
+
+            dummyUserVideos.forEach(video => {
+                 // Ensure video object has required properties before creating HTML
+                 if (!video || !video.title || !video.thumb || typeof video.views === 'undefined' || typeof video.daysSinceUpload === 'undefined') {
+                    console.warn("Skipping malformed placeholder video:", video);
+                    return;
+                 }
+                const timeAgo = video.daysSinceUpload > 30 ? `${Math.floor(video.daysSinceUpload / 30)} months ago` : `${video.daysSinceUpload} days ago`;
+                // Note: The video ID here is from dummy data, not Firestore
+                const itemHTML = `<div class="profile-video-item"><img src="${video.thumb}" alt="${video.title}"><div class="profile-video-details"><h4>${video.title}</h4><p>${video.views} views</p><p>Uploaded: ${timeAgo}</p></div><div class="profile-video-actions"><button class="edit-btn" onclick="openEditPage(${video.id})">Edit</button><button class="delete-btn" onclick="deleteVideo(${video.id})">Delete</button></div></div>`;
+                container.innerHTML += itemHTML;
+            });
+             console.log("Profile page populated with placeholder videos.");
+        };
+
+        window.populateProfitPage = () => { // Defined on window
+            const profitVideoListContainer = document.getElementById('profit-video-list');
+            profitVideoListContainer.innerHTML = ''; // Clear previous content
+
+            if (dummyUserVideos.length === 0) {
+                profitVideoListContainer.innerHTML = '<p style="text-align:center; padding: 20px;">No videos found.</p>';
+                return;
+            }
+
+            dummyUserVideos.forEach(video => {
+                 // Ensure video object has required properties
+                 if (!video || !video.title || !video.thumb || typeof video.views === 'undefined' || typeof video.daysSinceUpload === 'undefined') {
+                    console.warn("Skipping malformed placeholder video:", video);
+                    return;
+                 }
+                const timeAgo = video.daysSinceUpload > 30 ? `${Math.floor(video.daysSinceUpload / 30)} months ago` : `${video.daysSinceUpload} days ago`;
+                // Note: The video ID here is from dummy data, not Firestore
+                const itemHTML = `<div class="profit-video-item"><img src="${video.thumb}" alt="${video.title}"><div class="profit-video-info"><h4>${video.title}</h4><p>Views: ${video.views}</p><p>Uploaded: ${timeAgo}</p></div><input type="checkbox" class="profit-video-checkbox" data-video-id="${video.id}" onchange="updateTotalProfit()"></div>`;
+                profitVideoListContainer.innerHTML += itemHTML;
+            });
+            window.updateTotalProfit(); // Use window. prefix
+             console.log("Profit page populated with placeholder videos.");
+        };
+        
+        window.openEditPage = (videoId) => { // Defined on window
+            currentEditingVideoId = videoId;
+            const video = dummyUserVideos.find(v => v.id === videoId);
+            if (!video) return;
+             // Populate edit form with dummy data
+            document.getElementById('edit-video-name').value = video.title || '';
+            document.getElementById('edit-uploader-name').value = video.uploader || '';
+            document.getElementById('edit-selected-playlist-name').textContent = video.playlist || "Select a playlist";
+            editCategorySelect.value = video.category || '';
+             // Select audience based on dummy data (assuming default is 'all')
+            document.querySelector(`input[name="edit-audience"][value="${video.audience || 'all'}"]`).checked = true;
+
+            showPage('edit-video-page');
+        };
+
+        window.saveVideoChanges = () => { // Defined on window
+            if (currentEditingVideoId === null) return;
+            alert("Placeholder: Video changes saved locally (in dummy data). This will not affect any database or persist.");
+            const videoIndex = dummyUserVideos.findIndex(v => v.id === currentEditingVideoId);
+            if (videoIndex > -1) {
+                 // Update dummy data
+                dummyUserVideos[videoIndex].title = document.getElementById('edit-video-name').value;
+                dummyUserVideos[videoIndex].uploader = document.getElementById('edit-uploader-name').value;
+                dummyUserVideos[videoIndex].playlist = document.getElementById('edit-selected-playlist-name').textContent;
+                dummyUserVideos[videoIndex].category = editCategorySelect.value;
+                dummyUserVideos[videoIndex].audience = document.querySelector('input[name="edit-audience"]:checked').value;
+            }
+            currentEditingVideoId = null;
+            showPage('profile-view-page'); // Refresh profile page with updated dummy data
+        };
+
+        window.deleteVideo = (videoId) => { // Defined on window
+            if (confirm("Are you sure you want to delete this placeholder video? This action is only local.")) {
+                dummyUserVideos = dummyUserVideos.filter(v => v.id !== videoId);
+                alert("Placeholder video deleted locally.");
+                window.populateProfileViewPage(); // Refresh profile page using window. prefix
             }
         };
         
-        window.calculatePayment = () => {
-            const duration = parseFloat(document.getElementById('video-duration').value) || 0;
-            const size = parseFloat(document.getElementById('video-size').value) || 0;
-            let cost = 0;
-            if (duration > 0) {
-                cost += Math.ceil(duration / 20) * 40;
-            }
-            if (size > 720) {
-                const extraSize = size - 720;
-                cost += Math.ceil(extraSize / 100);
-            }
-            document.getElementById('calculated-amount').textContent = `₹ ${cost}`;
+        window.submitPaymentRequest = () => { // Defined on window
+            alert("Placeholder: Payment request submitted. This does not interact with Firestore paymentRequests.");
+            // You would add your Firestore interaction here later
+            showPage('profit-page'); // Go back to profit page
         };
 
+        window.startTrendingCardSlider = () => { // Defined on window
+             // Using placeholder videos for the slider
+            if (dummyUserVideos.length === 0) {
+                 trendingCardContainer.style.backgroundImage = '';
+                 trendingCardTitle.textContent = 'No videos available';
+                 return;
+            }
+            let currentTrendingIndex = 0;
+            // Set initial card
+            const initialVideo = dummyUserVideos[currentTrendingIndex];
+            trendingCardContainer.style.backgroundImage = `url('${initialVideo.thumb}')`;
+            trendingCardContainer.style.backgroundSize = 'cover';
+            trendingCardContainer.style.backgroundPosition = 'center';
+            trendingCardTitle.textContent = initialVideo.title;
+
+            function cycleTrendingCard() {
+                trendingCardContainer.classList.add('fade-out');
+                setTimeout(() => {
+                    currentTrendingIndex = (currentTrendingIndex + 1) % dummyUserVideos.length;
+                    const video = dummyUserVideos[currentTrendingIndex];
+                    trendingCardContainer.style.backgroundImage = `url('${video.thumb}')`;
+                     trendingCardContainer.style.backgroundSize = 'cover';
+                     trendingCardContainer.style.backgroundPosition = 'center';
+                    trendingCardTitle.textContent = video.title;
+                    trendingCardContainer.classList.remove('fade-out');
+                }, 500); // Match CSS transition time
+            }
+            if (trendingCardInterval) clearInterval(trendingCardInterval);
+            trendingCardInterval = setInterval(cycleTrendingCard, 3000); // Change slide every 3 seconds
+            console.log("Trending card slider started with placeholder videos.");
+        };
+
+
+        // --- All other static content population functions are kept as they are. ---
+        window.populateVideoPage = () => { videoPageContent.innerHTML = ''; categories.forEach(category => { const playlistsInCategory = userPlaylists.filter(p => p.category === category); if (playlistsInCategory.length > 0) { const section = document.createElement('div'); section.className = 'category-section'; let playlistHTML = ''; playlistsInCategory.forEach(pl => { playlistHTML += `<div class="playlist-card-small"><img src="${pl.thumb}" alt="${pl.name}"></div>`; }); section.innerHTML = `<h3 class="category-title">${category}</h3><div class="horizontal-scroll-wrapper"><button class="scroll-nav-btn left" onclick="scrollContent(this, -150)">←</button><div class="horizontal-scroll-container">${playlistHTML}</div><button class="scroll-nav-btn right" onclick="scrollContent(this, 150)">→</button></div>`; videoPageContent.appendChild(section); } }); };
+        window.scrollContent = (button, amount) => { const container = button.parentElement.querySelector('.horizontal-scroll-container'); container.scrollBy({ left: amount, behavior: 'smooth' }); };
+        window.calculatePayment = () => { const duration = parseFloat(document.getElementById('video-duration').value) || 0; const size = parseFloat(document.getElementById('video-size').value) || 0; let cost = 0; if (duration > 0) { cost += Math.ceil(duration / 20) * 40; } if (size > 720) { const extraSize = size - 720; cost += Math.ceil(extraSize / 100); } document.getElementById('calculated-amount').textContent = `₹ ${cost}`; };
+        window.processPayment = () => { alert("Redirecting to Razorpay... (Simulation)"); window.showPage('upload-page-3'); };
         window.populateAiCharPanel = () => { aiCharPanel.innerHTML = '<h4>Select Character</h4><hr style="margin: 10px 0; border-color: var(--border-color);">'; for(let i=0; i<10; i++) { const card = document.createElement('div'); card.className = 'ai-char-card'; aiCharPanel.appendChild(card); } };
         window.changeLanguage = (lang) => { if(infoTextContainer) infoTextContainer.innerHTML = textContent[lang] || ''; };
         window.changeGuidelineLanguage = (lang) => { if(guidelineContentContainer) guidelineContentContainer.innerHTML = guidelineTexts[lang] || ''; document.getElementById('guideline-lang-hi').classList.toggle('active', lang === 'hi'); document.getElementById('guideline-lang-en').classList.toggle('active', lang === 'en'); };
-        window.processPayment = () => { alert("Redirecting to Razorpay... (Simulation)"); window.showPage('upload-page-3'); };
-        
-        window.populateCategoryDropdown = () => { categorySelect.innerHTML = '<option disabled selected>Select a category</option>'; categories.forEach(cat => { const option = document.createElement('option'); option.value = cat; option.textContent = cat; categorySelect.appendChild(option); }); };
+        window.populateCategoryDropdown = (selectElement) => { selectElement.innerHTML = '<option disabled selected value="">Select a category</option>'; categories.forEach(cat => { const option = document.createElement('option'); option.value = cat; option.textContent = cat; selectElement.appendChild(option); }); };
         window.populatePlaylistOptions = () => { playlistOptionsContainer.innerHTML = ''; userPlaylists.forEach(pl => { playlistOptionsContainer.innerHTML += `<div class="playlist-option" onclick="selectPlaylist('${pl.name}', false)"><span>${pl.name}</span> <button class="thumb-btn" onclick="event.stopPropagation(); openPlaylistThumbnailPage(${pl.id}, '${pl.name}')">Thumbnail</button></div>`; }); playlistOptionsContainer.innerHTML += `<div class="playlist-option" onclick="selectPlaylist('Custom', true)"><span>-- Custom Playlist --</span></div>`; };
         window.openPlaylistThumbnailPage = (playlistId, playlistName) => { window.showPage('playlist-thumb-page'); };
         window.savePlaylistThumbnail = () => { alert(`Thumbnail saved! (Simulation)`); window.showPage('upload-page-3'); };
         window.togglePlaylistOptions = () => { const list = document.getElementById('playlist-options'); list.style.display = list.style.display === 'block' ? 'none' : 'block'; };
-        
-        window.selectPlaylist = (playlistName, isCustom) => {
-            const customInputGroup = document.getElementById('custom-playlist-input-group');
-            if (isCustom) {
-                document.getElementById('selected-playlist-name').textContent = 'Enter Custom Name';
-                customInputGroup.style.display = 'flex';
-            } else {
-                document.getElementById('selected-playlist-name').textContent = playlistName;
-                customInputGroup.style.display = 'none';
+        window.selectPlaylist = (playlistName, isCustom) => { const customInputGroup = document.getElementById('custom-playlist-input-group'); if (isCustom) { document.getElementById('selected-playlist-name').textContent = 'Enter Custom Name'; customInputGroup.style.display = 'flex'; } else { document.getElementById('selected-playlist-name').textContent = playlistName; customInputGroup.style.display = 'none'; } window.togglePlaylistOptions(); };
+        window.saveCustomPlaylist = () => { const customName = document.getElementById('custom-playlist-input').value; if (customName.trim()) { alert(`Custom playlist "${customName}" saved! (Simulation)`); document.getElementById('selected-playlist-name').textContent = customName; document.getElementById('custom-playlist-input-group').style.display = 'none'; document.getElementById('custom-playlist-input').value = ''; } else { alert('Please enter a name for your custom playlist.'); } };
+
+
+        // --- NEW: AI Friend Interaction Functions ---
+
+        // Function to initialize the AI Friend page display
+        window.initAiFriendPage = () => {
+            console.log("Initializing AI Friend Page");
+            // Reset AI display to default (idle image)
+            aiVisualVideo.style.display = 'none'; // Hide video element
+            aiVisualVideo.pause(); // Pause video if playing
+            aiVisualImage.style.display = 'block'; // Show image element
+            aiCharacterCard.classList.add('active-content'); // Ensure placeholder text is hidden (assuming default is image)
+            
+            // You might set a default idle image URL here if you have one, e.g.:
+            // aiVisualImage.src = "YOUR_BUNNYCDN_URL/ai_assets/vivan_idle_image.jpg"; 
+            // For now, it starts blank until backend sends an image URL or you set a default.
+
+            // Ensure audio is stopped
+            if (!aiResponseAudio.paused) {
+                 aiResponseAudio.pause();
+                 aiResponseAudio.currentTime = 0; // Reset audio
             }
-            window.togglePlaylistOptions(); // Hide dropdown after selection
+             aiResponseTextElement.textContent = 'Tap the microphone to start talking!'; // Default message
+            aiResponseTextElement.style.display = 'block'; // Show text initially
+
+            // Reset button state
+            aiInteractionButton.disabled = false;
+            interactionButtonIcon.textContent = '🎙️'; // Microphone icon
+            interactionButtonText.textContent = 'Tap to Talk';
         };
-        
-        window.saveCustomPlaylist = () => {
-            const customName = document.getElementById('custom-playlist-input').value;
-            if (customName.trim()) {
-                alert(`Custom playlist "${customName}" saved! (Simulation)`);
-                document.getElementById('selected-playlist-name').textContent = customName;
-                document.getElementById('custom-playlist-input-group').style.display = 'none';
-                document.getElementById('custom-playlist-input').value = '';
+
+        // Function to handle the Tap to Talk button click
+        window.toggleVoiceInput = async () => {
+            if (!BACKEND_API_URL || BACKEND_API_URL === "YOUR_RENDER_BACKEND_URL_HERE") {
+                alert("Backend API URL is not configured in the frontend code. Please update the BACKEND_API_URL variable.");
+                console.error("Backend API URL is not set.");
+                return;
+            }
+
+            if (isRecording) {
+                // Stop recording
+                console.log("Stopping recording...");
+                mediaRecorder.stop();
+                // isRecording = false; // This will be set in mediaRecorder.onstop
+
+                // Update button state immediately
+                aiInteractionButton.disabled = true; // Disable while processing
+                interactionButtonIcon.textContent = '⏳'; // Processing icon
+                interactionButtonText.textContent = 'Processing...';
+                aiResponseTextElement.textContent = 'Processing your request...'; // Update text
+                aiResponseTextElement.style.display = 'block';
+
             } else {
-                alert('Please enter a name for your custom playlist.');
+                // Start recording
+                try {
+                    console.log("Requesting microphone access...");
+                    // Request microphone access
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    console.log("Microphone access granted.");
+
+                    // Create MediaRecorder instance
+                    // Use the stream directly
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = []; // Clear previous chunks
+
+                    // Data available event handler
+                    mediaRecorder.ondataavailable = event => {
+                        audioChunks.push(event.data);
+                    };
+
+                    // Stop event handler
+                    mediaRecorder.onstop = () => {
+                        console.log("Recording stopped. Combining audio chunks...");
+                        isRecording = false; // Update state here
+
+                        // Combine audio chunks into a single Blob
+                        // Use a specific MIME type if possible, otherwise let the browser choose
+                         const mimeType = MediaRecorder.isTypeSupported('audio/webm; codecs=opus') ? 'audio/webm; codecs=opus' : 'audio/webm';
+                        const audioBlob = new Blob(audioChunks, { type: mimeType }); 
+                        console.log("Audio Blob created:", audioBlob);
+
+                        // Send the Blob to the backend API
+                        window.sendAudioToBackend(audioBlob); // Use window. prefix
+
+                        // Stop the microphone stream tracks after the blob is created
+                        stream.getTracks().forEach(track => track.stop());
+                        console.log("Microphone stream stopped.");
+                    };
+
+                     // Error handler
+                    mediaRecorder.onerror = (event) => {
+                         console.error("MediaRecorder error:", event.error);
+                         alert("Recording error: " + event.error.name);
+                         isRecording = false;
+                         // Attempt to stop stream tracks on error too
+                         stream.getTracks().forEach(track => track.stop());
+                         // Reset button state on error
+                         aiInteractionButton.disabled = false;
+                         interactionButtonIcon.textContent = '🎙️';
+                         interactionButtonText.textContent = 'Tap to Talk';
+                         aiResponseTextElement.textContent = 'Recording failed.'; // Show error text
+                         aiResponseTextElement.style.display = 'block';
+                    };
+
+
+                    // Start recording
+                    mediaRecorder.start();
+                    isRecording = true;
+                    console.log("Recording started.");
+
+                    // Update button state
+                    aiInteractionButton.disabled = false; // Keep enabled while recording
+                    interactionButtonIcon.textContent = '🔴'; // Recording icon (Red circle)
+                    interactionButtonText.textContent = 'Listening... Tap to Stop'; // Update text
+                     aiResponseTextElement.textContent = 'Listening...'; // Update text
+                    aiResponseTextElement.style.display = 'block';
+
+                } catch (err) {
+                    console.error('Error accessing microphone:', err);
+                    alert('Could not access microphone. Please ensure microphone permissions are granted and try again.');
+                    // Reset button state on error
+                    aiInteractionButton.disabled = false;
+                    interactionButtonIcon.textContent = '🎙️';
+                    interactionButtonText.textContent = 'Tap to Talk';
+                    isRecording = false; // Ensure state is false
+                    aiResponseTextElement.textContent = 'Microphone access failed.'; // Show error text
+                    aiResponseTextElement.style.display = 'block';
+                }
             }
         };
 
-        // --- ऐप को प्रारंभ करना ---
+        // Function to send the audio blob to the backend API
+        window.sendAudioToBackend = async (audioBlob) => {
+            console.log("Sending audio to backend...");
+            const formData = new FormData();
+            // 'audio_file' must match the parameter name expected by the backend API (`UploadFile = File(...)` in main.py)
+            formData.append('audio_file', audioBlob, 'user_audio.' + audioBlob.type.split('/')[1].split(';')[0]); // Use filename like user_audio.webm
+
+            try {
+                const response = await fetch(`${BACKEND_API_URL}/ai/interact/`, {
+                    method: 'POST',
+                    body: formData // Send audio as form data
+                });
+
+                if (!response.ok) {
+                    // Handle HTTP errors (e.g., 400, 500)
+                    const errorDetail = await response.text(); // Try to read error details
+                    console.error(`Backend API returned status ${response.status}:`, errorDetail);
+                     // Attempt to parse JSON error if available, otherwise use text
+                     let errorMessage = `Backend API failed with status ${response.status}.`;
+                     try {
+                         const errorJson = JSON.parse(errorDetail);
+                         if (errorJson.detail) {
+                             errorMessage = `Backend Error: ${errorJson.detail}`;
+                         } else {
+                             errorMessage = `Backend Error: ${errorDetail.substring(0, 200)}...`;
+                         }
+                     } catch {
+                         errorMessage = `Backend Error: ${errorDetail.substring(0, 200)}...`;
+                     }
+                    throw new Error(errorMessage);
+                }
+
+                const result = await response.json();
+                console.log("Received response from backend:", result);
+
+                // Process the backend response
+                window.handleAiResponse(result); // Use window. prefix
+
+            } catch (error) {
+                console.error('Error communicating with backend:', error);
+                // alert(`Error during AI interaction: ${error.message}`); // Avoid too many alerts
+                
+                // Reset AI display to idle and show error text
+                window.initAiFriendPage(); // Use window. prefix - this also resets text
+                aiResponseTextElement.textContent = `Error: ${error.message}`; // Show specific error text
+                 aiResponseTextElement.style.display = 'block'; // Ensure text is visible
+
+            } finally {
+                // Reset button state after processing (whether success or failure)
+                // Note: If successful, handleAiResponse will manage the visual, but button resets here.
+                // If an error occurred, initAiFriendPage also resets the button.
+                 if (!isRecording) { // Only reset if not still recording (error during recording)
+                     aiInteractionButton.disabled = false;
+                     interactionButtonIcon.textContent = '🎙️';
+                     interactionButtonText.textContent = 'Tap to Talk';
+                 }
+            }
+        };
+
+        // Function to handle the response received from the backend
+        window.handleAiResponse = (response) => {
+            console.log("Handling AI response:", response);
+
+            const { ai_action, ai_visual_asset_url, ai_audio_url, ai_text_response } = response;
+
+            // Stop any currently playing audio/video before starting new ones
+            if (!aiResponseAudio.paused) aiResponseAudio.pause();
+            if (!aiVisualVideo.paused) aiVisualVideo.pause();
+            aiVisualVideo.removeAttribute('src'); // Clear previous video source
+            aiResponseAudio.removeAttribute('src'); // Clear previous audio source
+
+
+            // Update AI Character Text Display
+            if (ai_text_response) {
+                aiResponseTextElement.textContent = ai_text_response;
+                aiResponseTextElement.style.display = 'block'; // Show text
+            } else {
+                 aiResponseTextElement.textContent = '...'; // Or some default like "No response"
+                 aiResponseTextElement.style.display = 'block'; // Show placeholder text
+            }
+
+            // Handle AI Visual and Audio Assets based on action
+            if (ai_action === "show_image" && ai_visual_asset_url) {
+                console.log("Action: show_image. Setting visual to image:", ai_visual_asset_url);
+                
+                aiVisualVideo.style.display = 'none'; // Hide video
+                aiVisualImage.src = ai_visual_asset_url;
+                aiVisualImage.style.display = 'block'; // Show image
+                aiCharacterCard.classList.add('active-content'); // Ensure placeholder text is hidden
+
+
+            } else if (ai_action === "play_talking_video_with_audio" && ai_visual_asset_url && ai_audio_url) {
+                console.log("Action: play_talking_video_with_audio. Setting visual to video:", ai_visual_asset_url, "and audio:", ai_audio_url);
+
+                // Set up video source
+                aiVisualVideo.src = ai_visual_asset_url;
+                aiVisualVideo.loop = true; // Loop the video while audio plays
+                aiVisualVideo.muted = true; // Mute the video itself, we play the separate TTS audio
+                aiVisualVideo.playsinline = true; // Ensure playsinline is set for video too
+
+                // Show the video, hide the image
+                aiVisualImage.style.display = 'none';
+                aiVisualVideo.style.display = 'block';
+                aiCharacterCard.classList.add('active-content'); // Ensure placeholder text is hidden
+
+                // Set up audio source
+                aiResponseAudio.src = ai_audio_url;
+
+                // Play audio - this will trigger video playback via event listener
+                aiResponseAudio.play().then(() => {
+                     console.log("AI audio playback started.");
+                     // You might hide the text response here if you only want it visible while loading
+                     // aiResponseTextElement.style.display = 'none'; 
+                }).catch(e => {
+                    console.error("Failed to play AI audio:", e);
+                    // Fallback: if audio fails, maybe just loop the video silently
+                    alert("Failed to play AI voice response. Showing video loop.");
+                    aiVisualVideo.play().catch(ve => console.error("Failed to play fallback video:", ve)); // Try playing video silently
+                     aiResponseTextElement.textContent = "Failed to play audio: " + (e.message || "Unknown error");
+                     aiResponseTextElement.style.display = 'block';
+                });
+
+            } else {
+                console.warn("Backend response had invalid action or missing URLs:", response);
+                // Fallback to showing the idle image if response is unclear or missing data
+                window.initAiFriendPage(); // Use window. prefix - this also resets text
+                 aiResponseTextElement.textContent = "Could not process AI response correctly.";
+                 aiResponseTextElement.style.display = 'block';
+            }
+        };
+
+        // Add event listeners for AI audio/video synchronization
+        // Play video as soon as audio starts (or is ready to play)
+        const playVideoOnAudioStart = () => {
+             // Ensure video element exists and has a source before attempting to play
+            if (aiVisualVideo && aiVisualVideo.src) {
+                 aiVisualVideo.play().catch(e => console.error("Failed to play AI video on audio start:", e));
+                 console.log("AI audio started, playing video.");
+            }
+        };
+
+        // Stop video when audio ends
+        const pauseVideoOnAudioEnd = () => {
+             // Ensure video element exists before attempting to pause
+            if (aiVisualVideo) {
+                aiVisualVideo.pause();
+                aiVisualVideo.currentTime = 0; // Reset video to start
+                console.log("AI audio ended, pausing video and resetting.");
+                 // Optionally switch back to idle image after audio finishes if needed
+                 // This depends on whether the 'play_talking_video_with_audio' action is for a single phrase
+                 // or meant to keep the video looping until the next interaction.
+                 // For now, we leave the video visible until the next interaction starts or the page is left.
+            }
+        };
+
+
+        // --- APP INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('appTheme') || 'default';
             window.applyTheme(savedTheme);
             
-            // सभी सेटअप फंक्शन को कॉल करें
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    console.log("User is signed in:", user.uid);
+                } else {
+                    console.log("No user is signed in. Signing in anonymously...");
+                    auth.signInAnonymously().catch(error => {
+                        console.error("Anonymous sign-in failed:", error);
+                    });
+                }
+            });
+
+            // Initialize static content and placeholder data
             window.populateAiCharPanel();
             window.populatePlaylistOptions();
-            window.populateCategoryDropdown();
+            window.populateCategoryDropdown(categorySelect);
+            window.populateCategoryDropdown(editCategorySelect);
             window.changeLanguage('hi'); 
             window.changeGuidelineLanguage('hi');
-            
-            // पेमेंट कैलकुलेटर के लिए इवेंट लिस्टनर जोड़ें
+            window.populateProfileViewPage(); // Use window. prefix
+            window.populateProfitPage(); // Use window. prefix
+            window.startTrendingCardSlider(); // Use window. prefix
+
+            // Event listeners for placeholder data pages
             const durationInput = document.getElementById('video-duration');
             const sizeInput = document.getElementById('video-size');
             if (durationInput) durationInput.addEventListener('input', window.calculatePayment);
             if (sizeInput) sizeInput.addEventListener('input', window.calculatePayment);
-            
-            // होम पेज दिखाएँ
-            window.showPage('home-page');
-            
-            // ऑडियो खत्म होने पर बटन को रीसेट करें
-            storyAudio.onended = () => {
-                storyPlayBtn.textContent = '▶️';
-            };
-        });
+            // Add event listeners for profit checkboxes - they work with dummy data now
+            if (profitVideoListContainer) { // Check if element exists before adding listener
+                profitVideoListContainer.addEventListener('change', (event) => {
+                    if (event.target.classList.contains('profit-video-checkbox')) {
+                        window.updateTotalProfit(); // Use window. prefix
+                    }
+                });
+            }
+             // Add event listeners for AI audio/video sync AFTER elements are available
+            if(aiResponseAudio) {
+                 aiResponseAudio.addEventListener('playing', playVideoOnAudioStart); // When audio starts playing
+                 aiResponseAudio.addEventListener('ended', pauseVideoOnAudioEnd); // When audio finishes
+                 aiResponseAudio.addEventListener('pause', pauseVideoOnAudioEnd); // Also pause video if audio is manually paused
+            }
 
+
+            // Start on the home page after everything is initialized
+            // Call initAiFriendPage only when the AI Friend page is specifically shown via showPage
+            window.showPage('home-page'); 
+            
+            storyAudio.onended = () => { storyPlayBtn.textContent = '▶️'; };
+        });
     </script>
 </body>
 </html>
