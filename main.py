@@ -2,8 +2,8 @@
 
 import os
 from fastapi import FastAPI, UploadFile, File, HTTPException, status, Request
-from fastapi.responses import HTMLResponse # यह लाइन index.html दिखाने के लिए ज़रूरी है
-from fastapi.templating import Jinja2Templates # यह लाइन index.html दिखाने के लिए ज़रूरी है
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 import requests
 import boto3
@@ -14,10 +14,7 @@ load_dotenv()
 app = FastAPI()
 
 # --- नया कोड: index.html दिखाने के लिए ---
-# FastAPI को बताओ कि तुम्हारी index.html फाइल कहाँ रखी है।
-# "." का मतलब है उसी फोल्डर में जहाँ main.py है।
 templates = Jinja2Templates(directory=".")
-# --- नया कोड खत्म ---
 
 # CORS सेटिंग्स (कोई बदलाव नहीं)
 app.add_middleware(
@@ -51,24 +48,20 @@ except Exception as e:
     s3_client = None
 
 # --- बदला हुआ कोड: ऐप खुलने पर index.html दिखाओ ---
-# यह तुम्हारे ऐप का मुख्य पेज दिखाएगा।
-# response_class=HTMLResponse ब्राउज़र को बताता है कि यह एक HTML पेज है।
 @app.get("/", response_class=HTMLResponse)
 async def serve_index(request: Request):
     """
     यह फंक्शन मुख्य index.html फाइल को सर्व करता है।
     """
     return templates.TemplateResponse("index.html", {"request": request})
-# --- बदला हुआ कोड खत्म ---
 
-
-# --- AI इंटरेक्शन API (कोई बदलाव नहीं) ---
+# --- AI इंटरेक्शन API ---
 @app.post("/ai/interact/")
 async def ai_interact(audio_file: UploadFile = File(...)):
     print("Received request to /ai/interact/")
 
-    if not OPENROUTER_API_KEY and not REPLICATE_API_TOKEN:
-         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="AI API keys not configured on the backend.")
+    if not OPENROUTER_API_KEY:
+         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="OpenRouter API key not configured on the backend.")
     
     try:
         audio_bytes = await audio_file.read()
@@ -80,7 +73,7 @@ async def ai_interact(audio_file: UploadFile = File(...)):
     user_text = None
     try:
         print("--- Attempting Audio Transcription (Placeholder) ---")
-        user_text = "Tell me a short story."
+        user_text = "Tell me a short story about a robot and a child."
         print(f"Transcribed Text: '{user_text}'")
     except Exception as e:
         print(f"Transcription Error: {e}")
@@ -97,14 +90,25 @@ async def ai_interact(audio_file: UploadFile = File(...)):
                 {"role": "user", "content": user_text}
             ]
         }
-        llm_headers = { "Authorization": f"Bearer {OPENROUTER_API_KEY}", "Content-Type": "application/json" }
+        
+        # --- यहाँ बदलाव किया गया है ---
+        # OpenRouter को बताने के लिए कि रिक्वेस्ट कहाँ से आ रही है, ये हेडर्स ज़रूरी हैं।
+        llm_headers = {
+            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://shubhzone.onrender.com", # <<< यह ज़रूरी लाइन जोड़ी गई
+            "X-Title": "Shubhzone AI App" # <<< यह अच्छी प्रैक्टिस है
+        }
+        # --- बदलाव खत्म ---
+        
         llm_response = requests.post(llm_url, headers=llm_headers, json=llm_payload)
-        llm_response.raise_for_status()
+        llm_response.raise_for_status() # यह एरर देगा अगर 404 या कोई और प्रॉब्लम हुई
+        
         llm_text_response = llm_response.json()["choices"][0]["message"]["content"]
         print(f"LLM Text Response: '{llm_text_response}'")
-    except requests.exceptions.RequestException as e:
-        print(f"LLM Request Error: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"LLM API request failed: {e}")
+    except requests.exceptions.HTTPError as e:
+        print(f"LLM HTTP Error: {e.response.status_code} - {e.response.text}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"LLM API request failed: {e.response.status_code} Client Error: {e.response.reason} for url: {e.request.url}")
     except Exception as e:
         print(f"LLM Processing Error: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"LLM response processing failed: {e}")
@@ -125,9 +129,11 @@ async def ai_interact(audio_file: UploadFile = File(...)):
         print(f"TTS Error: {e}")
         tts_audio_url = None
 
+    # अब जब AI का जवाब मिल गया है, तो हम तय करेंगे कि Wasabi से कौन सी इमेज दिखानी है।
     ai_visual_asset_path = "ai_assets/vivan_idle_image.jpg"
     ai_action = "show_image"
     if tts_audio_url:
+        # अगर ऑडियो है, तो टॉकिंग वीडियो दिखाओ
         ai_visual_asset_path = "ai_assets/vivan_talking_loop.mp4"
         ai_action = "play_talking_video_with_audio"
     
@@ -138,7 +144,7 @@ async def ai_interact(audio_file: UploadFile = File(...)):
         "user_text": user_text,
         "ai_text_response": llm_text_response,
         "ai_action": ai_action,
-        "ai_visual_asset_url": ai_visual_asset_url,
+        "ai_visual_asset_url": ai_visual_asset_url, # यह है Wasabi/BunnyCDN का URL
         "ai_audio_url": tts_audio_url
     }
 
