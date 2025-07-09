@@ -349,22 +349,22 @@
                 <div class="ai-character-display">
                     <!-- AI Character Card: Container for AI visuals -->
                     <div id="ai-character-card" class="ai-character-card">
-                         <!-- NEW: Elements to display AI visuals -->
+                         <!-- Elements to display AI visuals -->
                          <!-- These elements are added inside the existing .ai-character-card div -->
                         <img id="ai-visual-image" src="" alt="AI Character Idle" style="display: none;">
                         <video id="ai-visual-video" src="" loop muted playsinline style="display: none;"></video>
                         <p class="ai-placeholder-text">Loading AI Character...</p> <!-- Keep placeholder text -->
-                         <!-- NEW: Element to display AI text response -->
+                         <!-- Element to display AI text response -->
                         <div id="ai-response-text" style="display: none;"></div> 
                     </div>
-                    <!-- NEW: Button to start/stop voice interaction -->
+                    <!-- Button to start/stop voice interaction -->
                     <!-- This button is added outside the .ai-character-card div but inside .ai-character-display -->
                     <button id="ai-interaction-button" onclick="window.toggleVoiceInput()">
                         <span id="interaction-button-icon">🎙️</span> <!-- Microphone icon -->
                         <span id="interaction-button-text">Tap to Talk</span>
                     </button>
                 </div>
-                 <!-- NEW: Audio element for AI voice response -->
+                 <!-- Audio element for AI voice response -->
                  <!-- This audio element is added outside the .ai-character-display div -->
                  <!-- Set playsinline to allow playback without entering fullscreen on some mobile browsers -->
                 <audio id="ai-response-audio" preload="auto" playsinline style="display: none;"></audio> 
@@ -407,7 +407,7 @@
             <!-- PROFILE PAGE (Before Approval) -->
             <div id="profile-page" class="page">
                 <div class="page-header"><h2 class="page-title">Your Profile 🖋️</h2></div>
-                <div id="profile-pending-notice" style="display:none; text-align:center; padding: 20px; background:var(--input-bg); border-radius:8px; margin-bottom:20px; color: #ffa726; border: 1px solid #ffa726;">
+                <div id="profile-pending-notice" style="display:none; text-align:center; padding: 20px; background:var(--input-bg); border-radius:8px; margin-bottom:20px; color: #ffa726; border: 1px solid #ffa26;">
                     Your profile is pending approval. Please wait for the admin to review your details.
                 </div>
                 <div id="profile-form-container">
@@ -424,7 +424,32 @@
             <!-- Other pages (Upload, Edit, etc.) are kept as they are -->
             <div id="upload-page-1" class="page"><div class="page-header"><button class="header-btn back-icon" onclick="showPage('home-page')">←</button><h2 class="page-title">Plan</h2><button class="header-btn" onclick="showPage('upload-page-2')">Skip</button></div><div class="transparent-bar">Please read carefully</div><div class="golden-plate"><h2>Investment (Per 20 min video)</h2><div class="cost-item"><span>Storage cost per year:</span> <span>100 Rs</span></div><div class="cost-item"><span>As a member of my app:</span> <span>(-50 Rs)</span></div><div class="cost-item"><span>As a support:</span> <span>(-10 Rs)</span></div><div class="total"><span>Total:</span><span>40 Rs</span></div></div><div class="golden-plate"><h2>Return of Investment</h2><div class="cost-item"><span>1000 Views:</span> <span>4500 Rs</span></div><p style="text-align: center; margin-top: 10px; font-weight: bold;">for your video</p></div><div class="horizontal-scroll-wrapper"><button class="scroll-nav-btn left" onclick="scrollContent(this, -150)">←</button><div class="horizontal-scroll-container"><div class="small-plate"><h3>Bonus: 200 Rs</h3><p>"Reached 1,000 within 12 months."</p><div class="bonus-total">Total: 4700 Rs</div></div><div class="small-plate"><h3>Bonus: 500 Rs</h3><p>"Reached 1,000 within 11 months."</p><div class="bonus-total">Total: 5000 Rs</div></div><div class="small-plate"><h3>Bonus: 700 Rs</h3><p>"Reached 1,000 within 10 months."</p><div class="bonus-total">Total: 5200 Rs</div></div><div class="small-plate"><h3>Bonus: 900 Rs</h3><p>"Reached 1,000 within 5 months."</p><div class="bonus-total">Total: 5400 Rs</div></div><div class="small-plate"><h3>Bonus: 1000 Rs</h3><p>"Reached 1,000 within 4 months."</p><div class="bonus-total">Total: 5500 Rs</div></div><div class="small-plate"><h3>Bonus: 1500 Rs</h3><p>"Reached 1,000 within 3 months."</p><div class="bonus-total">Total: 6000 Rs</div></div><div class="small-plate"><h3>Bonus: 2000 Rs</h3><p>"Reached 1,000 within 1 month."</p><div class="bonus-total">Total: 6500 Rs</div></div><div class="small-plate"><h3>Bonus: 3500 Rs</h3><p>"Reached 1,000 within 10 days."</p><div class="bonus-total">Total: 8000 Rs</div></div></div><button class="scroll-nav-btn right" onclick="scrollContent(this, 150)">→</button></div><div class="info-card"><div class="info-card-header">⭐ Important Information</div><div class="info-card-text" id="info-text-container"></div></div><div class="language-selector"><button id="lang-hi" class="lang-btn active" onclick="changeLanguage('hi')">हिन्दी</button><button id="lang-en" class="lang-btn" onclick="changeLanguage('en')">English</button></div><button class="button" onclick="showPage('upload-page-2')">OK</button></div>
             <div id="upload-page-2" class="page"><div class="page-header"><button class="header-btn back-icon" onclick="showPage('upload-page-1')">←</button><h2 class="page-title">Payment 🪙</h2><button class="header-btn" onclick="showPage('upload-page-3')">Skip</button></div><h2>Calculate Your Cost</h2><div class="input-group"><label for="video-duration">Video Duration (in minutes)</label><input type="number" id="video-duration" class="input-field" placeholder="For every 20 min block, Rs 40 will be charged."></div><div class="input-group"><label for="video-size">Video Size (in MB)</label><input type="number" id="video-size" class="input-field" placeholder="Ideal size for 20min is 720MB. +Re 1 per 100MB over."></div><div id="payment-summary"><p>Total Payment Required</p><div id="calculated-amount">₹ 0</div></div><button class="button" onclick="processPayment()">Pay with Razorpay</button></div>
-            <div id="upload-page-3" class="page"><div class="page-header"><button class="header-btn back-icon" onclick="showPage('upload-page-2')">←</button><h2 class="page-title">Upload Video 📱</h2><button class="header-btn" onclick="showPage('home-page')">Skip</button></div><div class="input-group"><label for="video-name">Video Name</label><input type="text" id="video-name" class="input-field" placeholder="Enter video title"></div><div class="input-group"><label>Audience</label><div class="radio-group"><label><input type="radio" name="audience" value="all" checked> For All Audiences</label><label><input type="radio" name="audience" value="18+"> For 18+ Only</label></div></div><div class="input-group"><label>Playlist</label><div class="custom-select-wrapper"><div class="playlist-selected-value" onclick="togglePlaylistOptions()"><span id="selected-playlist-name">Select a playlist</span></div><div class="playlist-options-list" id="playlist-options"></div></div><div id="custom-playlist-input-group" style="display:none;"><input type="text" id="custom-playlist-input" class="input-field" placeholder="Enter new playlist name..."><button class="save-btn" onclick="saveCustomPlaylist()">Save</button></div></div><div class="input-group"><label for="video-category">Category</label><div class="custom-select-wrapper"><select id="video-category" class="input-field"><option>Select a category</option></select></div></div><label>Video Thumbnail (16:9)</label><input type="file" id="thumbnail-file-input" style="display: none;" accept="image/*"><div class="upload-card ratio-16-9" onclick="document.getElementById('thumbnail-file-input').click()"><p>Click to upload</p></div><label>Video File</label><input type="file" id="video-file-input" style="display: none;" accept="video/*"><div class="upload-card ratio-16-9" onclick="document.getElementById('video-file-input').click()"><p>Click to upload</p></div><div class="input-group"><label>Uploader Name</label><input type="text" class="input-field" placeholder="Enter your name"></div><button class="button" onclick="alert('Video Uploaded Successfully!'); showPage('home-page');">Upload</button></div>
+            <div id="upload-page-3" class="page">
+                <div class="page-header"><button class="header-btn back-icon" onclick="showPage('upload-page-2')">←</button><h2 class="page-title">Upload Video 📱</h2><button class="header-btn" onclick="showPage('home-page')">Skip</button></div>
+                <div class="input-group"><label for="video-name">Video Name</label><input type="text" id="video-name" class="input-field" placeholder="Enter video title"></div>
+                <div class="input-group"><label>Audience</label><div class="radio-group"><label><input type="radio" name="audience" value="all" checked> For All Audiences</label><label><input type="radio" name="audience" value="18+"> For 18+ Only</label></div></div>
+                <div class="input-group"><label>Playlist</label><div class="custom-select-wrapper"><div class="playlist-selected-value" onclick="togglePlaylistOptions()"><span id="selected-playlist-name">Select a playlist</span></div><div class="playlist-options-list" id="playlist-options"></div></div><div id="custom-playlist-input-group" style="display:none;"><input type="text" id="custom-playlist-input" class="input-field" placeholder="Enter new playlist name..."><button class="save-btn" onclick="saveCustomPlaylist()">Save</button></div></div>
+                <div class="input-group"><label for="video-category">Category</label><div class="custom-select-wrapper"><select id="video-category" class="input-field"><option>Select a category</option></select></div></div>
+                
+                <label>Video Thumbnail (16:9)</label>
+                <input type="file" id="thumbnail-file-input" style="display: none;" accept="image/*">
+                <div class="upload-card ratio-16-9" onclick="document.getElementById('thumbnail-file-input').click()">
+                    <p>Click to upload</p>
+                </div>
+                
+                <label>Video File</label>
+                 <!-- Existing video file input -->
+                <input type="file" id="video-file-input" style="display: none;" accept="video/*">
+                 <!-- Changed onclick to trigger the actual file input -->
+                <div class="upload-card ratio-16-9" onclick="document.getElementById('video-file-input').click()">
+                    <p>Click to upload</p>
+                </div>
+                
+                <div class="input-group"><label>Uploader Name</label><input type="text" class="input-field" placeholder="Enter your name"></div>
+                
+                 <!-- Changed onclick to call the new upload function -->
+                <button class="button" onclick="window.handleVideoUpload()">Upload</button> 
+            </div>
             <div id="edit-video-page" class="page"><div class="page-header"><button class="header-btn back-icon" onclick="showPage('profile-view-page')">←</button><h2 class="page-title">Edit Video 📝</h2><span></span></div><div class="input-group"><label for="edit-video-name">Video Name</label><input type="text" id="edit-video-name" class="input-field" placeholder="Enter video title"></div><div class="input-group"><label>Audience</label><div class="radio-group"><label><input type="radio" name="edit-audience" value="all"> For All Audiences</label><label><input type="radio" name="edit-audience" value="18+"> For 18+ Only</label></div></div><div class="input-group"><label>Playlist</label><div class="custom-select-wrapper"><div class="playlist-selected-value" onclick="togglePlaylistOptions()"><span id="edit-selected-playlist-name">Select a playlist</span></div></div></div><div class="input-group"><label for="edit-video-category">Category</label><div class="custom-select-wrapper"><select id="edit-video-category" class="input-field"><option>Select a category</option></select></div></div><label>Video Thumbnail (16:9)</label><input type="file" id="edit-thumbnail-file-input" style="display: none;" accept="image/*"><div class="upload-card ratio-16-9" onclick="document.getElementById('edit-thumbnail-file-input').click()"><p>Click to upload new thumbnail</p></div><label>Video File</label><input type="file" id="edit-video-file-input" style="display: none;" accept="video/*"><div class="upload-card ratio-16-9" onclick="document.getElementById('edit-video-file-input').click()"><p>Click to upload new video file</p></div><div class="input-group"><label>Uploader Name</label><input type="text" id="edit-uploader-name" class="input-field" placeholder="Enter your name"></div><button class="button" onclick="alert('Placeholder: Video changes saved locally. This will not affect any database.')">Save Changes</button></div>
             <div id="playlist-thumb-page" class="page"><div class="page-header"><button class="header-btn back-icon" onclick="showPage('upload-page-3')">←</button><h2 class="page-title">Thumbnail</h2><button class="header-btn" onclick="savePlaylistThumbnail()">Save</button></div><p style="text-align:center; margin-bottom: 20px;">Upload a new thumbnail for your playlist.</p><input type="file" id="playlist-thumbnail-input" style="display:none" accept="image/*"><div class="upload-card ratio-9-16" onclick="document.getElementById('playlist-thumbnail-input').click()"><p>Click to Upload</p></div></div>
             <div id="guideline-page" class="page"><div class="page-header"><button class="header-btn back-icon" onclick="showPage('home-page')">←</button><h2 class="page-title">Guideline 📚</h2><div class="language-selector"><button id="guideline-lang-hi" class="lang-btn active" onclick="changeGuidelineLanguage('hi')">हिन्दी</button><button id="guideline-lang-en" class="lang-btn" onclick="changeGuidelineLanguage('en')">English</button></div></div><div class="guideline-content" id="guideline-content-container"></div></div>
@@ -463,14 +488,16 @@
         let currentStoryData = null;
         let cachedStories = null; // To cache stories after loading
 
-        // --- NEW: AI Friend Variables ---
+        // --- AI Friend Variables ---
         let mediaRecorder = null;
         let audioChunks = [];
         let isRecording = false;
-        // !!! IMPORTANT: REPLACE WITH YOUR RENDER BACKEND URL !!!
-        // This is the URL where your Python backend (main.py) is deployed on Render.
-        // Example: "https://my-ai-backend-abc123.onrender.com"
-        const BACKEND_API_URL = "YOUR_RENDER_BACKEND_URL_HERE"; 
+        // !!! IMPORTANT: REPLACE WITH YOUR RENDER BACKEND API URL !!!
+        // Since your backend (main.py) and frontend (index.html) are in the same repo
+        // and deployed as a single Web Service on Render, the backend API URL
+        // is the SAME URL as your frontend service URL.
+        // This should be: https://shubhzone.onrender.com
+        const BACKEND_API_URL = "https://shubhzone.onrender.com"; // REPLACE "https://shubhzone.onrender.com" with your actual Render frontend URL if it changes
         // !!! Make sure it ends WITHOUT a trailing slash !!!
 
 
@@ -498,7 +525,7 @@
         const profitVideoListContainer = document.getElementById('profit-video-list'); // Get profit video list container
         const profitTotalDisplay = document.getElementById('profit-total-display'); // Get profit total display
 
-        // --- NEW: AI Friend DOM Elements ---
+        // --- AI Friend DOM Elements ---
         // Get the elements added in the HTML body section for the AI Friend page
         const aiCharacterCard = document.getElementById('ai-character-card');
         const aiVisualImage = document.getElementById('ai-visual-image');
@@ -508,6 +535,16 @@
         const interactionButtonIcon = document.getElementById('interaction-button-icon');
         const interactionButtonText = document.getElementById('interaction-button-text');
          const aiResponseTextElement = document.getElementById('ai-response-text'); // Element to show AI's text response
+
+        // --- Video Upload DOM Elements ---
+        // Get the elements on the Upload page (#upload-page-3)
+        const videoFileInput = document.getElementById('video-file-input');
+        const thumbnailFileInput = document.getElementById('thumbnail-file-input');
+        const videoNameInput = document.getElementById('video-name');
+        const uploaderNameInput = document.querySelector('#upload-page-3 input[placeholder="Enter your name"]'); // Assuming this is the uploader name input
+        const audienceRadios = document.querySelectorAll('input[name="audience"]');
+        const selectedPlaylistNameSpan = document.getElementById('selected-playlist-name');
+        const videoCategorySelect = document.getElementById('video-category');
 
 
         // --- RESTORED: Placeholder data for video pages to avoid empty look ---
@@ -523,7 +560,7 @@
         let userPlaylists = [ { id: 1, name: "Goa Trip", thumb: "https://i.ibb.co/680xQ8r/vlog-thumb.jpg", category: "Vlogs" }, { id: 7, name: "Manali Vlog", thumb: "https://i.ibb.co/yBNgC39/gaming-thumb.jpg", category: "Vlogs"}, { id: 8, name: "Mumbai Streets", thumb: "https://i.ibb.co/3sS7jDB/tech-thumb.jpg", category: "Vlogs"}, { id: 9, name: "Kerala Backwaters", thumb: "https://i.ibb.co/kHnZysV/cook-thumb.jpg", category: "Vlogs"}, { id: 10, name: "Rajasthan Forts", thumb: "https://i.ibb.co/JqT2S9b/comedy-thumb.jpg", category: "Vlogs"}, { id: 2, name: "Unboxing", thumb: "https://i.ibb.co/3sS7jDB/tech-thumb.jpg", category: "Tech" }, { id: 3, name: "Cooking", thumb: "https://i.ibb.co/kHnZysV/cook-thumb.jpg", category: "Lifestyle" }, {id: 4, name: "Gameplay", thumb: "https://i.ibb.co/yBNgC39/gaming-thumb.jpg", category: "Gaming"}, {id: 5, name: "Stand Up", thumb: "https://i.ibb.co/JqT2S9b/comedy-thumb.jpg", category: "Comedy"}, {id: 6, name: "New Songs", thumb: "https://i.ibb.co/z5N0dYv/music-thumb.jpg", category: "Music"} ];
         const categories = ["Vlogs", "Tech", "Lifestyle", "Gaming", "Comedy", "Music", "Education", "Science", "Movies", "News"];
         const textContent = { hi: `गणना को आपके लिए आसान बनाने के लिए, हम भुगतान हर 100, 1,000 या 10,000 व्यूज़ के आधार पर करेंगे — ताकि आपको हर एक व्यू की गिनती या हिसाब रखने की चिंता न करनी पड़े।<br><br>आप जब चाहें, भुगतान का अनुरोध कर सकते हैं — चाहे आपके कुल व्यूज़ 1,758 ही क्यों न हों, क्योंकि आपकी मेहनत हमारे लिए मायने रखती है।<br><br>यह मंच आपकी कड़ी मेहनत की सच्चे दिल से सराहना करता है और इसे पूरी तरह से आपकी सुविधा और संतुष्टि को ध्यान में रखते हुए बनाया गया है। हमने इस प्रणाली को सरल, पारदर्शी और लचीला बनाया है — ताकि आप निश्चिंत होकर सिर्फ़ अपने कंटेंट पर ध्यान दें, बाक़ी सब हम संभाल लेंगे। हम हमेशा आपके साथ हैं।`, en: `To make calculations easier for you, we will process payments based on every 100, 1,000, or 10,000 views — so you don't have to worry about counting or keeping track of every single view.<br><br>You can request a payout whenever you want — even if your total views are just 1,758, because your hard work matters to us.<br><br>This platform genuinely appreciates your hard work and is designed with your complete convenience and satisfaction in mind. We have made this system simple, transparent, and flexible — so you can focus on your content without any worries, and we will handle the rest. We are always with you.` };
-        const guidelineTexts = { hi: `<h1>📜 Shubhzone ऐप उपयोग एवं कंटेंट नीति</h1><p>📱 ऐप का नाम: Shubhzone<br>📧 संपर्क: udbhavscience12@gmail.com<br>🔞 वयस्क (Adult) कंटेंट केवल 18+ उपयोगकर्ताओं के लिए उपलब्ध है</p><hr><h2>🔰 1. ऐप का उद्देश्य (App Purpose)</h2><p>Shubhzone एक मनोरंजन ऐप है, जो उपयोगकर्ताओं को भावनात्मक, रोमांटिक और कल्पनात्मक कहानियाँ, वीडियो, ऑडियो और चैट स्टोरीज़ जैसे कंटेंट उपलब्ध कराता है। यह ऐप विशेष रूप से प्रीमियम उपयोगकर्ताओं के लिए तैयार किया गया है, और इसमें मौजूद वयस्क (Adult) कंटेंट केवल 18 वर्ष या उससे अधिक आयु वाले उपयोगकर्ताओं के लिए ही अनुमत है।</p><h3>✅ क्या करें (Allowed):</h3><ul><li>ऐप का प्रयोग मनोरंजन और निजी उपयोग हेतु करें।</li><li>अपनी उम्र की पुष्टि (Age Confirmation) ईमानदारी से करें।</li><li>किसी भी कंटेंट को देखकर असहज लगने पर उसे रिपोर्ट करें।</li><li>किसी अन्य व्यक्ति के प्रति अपमानजनक भाषा का प्रयोग न करें।</li></ul><h3>❌ क्या न करें (Forbidden):</h3><ul><li>अभद्र भाषा, गाली-गलौज, जातीय या धार्मिक टिप्पणी ❌</li><li>किसी अन्य उपयोगकर्ता को परेशान करना, धमकाना ❌</li><li>किसी भी प्रकार की अश्लील या पोर्नोग्राफिक सामग्री साझा करना ❌</li><li>ऐप के कंटेंट को बिना अनुमति किसी अन्य जगह अपलोड करना ❌</li></ul><hr><h2>🔞 3. 18+ कंटेंट (केवल वयस्क उपयोगकर्ताओं हेतु)</h2><p>Shubhzone ऐप में मौजूद वयस्क कंटेंट केवल उन उपयोगकर्ताओं को दिखाया जाता है जो 18 वर्ष या उससे अधिक आयु के हैं और ऐप में Age Confirmation और प्रीमियम सदस्यता प्रक्रिया पूरी कर चुके हैं।</p><h3>🟢 अनुमत कंटेंट (Allowed for 18+):</h3><ul><li>✔️ रोमांटिक और कल्पनात्मक लघु फिल्में</li><li>✔️ इशारों में रोमांस वाले दृश्य (Suggestive only)</li><li>✔️ सेंसुअल वॉइस स्टोरीज़ / चैट आधारित स्टोरीज़</li><li>✔️ रिलेशनशिप आधारित भावनात्मक नाटक</li><li>✔️ बोल्ड लेकिन मर्यादित डायलॉग्स</li><li>✔️ ग्लैमरस ड्रेस-अप, लेकिन अश्लीलता नहीं</li></ul><h3>🔴 निषिद्ध कंटेंट (Strictly Forbidden):</h3><ul><li>⛔ नग्नता (पूर्ण या आंशिक)</li><li>⛔ कोई भी यौन क्रिया या उसका स्पष्ट प्रदर्शन</li><li>⛔ सेक्स साउंड्स, मूनिंग, या भद्दी आवाज़ें</li><li>⛔ 18 वर्ष से कम पात्रों का उपयोग या संदर्भ</li><li>⛔ गैरकानूनी, कॉपीराइट या चोरी किया गया कंटेंट</li><li>⛔ अश्लील थंबनेल या पोस्टर</li><li>⛔ किसी अन्य पोर्न वेबसाइट या लिंक का प्रचार</li></ul><hr><h2>🧑‍🎨 4. कंटेंट क्रिएटर्स के लिए निर्देश</h2><p>If you're creating or uploading content for Shubhzone, follow these mandatory rules:</p><ul><li>Only original content that you own or have full rights to.</li><li>No direct nudity or sexual visuals in your content.</li><li>Always include a disclaimer like: <blockquote>"This is a work of fiction, meant only for entertainment."</blockquote></li><li>Ensure thumbnails and visuals are safe, clean, and within guidelines.</li><li>Do not link or refer to any external porn or adult website.</li></ul><hr><h2>🛡️ 5. ऐप सुरक्षा और गोपनीयता नीति</h2><p>All user data is stored securely. User behavior may be moderated and monitored. In case of a violation, content may be removed or the account suspended.</p><hr><h2>📢 6. रिपोर्ट व सहायता (Support)</h2><p>If you come across any inappropriate content or user behavior:</p><ul><li>📩 Email Us: udbhavscience12@gmail.com</li><li>📍 Report button का प्रयोग करें (वीडियो या चैट के नीचे)</li><li>🕒 हमारी टीम 24 to 48 hours के भीतर कार्रवाई करेगी</li></ul><hr><h2>📘 7. अस्वीकरण (Disclaimer)</h2><blockquote>Shubhzone ऐप में प्रदर्शित सभी कहानियाँ, पात्र और दृश्य पूर्णतः काल्पनिक हैं। इनका उद्देश्य केवल मनोरंजन है। यह ऐप कोई भी पोर्नोग्राफ़ी या अश्लीलता को समर्थन नहीं देता। सभी उपयोगकर्ताओं से अपेक्षा की जाती है कि वे नियमों का पालन करें और एक स्वस्थ digital experience बनाए रखें।</blockquote><hr><h2>✔️ 8. उपयोगकर्ता की सहमति (User Consent)</h2><p>✅ Shubhzone ऐप का उपयोग करने का अर्थ है कि आपने उपरोक्त सभी नियमों को पढ़ा, समझा और स्वीकार किया है।</p>`, en: `<h1>📜 Shubhzone App Usage and Content Policy</h1><p>📱 App Name: Shubhzone<br>📧 Contact: udbhavscience12@gmail.com<br>🔞 Adult content is available only to 18+ users</p><hr><h2>🔰 1. App Purpose</h2><p>Shubhzone is an entertainment app that provides users with content such as emotional, romantic, and imaginative stories, videos, audio, and chat stories. The app is specifically designed for premium users, and the adult content within it is permitted only for users aged 18 or above.</p><h3>✅ Do's (Allowed):</h3><ul><li>Use the app for entertainment and personal use.</li><li>Honestly confirm your age.</li><li>Report any content that makes you uncomfortable.</li><li>Do not use abusive language towards any other user.</li></ul><h3>❌ Don'ts (Forbidden):</h3><ul><li>Abusive language, cursing, racial, or religious comments ❌</li><li>Harassing, threatening any other user ❌</li><li>Sharing any kind of obscene or pornographic material ❌</li><li>Uploading app content elsewhere without permission ❌</li></ul><hr><h2>🔞 3. 18+ Content (For Adult Users Only)</h2><p>Adult content in the Shubhzone app is shown only to users who are 18 years of age or older and have completed the Age Confirmation and premium subscription process within the app.</p><h3>🟢 Permitted Content (Allowed for 18+):</h3><ul><li>✔️ Romantic and imaginative short films</li><li>✔️ Suggestive only romantic scenes</li><li>✔️ Sensual voice stories / chat based stories</li><li>✔️ Relationship based emotional dramas</li><li>✔️ Bold but decent dialogues</li><li>✔️ Glamorous dress-up, but not obscenity</li></ul><h3>🔴 Strictly Forbidden Content:</h3><ul><li>⛔ Nudity (full or partial)</li><li>⛔ Any sexual acts or explicit depictions</li><li>⛔ Sex sounds, moaning, or vulgar noises</li><li>⛔ 18 वर्ष से कम पात्रों का उपयोग या संदर्भ</li><li>⛔ Illegal, copyrighted, or stolen content</li><li>⛔ Obscene thumbnails or posters</li><li>⛔ Promotion of any other pornographic website or link</li></ul><hr><h2>🧑‍🎨 4. Content Creator Guidelines</h2><p>If you're creating or uploading content for Shubhzone, follow these mandatory rules:</p><ul><li>Only original content that you own or have full rights to.</li><li>No direct nudity or sexual visuals in your content.</li><li>Always include a disclaimer like: <blockquote>"This is a work of fiction, meant only for entertainment."</blockquote></li><li>Ensure thumbnails and visuals are safe, clean, and within guidelines.</li><li>Do not link or refer to any external porn or adult website.</li></ul><hr><h2>🛡️ 5. App Security and Privacy Policy</h2><p>All user data is stored securely. User behavior may be moderated and monitored. In case of a violation, content may be removed or the account suspended.</p><hr><h2>📢 6. Report & Support</h2><p>If you come across any inappropriate content or user behavior:</p><ul><li>📩 Email Us: udbhavscience12@gmail.com</li><li>📍 Use the Report button (below video or chat)</li><li>🕒 Our team will take action within 24 to 48 hours</li></ul><hr><h2>📘 7. Disclaimer</h2><blockquote>All stories, characters, and scenes shown in the Shubhzone app are purely fictional. Their purpose is solely entertainment. This app does not support any form of pornography or obscenity. All users से अपेक्षा की जाती है कि वे नियमों का पालन करें और एक स्वस्थ digital experience बनाए रखें।</blockquote><hr><h2>✔️ 8. उपयोगकर्ता की सहमति (User Consent)</h2><p>✅ Shubhzone ऐप का उपयोग करने का अर्थ है कि आपने उपरोक्त सभी नियमों को पढ़ा, समझा और स्वीकार किया है।</p>`};
+        const guidelineTexts = { hi: `<h1>📜 Shubhzone ऐप उपयोग एवं कंटेंट नीति</h1><p>📱 ऐप का नाम: Shubhzone<br>📧 संपर्क: udbhavscience12@gmail.com<br>🔞 वयस्क (Adult) कंटेंट केवल 18+ उपयोगकर्ताओं के लिए उपलब्ध है</p><hr><h2>🔰 1. ऐप का उद्देश्य (App Purpose)</h2><p>Shubhzone एक मनोरंजन ऐप है, जो उपयोगकर्ताओं को भावनात्मक, रोमांटिक और कल्पनात्मक कहानियाँ, वीडियो, ऑडियो और चैट स्टोरीज़ जैसे कंटेंट उपलब्ध कराता है। यह ऐप विशेष रूप से प्रीमियम उपयोगकर्ताओं के लिए तैयार किया गया है, और इसमें मौजूद वयस्क (Adult) कंटेंट केवल 18 वर्ष या उससे अधिक आयु वाले उपयोगकर्ताओं के लिए ही अनुमत है।</p><h3>✅ क्या करें (Allowed):</h3><ul><li>ऐप का प्रयोग मनोरंजन और निजी उपयोग हेतु करें।</li><li>अपनी उम्र की पुष्टि (Age Confirmation) ईमानदारी से करें।</li><li>किसी भी कंटेंट को देखकर असहज लगने पर उसे रिपोर्ट करें।</li><li>किसी अन्य व्यक्ति के प्रति अपमानजनक भाषा का प्रयोग न करें।</li></ul><h3>❌ क्या न करें (Forbidden):</h3><ul><li>अभद्र भाषा, गाली-गलौज, जातीय या धार्मिक टिप्पणी ❌</li><li>किसी अन्य उपयोगकर्ता को परेशान करना, धमकाना ❌</li><li>किसी भी प्रकार की अश्लील या पोर्नोग्राफिक सामग्री साझा करना ❌</li><li>ऐप के कंटेंट को बिना अनुमति किसी अन्य जगह अपलोड करना ❌</li></ul><hr><h2>🔞 3. 18+ कंटेंट (केवल वयस्क उपयोगकर्ताओं हेतु)</h2><p>Shubhzone ऐप में मौजूद वयस्क कंटेंट केवल उन उपयोगकर्ताओं को दिखाया जाता है जो 18 वर्ष या उससे अधिक आयु के हैं और ऐप में Age Confirmation और प्रीमियम सदस्यता प्रक्रिया पूरी कर चुके हैं।</p><h3>🟢 अनुमत कंटेंट (Allowed for 18+):</h3><ul><li>✔️ रोमांटिक और कल्पनात्मक लघु फिल्में</li><li>✔️ इशारों में रोमांस वाले दृश्य (Suggestive only)</li><li>✔️ सेंसुअल वॉइस स्टोरीज़ / चैट आधारित स्टोरीज़</li><li>✔️ रिलेशनशिप आधारित भावनात्मक नाटक</li><li>✔️ बोल्ड लेकिन मर्यादित डायलॉग्स</li><li>✔️ ग्लैमरस ड्रेस-अप, लेकिन अश्लीलता नहीं</li></ul><h3>🔴 निषिद्ध कंटेंट (Strictly Forbidden):</h3><ul><li>⛔ नग्नता (पूर्ण या आंशिक)</li><li>⛔ कोई भी यौन क्रिया या उसका स्पष्ट प्रदर्शन</li><li>⛔ सेक्स साउंड्स, मूनिंग, या भद्दी आवाज़ें</li><li>⛔ 18 वर्ष से कम पात्रों का उपयोग या संदर्भ</li><li>⛔ गैरकानूनी, कॉपीराइट या चोरी किया गया कंटेंट</li><li>⛔ अश्लील थंबनेल या पोस्टर</li><li>⛔ किसी अन्य पोर्न वेबसाइट या लिंक का प्रचार</li></ul><hr><h2>🧑‍🎨 4. कंटेंट क्रिएटर्स के लिए निर्देश</h2><p>If you're creating or uploading content for Shubhzone, follow these mandatory rules:</p><ul><li>Only original content that you own or have full rights to.</li><li>No direct nudity or sexual visuals in your content.</li><li>Always include a disclaimer like: <blockquote>"This is a work of fiction, meant only for entertainment."</blockquote></li><li>Ensure thumbnails and visuals are safe, clean, and within guidelines.</li><li>Do not link or refer to any external porn or adult website.</li></ul><hr><h2>🛡️ 5. ऐप सुरक्षा और गोपनीयता नीति</h2><p>All user data is stored securely. User behavior may be moderated and monitored. In case of a violation, content may be removed or the account suspended.</p><hr><h2>📢 6. रिपोर्ट व सहायता (Support)</h2><p>If you come across any inappropriate content or user behavior:</p><ul><li>📩 Email Us: udbhavscience12@gmail.com</li><li>📍 Report button का प्रयोग करें (वीडियो या चैट के नीचे)</li><li>🕒 हमारी टीम 24 to 48 hours के भीतर कार्रवाई करेगी</li></ul><hr><h2>📘 7. अस्वीकरण (Disclaimer)</h2><blockquote>All stories, characters, and scenes shown in the Shubhzone ऐप में प्रदर्शित सभी कहानियाँ, पात्र और दृश्य पूर्णतः काल्पनिक हैं। इनका उद्देश्य केवल मनोरंजन है। यह ऐप कोई भी पोर्नोग्राफ़ी या अश्लीलता को समर्थन नहीं देता। सभी उपयोगकर्ताओं से अपेक्षा की जाती है कि वे नियमों का पालन करें और एक स्वस्थ digital experience बनाए रखें।</blockquote><hr><h2>✔️ 8. उपयोगकर्ता की सहमति (User Consent)</h2><p>✅ Shubhzone ऐप का उपयोग करने का अर्थ है कि आपने उपरोक्त सभी नियमों को पढ़ा, समझा और स्वीकार किया है।</p>`};
         
         // --- FUNCTIONS ---
 
@@ -571,15 +608,26 @@
             if(pageId === 'profit-page') window.populateProfitPage(); // Use window. prefix
             if(pageId === 'video-page') window.populateVideoPage(); // Use window. prefix
             if(pageId === 'story-page') { // Only load stories if not cached
-                if (!cachedStories) {
-                    window.loadAndPopulateStories(); // Use window. prefix
-                } else {
-                    window.populateStoryGrid(cachedStories); // Use window. prefix
-                }
+                // The loadAndPopulateStories function already checks if !cachedStories
+                window.loadAndPopulateStories(); // Use window. prefix
             }
-            // NEW: Initialize AI Friend page display when shown
+            // Initialize AI Friend page display when shown
             if(pageId === 'ai-friend-page') {
                  window.initAiFriendPage(); 
+            }
+             // Initialize Upload page dropdowns when shown
+            if(pageId === 'upload-page-3') {
+                 window.populatePlaylistOptions(); // Ensure playlists are loaded
+                 window.populateCategoryDropdown(videoCategorySelect); // Ensure categories are loaded
+                 // Reset file inputs
+                 if(videoFileInput) videoFileInput.value = '';
+                 if(thumbnailFileInput) thumbnailFileInput.value = '';
+                 // Reset form fields
+                 if(videoNameInput) videoNameInput.value = '';
+                 if(uploaderNameInput) uploaderNameInput.value = '';
+                 if(audienceRadios) audienceRadios[0].checked = true; // Select 'For All' by default
+                 if(selectedPlaylistNameSpan) selectedPlaylistNameSpan.textContent = 'Select a playlist';
+                 if(videoCategorySelect) videoCategorySelect.value = ''; // Reset category dropdown
             }
 
 
@@ -591,9 +639,20 @@
         window.fetchStoryLinks = async () => { // Defined on window
             try {
                 // Fetch links from Firestore (this part is reliable)
+                console.log("Fetching story links from Firestore...");
+                // Ensure db is initialized
+                 if (!db) {
+                     console.error("Firestore is not initialized.");
+                     return [];
+                 }
                 const snapshot = await db.collection('storyLinks').orderBy('createdAt', 'desc').get();
-                if (snapshot.empty) return [];
-                return snapshot.docs.map(doc => doc.data().url);
+                if (snapshot.empty) {
+                    console.log("No story links found in Firestore.");
+                    return [];
+                }
+                const links = snapshot.docs.map(doc => doc.data().url);
+                console.log("Found story links:", links);
+                return links;
             } catch (error) {
                 console.error("Error fetching story links from Firestore: ", error);
                 return [];
@@ -601,17 +660,24 @@
         };
 
         window.loadAllStories = async () => { // Defined on window
+            // Check if stories are already cached
+            if (cachedStories) {
+                console.log("Loading stories from cache.");
+                return cachedStories;
+            }
+
             storyGrid.innerHTML = '<p style="text-align:center;">Loading stories...</p>';
             const links = await window.fetchStoryLinks(); // Use window. prefix
             if (links.length === 0) {
-                storyGrid.innerHTML = '<p style="text-align:center;">No story links found in Firestore.</p>';
-                return [];
+                // Update message in populateStoryGrid if links are empty
+                return []; 
             }
             
             const storyPromises = links.map(async (url) => {
                 console.log(`Attempting to fetch story from: ${url} via proxy`);
 
                 try {
+                    // Using allorigins proxy to bypass CORS issues
                     const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
                     const proxyResponse = await fetch(proxyUrl);
 
@@ -622,17 +688,17 @@
                     }
 
                     const rawProxyText = await proxyResponse.text(); // Read as text first
-                    console.log(`Raw proxy response text for ${url}:`, rawProxyText.substring(0, 500) + '...');
+                    // console.log(`Raw proxy response text for ${url}:`, rawProxyText.substring(0, 500) + '...'); // Avoid logging potentially large text
 
                     let proxyData;
                     try {
-                         // Attempt to parse the outer proxy response JSON
+                         // Attempt to parse the outer proxy response JSON (from allorigins)
                         proxyData = JSON.parse(rawProxyText); 
-                         console.log(`Parsed proxy response structure for ${url}:`, proxyData);
+                         // console.log(`Parsed proxy response structure for ${url}:`, proxyData); // Avoid logging large structure
 
                          // Check if the 'contents' field exists and is a string
-                         if (proxyData.contents && typeof proxyData.contents === 'string') {
-                              console.log(`Attempting to parse content string from proxy for ${url}:`, proxyData.contents.substring(0, 200) + '...');
+                         if (proxyData && proxyData.contents && typeof proxyData.contents === 'string') {
+                              // console.log(`Attempting to parse content string from proxy for ${url}:`, proxyData.contents.substring(0, 200) + '...'); // Avoid logging content string
                              try {
                                   // Attempt to parse the actual story JSON string within 'contents'
                                  const storyData = JSON.parse(proxyData.contents);
@@ -642,14 +708,14 @@
                                      typeof item === 'object' && item !== null && 
                                      'title' in item && 'imageUrl' in item && 'audioUrl' in item && 'readText' in item
                                  )) {
-                                      console.log(`Successfully parsed story data for ${url}:`, storyData);
+                                      console.log(`Successfully parsed story data for ${url}`); // Log success
                                      return storyData; // Return the array of story objects
                                  } else {
                                       console.error(`Parsed content is not a valid story array with required fields for ${url}`, storyData);
                                      return null;
                                  }
                              } catch (e) {
-                                  console.error(`Failed to parse JSON content string from proxy response for ${url}:`, e, proxyData.contents.substring(0, 200) + '...');
+                                  console.error(`Failed to parse JSON content string from proxy response for ${url}:`, e, proxyData.contents ? proxyData.contents.substring(0, 200) + '...' : 'Empty content'); // Added check for proxyData.contents
                                  return null;
                              }
                          } else {
@@ -658,13 +724,13 @@
                          }
 
                     } catch (e) {
-                         // Catch errors specifically from JSON.parse(rawProxyText)
-                         console.error(`Failed to parse raw proxy text for ${url} (outer JSON structure):`, e, rawProxyText.substring(0, 200) + '...');
+                         // Catch errors specifically from JSON.parse(rawProxyText) (parsing allorigins response)
+                         console.error(`Failed to parse raw proxy text for ${url} (outer JSON structure):`, e, rawProxyText ? rawProxyText.substring(0, 200) + '...' : 'Empty raw text'); // Added check for rawProxyText
                         return null;
                     }
 
                 } catch (error) {
-                    // This catches errors during the initial fetch
+                    // This catches errors during the initial fetch (network issues, CORS block without proxy)
                     console.error(`General fetch error for ${url}:`, error);
                     return null;
                 }
@@ -677,24 +743,56 @@
                 .filter(item => item !== null) // Remove nulls from failed fetches/parses
                 .flat(); // Flatten the array of arrays into a single array
 
-            console.log("Final list of successfully loaded stories:", validStories);
+            console.log("Final list of successfully loaded stories:", validStories.length, "total stories.");
+
+            // Cache the loaded stories if successful
+            cachedStories = validStories; // Always cache the result, even if empty
 
             return validStories;
         };
         
         window.loadAndPopulateStories = async () => { // Defined on window
             try {
-                const stories = await window.loadAllStories(); // Use window. prefix
-                cachedStories = stories; // Cache the loaded stories
-                window.populateStoryGrid(stories); // Use window. prefix
+                // Only show loading message if stories are not already cached
+                 if (!cachedStories) {
+                    storyGrid.innerHTML = '<p style="text-align:center;">Loading stories...</p>';
+                 } else {
+                    // If cached, populate immediately for a snappier feel, then maybe refresh in background
+                    console.log("Populating story grid from cache first.");
+                    window.populateStoryGrid(cachedStories);
+                 }
+
+                // Always attempt to load fresh stories in the background
+                const stories = await window.loadAllStories(); // This will fetch fresh data (and update cache)
+
+                // Only update grid if fresh stories are different or if there were no cached stories
+                 if (!cachedStories || JSON.stringify(stories) !== JSON.stringify(cachedStories)) {
+                    if (stories.length === 0) {
+                         storyGrid.innerHTML = '<p style="text-align:center;">No stories available right now.</p>'; 
+                         console.log("No fresh stories found to populate the grid.");
+                    } else {
+                        window.populateStoryGrid(stories); // Use window. prefix
+                        console.log(`Populated story grid with ${stories.length} fresh stories.`);
+                    }
+                    cachedStories = stories; // Update cache
+                 } else {
+                     console.log("Fresh stories are the same as cached. No grid update needed.");
+                 }
+
+
             } catch (error) {
                 console.error("Error loading all stories:", error);
-                storyGrid.innerHTML = '<p style="text-align:center; color:red;">Could not load stories. Please try again later.</p>';
+                // Fallback message if loading fails entirely (even from cache if applicable)
+                if (!cachedStories || cachedStories.length === 0) {
+                     storyGrid.innerHTML = '<p style="text-align:center; color:red;">Could not load stories. Please try again later.</p>';
+                } else {
+                    console.log("Failed to fetch fresh stories, but showing cached ones.");
+                }
             }
         };
         
         window.populateStoryGrid = (stories) => { // Defined on window
-             console.log("Populating story grid with stories:", stories); // Log stories received
+             console.log("Populating story grid with stories:", stories ? stories.length : 0, "items."); // Log stories received
             storyGrid.innerHTML = ''; 
             if (!stories || !Array.isArray(stories) || stories.length === 0) { // Added Array check
                 storyGrid.innerHTML = '<p style="text-align:center;">No stories available right now.</p>'; 
@@ -702,6 +800,7 @@
             } 
             stories.forEach(story => { 
                  // Re-validate before displaying each story (extra safety)
+                 // This check was already in the previous code I gave you.
                 if (!story || typeof story !== 'object' || !story.title || !story.imageUrl || !story.audioUrl || !story.readText) {
                     console.warn("Skipping malformed individual story data:", story);
                     return; // Skip this story if required fields are missing
@@ -878,6 +977,11 @@
         window.fetchFeatures = async () => { // Defined on window
             try { 
                 // You would fetch features from Firestore here
+                // Ensure db is initialized
+                 if (!db) {
+                     console.error("Firestore is not initialized.");
+                     return [];
+                 }
                 const snapshot = await db.collection('features').get(); 
                 if (snapshot.empty) return []; 
                 return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); 
@@ -1077,7 +1181,7 @@
                      trendingCardContainer.style.backgroundPosition = 'center';
                     trendingCardTitle.textContent = video.title;
                     trendingCardContainer.classList.remove('fade-out');
-                }, 500); // Match CSS transition time
+                }, 3000); // Change slide every 3 seconds
             }
             if (trendingCardInterval) clearInterval(trendingCardInterval);
             trendingCardInterval = setInterval(cycleTrendingCard, 3000); // Change slide every 3 seconds
@@ -1102,7 +1206,7 @@
         window.saveCustomPlaylist = () => { const customName = document.getElementById('custom-playlist-input').value; if (customName.trim()) { alert(`Custom playlist "${customName}" saved! (Simulation)`); document.getElementById('selected-playlist-name').textContent = customName; document.getElementById('custom-playlist-input-group').style.display = 'none'; document.getElementById('custom-playlist-input').value = ''; } else { alert('Please enter a name for your custom playlist.'); } };
 
 
-        // --- NEW: AI Friend Interaction Functions ---
+        // --- AI Friend Interaction Functions ---
 
         // Function to initialize the AI Friend page display
         window.initAiFriendPage = () => {
@@ -1110,18 +1214,26 @@
             // Reset AI display to default (idle image)
             aiVisualVideo.style.display = 'none'; // Hide video element
             aiVisualVideo.pause(); // Pause video if playing
-            aiVisualImage.style.display = 'block'; // Show image element
-            aiCharacterCard.classList.add('active-content'); // Ensure placeholder text is hidden (assuming default is image)
-            
+             aiVisualVideo.removeAttribute('src'); // Clear video source
+
             // You might set a default idle image URL here if you have one, e.g.:
             // aiVisualImage.src = "YOUR_BUNNYCDN_URL/ai_assets/vivan_idle_image.jpg"; 
             // For now, it starts blank until backend sends an image URL or you set a default.
+            // If you have a default image URL, set it here:
+            aiVisualImage.src = "https://i.ibb.co/HTjy6Cjd/Leonardo-Phoenix-10-A-young-girl-sitting-in-a-cozy-dimly-lit-r-0.jpg"; // Using the image from home card as a temporary default
+            aiVisualImage.style.display = 'block'; // Show image element by default
+
+            aiCharacterCard.classList.add('active-content'); // Ensure placeholder text is hidden (assuming default is image)
+            
 
             // Ensure audio is stopped
-            if (!aiResponseAudio.paused) {
+            if (aiResponseAudio && !aiResponseAudio.paused) { // Added check for aiResponseAudio
                  aiResponseAudio.pause();
                  aiResponseAudio.currentTime = 0; // Reset audio
             }
+            if (aiResponseAudio) aiResponseAudio.removeAttribute('src'); // Clear audio source
+
+
              aiResponseTextElement.textContent = 'Tap the microphone to start talking!'; // Default message
             aiResponseTextElement.style.display = 'block'; // Show text initially
 
@@ -1133,24 +1245,50 @@
 
         // Function to handle the Tap to Talk button click
         window.toggleVoiceInput = async () => {
+            // Check if backend URL is set
             if (!BACKEND_API_URL || BACKEND_API_URL === "YOUR_RENDER_BACKEND_URL_HERE") {
                 alert("Backend API URL is not configured in the frontend code. Please update the BACKEND_API_URL variable.");
                 console.error("Backend API URL is not set.");
+                // Show a message on the card
+                 aiResponseTextElement.textContent = "Backend URL not set. Cannot talk to AI.";
+                 aiResponseTextElement.style.display = 'block';
                 return;
             }
+
+            // Prevent interaction if AI is already processing/talking
+            if (aiInteractionButton && aiInteractionButton.disabled && !isRecording) { // Added check for aiInteractionButton
+                 console.log("Button is disabled, AI is busy.");
+                 return; // Do nothing if button is disabled for processing
+            }
+
 
             if (isRecording) {
                 // Stop recording
                 console.log("Stopping recording...");
-                mediaRecorder.stop();
-                // isRecording = false; // This will be set in mediaRecorder.onstop
-
-                // Update button state immediately
-                aiInteractionButton.disabled = true; // Disable while processing
-                interactionButtonIcon.textContent = '⏳'; // Processing icon
-                interactionButtonText.textContent = 'Processing...';
-                aiResponseTextElement.textContent = 'Processing your request...'; // Update text
+                // Disable button right away to prevent double tap
+                if (aiInteractionButton) aiInteractionButton.disabled = true; // Added check
+                if (interactionButtonIcon) interactionButtonIcon.textContent = '⏳'; // Processing icon // Added check
+                if (interactionButtonText) interactionButtonText.textContent = 'Processing...'; // Added check
+                 aiResponseTextElement.textContent = 'Processing your voice...'; // Update text
                 aiResponseTextElement.style.display = 'block';
+
+
+                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                     mediaRecorder.stop();
+                } else {
+                     console.warn("MediaRecorder was not active when stop was called.");
+                     // If recorder wasn't active, maybe handle cleanup manually?
+                     // For now, just proceed to sending whatever chunks we have, if any.
+                    window.sendAudioToBackend(new Blob(audioChunks, { type: 'audio/webm' })); // Try sending current chunks
+                     audioChunks = []; // Clear chunks
+                     isRecording = false; // Ensure state is reset
+                     // Re-enable button if it was manually disabled and no processing started
+                    if (aiInteractionButton && !aiInteractionButton.disabled) { // Added check
+                         aiInteractionButton.disabled = false;
+                         if (interactionButtonIcon) interactionButtonIcon.textContent = '🎙️'; // Added check
+                         if (interactionButtonText) interactionButtonText.textContent = 'Tap to Talk'; // Added check
+                    }
+                }
 
             } else {
                 // Start recording
@@ -1161,13 +1299,16 @@
                     console.log("Microphone access granted.");
 
                     // Create MediaRecorder instance
-                    // Use the stream directly
-                    mediaRecorder = new MediaRecorder(stream);
+                    // Use a specific MIME type if supported, otherwise let the browser choose
+                     const options = MediaRecorder.isTypeSupported('audio/webm; codecs=opus') ? { mimeType : 'audio/webm; codecs=opus' } : {};
+                    mediaRecorder = new MediaRecorder(stream, options);
                     audioChunks = []; // Clear previous chunks
 
                     // Data available event handler
                     mediaRecorder.ondataavailable = event => {
-                        audioChunks.push(event.data);
+                        if (event.data.size > 0) {
+                            audioChunks.push(event.data);
+                        }
                     };
 
                     // Stop event handler
@@ -1175,11 +1316,19 @@
                         console.log("Recording stopped. Combining audio chunks...");
                         isRecording = false; // Update state here
 
+                        if (audioChunks.length === 0) {
+                             console.warn("No audio data recorded.");
+                             // Handle case where no audio was captured (e.g., very short press)
+                            window.initAiFriendPage(); // Reset state and UI
+                             aiResponseTextElement.textContent = "No voice detected. Tap to talk.";
+                             aiResponseTextElement.style.display = 'block';
+                             return;
+                        }
+
+
                         // Combine audio chunks into a single Blob
-                        // Use a specific MIME type if possible, otherwise let the browser choose
-                         const mimeType = MediaRecorder.isTypeSupported('audio/webm; codecs=opus') ? 'audio/webm; codecs=opus' : 'audio/webm';
-                        const audioBlob = new Blob(audioChunks, { type: mimeType }); 
-                        console.log("Audio Blob created:", audioBlob);
+                         const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' }); // Use recorder's type or default
+                        console.log("Audio Blob created:", audioBlob.type, audioBlob.size, "bytes");
 
                         // Send the Blob to the backend API
                         window.sendAudioToBackend(audioBlob); // Use window. prefix
@@ -1192,14 +1341,14 @@
                      // Error handler
                     mediaRecorder.onerror = (event) => {
                          console.error("MediaRecorder error:", event.error);
-                         alert("Recording error: " + event.error.name);
-                         isRecording = false;
+                         alert("Recording error: " + event.error.name + ". Please try again.");
+                         isRecording = false; // Ensure state is false
                          // Attempt to stop stream tracks on error too
                          stream.getTracks().forEach(track => track.stop());
                          // Reset button state on error
-                         aiInteractionButton.disabled = false;
-                         interactionButtonIcon.textContent = '🎙️';
-                         interactionButtonText.textContent = 'Tap to Talk';
+                         if (aiInteractionButton) aiInteractionButton.disabled = false; // Added check
+                         if (interactionButtonIcon) interactionButtonIcon.textContent = '🎙️'; // Added check
+                         if (interactionButtonText) interactionButtonText.textContent = 'Tap to Talk'; // Added check
                          aiResponseTextElement.textContent = 'Recording failed.'; // Show error text
                          aiResponseTextElement.style.display = 'block';
                     };
@@ -1211,9 +1360,9 @@
                     console.log("Recording started.");
 
                     // Update button state
-                    aiInteractionButton.disabled = false; // Keep enabled while recording
-                    interactionButtonIcon.textContent = '🔴'; // Recording icon (Red circle)
-                    interactionButtonText.textContent = 'Listening... Tap to Stop'; // Update text
+                    if (aiInteractionButton) aiInteractionButton.disabled = false; // Keep enabled while recording so user can tap to stop // Added check
+                    if (interactionButtonIcon) interactionButtonIcon.textContent = '🔴'; // Recording icon (Red circle) // Added check
+                    if (interactionButtonText) interactionButtonText.textContent = 'Listening... Tap to Stop'; // Update text // Added check
                      aiResponseTextElement.textContent = 'Listening...'; // Update text
                     aiResponseTextElement.style.display = 'block';
 
@@ -1221,9 +1370,9 @@
                     console.error('Error accessing microphone:', err);
                     alert('Could not access microphone. Please ensure microphone permissions are granted and try again.');
                     // Reset button state on error
-                    aiInteractionButton.disabled = false;
-                    interactionButtonIcon.textContent = '🎙️';
-                    interactionButtonText.textContent = 'Tap to Talk';
+                    if (aiInteractionButton) aiInteractionButton.disabled = false; // Added check
+                    if (interactionButtonIcon) interactionButtonIcon.textContent = '🎙️'; // Added check
+                    if (interactionButtonText) interactionButtonText.textContent = 'Tap to Talk'; // Added check
                     isRecording = false; // Ensure state is false
                     aiResponseTextElement.textContent = 'Microphone access failed.'; // Show error text
                     aiResponseTextElement.style.display = 'block';
@@ -1234,9 +1383,19 @@
         // Function to send the audio blob to the backend API
         window.sendAudioToBackend = async (audioBlob) => {
             console.log("Sending audio to backend...");
+            // Ensure button is disabled while sending/waiting for response
+            if (aiInteractionButton) aiInteractionButton.disabled = true; // Added check
+            if (interactionButtonIcon) interactionButtonIcon.textContent = '⬆️'; // Uploading icon // Added check
+            if (interactionButtonText) interactionButtonText.textContent = 'Sending...'; // Added check
+             aiResponseTextElement.textContent = 'Sending voice data to AI...'; // Update text
+
+
             const formData = new FormData();
             // 'audio_file' must match the parameter name expected by the backend API (`UploadFile = File(...)` in main.py)
-            formData.append('audio_file', audioBlob, 'user_audio.' + audioBlob.type.split('/')[1].split(';')[0]); // Use filename like user_audio.webm
+            // Generate a filename with the correct extension based on blob type
+             const fileExtension = audioBlob.type.split('/')[1] ? '.' + audioBlob.type.split('/')[1].split(';')[0] : '.bin';
+             const filename = `user_audio_${Date.now()}${fileExtension}`; // Unique filename
+            formData.append('audio_file', audioBlob, filename); 
 
             try {
                 const response = await fetch(`${BACKEND_API_URL}/ai/interact/`, {
@@ -1280,12 +1439,11 @@
 
             } finally {
                 // Reset button state after processing (whether success or failure)
-                // Note: If successful, handleAiResponse will manage the visual, but button resets here.
-                // If an error occurred, initAiFriendPage also resets the button.
-                 if (!isRecording) { // Only reset if not still recording (error during recording)
-                     aiInteractionButton.disabled = false;
-                     interactionButtonIcon.textContent = '🎙️';
-                     interactionButtonText.textContent = 'Tap to Talk';
+                // The UI will be updated again when AI audio/video finishes via handleAiResponse
+                 if (!isRecording) { // Only reset button if not still recording (error during recording would keep isRecording false)
+                     // aiInteractionButton.disabled = false; // Keep disabled if AI is talking
+                     // interactionButtonIcon.textContent = '🎙️';
+                     // interactionButtonText.textContent = 'Tap to Talk';
                  }
             }
         };
@@ -1294,36 +1452,50 @@
         window.handleAiResponse = (response) => {
             console.log("Handling AI response:", response);
 
-            const { ai_action, ai_visual_asset_url, ai_audio_url, ai_text_response } = response;
+            const { status: responseStatus, ai_action, ai_visual_asset_url, ai_audio_url, ai_text_response } = response;
 
             // Stop any currently playing audio/video before starting new ones
-            if (!aiResponseAudio.paused) aiResponseAudio.pause();
-            if (!aiVisualVideo.paused) aiVisualVideo.pause();
-            aiVisualVideo.removeAttribute('src'); // Clear previous video source
-            aiResponseAudio.removeAttribute('src'); // Clear previous audio source
+            if (aiResponseAudio && !aiResponseAudio.paused) aiResponseAudio.pause(); // Added check
+            if (aiVisualVideo && !aiVisualVideo.paused) aiVisualVideo.pause(); // Added check
+            if (aiVisualVideo) aiVisualVideo.removeAttribute('src'); // Clear previous video source // Added check
+            if (aiResponseAudio) aiResponseAudio.removeAttribute('src'); // Clear previous audio source // Added check
 
 
             // Update AI Character Text Display
-            if (ai_text_response) {
-                aiResponseTextElement.textContent = ai_text_response;
-                aiResponseTextElement.style.display = 'block'; // Show text
-            } else {
-                 aiResponseTextElement.textContent = '...'; // Or some default like "No response"
-                 aiResponseTextElement.style.display = 'block'; // Show placeholder text
+            if (aiResponseTextElement) { // Added check
+                if (ai_text_response) {
+                    aiResponseTextElement.textContent = ai_text_response;
+                    aiResponseTextElement.style.display = 'block'; // Show text
+                } else {
+                     aiResponseTextElement.textContent = '...'; // Or some default like "No response text"
+                     aiResponseTextElement.style.display = 'block'; // Show placeholder text
+                }
             }
 
+
             // Handle AI Visual and Audio Assets based on action
-            if (ai_action === "show_image" && ai_visual_asset_url) {
+            if (ai_action === "show_image" && ai_visual_asset_url && aiVisualImage) { // Added check for aiVisualImage
                 console.log("Action: show_image. Setting visual to image:", ai_visual_asset_url);
                 
-                aiVisualVideo.style.display = 'none'; // Hide video
+                if (aiVisualVideo) aiVisualVideo.style.display = 'none'; // Hide video // Added check
                 aiVisualImage.src = ai_visual_asset_url;
                 aiVisualImage.style.display = 'block'; // Show image
-                aiCharacterCard.classList.add('active-content'); // Ensure placeholder text is hidden
+                if (aiCharacterCard) aiCharacterCard.classList.add('active-content'); // Ensure placeholder text is hidden // Added check
+
+                // Re-enable button as interaction is likely finished (image implies no talking)
+                 if (aiInteractionButton) aiInteractionButton.disabled = false; // Added check
+                 if (interactionButtonIcon) interactionButtonIcon.textContent = '🎙️'; // Added check
+                 if (interactionButtonText) interactionButtonText.textContent = 'Tap to Talk'; // Added check
 
 
-            } else if (ai_action === "play_talking_video_with_audio" && ai_visual_asset_url && ai_audio_url) {
+            } else if (ai_action === "play_talking_video_with_audio" && ai_visual_asset_url && ai_audio_url && aiVisualVideo && aiResponseAudio) { // Added checks
                 console.log("Action: play_talking_video_with_audio. Setting visual to video:", ai_visual_asset_url, "and audio:", ai_audio_url);
+
+                 // Disable button while AI is talking
+                 if (aiInteractionButton) aiInteractionButton.disabled = true; // Added check
+                 if (interactionButtonIcon) interactionButtonIcon.textContent = '💬'; // Talking icon // Added check
+                 if (interactionButtonText) interactionButtonText.textContent = 'AI is Talking...'; // Added check
+
 
                 // Set up video source
                 aiVisualVideo.src = ai_visual_asset_url;
@@ -1332,9 +1504,9 @@
                 aiVisualVideo.playsinline = true; // Ensure playsinline is set for video too
 
                 // Show the video, hide the image
-                aiVisualImage.style.display = 'none';
+                if (aiVisualImage) aiVisualImage.style.display = 'none'; // Added check
                 aiVisualVideo.style.display = 'block';
-                aiCharacterCard.classList.add('active-content'); // Ensure placeholder text is hidden
+                if (aiCharacterCard) aiCharacterCard.classList.add('active-content'); // Ensure placeholder text is hidden // Added check
 
                 // Set up audio source
                 aiResponseAudio.src = ai_audio_url;
@@ -1342,23 +1514,35 @@
                 // Play audio - this will trigger video playback via event listener
                 aiResponseAudio.play().then(() => {
                      console.log("AI audio playback started.");
-                     // You might hide the text response here if you only want it visible while loading
-                     // aiResponseTextElement.style.display = 'none'; 
+                     // Optionally hide the text response here if you only want it visible while loading
+                     // if(aiResponseTextElement) aiResponseTextElement.style.display = 'none'; // Added check
                 }).catch(e => {
                     console.error("Failed to play AI audio:", e);
                     // Fallback: if audio fails, maybe just loop the video silently
-                    alert("Failed to play AI voice response. Showing video loop.");
-                    aiVisualVideo.play().catch(ve => console.error("Failed to play fallback video:", ve)); // Try playing video silently
-                     aiResponseTextElement.textContent = "Failed to play audio: " + (e.message || "Unknown error");
-                     aiResponseTextElement.style.display = 'block';
+                    // alert("Failed to play AI voice response. Showing video loop."); // Avoid alert here
+                    if (aiVisualVideo) aiVisualVideo.play().catch(ve => console.error("Failed to play fallback video:", ve)); // Try playing video silently // Added check
+                    if (aiResponseTextElement) { // Added check
+                        aiResponseTextElement.textContent = "Failed to play audio: " + (e.message || "Unknown error");
+                        aiResponseTextElement.style.display = 'block';
+                    }
+                     // Ensure video is shown even if audio fails
+                     if (aiVisualVideo) aiVisualVideo.style.display = 'block'; // Added check
+                     if (aiVisualImage) aiVisualImage.style.display = 'none'; // Added check
+                     if (aiCharacterCard) aiCharacterCard.classList.add('active-content'); // Added check
+                     // Re-enable button if audio failed
+                     if (aiInteractionButton) aiInteractionButton.disabled = false; // Added check
+                     if (interactionButtonIcon) interactionButtonIcon.textContent = '🎙️'; // Added check
+                     if (interactionButtonText) interactionButtonText.textContent = 'Tap to Talk'; // Added check
                 });
 
             } else {
                 console.warn("Backend response had invalid action or missing URLs:", response);
                 // Fallback to showing the idle image if response is unclear or missing data
                 window.initAiFriendPage(); // Use window. prefix - this also resets text
-                 aiResponseTextElement.textContent = "Could not process AI response correctly.";
-                 aiResponseTextElement.style.display = 'block';
+                 if (aiResponseTextElement) { // Added check
+                    aiResponseTextElement.textContent = "Could not process AI response correctly. (Invalid response)";
+                    aiResponseTextElement.style.display = 'block';
+                 }
             }
         };
 
@@ -1366,7 +1550,7 @@
         // Play video as soon as audio starts (or is ready to play)
         const playVideoOnAudioStart = () => {
              // Ensure video element exists and has a source before attempting to play
-            if (aiVisualVideo && aiVisualVideo.src) {
+            if (aiVisualVideo && aiVisualVideo.src && aiVisualVideo.style.display !== 'none') { // Only play if video is visible
                  aiVisualVideo.play().catch(e => console.error("Failed to play AI video on audio start:", e));
                  console.log("AI audio started, playing video.");
             }
@@ -1375,20 +1559,154 @@
         // Stop video when audio ends
         const pauseVideoOnAudioEnd = () => {
              // Ensure video element exists before attempting to pause
-            if (aiVisualVideo) {
+            if (aiVisualVideo && aiVisualVideo.style.display !== 'none') { // Only pause if video is visible
                 aiVisualVideo.pause();
                 aiVisualVideo.currentTime = 0; // Reset video to start
                 console.log("AI audio ended, pausing video and resetting.");
-                 // Optionally switch back to idle image after audio finishes if needed
-                 // This depends on whether the 'play_talking_video_with_audio' action is for a single phrase
-                 // or meant to keep the video looping until the next interaction.
-                 // For now, we leave the video visible until the next interaction starts or the page is left.
+                 // Re-enable button when talking finishes
+                 if (aiInteractionButton) aiInteractionButton.disabled = false; // Added check
+                 if (interactionButtonIcon) interactionButtonIcon.textContent = '🎙️'; // Added check
+                 if (interactionButtonText) interactionButtonText.textContent = 'Tap to Talk'; // Added check
             }
+        };
+
+
+        // --- NEW: Video Upload Function ---
+        window.handleVideoUpload = async () => {
+             // Get elements safely
+            const videoFile = videoFileInput ? videoFileInput.files[0] : null;
+            const thumbnailFile = thumbnailFileInput ? thumbnailFileInput.files[0] : null;
+            const videoName = videoNameInput ? videoNameInput.value.trim() : '';
+            const uploaderName = uploaderNameInput ? uploaderNameInput.value.trim() : '';
+            const audience = document.querySelector('input[name="audience"]:checked') ? document.querySelector('input[name="audience"]:checked').value : null;
+            const playlistName = selectedPlaylistNameSpan ? selectedPlaylistNameSpan.textContent.trim() : '';
+            const category = videoCategorySelect ? videoCategorySelect.value : '';
+            
+            if (!videoFile) {
+                alert("Please select a video file to upload.");
+                return;
+            }
+            if (!thumbnailFile) {
+                 alert("Please select a thumbnail image.");
+                 return;
+            }
+            if (!videoName) {
+                 alert("Please enter a video name.");
+                 return;
+            }
+             // Add more validation if needed (playlist selected, category selected, etc.)
+            if (playlistName === 'Select a playlist' || !playlistName) {
+                 alert("Please select or create a playlist.");
+                 return;
+            }
+            if (category === 'Select a category' || !category) {
+                 alert("Please select a category.");
+                 return;
+            }
+
+
+            console.log("Preparing video upload...");
+            // Disable button during upload
+            const uploadButton = document.querySelector('#upload-page-3 .button');
+            if (uploadButton) { // Added check for uploadButton
+                uploadButton.disabled = true;
+                uploadButton.textContent = 'Uploading...';
+            } else {
+                 console.error("Upload button not found.");
+                 return; // Stop if button not found
+            }
+
+
+            const formData = new FormData();
+            formData.append('video_file', videoFile); // Backend expects 'video_file'
+            formData.append('thumbnail_file', thumbnailFile); // Backend expects 'thumbnail_file'
+            formData.append('video_name', videoName);
+            formData.append('uploader_name', uploaderName);
+            formData.append('audience', audience);
+            formData.append('playlist_name', playlistName); // Send playlist name
+            formData.append('category', category); // Send category
+
+
+            // --- Placeholder: Send data to Backend /media/upload endpoint ---
+            // This is where you will add the actual fetch call to your backend's
+            // /media/upload endpoint once it's implemented in main.py.
+            // For now, we'll just log the data and simulate success.
+
+            console.log("Simulating upload data:", Object.fromEntries(formData.entries()));
+
+            // !!! REPLACE THIS SIMULATION WITH ACTUAL BACKEND FETCH LATER !!!
+             // Ensure BACKEND_API_URL is set before attempting fetch
+            if (!BACKEND_API_URL || BACKEND_API_URL === "YOUR_RENDER_BACKEND_URL_HERE") {
+                 console.error("Backend API URL is not configured for upload.");
+                 alert("Backend API URL is not configured. Cannot upload.");
+                 uploadButton.disabled = false;
+                 uploadButton.textContent = 'Upload'; // Reset button text
+                 return;
+            }
+
+            try {
+                console.log(`Sending upload request to: ${BACKEND_API_URL}/media/upload/`);
+                const uploadResponse = await fetch(`${BACKEND_API_URL}/media/upload/`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!uploadResponse.ok) {
+                    const errorDetail = await uploadResponse.text();
+                    console.error("Upload failed:", uploadResponse.status, errorDetail);
+                     let errorMessage = `Upload failed: ${uploadResponse.status}.`;
+                      try {
+                          const errorJson = JSON.parse(errorDetail);
+                          if (errorJson.detail) {
+                              errorMessage = `Upload Error: ${errorJson.detail}`;
+                          } else {
+                              errorMessage = `Upload Error: ${errorDetail.substring(0, 100)}...`;
+                          }
+                      } catch {
+                          errorMessage = `Upload Error: ${errorDetail.substring(0, 100)}...`;
+                      }
+                    alert(errorMessage);
+                    // Note: The /media/upload endpoint is currently a placeholder in main.py
+                    // and will return 501 Not Implemented. This is expected until you implement it.
+                     if (uploadResponse.status === 501) {
+                         alert("Upload backend not implemented yet. Simulation complete.");
+                     }
+
+
+                    return; // Stop if upload fails
+                }
+
+                const uploadResult = await uploadResponse.json();
+                console.log("Upload successful:", uploadResult);
+                // You might get the BunnyCDN URL back here and do something with it (e.g., save to Firestore)
+                alert('Video Uploaded Successfully!');
+                showPage('home-page'); // Navigate home on success
+
+            } catch (error) {
+                console.error("Error during upload fetch:", error);
+                alert("An error occurred during upload: " + (error.message || "Unknown error"));
+            } finally {
+                if (uploadButton) { // Added check
+                    uploadButton.disabled = false;
+                    uploadButton.textContent = 'Upload'; // Reset button text
+                }
+            }
+            // !!! END OF ACTUAL BACKEND FETCH !!!
+
+
+            // --- REMOVE THIS TEMPORARY SIMULATION SUCCESS LATER ---
+            // await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate network delay
+            // alert('Video Upload Process Simulated Successfully! (Replace with actual backend call)');
+            // if (uploadButton) { uploadButton.disabled = false; uploadButton.textContent = 'Upload'; }
+            // showPage('home-page'); // Navigate home after simulation
+            // --- END TEMPORARY SIMULATION ---
+
         };
 
 
         // --- APP INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM Content Loaded. Initializing app.");
             const savedTheme = localStorage.getItem('appTheme') || 'default';
             window.applyTheme(savedTheme);
             
@@ -1405,13 +1723,17 @@
 
             // Initialize static content and placeholder data
             window.populateAiCharPanel();
-            window.populatePlaylistOptions();
-            window.populateCategoryDropdown(categorySelect);
-            window.populateCategoryDropdown(editCategorySelect);
+            // Populate playlist and category dropdowns are now called when upload page is shown
+            // window.populatePlaylistOptions(); 
+            // window.populateCategoryDropdown(categorySelect);
+            // window.populateCategoryDropdown(editCategorySelect); // Should be called when edit page is shown
+
             window.changeLanguage('hi'); 
             window.changeGuidelineLanguage('hi');
-            window.populateProfileViewPage(); // Use window. prefix
-            window.populateProfitPage(); // Use window. prefix
+            // Populate profile and profit pages are now called when their respective pages are shown
+            // window.populateProfileViewPage(); 
+            // window.populateProfitPage(); 
+
             window.startTrendingCardSlider(); // Use window. prefix
 
             // Event listeners for placeholder data pages
@@ -1427,7 +1749,8 @@
                     }
                 });
             }
-             // Add event listeners for AI audio/video sync AFTER elements are available
+             // Add event listeners for AI audio/video synchronization AFTER elements are available
+            // These listeners need to be on the audio element reference
             if(aiResponseAudio) {
                  aiResponseAudio.addEventListener('playing', playVideoOnAudioStart); // When audio starts playing
                  aiResponseAudio.addEventListener('ended', pauseVideoOnAudioEnd); // When audio finishes
@@ -1436,10 +1759,17 @@
 
 
             // Start on the home page after everything is initialized
-            // Call initAiFriendPage only when the AI Friend page is specifically shown via showPage
+            // Call initAiFriendPage and others only when their pages are specifically shown via showPage
             window.showPage('home-page'); 
             
-            storyAudio.onended = () => { storyPlayBtn.textContent = '▶️'; };
+            // Event listener for story audio ending
+            if (storyAudio) { // Added check
+               storyAudio.onended = () => { 
+                   if (storyPlayBtn) storyPlayBtn.textContent = '▶️'; // Added check
+               };
+            }
+
+             console.log("App initialization complete.");
         });
     </script>
 </body>
