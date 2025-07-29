@@ -3,23 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoulSpark App</title>
+    <title>AI Voice Call App</title>
+    
+    <!-- ================== CSS Code Starts Here ================== -->
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 50px; background-color: #f0f2f5; }
-        h1 { color: #333; }
-        p { color: #666; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .button { background-color: #28a745; color: white; padding: 15px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+        .container { 
+            background: white; 
+            padding: 2rem; 
+            border-radius: 12px; 
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 420px; 
+            text-align: center;
+        }
+        h1 { 
+            text-align: center; 
+            color: #1c1e21; 
+            margin-bottom: 1.5rem;
+        }
+        label { 
+            display: block; 
+            margin-bottom: 0.5rem; 
+            color: #555; 
+            font-weight: 600;
+            text-align: left;
+        }
+        input, textarea { 
+            width: 95%; 
+            padding: 0.8rem; 
+            border: 1px solid #ccc; 
+            border-radius: 8px; 
+            margin-bottom: 1.2rem; 
+            font-size: 1rem;
+        }
+        textarea {
+            resize: vertical;
+        }
+        button { 
+            width: 100%; 
+            padding: 0.85rem; 
+            border: none; 
+            background-color: #007bff; 
+            color: white; 
+            font-size: 1.1rem; 
+            font-weight: bold;
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: background-color 0.3s;
+        }
+        button:hover { 
+            background-color: #0056b3; 
+        }
+        .message { 
+            text-align: center; 
+            margin-top: 1.5rem; 
+            padding: 1rem; 
+            border-radius: 8px; 
+            font-weight: 500;
+        }
+        .success { 
+            background-color: #d4edda; 
+            color: #155724; 
+        }
+        .error { 
+            background-color: #f8d7da; 
+            color: #721c24; 
+        }
     </style>
+    <!-- ================== CSS Code Ends Here ================== -->
 </head>
 <body>
     <div class="container">
-        <h1>SoulSpark App</h1>
-        <p>भारत का नया वीडियो प्लेटफ़ॉर्म, जहाँ हर क्रिएटर पहले दिन से कमाता है।</p>
-        <br>
-        <a href="https://github.com/Himanshu-soulspark/soul_spark/releases/download/V2.0/SoulSpark.apk" class="button">Download The App</a>
-        <br><br>
-        <p>For any queries, contact us at: your_email@gmail.com</p>
+        <h1>AI Voice Call</h1>
+        <form id="call-form">
+            <label for="text-to-speak">Text to Speak:</label>
+            <textarea id="text-to-speak" name="text" rows="4" required>Hello, this is a test call from your AI assistant.</textarea>
+
+            <label for="phone-number">Phone Number to Call:</label>
+            <input type="tel" id="phone-number" name="number" placeholder="+911234567890" required>
+            
+            <button type="submit">Call Now</button>
+        </form>
+        <div id="message-box" class="message" style="display:none;"></div>
     </div>
+
+    <!-- ================== JavaScript Code Starts Here ================== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const callForm = document.getElementById('call-form');
+            const messageBox = document.getElementById('message-box');
+
+            callForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const textToSpeak = document.getElementById('text-to-speak').value;
+                const phoneNumber = document.getElementById('phone-number').value;
+                
+                messageBox.style.display = 'block';
+                messageBox.className = 'message';
+                messageBox.textContent = 'Calling... Please wait.';
+
+                try {
+                    const response = await fetch('/call', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            text: textToSpeak,
+                            number: phoneNumber,
+                        }),
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        messageBox.className = 'message success';
+                        messageBox.textContent = `Call initiated successfully! SID: ${result.sid}`;
+                    } else {
+                        messageBox.className = 'message error';
+                        messageBox.textContent = `Error: ${result.error || 'Unknown error'}`;
+                    }
+                } catch (error) {
+                    messageBox.className = 'message error';
+                    messageBox.textContent = 'An unexpected error occurred. Could not connect to the server.';
+                    console.error('Fetch Error:', error);
+                }
+            });
+        });
+    </script>
+    <!-- ================== JavaScript Code Ends Here ================== -->
 </body>
 </html>
