@@ -3,144 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Voice Call App</title>
-    
-    <!-- ================== CSS Code Starts Here ================== -->
-    <style>
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f2f5; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-        }
-        .container { 
-            background: white; 
-            padding: 2rem; 
-            border-radius: 12px; 
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1); 
-            width: 100%; 
-            max-width: 420px; 
-            text-align: center;
-        }
-        h1 { 
-            text-align: center; 
-            color: #1c1e21; 
-            margin-bottom: 1.5rem;
-        }
-        label { 
-            display: block; 
-            margin-bottom: 0.5rem; 
-            color: #555; 
-            font-weight: 600;
-            text-align: left;
-        }
-        input, textarea { 
-            width: 95%; 
-            padding: 0.8rem; 
-            border: 1px solid #ccc; 
-            border-radius: 8px; 
-            margin-bottom: 1.2rem; 
-            font-size: 1rem;
-        }
-        textarea {
-            resize: vertical;
-        }
-        button { 
-            width: 100%; 
-            padding: 0.85rem; 
-            border: none; 
-            background-color: #007bff; 
-            color: white; 
-            font-size: 1.1rem; 
-            font-weight: bold;
-            border-radius: 8px; 
-            cursor: pointer; 
-            transition: background-color 0.3s;
-        }
-        button:hover { 
-            background-color: #0056b3; 
-        }
-        .message { 
-            text-align: center; 
-            margin-top: 1.5rem; 
-            padding: 1rem; 
-            border-radius: 8px; 
-            font-weight: 500;
-        }
-        .success { 
-            background-color: #d4edda; 
-            color: #155724; 
-        }
-        .error { 
-            background-color: #f8d7da; 
-            color: #721c24; 
-        }
-    </style>
-    <!-- ================== CSS Code Ends Here ================== -->
+    <title>App-to-App Voice Call</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>AI Voice Call</h1>
-        <form id="call-form">
-            <label for="text-to-speak">Text to Speak:</label>
-            <textarea id="text-to-speak" name="text" rows="4" required>Hello, this is a test call from your AI assistant.</textarea>
 
-            <label for="phone-number">Phone Number to Call:</label>
-            <input type="tel" id="phone-number" name="number" placeholder="+911234567890" required>
-            
-            <button type="submit">Call Now</button>
-        </form>
-        <div id="message-box" class="message" style="display:none;"></div>
+    <div class="container">
+        <h1>App-to-App Voice Call</h1>
+        <p>Real-Time Voice Changer</p>
+
+        <div class="card my-video-container">
+            <h2>Aapki Details</h2>
+            <p>Aapki Unique ID: <strong id="my-id">Connecting...</strong></p>
+            <audio id="localAudio" muted></audio> <!-- Local audio preview (muted) -->
+        </div>
+
+        <div class="card call-controls">
+            <h2>Call Karein</h2>
+            <input type="text" id="friend-id" placeholder="Dost ki ID yahan daalein">
+            <button id="call-btn">Call</button>
+            <p id="call-status"></p>
+        </div>
+
+        <div class="card voice-effects">
+            <h2>Voice Effects</h2>
+            <select id="voice-filter">
+                <option value="none">Normal Voice</option>
+                <option value="robot">Robotic Voice</option>
+                <option value="chipmunk">Chipmunk (High Pitch)</option>
+                <option value="monster">Monster (Low Pitch)</option>
+            </select>
+        </div>
+
+        <div class="card incoming-call" id="incoming-call-div" style="display:none;">
+            <h2>Incoming Call...</h2>
+            <p><strong id="caller-id"></strong> is calling you.</p>
+            <button id="answer-btn">Answer</button>
+        </div>
+        
+        <div class="card remote-video-container">
+            <h2>Dost ki Awaaz</h2>
+            <audio id="remoteAudio" controls></audio> <!-- Remote audio will play here -->
+        </div>
+
+        <div class="card payment">
+            <h2>Unlock Premium Filters</h2>
+            <p>Ek premium filter unlock karne ke liye ₹20 pay karein.</p>
+            <!-- IMPORTANT: Yahaan 'yourupi@upi' ko apni asli UPI ID se badal lein -->
+            <a href="upi://pay?pa=yourupi@upi&pn=VoiceChangerApp&am=20&tn=Unlock Premium Filter&cu=INR" target="_blank" class="upi-button">
+              Pay ₹20 with UPI
+            </a>
+            <p class="small-text">Payment ke baad, apni Transaction ID enter karke verify karein (manual verification for now).</p>
+        </div>
+
     </div>
 
-    <!-- ================== JavaScript Code Starts Here ================== -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const callForm = document.getElementById('call-form');
-            const messageBox = document.getElementById('message-box');
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-peer@9.11.1/simplepeer.min.js"></script>
+    
+    <!-- Main App Logic -->
+    <script src="app.js"></script>
 
-            callForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-
-                const textToSpeak = document.getElementById('text-to-speak').value;
-                const phoneNumber = document.getElementById('phone-number').value;
-                
-                messageBox.style.display = 'block';
-                messageBox.className = 'message';
-                messageBox.textContent = 'Calling... Please wait.';
-
-                try {
-                    const response = await fetch('/call', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            text: textToSpeak,
-                            number: phoneNumber,
-                        }),
-                    });
-
-                    const result = await response.json();
-
-                    if (response.ok) {
-                        messageBox.className = 'message success';
-                        messageBox.textContent = `Call initiated successfully! SID: ${result.sid}`;
-                    } else {
-                        messageBox.className = 'message error';
-                        messageBox.textContent = `Error: ${result.error || 'Unknown error'}`;
-                    }
-                } catch (error) {
-                    messageBox.className = 'message error';
-                    messageBox.textContent = 'An unexpected error occurred. Could not connect to the server.';
-                    console.error('Fetch Error:', error);
-                }
-            });
-        });
-    </script>
-    <!-- ================== JavaScript Code Ends Here ================== -->
 </body>
 </html>
