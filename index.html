@@ -3,38 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App-to-App Voice Call</title>
+    <title>Voice Call App</title>
+    
+    <!-- Google Fonts (Poppins) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome (Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+
+    <!-- Humari CSS file -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="container">
-        <h1>App-to-App Voice Call</h1>
-        <p>Real-Time Voice Changer</p>
+        <header class="app-header">
+            <i class="fa-solid fa-headset"></i>
+            <h1>Voice Changer</h1>
+            <p>Real-Time Voice Call</p>
+        </header>
 
-        <div class="card my-video-container">
+        <div class="card my-details">
             <h2>Aapki Details</h2>
-            <p>Aapki Unique ID: <strong id="my-id">Connecting...</strong></p>
-            <audio id="localAudio" muted></audio> <!-- Local audio preview (muted) -->
+            <div class="id-wrapper">
+                <i class="fa-solid fa-id-card"></i>
+                <span>Aapki Unique ID:</span>
+                <strong id="my-id">Connecting...</strong>
+                <button id="copy-id-btn" title="Copy ID"><i class="fa-regular fa-copy"></i></button>
+            </div>
         </div>
 
         <div class="card call-controls">
             <h2>Call Karein</h2>
-            <input type="text" id="friend-id" placeholder="Dost ki ID yahan daalein">
-            <button id="call-btn">Call</button>
+            <div class="input-group">
+                <i class="fa-solid fa-user-group"></i>
+                <input type="text" id="friend-id" placeholder="Dost ki ID yahan daalein">
+            </div>
+            <button id="call-btn">
+                <i class="fa-solid fa-phone"></i>
+                Call
+            </button>
             <p id="call-status"></p>
         </div>
 
         <div class="card voice-effects">
             <h2>Voice Effects</h2>
-            <select id="voice-filter">
-                <option value="none">Normal Voice</option>
-                <option value="robot">Robotic Voice</option>
-                <option value="chipmunk">Chipmunk (High Pitch)</option>
-                <option value="monster">Monster (Low Pitch)</option>
-            </select>
+            <div class="input-group">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <select id="voice-filter">
+                    <option value="none">Normal Voice</option>
+                    <option value="robot">Robotic Voice</option>
+                    <option value="chipmunk">Chipmunk (High Pitch)</option>
+                    <option value="monster">Monster (Low Pitch)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="card remote-audio-container">
+            <h2>Dost ki Awaaz</h2>
+            <audio id="remoteAudio" controls></audio>
         </div>
 
+        <!-- Incoming Call Popup (hidden by default) -->
+        <div class="incoming-call-popup" id="incoming-call-div" style="display:none;">
+            <div class="incoming-call-content">
+                <i class="fa-solid fa-phone-volume incoming-icon"></i>
+                <h2>Incoming Call</h2>
+                <p><strong id="caller-id"></strong> is calling you...</p>
+                <button id="answer-btn">
+                    <i class="fa-solid fa-phone-flip"></i>
+                    Answer
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-peer@9.11.1/simplepeer.min.js"></script>
+    
+    <!-- Main App Logic -->
+    <script src="app.js"></script>
+
+</body>
+</html>
         <div class="card incoming-call" id="incoming-call-div" style="display:none;">
             <h2>Incoming Call...</h2>
             <p><strong id="caller-id"></strong> is calling you.</p>
