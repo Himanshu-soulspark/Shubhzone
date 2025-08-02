@@ -90,35 +90,3 @@
 
 </body>
 </html>
-        <div class="card incoming-call" id="incoming-call-div" style="display:none;">
-            <h2>Incoming Call...</h2>
-            <p><strong id="caller-id"></strong> is calling you.</p>
-            <button id="answer-btn">Answer</button>
-        </div>
-        
-        <div class="card remote-video-container">
-            <h2>Dost ki Awaaz</h2>
-            <audio id="remoteAudio" controls></audio> <!-- Remote audio will play here -->
-        </div>
-
-        <div class="card payment">
-            <h2>Unlock Premium Filters</h2>
-            <p>Ek premium filter unlock karne ke liye ₹20 pay karein.</p>
-            <!-- IMPORTANT: Yahaan 'yourupi@upi' ko apni asli UPI ID se badal lein -->
-            <a href="upi://pay?pa=yourupi@upi&pn=VoiceChangerApp&am=20&tn=Unlock Premium Filter&cu=INR" target="_blank" class="upi-button">
-              Pay ₹20 with UPI
-            </a>
-            <p class="small-text">Payment ke baad, apni Transaction ID enter karke verify karein (manual verification for now).</p>
-        </div>
-
-    </div>
-
-    <!-- Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/simple-peer@9.11.1/simplepeer.min.js"></script>
-    
-    <!-- Main App Logic -->
-    <script src="app.js"></script>
-
-</body>
-</html>
