@@ -1,6 +1,4 @@
-// Is line ko dhyan se dekhein. Humne poora URL hata diya hai.
-// Jab frontend aur backend ek hi server par hote hain, toh 'io()' likhne se
-// yeh apne aap sahi server se connect ho jaata hai.
+// Server se connect kar rahe hain. Is line ko badalne ki zaroorat nahi hai.
 const socket = io();
 
 // UI Elements ko select kar rahe hain
@@ -32,24 +30,23 @@ socket.on('connect_error', () => {
 socket.on("your-id", (id) => {
     myId = id;
     myIdElem.textContent = myId;
-    myIdElem.style.color = '#007bff'; // Blue color for ID
+    myIdElem.style.color = '#007bff';
     console.log("My ID:", myId);
 });
 
 // Microphone se audio stream lene ka function
 async function getMedia() {
     try {
-        // Echo cancellation aur noise suppression enable kar rahe hain taaki awaaz saaf aaye
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-            video: false, 
-            audio: { echoCancellation: true, noiseSuppression: true } 
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: false,
+            audio: { echoCancellation: true, noiseSuppression: true }
         });
         myStream = stream;
-        localAudio.srcObject = stream; // Local audio preview ke liye (muted)
-        setupAudioProcessing(stream); // Audio processing setup karein
+        localAudio.srcObject = stream;
+        setupAudioProcessing(stream);
     } catch (err) {
         console.error("Failed to get local stream", err);
-        alert("Microphone access denied. Please allow microphone access to use the app.");
+        alert("Microphone access denied. Please allow microphone access.");
     }
 }
 
@@ -57,48 +54,37 @@ async function getMedia() {
 function setupAudioProcessing(stream) {
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
     mediaStreamSource = audioContext.createMediaStreamSource(stream);
-    destination = audioContext.createMediaStreamDestination(); // Processed stream ke liye destination
-    
-    // Shuru me koi filter nahi, direct connection
+    destination = audioContext.createMediaStreamDestination();
     mediaStreamSource.connect(destination);
-    
-    // Jab user filter select karega, toh yeh function call hoga
     voiceFilterSelect.addEventListener("change", applyFilter);
 }
 
 // Voice filter lagane ka function
 function applyFilter() {
     const selectedFilter = voiceFilterSelect.value;
-    
-    // Puraane filter ko disconnect karein (agar koi hai)
     if (filterNode) filterNode.disconnect();
     mediaStreamSource.disconnect();
 
-    // Agar 'Normal Voice' select kiya hai
     if (selectedFilter === "none") {
         mediaStreamSource.connect(destination);
         return;
     }
 
-    // Naya filter node banayein
     if (selectedFilter === 'robot') {
         filterNode = audioContext.createBiquadFilter();
         filterNode.type = "bandpass";
         filterNode.frequency.value = 1500;
         filterNode.Q.value = 50;
     } else if (selectedFilter === 'chipmunk') {
-        // High pitch effect
         filterNode = audioContext.createBiquadFilter();
         filterNode.type = "highpass";
-        filterNode.detune.value = 1200; // Pitch up
+        filterNode.detune.value = 1200;
     } else if (selectedFilter === 'monster') {
-        // Low pitch effect
         filterNode = audioContext.createBiquadFilter();
         filterNode.type = "lowpass";
-        filterNode.detune.value = -1200; // Pitch down
+        filterNode.detune.value = -1200;
     }
-    
-    // Naye filter ko connect karein
+
     mediaStreamSource.connect(filterNode);
     filterNode.connect(destination);
 }
@@ -106,48 +92,47 @@ function applyFilter() {
 // Page load hote hi microphone access maangein
 getMedia();
 
-// Function to call a user
+// --- YAHAN BADLAAV KIYA GAYA HAI ---
+// Function to call a user (with STUN servers)
 function callUser(friendId) {
-    if (!myStream) {
-        alert("Could not find your microphone stream.");
-        return;
-    }
+    if (!myStream) return alert("Could not find your microphone stream.");
     callStatusElem.textContent = `Calling ${friendId}...`;
-    
-    // WebRTC connection shuru karein (caller)
-    peer = new SimplePeer({ 
-        initiator: true, 
-        trickle: false, 
-        stream: destination.stream // Hum original nahi, balki filtered audio stream bhej rahe hain
+
+    peer = new SimplePeer({
+        initiator: true,
+        trickle: false,
+        stream: destination.stream,
+        // Yeh STUN servers alag-alag networks ke beech call connect karne mein madad karte hain
+        config: {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:global.stun.twilio.com:3478' }
+            ]
+        }
     });
 
-    // WebRTC "offer" signal generate hone par
     peer.on("signal", (data) => {
-        socket.emit("call-user", { 
-            userToCall: friendId, 
-            signalData: data, 
-            from: myId 
-        });
+        socket.emit("call-user", { userToCall: friendId, signalData: data, from: myId });
     });
 
-    // Jab dost ki audio stream aaye
     peer.on("stream", (stream) => {
         remoteAudio.srcObject = stream;
         remoteAudio.play();
     });
 
-    // Jab dost call accept kar le
     socket.on("call-accepted", (signal) => {
         callStatusElem.textContent = "Call connected!";
         incomingCallDiv.style.display = 'none';
-        peer.signal(signal); // Connection poora karein
+        peer.signal(signal);
     });
 
     peer.on('close', handleCallEnd);
-    peer.on('error', handleCallEnd);
+    peer.on('error', (err) => {
+        console.error("Peer Error:", err);
+        handleCallEnd();
+    });
 }
 
-// Jab aapke paas koi call aaye
 socket.on("hey", (data) => {
     callerSignal = data.signal;
     callerIdElem.textContent = data.from;
@@ -155,37 +140,43 @@ socket.on("hey", (data) => {
     callStatusElem.textContent = "";
 });
 
-// Call ka jawab dene ka function
+
+// --- YAHAN BHI BADLAAV KIYA GAYA HAI ---
+// Call ka jawab dene ka function (with STUN servers)
 function answerCall() {
-    if (!myStream) {
-        alert("Could not find your microphone stream.");
-        return;
-    }
+    if (!myStream) return alert("Could not find your microphone stream.");
     incomingCallDiv.style.display = "none";
     callStatusElem.textContent = "Connecting...";
 
-    // WebRTC connection shuru karein (callee)
-    peer = new SimplePeer({ 
-        initiator: false, 
-        trickle: false, 
-        stream: destination.stream 
+    peer = new SimplePeer({
+        initiator: false,
+        trickle: false,
+        stream: destination.stream,
+        // Yeh STUN servers yahaan bhi zaroori hain
+        config: {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:global.stun.twilio.com:3478' }
+            ]
+        }
     });
 
-    // WebRTC "answer" signal generate hone par
     peer.on("signal", (data) => {
         socket.emit("accept-call", { signal: data, to: callerIdElem.textContent });
     });
 
-    // Jab caller ki audio stream aaye
     peer.on("stream", (stream) => {
         remoteAudio.srcObject = stream;
         remoteAudio.play();
     });
 
-    peer.signal(callerSignal); // Aaye hue "offer" ko accept karein
+    peer.signal(callerSignal);
 
     peer.on('close', handleCallEnd);
-    peer.on('error', handleCallEnd);
+    peer.on('error', (err) => {
+        console.error("Peer Error:", err);
+        handleCallEnd();
+    });
 }
 
 function handleCallEnd() {
@@ -196,6 +187,8 @@ function handleCallEnd() {
         peer = null;
     }
     remoteAudio.srcObject = null;
+    // Page ko refresh kar sakte hain taaki sab reset ho jaaye
+    // window.location.reload(); 
 }
 
 socket.on('call-ended', handleCallEnd);
