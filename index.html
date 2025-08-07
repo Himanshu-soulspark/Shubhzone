@@ -1,92 +1,828 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voice Call App</title>
-    
-    <!-- Google Fonts (Poppins) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Raksha Sutra</title>
+    <style>
+        /* --- Google Fonts --- */
+        @import url('https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi:wght@400&family=Poppins:wght@400;600;700&display=swap');
 
-    <!-- Font Awesome (Icons) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+        /* --- CSS Variables --- */
+        :root {
+            --primary-color: #e94d6e;
+            --secondary-color: #f06595;
+            --text-color: #34495e;
+            --light-text-color: #f0f0f0;
+            --card-bg: rgba(255, 255, 255, 0.4);
+            --blur-effect: blur(10px);
+        }
 
-    <!-- Humari CSS file -->
-    <link rel="stylesheet" href="style.css">
+        /* --- General Styles --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* *** UPDATED FILE NAME *** */
+            background: url('Leonardo_Phoenix_10_A_beautiful_festive_background_for_a_Raks_3.jpg') no-repeat center center/cover;
+            overflow: hidden;
+            color: var(--text-color);
+        }
+        
+        /* --- Page Container --- */
+        .page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: opacity 0.7s ease-in-out, transform 0.7s ease-in-out;
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+            padding: 20px;
+            text-align: center;
+            overflow-y: auto;
+        }
+
+        .page.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        /* --- Landing Page --- */
+        .title {
+            font-family: 'Tiro Devanagari Hindi', serif;
+            font-size: clamp(2.8rem, 8vw, 4.5rem);
+            color: #fff;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+
+        .video-card {
+            position: relative;
+            width: 90vw;
+            max-width: 600px;
+            aspect-ratio: 16 / 9;
+            background: var(--card-bg);
+            backdrop-filter: var(--blur-effect);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .video-card video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .subtitle { margin-top: 25px; font-size: clamp(0.9rem, 2.5vw, 1.1rem); color: var(--light-text-color); max-width: 600px; text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5); padding: 0 15px; }
+
+        .cta-button {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 10px 25px rgba(233, 77, 110, 0.4);
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        .cta-button:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(233, 77, 110, 0.5); }
+        .cta-button:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* --- Speaker Icon --- */
+        #speaker-icon { position: fixed; top: 20px; right: 20px; font-size: 1.8rem; color: white; cursor: pointer; z-index: 1000; text-shadow: 2px 2px 5px rgba(0,0,0,0.4); }
+
+        /* --- Form & Profile Page --- */
+        .form-container { width: 90%; max-width: 450px; padding: 40px 30px; background: var(--card-bg); backdrop-filter: var(--blur-effect); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 20px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); }
+        .form-container h2 { font-family: 'Poppins', serif; font-size: 2rem; color: var(--text-color); margin-bottom: 30px; }
+        .input-group { margin-bottom: 20px; position: relative;}
+        .input-field { width: 100%; padding: 15px; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; background-color: rgba(255,255,255,0.7); font-size: 1rem; color: var(--text-color); }
+        .back-link { display: inline-block; margin-top: 15px; color: var(--text-color); text-decoration: none; font-weight: 600; }
+        
+        /* --- Home Page --- */
+        #home-page { justify-content: space-between; padding: 80px 20px 20px 20px; }
+        .home-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px; background: rgba(0,0,0,0.2); backdrop-filter: blur(5px); z-index: 10; }
+        .home-header .title { margin: 0; font-size: 2rem; text-align: center; }
+        #home-page .content-area { display: flex; flex-direction: column; align-items: center; width: 100%; gap: 25px; max-width: 500px; flex-grow: 1; justify-content: center; }
+        .cards-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; width: 100%; }
+        .home-card-wrapper { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .home-card { width: 100%; aspect-ratio: 1 / 1; background-size: cover; background-position: center; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.3s ease; }
+        .home-card:hover { transform: scale(1.05); }
+        #home-page .cta-button { margin-top: 0; width: 100%; padding: 12px 20px; font-size: 1rem; }
+        .home-footer { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; margin-top: auto; }
+        .footer-strip { width: 100%; padding: 15px 25px; font-size: 1.1rem; font-weight: 600; color: #fff; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; cursor: pointer; transition: all 0.3s ease; }
+        .call-details { padding: 20px; border-radius: 15px; display: flex; flex-direction: column; gap: 15px; color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.4); transition: all 0.5s ease; max-height: 0; overflow: hidden; padding: 0 20px; opacity: 0; }
+        .call-details.visible { max-height: 500px; padding: 20px; opacity: 1; margin-top: 15px; }
+        #user-call-id-display { font-weight: 600; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px; }
+        .call-buttons-container { display: flex; gap: 10px; justify-content: center; }
+        .call-buttons-container .cta-button { margin-top: 5px; width: auto; }
+
+        /* --- Profile Page --- */
+        #profile-page .profile-info { text-align: left; width: 100%; }
+        #profile-page .profile-info p { margin-bottom: 20px; color: var(--text-color); font-weight: 600; }
+        #profile-page .profile-info span { font-weight: 400; word-break: break-all; background: rgba(0,0,0,0.2); padding: 5px 8px; border-radius: 8px; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); }
+
+        /* --- Main Interface Page --- */
+        #main-interface-page { overflow: hidden; }
+        #main-interface-page .page-content { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; padding-top: 5vh; }
+        .interface-layout { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 25px; width: 100%; max-width: 95vw; padding: 10px; z-index: 1; }
+        #main-interface-video-card { width: 40vw; max-width: 250px; aspect-ratio: 9 / 16; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.4); position: relative; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.5); }
+        #main-interface-video-card video { width: 100%; height: 100%; object-fit: cover; }
+        .date-display { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); color: #fff; background: rgba(233, 77, 110, 0.7); padding: 5px 15px; border-radius: 12px; font-size: clamp(0.8rem, 2.5vw, 1rem); font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); z-index: 5; white-space: nowrap; }
+        .message-card { background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(15px); border: 2px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 2vw; width: 50vw; max-width: 450px; aspect-ratio: 16 / 9; display: flex; flex-direction: column; justify-content: center; position: relative; box-shadow: 0 15px 40px rgba(0,0,0,0.4); opacity: 0; transform: translateX(50px); animation: revealCard 1.5s 0.5s ease-out forwards; }
+        #main-interface-message { color: white; text-shadow: 1px 1px 4px rgba(0,0,0,0.7); font-size: clamp(0.8rem, 1.5vw, 1rem); line-height: 1.7; white-space: pre-wrap; text-align: left; overflow: auto; }
+        #replay-speech-btn { font-size: 1.6rem; cursor: pointer; color: white; background: rgba(0,0,0,0.2); border-radius: 50%; padding: 8px; position: absolute; bottom: 15px; right: 15px; transition: transform 0.2s; }
+        #replay-speech-btn:hover { transform: scale(1.1); }
+        @keyframes revealCard { to { opacity: 1; transform: translateX(0); } }
+        @media (max-width: 700px) {
+            .interface-layout { flex-direction: column; gap: 20px; }
+            #main-interface-video-card { width: 60vw; max-width: 220px; }
+            .message-card { width: 90vw; max-width: 400px; transform: translateY(50px); aspect-ratio: 16/9; }
+            #main-interface-message { font-size: 0.9rem; }
+        }
+
+        /* --- Falling Flowers Animation --- */
+        #falling-elements-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 2; pointer-events: none; }
+        .falling-element { position: absolute; top: -50px; animation: fall linear infinite; font-size: 1.5rem; }
+        @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
+
+        /* --- Call Page --- */
+        #call-page { background-color: #2c3e50; gap: 10px; }
+        #videos-container { width: 100%; height: 100%; position: relative; }
+        #remote-video { width: 100%; height: 100%; object-fit: cover; background-color: #000; }
+        #local-video { position: absolute; bottom: 20px; right: 20px; width: 30vw; max-width: 150px; aspect-ratio: 9/16; object-fit: cover; border-radius: 15px; border: 2px solid rgba(255,255,255,0.5); box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        #call-controls { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; background: rgba(0,0,0,0.4); padding: 10px 20px; border-radius: 50px; }
+        .control-btn { font-size: 1.8rem; color: white; cursor: pointer; background: none; border: none; padding: 10px; border-radius: 50%; transition: background-color 0.3s; }
+        #hangup-btn { color: #e74c3c; }
+
+    </style>
 </head>
 <body>
 
-    <div class="container">
-        <header class="app-header">
-            <i class="fa-solid fa-headset"></i>
-            <h1>Voice Changer</h1>
-            <p>Real-Time Voice Call</p>
-        </header>
+<audio id="background-audio" loop><source src="3.m4a" type="audio/mp4"></audio>
+<div id="speaker-icon">🔇</div>
 
-        <div class="card my-details">
-            <h2>Aapki Details</h2>
-            <div class="id-wrapper">
-                <i class="fa-solid fa-id-card"></i>
-                <span>Aapki Unique ID:</span>
-                <strong id="my-id">Connecting...</strong>
-                <button id="copy-id-btn" title="Copy ID"><i class="fa-regular fa-copy"></i></button>
-            </div>
-        </div>
+<!-- Page 1: Landing Page -->
+<div id="landing-page" class="page active">
+    <h1 class="title">Raksha Sutra</h1>
+    <!-- *** UPDATED FILE NAME *** -->
+    <div class="video-card"><video autoplay loop muted playsinline><source src="Generated File August 07, 2025 - 7_34PM.mp4" type="video/mp4"></video></div>
+    <p class="subtitle">"Raksha Bandhan is not just a thread, it's an unbreakable bond of hearts.<br>Let's feel this relationship again, with a loving digital Rakhi."</p>
+    <button id="get-started-btn" class="cta-button">Get Started</button>
+</div>
 
-        <div class="card call-controls">
-            <h2>Call Karein</h2>
-            <div class="input-group">
-                <i class="fa-solid fa-user-group"></i>
-                <input type="text" id="friend-id" placeholder="Dost ki ID yahan daalein">
-            </div>
-            <button id="call-btn">
-                <i class="fa-solid fa-phone"></i>
-                Call
-            </button>
-            <p id="call-status"></p>
-        </div>
-
-        <div class="card voice-effects">
-            <h2>Voice Effects</h2>
-            <div class="input-group">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                <select id="voice-filter">
-                    <option value="none">Normal Voice</option>
-                    <option value="robot">Robotic Voice</option>
-                    <option value="chipmunk">Chipmunk (High Pitch)</option>
-                    <option value="monster">Monster (Low Pitch)</option>
-                </select>
-            </div>
-        </div>
-        
-        <div class="card remote-audio-container">
-            <h2>Dost ki Awaaz</h2>
-            <audio id="remoteAudio" controls></audio>
-        </div>
-
-        <!-- Incoming Call Popup (hidden by default) -->
-        <div class="incoming-call-popup" id="incoming-call-div" style="display:none;">
-            <div class="incoming-call-content">
-                <i class="fa-solid fa-phone-volume incoming-icon"></i>
-                <h2>Incoming Call</h2>
-                <p><strong id="caller-id"></strong> is calling you...</p>
-                <button id="answer-btn">
-                    <i class="fa-solid fa-phone-flip"></i>
-                    Answer
-                </button>
-            </div>
-        </div>
-
+<!-- Page 2: Info Form Page -->
+<div id="form-page" class="page">
+    <div class="form-container">
+        <h2>Fill Your Information</h2>
+        <form id="info-form">
+            <div class="input-group"><input type="text" id="name" class="input-field" placeholder="Full Name" required></div>
+            <div class="input-group"><input type="tel" id="phone" class="input-field" placeholder="Mobile Number (Your Call ID)" required></div>
+            <div class="input-group"><textarea id="address" rows="3" class="input-field" placeholder="Full Address" required></textarea></div>
+            <button type="submit" class="cta-button">Submit</button>
+        </form>
     </div>
+</div>
 
-    <!-- Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/simple-peer@9.11.1/simplepeer.min.js"></script>
+<!-- Page 3: Main Interface Page -->
+<div id="main-interface-page" class="page">
+    <div id="falling-elements-container"></div>
+    <div class="page-content">
+        <div class="interface-layout">
+            <div id="main-interface-video-card">
+                 <div class="date-display">Sat, 9 Aug, 2025</div>
+                <video playsinline id="main-video-player"></video>
+            </div>
+            <div class="message-card">
+                <div id="main-interface-message"></div>
+                <div id="replay-speech-btn">🔊</div>
+            </div>
+        </div>
+        <button id="proceed-to-home-btn" class="cta-button">Proceed</button>
+    </div>
+</div>
+
+<!-- Page 4: Home Page -->
+<div id="home-page" class="page">
+    <header class="home-header"><h1 class="title">Raksha Sutra</h1></header>
+    <div class="content-area">
+        <div class="cards-container">
+            <div class="home-card-wrapper">
+                <!-- *** UPDATED FILE NAME *** -->
+                <div id="message-card-btn" class="home-card" style="background-image: url('IMG-20250807-WA0000.jpg');"></div>
+                <button id="open-message-creator-btn" class="cta-button">Open</button>
+            </div>
+            <div class="home-card-wrapper">
+                <!-- *** UPDATED FILE NAME *** -->
+                <div id="card-creator-btn" class="home-card" style="background-image: url('Leonardo_Phoenix_10_A_beautifully_designed_Raksha_Bandhan_Mass_1.jpg');"></div>
+                <button id="open-card-creator-btn" class="cta-button">Open</button>
+            </div>
+        </div>
+    </div>
+    <div class="home-footer">
+        <div id="my-profile-strip" class="footer-strip">My Profile</div>
+        <div id="change-music-strip" class="footer-strip">Change Music</div>
+        <div id="toggle-call-section-strip" class="footer-strip">Audio / Video Call</div>
+        <div id="call-details-section" class="call-details">
+            <h3>Connect with loved ones</h3>
+            <p>Your Call ID: <strong id="user-call-id-display">Not registered</strong></p>
+            <div class="input-group">
+                <input type="tel" id="callee-id-input" class="input-field" placeholder="Enter friend's Call ID">
+            </div>
+            <div class="call-buttons-container">
+                <button id="audio-call-btn" class="cta-button">Audio Call</button>
+                <button id="video-call-btn" class="cta-button">Video Call</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page 5: My Profile Page -->
+<div id="profile-page" class="page">
+    <div class="form-container">
+        <h2>My Profile</h2>
+        <div class="profile-info">
+            <p>Your Name:</p>
+            <div class="input-group"><input type="text" id="profile-name-input" class="input-field" placeholder="Your Name" required></div>
+            
+            <p>Your Address:</p>
+            <div class="input-group"><textarea id="profile-address-input" class="input-field" placeholder="Your Address" rows="3" required></textarea></div>
+
+            <p>Your Call ID: <span id="profile-call-id">Not Registered</span></p>
+        </div>
+        <button id="update-profile-btn" class="cta-button">Update Profile</button>
+        <a href="#" class="back-link" data-target="home-page">Go Back</a>
+    </div>
+</div>
+
+
+<!-- Page 6: Music Change Page -->
+<div id="music-page" class="page">
+     <div class="form-container">
+        <h2>Change Music</h2>
+        <button class="cta-button music-btn" data-src="1.m4a">Raksha Sutra Music 1</button>
+        <button class="cta-button music-btn" data-src="2.m4a">Raksha Sutra Music 2</button>
+        <button class="cta-button music-btn" data-src="3.m4a">Raksha Sutra Music 3</button>
+        <a href="#" class="back-link" data-target="home-page">Go Back</a>
+    </div>
+</div>
+
+<!-- Page 7: Pre-made Message Creator Page -->
+<div id="message-creator-page" class="page">
+    <div class="form-container">
+        <h2 id="message-creator-title">Create a Message</h2>
+        <button id="bhai-to-bhen-btn" class="cta-button" style="width:100%; margin-bottom: 15px;">From Brother to Sister</button>
+        <button id="bhen-to-bhai-btn" class="cta-button" style="width:100%;">From Sister to Brother</button>
+         <a href="#" class="back-link" data-target="home-page">Go Back</a>
+    </div>
+</div>
+
+<!-- Page 8: Name Input for Messages -->
+<div id="message-name-form-page" class="page">
+    <div class="form-container">
+        <h2 id="message-name-title">Enter Names</h2>
+        <form id="message-name-form">
+            <div class="input-group"><input type="text" id="sender-name" class="input-field" placeholder="Your Name" required></div>
+            <div class="input-group"><input type="text" id="receiver-name" class="input-field" placeholder="Brother's/Sister's Name" required></div>
+            <button type="submit" class="cta-button">See Message</button>
+        </form>
+        <a href="#" class="back-link" data-target="message-creator-page">Go Back</a>
+    </div>
+</div>
+
+<!-- Page 9: Message Display Page -->
+<div id="message-display-page" class="page">
+     <div class="form-container">
+        <h2>A Lovely Message For You</h2>
+        <div id="message-display-card" style="width: 100%; min-height: 250px; padding: 25px; background: rgba(255,255,255,0.7); border-radius: 15px; font-size: 1.1rem; line-height: 1.6; color: var(--text-color); display: flex; align-items: center; justify-content: center; text-align: center; margin-bottom: 20px; white-space: pre-wrap;"></div>
+        <p style="color: #555; margin-top: 15px; font-style: italic;">Swipe left or right to change the message</p>
+        <a href="#" class="back-link" data-target="message-name-form-page">Go Back</a>
+    </div>
+</div>
+
+<!-- Page 10: Card Message Input Page -->
+<div id="card-message-input-page" class="page">
+    <div class="form-container">
+        <h2>Write Your Message</h2>
+        <div class="input-group">
+            <textarea id="card-wish-input" class="input-field" placeholder="Write your wish here..." required rows="5"></textarea>
+        </div>
+        <button id="go-to-editor-btn" class="cta-button">Create Image</button>
+        <a href="#" class="back-link" data-target="home-page">Go Back</a>
+    </div>
+</div>
+
+<!-- Page 11: Card Editor Page -->
+<div id="card-editor-page" class="page">
+    <div class="editor-header">
+        <button id="editor-back-btn" class="editor-btn">Back</button>
+        <a id="editor-download-btn" class="editor-btn download-btn" href="#" download="rakhi-wish.png">Download</a>
+    </div>
+    <canvas id="editor-canvas"></canvas>
+    <div id="card-gallery" class="card-gallery-container">
+    </div>
+</div>
+
+<!-- Page 12: Call Page -->
+<div id="call-page" class="page">
+    <div id="videos-container">
+        <video id="remote-video" autoplay playsinline></video>
+        <video id="local-video" autoplay playsinline muted></video>
+    </div>
+    <div id="call-controls">
+        <button id="toggle-mic-btn" class="control-btn">🎙️</button>
+        <button id="toggle-cam-btn" class="control-btn">📷</button>
+        <button id="hangup-btn" class="control-btn">📞</button>
+    </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-analytics.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+    import { getDatabase, ref, set, onValue, off, remove } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyB2PG5JvDko2UmQDlY9gN5lBgga2vQy-Ws",
+        authDomain: "conceptra-c1000.firebaseapp.com",
+        databaseURL: "https://conceptra-c1000-default-rtdb.firebaseio.com",
+        projectId: "conceptra-c1000",
+        storageBucket: "conceptra-c1000.firebasestorage.app",
+        messagingSenderId: "298402987968",
+        appId: "1:298402987968:web:c0d0d7d6c08cdfa6bc5225",
+        measurementId: "G-QRQYEVSJJ6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const rtdb = getDatabase(app);
+
+    const pages = document.querySelectorAll('.page');
+    const audio = document.getElementById('background-audio');
+    const speakerIcon = document.getElementById('speaker-icon');
+    let isMusicPlaying = false;
+    let fallingElementsInterval;
+
+    const mainVideoPlayer = document.getElementById('main-video-player');
+    // *** UPDATED FILE NAMES ***
+    const mainInterfaceVideos = [
+        'main interfacemp4.mp4', 
+        'coming soon rakshabandhan __ 9 August 2025 _comingsoon _rakhi_happyrakshabandhan_status_short(360P).mp4', 
+        'main interface 3.mp4', 
+        'Happy Rakshabandhan 🎊✨🪔 __ Coming soon 🎊 __ _rakshabandhan _status _viral(360P).mp4', 
+        'main interface 4.mp4'
+    ];
+    let currentMainVideoIndex = 0;
+
+    const servers = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
+    let peerConnection;
+    let localStream;
+    let remoteStream;
+    let currentCallRef;
+
+    async function loadProfileForEditing() {
+        const userCallId = localStorage.getItem('rakshaSutraUserCallId');
+        if (!userCallId) {
+            alert("You must be registered to view your profile.");
+            showPage('form-page');
+            return;
+        }
+
+        document.getElementById('profile-call-id').textContent = userCallId;
+
+        try {
+            const userDocRef = doc(db, "users", userCallId);
+            const docSnap = await getDoc(userDocRef);
+
+            if (docSnap.exists()) {
+                const userData = docSnap.data();
+                document.getElementById('profile-name-input').value = userData.name || '';
+                document.getElementById('profile-address-input').value = userData.address || '';
+            } else {
+                console.log("No such document!");
+                alert("Could not find your profile data.");
+                localStorage.clear();
+                showPage('form-page');
+            }
+        } catch (error) {
+            console.error("Error getting document:", error);
+            alert("Error fetching your profile: " + error.message);
+        }
+    }
+
+
+    function showPage(pageId) {
+        const activePage = document.querySelector('.page.active');
+        if (activePage) {
+            if (activePage.id === 'main-interface-page') {
+                mainVideoPlayer.pause();
+                mainVideoPlayer.muted = true; 
+                if (localStorage.getItem('musicWasPlaying') === 'true' && audio.paused) {
+                    audio.play().catch(()=>{});
+                }
+            }
+            if (activePage.id === 'call-page') {
+                endCall();
+            }
+        }
+
+        pages.forEach(p => p.classList.remove('active'));
+        const page = document.getElementById(pageId);
+        if (page) {
+            page.classList.add('active');
+        }
+
+        if (pageId === 'main-interface-page') {
+            startFallingElements();
+            if (!audio.paused) {
+                audio.pause();
+                localStorage.setItem('musicWasPlaying', 'true');
+            } else {
+                localStorage.setItem('musicWasPlaying', 'false');
+            }
+            mainVideoPlayer.muted = false;
+            mainVideoPlayer.play();
+        }
+        
+        if (pageId === 'home-page') {
+            const userCallId = localStorage.getItem('rakshaSutraUserCallId');
+            if(document.getElementById('user-call-id-display')) {
+                document.getElementById('user-call-id-display').textContent = userCallId || 'Not registered';
+            }
+        } else if (pageId === 'profile-page') {
+            loadProfileForEditing();
+        }
+    }
+
+    function toggleMusic() {
+        if (audio.paused) {
+            audio.play().then(() => {
+                speakerIcon.textContent = '🔊';
+                isMusicPlaying = true;
+            }).catch(() => { isMusicPlaying = false; });
+        } else {
+            audio.pause();
+            speakerIcon.textContent = '🔇';
+            isMusicPlaying = false;
+        }
+    }
     
-    <!-- Main App Logic -->
-    <script src="app.js"></script>
+    function startFallingElements() {
+        if (fallingElementsInterval) clearInterval(fallingElementsInterval);
+        const container = document.getElementById('falling-elements-container');
+        container.innerHTML = '';
+        const elements = ['🌺', '🌹', '🌸', '🌷', '🌼', '🏵️', '💮', '☘️', '🍁'];
+        fallingElementsInterval = setInterval(() => {
+            const element = document.createElement('div');
+            element.className = 'falling-element';
+            element.textContent = elements[Math.floor(Math.random() * elements.length)];
+            element.style.left = Math.random() * 100 + 'vw';
+            element.style.animationDuration = Math.random() * 5 + 5 + 's';
+            element.style.fontSize = Math.random() * 1.5 + 1 + 'rem';
+            container.appendChild(element);
+            setTimeout(() => { element.remove(); }, 10000);
+        }, 300);
+    }
 
+    function speakMessage(text) {
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'hi-IN';
+        utterance.rate = 0.9;
+        utterance.pitch = 1.1;
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function setupMainInterfacePage(userName) {
+        const messageText = `प्रिय ${userName},\n\nरक्षाबंधन एक ऐसा पवित्र अवसर है जो भाई-बहन के रिश्ते को सम्मान, विश्वास और सुरक्षा के बंधन में जोड़ता है।\nइस खास दिन पर, हम अपने जीवन में उन रिश्तों का आभार व्यक्त करते हैं जो हर परिस्थिति में हमारे साथ खड़े रहते हैं।`;
+        document.getElementById('main-interface-message').textContent = messageText;
+        mainVideoPlayer.src = mainInterfaceVideos[currentMainVideoIndex];
+        showPage('main-interface-page');
+        setTimeout(() => speakMessage(messageText), 1500);
+    }
+    
+    function playNextMainVideo() {
+        currentMainVideoIndex = (currentMainVideoIndex + 1) % mainInterfaceVideos.length;
+        mainVideoPlayer.src = mainInterfaceVideos[currentMainVideoIndex];
+        mainVideoPlayer.play();
+    }
+
+    async function initiateCall(isVideo) {
+        // This is where the browser checks for a secure context (https or localhost)
+        // If the context is not secure, it will not allow access to getUserMedia
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert("कॉलिंग फीचर आपके ब्राउज़र में समर्थित नहीं है या आप एक असुरक्षित (non-https) कनेक्शन पर हैं।");
+            return;
+        }
+
+        const calleeId = document.getElementById('callee-id-input').value;
+        const callerId = localStorage.getItem('rakshaSutraUserCallId');
+        if (!calleeId || !callerId) {
+            alert("कृपया मित्र की वैध कॉल आईडी दर्ज करें। आपको पहले पंजीकरण करना होगा।");
+            return;
+        }
+        
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true });
+            document.getElementById('local-video').srcObject = localStream;
+        } catch (error) {
+            console.error("Error accessing media devices.", error);
+            alert("कैमरा/माइक्रोफ़ोन तक पहुँचने में विफल। कृपया अनुमति दें और सुनिश्चित करें कि आप एक सुरक्षित (https) कनेक्शन पर हैं।");
+            return;
+        }
+
+        currentCallRef = ref(rtdb, `calls/${calleeId}`);
+        peerConnection = new RTCPeerConnection(servers);
+
+        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+        
+        peerConnection.ontrack = event => {
+            if (event.streams && event.streams[0]) {
+                document.getElementById('remote-video').srcObject = event.streams[0];
+            }
+        };
+
+        peerConnection.onicecandidate = event => {
+            if (event.candidate) {
+                set(ref(rtdb, `calls/${calleeId}/iceCandidates/caller`), event.candidate.toJSON());
+            }
+        };
+        
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        
+        const offerPayload = { sdp: offer.sdp, type: offer.type, callerId: callerId, isVideo: isVideo };
+        await set(ref(rtdb, `calls/${calleeId}/offer`), offerPayload);
+
+        onValue(ref(rtdb, `calls/${calleeId}/answer`), async (snapshot) => {
+            if (snapshot.exists() && !peerConnection.currentRemoteDescription) {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(snapshot.val()));
+            }
+        }, { onlyOnce: true });
+
+        onValue(ref(rtdb, `calls/${calleeId}/iceCandidates/callee`), (snapshot) => {
+            if (snapshot.exists()) {
+                peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val()));
+            }
+        });
+        
+        showPage('call-page');
+    }
+
+    function listenForCalls() {
+        const myCallId = localStorage.getItem('rakshaSutraUserCallId');
+        if (!myCallId) return;
+
+        const callRef = ref(rtdb, `calls/${myCallId}`);
+        onValue(callRef, async (snapshot) => {
+            if (snapshot.hasChild('offer')) {
+                const { callerId, isVideo } = snapshot.val().offer;
+                const confirmed = confirm(`(${callerId}) से एक ${isVideo ? 'वीडियो' : 'ऑडियो'} कॉल आ रहा है। स्वीकार करें?`);
+                if (confirmed) {
+                    await answerCall(myCallId, snapshot.val().offer);
+                } else {
+                    await remove(callRef);
+                }
+            }
+        });
+    }
+    
+    async function answerCall(myCallId, offer) {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert("कॉलिंग फीचर आपके ब्राउज़र में समर्थित नहीं है।");
+            return;
+        }
+
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: offer.isVideo, audio: true });
+            document.getElementById('local-video').srcObject = localStream;
+        } catch (error) {
+            console.error("Error accessing media devices.", error);
+            alert("कैमरा/माइक्रोफ़ोन तक पहुँचने में विफल। कृपया अनुमति दें।");
+            return;
+        }
+
+        currentCallRef = ref(rtdb, `calls/${myCallId}`);
+        peerConnection = new RTCPeerConnection(servers);
+        
+        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+        peerConnection.ontrack = event => {
+            if (event.streams && event.streams[0]) {
+                document.getElementById('remote-video').srcObject = event.streams[0];
+            }
+        };
+
+        peerConnection.onicecandidate = event => {
+            if (event.candidate) {
+                set(ref(rtdb, `calls/${myCallId}/iceCandidates/callee`), event.candidate.toJSON());
+            }
+        };
+        
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+        
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+
+        await set(ref(rtdb, `calls/${myCallId}/answer`), { sdp: answer.sdp, type: answer.type });
+
+        onValue(ref(rtdb, `calls/${myCallId}/iceCandidates/caller`), (snapshot) => {
+            if (snapshot.exists()) {
+                peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val()));
+            }
+        });
+
+        showPage('call-page');
+    }
+    
+    function endCall() {
+        if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+            localStream = null;
+        }
+        if (peerConnection) {
+            peerConnection.close();
+            peerConnection = null;
+        }
+        if (currentCallRef) {
+            remove(currentCallRef);
+            currentCallRef = null;
+        }
+        if (document.querySelector('.page.active').id === 'call-page') {
+             showPage('home-page');
+        }
+    }
+
+    // --- Event Listeners ---
+
+    window.addEventListener('load', () => {
+        showPage('landing-page');
+        if (localStorage.getItem('rakshaSutraUserCallId')) {
+            listenForCalls();
+        }
+    });
+
+    speakerIcon.addEventListener('click', toggleMusic);
+
+    document.getElementById('get-started-btn').addEventListener('click', () => {
+        if (localStorage.getItem('rakshaSutraUserCallId')) {
+            setupMainInterfacePage(localStorage.getItem('rakshaSutraUserName'));
+        } else {
+            showPage('form-page');
+        }
+    });
+
+    document.getElementById('info-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.textContent = 'Submitting...';
+
+        const phone = document.getElementById('phone').value;
+        const name = document.getElementById('name').value;
+        const address = document.getElementById('address').value;
+
+        try {
+            await setDoc(doc(db, "users", phone), { 
+                name: name, 
+                phone: phone, 
+                address: address, 
+                timestamp: serverTimestamp() 
+            });
+
+            localStorage.setItem('rakshaSutraUserName', name);
+            localStorage.setItem('rakshaSutraUserCallId', phone);
+            
+            alert(`धन्यवाद, ${name}! आपकी प्रोफ़ाइल बन गई है।\nआपकी कॉल आईडी है: ${phone}`);
+            
+            listenForCalls();
+            setupMainInterfacePage(name);
+            
+        } catch (error) {
+            console.error("Error writing document: ", error);
+            alert("एक त्रुटि हुई: " + error.message);
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Submit';
+        }
+    });
+
+    mainVideoPlayer.addEventListener('ended', playNextMainVideo);
+
+    let touchstartX = 0;
+    document.getElementById('main-interface-video-card').addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, { passive: true });
+    document.getElementById('main-interface-video-card').addEventListener('touchend', e => {
+        const touchendX = e.changedTouches[0].screenX;
+        if (touchendX < touchstartX - 50) playNextMainVideo();
+        if (touchendX > touchstartX + 50) {
+            currentMainVideoIndex = (currentMainVideoIndex - 1 + mainInterfaceVideos.length) % mainInterfaceVideos.length;
+            mainVideoPlayer.src = mainInterfaceVideos[currentMainVideoIndex];
+            mainVideoPlayer.play();
+        }
+    });
+    
+    document.getElementById('update-profile-btn').addEventListener('click', async () => {
+        const updateButton = document.getElementById('update-profile-btn');
+        const userCallId = localStorage.getItem('rakshaSutraUserCallId');
+        
+        if (!userCallId) {
+            alert("Cannot update profile. User is not registered.");
+            return;
+        }
+
+        const newName = document.getElementById('profile-name-input').value;
+        const newAddress = document.getElementById('profile-address-input').value;
+
+        if (!newName || !newAddress) {
+            alert("Name and Address cannot be empty.");
+            return;
+        }
+        
+        updateButton.disabled = true;
+        updateButton.textContent = 'Updating...';
+
+        const userDocRef = doc(db, "users", userCallId);
+
+        try {
+            await updateDoc(userDocRef, {
+                name: newName,
+                address: newAddress
+            });
+
+            localStorage.setItem('rakshaSutraUserName', newName);
+
+            alert("Profile updated successfully!");
+        } catch (error) {
+            console.error("Error updating document: ", error);
+            alert("An error occurred while updating: " + error.message);
+        } finally {
+            updateButton.disabled = false;
+            updateButton.textContent = 'Update Profile';
+        }
+    });
+
+    document.getElementById('proceed-to-home-btn').addEventListener('click', () => showPage('home-page'));
+    document.getElementById('message-card-btn').addEventListener('click', () => showPage('message-creator-page'));
+    document.getElementById('open-message-creator-btn').addEventListener('click', () => showPage('message-creator-page'));
+    document.getElementById('card-creator-btn').addEventListener('click', () => showPage('card-message-input-page'));
+    document.getElementById('open-card-creator-btn').addEventListener('click', () => showPage('card-message-input-page'));
+    document.getElementById('change-music-strip').addEventListener('click', () => showPage('music-page'));
+    document.getElementById('my-profile-strip').addEventListener('click', () => showPage('profile-page'));
+
+    document.getElementById('toggle-call-section-strip').addEventListener('click', () => {
+        document.getElementById('call-details-section').classList.toggle('visible');
+    });
+    
+    document.getElementById('video-call-btn').addEventListener('click', () => initiateCall(true));
+    document.getElementById('audio-call-btn').addEventListener('click', () => initiateCall(false));
+    document.getElementById('hangup-btn').addEventListener('click', endCall);
+
+    document.getElementById('toggle-mic-btn').addEventListener('click', () => {
+        if (localStream) {
+            localStream.getAudioTracks().forEach(track => {
+                track.enabled = !track.enabled;
+            });
+        }
+    });
+    document.getElementById('toggle-cam-btn').addEventListener('click', () => {
+        if (localStream) {
+            localStream.getVideoTracks().forEach(track => {
+                track.enabled = !track.enabled;
+            });
+        }
+    });
+
+    document.querySelectorAll('.back-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage(link.dataset.target);
+        });
+    });
+    
+    document.querySelectorAll('.music-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            audio.src = button.dataset.src;
+            if (audio.paused) {
+                toggleMusic();
+            } else {
+                audio.play();
+            }
+            showPage('home-page');
+        });
+    });
+
+</script>
 </body>
 </html>
