@@ -24,7 +24,7 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: url('Leonardo_Phoenix_10_A_beautiful_festive_background_for_a_Raks_3.jpg') no-repeat center center/cover;
+            background: url('https://i.imgur.com/OfaHTgG.jpg') no-repeat center center/cover;
             overflow: hidden;
             color: var(--text-color);
         }
@@ -56,7 +56,7 @@
         }
 
         /* --- Landing Page --- */
-        .title {
+        #landing-page .title {
             font-family: 'Tiro Devanagari Hindi', serif;
             font-size: clamp(2.8rem, 8vw, 4.5rem);
             color: #fff;
@@ -107,25 +107,85 @@
         .input-field { width: 100%; padding: 15px; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; background-color: rgba(255,255,255,0.7); font-size: 1rem; color: var(--text-color); }
         .back-link { display: inline-block; margin-top: 15px; color: var(--text-color); text-decoration: none; font-weight: 600; }
         
-        /* --- Home Page --- */
-        #home-page { justify-content: space-between; padding: 80px 20px 20px 20px; }
-        .home-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px; background: rgba(0,0,0,0.2); backdrop-filter: blur(5px); z-index: 10; }
-        .home-header .title { margin: 0; font-size: 2rem; text-align: center; }
-        #home-page .content-area { display: flex; flex-direction: column; align-items: center; width: 100%; gap: 25px; max-width: 500px; flex-grow: 1; justify-content: center; }
-        .cards-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; width: 100%; }
-        .home-card-wrapper { display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        .home-card { width: 100%; aspect-ratio: 1 / 1; background-size: cover; background-position: center; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.3s ease; }
-        .home-card:hover { transform: scale(1.05); }
-        #home-page .cta-button { margin-top: 0; width: 100%; padding: 12px 20px; font-size: 1rem; }
-        .home-footer { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; margin-top: auto; padding-top:20px; }
-        .footer-strip { width: 100%; padding: 15px 25px; font-size: 1.1rem; font-weight: 600; color: #fff; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        /* --- NEW: Redesigned Home Page --- */
+        #home-page {
+            justify-content: space-evenly;
+            padding: 20px;
+        }
+        .home-header {
+            font-family: 'Tiro Devanagari Hindi', serif;
+            font-size: clamp(2.5rem, 7vw, 3.5rem);
+            color: #fff;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.6);
+        }
+        .home-cards-container {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            max-width: 500px;
+            justify-content: center;
+        }
+        .home-main-card {
+            width: 48%;
+            aspect-ratio: 2 / 2.5;
+            background-size: cover;
+            background-position: center;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .home-main-card:hover { transform: scale(1.05); }
+        .home-main-card .card-label {
+            width: 100%;
+            padding: 12px 10px;
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+        .home-footer-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 450px;
+        }
+        .footer-button {
+            width: 100%;
+            padding: 18px 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .footer-button:hover {
+             background: rgba(0, 0, 0, 0.5);
+             transform: translateY(-3px);
+        }
         
         /* --- Profile Page --- */
         #profile-page .profile-info { text-align: left; width: 100%; }
         #profile-page .profile-info p { margin-bottom: 20px; color: var(--text-color); font-weight: 600; }
         #profile-page .profile-info span { font-weight: 400; word-break: break-all; background: rgba(0,0,0,0.2); padding: 5px 8px; border-radius: 8px; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); }
 
-        /* --- NEW: Main Interface Page --- */
+        /* --- Main Interface Page --- */
         #main-interface-page { justify-content: center; }
         .dual-card-layout {
             display: flex;
@@ -223,7 +283,7 @@
         .falling-element { position: absolute; top: -50px; animation: fall linear infinite; font-size: 1.5rem; }
         @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
 
-        /* --- NEW: Shared Message Viewer --- */
+        /* --- Shared Message Viewer --- */
         #shared-message-viewer {
             position: fixed;
             top: 0;
@@ -233,7 +293,7 @@
             background: rgba(0,0,0,0.8);
             backdrop-filter: blur(10px);
             z-index: 9999;
-            display: none; /* Hidden by default */
+            display: none; 
             justify-content: center;
             align-items: center;
             padding: 20px;
@@ -258,7 +318,6 @@
         #message-display-card {
             width: 100%; min-height: 250px; padding: 25px; background: rgba(255,255,255,0.7); border-radius: 15px; font-size: 1.1rem; line-height: 1.6; color: var(--text-color); display: flex; align-items: center; justify-content: center; text-align: center; margin-bottom: 20px; white-space: pre-wrap;
         }
-
     </style>
 </head>
 <body>
@@ -266,13 +325,12 @@
 <audio id="background-audio" loop><source src="3.m4a" type="audio/mp4"></audio>
 <div id="speaker-icon">🔇</div>
 
-<!-- NEW: Shared Message Viewer -->
 <div id="shared-message-viewer">
     <div id="shared-message-content"></div>
 </div>
 
 <!-- Page 1: Landing Page -->
-<div id="landing-page" class="page">
+<div id="landing-page" class="page active">
     <h1 class="title">Raksha Sutra</h1>
     <div class="video-card"><video autoplay loop muted playsinline><source src="Generated File August 07, 2025 - 7_34PM.mp4" type="video/mp4"></video></div>
     <p class="subtitle">"रक्षाबंधन सिर्फ एक धागा नहीं, बल्कि दिलों का एक अटूट बंधन है।<br>आइए इस रिश्ते को फिर से महसूस करें, एक प्यार भरी डिजिटल राखी के साथ।"</p>
@@ -292,7 +350,7 @@
     </div>
 </div>
 
-<!-- Page 3: Main Interface Page (NEW DESIGN) -->
+<!-- Page 3: Main Interface Page -->
 <div id="main-interface-page" class="page">
     <div id="falling-elements-container"></div>
     <div class="dual-card-layout">
@@ -313,26 +371,22 @@
     </button>
 </div>
 
-<!-- Page 4: Home Page -->
+<!-- Page 4: Home Page (NEW DESIGN) -->
 <div id="home-page" class="page">
-    <header class="home-header"><h1 class="title">रक्षा सूत्र</h1></header>
-    <div class="content-area">
-        <div class="cards-container">
-            <div class="home-card-wrapper">
-                <div id="message-card-btn" class="home-card" style="background-image: url('IMG-20250807-WA0000.jpg');"></div>
-                <button id="open-message-creator-btn" class="cta-button">संदेश भेजें</button>
-            </div>
-            <div class="home-card-wrapper">
-                <div id="card-creator-btn" class="home-card" style="background-image: url('Leonardo_Phoenix_10_A_beautifully_designed_Raksha_Bandhan_Mass_1.jpg');"></div>
-                <button id="open-card-creator-btn" class="cta-button">कार्ड बनाएं</button>
-            </div>
+    <h1 class="home-header">रक्षा सूत्र</h1>
+    <div class="home-cards-container">
+        <div id="open-message-creator-btn" class="home-main-card" style="background-image: url('https://i.imgur.com/uJmYf4L.jpeg');">
+            <div class="card-label">संदेश भेजें</div>
+        </div>
+        <div id="open-card-creator-btn" class="home-main-card" style="background-image: url('https://i.imgur.com/k2gUa2d.jpeg');">
+            <div class="card-label">कार्ड बनाएं</div>
         </div>
     </div>
-    <div class="home-footer">
-        <div id="my-profile-strip" class="footer-strip">मेरी प्रोफाइल</div>
-        <div id="change-music-strip" class="footer-strip">संगीत बदलें</div>
-        <div id="whatsapp-share-strip" class="footer-strip">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M.05 22c.12-.59.25-1.18.41-1.76l.09-.32c.31-1.09.7-2.14 1.18-3.15.53-1.12 1.16-2.19 1.88-3.18.82-1.1 1.74-2.1 2.76-3 .2-.18.4-.36.6-.53l.4-.33c.53-.44 1.1-.82 1.7-1.14.99-.53 2.03-.9 3.1-1.1.33-.07.67-.12 1.01-.16.29-.03.59-.05.88-.05.23 0 .46.01.69.03.37.03.74.08 1.1.15.99.19 1.94.55 2.83 1.06.88.5 1.69 1.14 2.41 1.89s1.25 1.53 1.75 2.41c.45.83.78 1.71 1 2.62.22.91.31 1.85.28 2.79-.03.95-.2 1.89-.51 2.79-.31.9-.76 1.76-1.33 2.55-.57.79-1.25 1.5-2.02 2.11-.78.6-1.63 1.1-2.54 1.49-.91.38-1.88.64-2.86.76-.98.12-1.97.1-2.95-.05-.98-.15-1.95-.44-2.88-.86a12.926 12.926 0 01-2.7-1.48c-.24-.13-.47-.27-.7-.41l-1.68-1.02c-.55-.33-1.1-.68-1.64-1.05-.1-.07-.2-.14-.3-.21l-.06-.05c-.62-.48-1.2-1-1.73-1.57-.49-.52-.93-1.08-1.32-1.68-.3-.46-.55-.95-.77-1.45l-.02-.06c-.25-.56-.47-1.14-.65-1.73l-.04-.13c-.22-.72-.39-1.46-.5-2.22-.05-.33-.08-.67-.1-1H.05zM9.3 8.35c.14-.38.33-.74.58-1.06.25-.32.55-.6.88-.82.34-.22.7-.4 1.08-.52s.78-.18 1.18-.18c.39 0 .78.04 1.15.13.37.09.73.23 1.06.41.33.18.64.41.91.68.27.27.5.58.68.91.18.33.31.69.4 1.06.09.37.13.76.13 1.15s-.04.78-.13 1.15c-.09.37-.22.73-.4 1.06-.18.33-.41.64-.68.91-.27.27-.58.5-.91.68-.33.18-.69.32-1.06.41-.37.09-.76.13-1.15.13s-.78-.04-1.15-.13c-.37-.09-.73-.23-1.06-.41-.33-.18-.64-.41-.91-.68-.27-.27-.5-.58-.68-.91-.18-.33-.31-.69-.4-1.06-.09-.37-.13-.76-.13-1.15s.05-.78.14-1.15z"/></svg>
+    <div class="home-footer-buttons">
+        <div id="my-profile-strip" class="footer-button">मेरी प्रोफाइल</div>
+        <div id="change-music-strip" class="footer-button">संगीत बदलें</div>
+        <div id="whatsapp-share-strip" class="footer-button">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF" style="vertical-align: middle;"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M.05 22c.12-.59.25-1.18.41-1.76l.09-.32c.31-1.09.7-2.14 1.18-3.15.53-1.12 1.16-2.19 1.88-3.18.82-1.1 1.74-2.1 2.76-3 .2-.18.4-.36.6-.53l.4-.33c.53-.44 1.1-.82 1.7-1.14.99-.53 2.03-.9 3.1-1.1.33-.07.67-.12 1.01-.16.29-.03.59-.05.88-.05.23 0 .46.01.69.03.37.03.74.08 1.1.15.99.19 1.94.55 2.83 1.06.88.5 1.69 1.14 2.41 1.89s1.25 1.53 1.75 2.41c.45.83.78 1.71 1 2.62.22.91.31 1.85.28 2.79-.03.95-.2 1.89-.51 2.79-.31.9-.76 1.76-1.33 2.55-.57.79-1.25 1.5-2.02 2.11-.78.6-1.63 1.1-2.54 1.49-.91.38-1.88.64-2.86.76-.98.12-1.97.1-2.95-.05-.98-.15-1.95-.44-2.88-.86a12.926 12.926 0 01-2.7-1.48c-.24-.13-.47-.27-.7-.41l-1.68-1.02c-.55-.33-1.1-.68-1.64-1.05-.1-.07-.2-.14-.3-.21l-.06-.05c-.62-.48-1.2-1-1.73-1.57-.49-.52-.93-1.08-1.32-1.68-.3-.46-.55-.95-.77-1.45l-.02-.06c-.25-.56-.47-1.14-.65-1.73l-.04-.13c-.22-.72-.39-1.46-.5-2.22-.05-.33-.08-.67-.1-1H.05zM9.3 8.35c.14-.38.33-.74.58-1.06.25-.32.55-.6.88-.82.34-.22.7-.4 1.08-.52s.78-.18 1.18-.18c.39 0 .78.04 1.15.13.37.09.73.23 1.06.41.33.18.64.41.91.68.27.27.5.58.68.91.18.33.31.69.4 1.06.09.37.13.76.13 1.15s-.04.78-.13 1.15c-.09.37-.22.73-.4 1.06-.18.33-.41.64-.68.91-.27.27-.58.5-.91.68-.33.18-.69.32-1.06.41-.37-.09-.76.13-1.15.13s-.78-.04-1.15-.13c-.37-.09-.73-.23-1.06-.41-.33-.18-.64-.41-.91-.68-.27-.27-.5-.58-.68-.91-.18-.33-.31-.69-.4-1.06-.09-.37-.13-.76-.13-1.15s.05-.78.14-1.15z"/></svg>
             <span>ऐप शेयर करें</span>
         </div>
     </div>
@@ -447,37 +501,14 @@
     const pages = document.querySelectorAll('.page');
     const audio = document.getElementById('background-audio');
     const speakerIcon = document.getElementById('speaker-icon');
-    let isMusicPlaying = false;
     let fallingElementsInterval;
     let currentShareId = null;
     
     let messageType = ''; 
     let currentMessageIndex = 0;
     const messages = {
-        'bhai-to-bhen': [
-            "मेरी प्यारी बहना, यह राखी का धागा सिर्फ एक धागा नहीं, बल्कि मेरे प्यार और सुरक्षा का वादा है जो मैं तुमसे जीवन भर निभाऊंगा। रक्षाबंधन की बहुत-बहुत बधाई!",
-            "बचपन की वो खट्टी-मीठी यादें आज भी चेहरे पर मुस्कान ले आती हैं। तुम्हारा होना मेरे जीवन का सबसे बड़ा तोहफा है। हैप्पी रक्षाबंधन, मेरी प्यारी बहन!",
-            "तुम सिर्फ मेरी बहन नहीं, मेरी सबसे अच्छी दोस्त भी हो। हर मुश्किल में मेरा साथ देने के लिए धन्यवाद। ईश्वर तुम्हें दुनिया की सारी खुशियाँ दे।",
-            "चाहे हम कितने भी दूर क्यों न हों, इस राखी के दिन मेरा मन हमेशा तुम्हारे पास होता है। तुम्हारा भाई हमेशा तुम्हारे साथ है। हैप्पी राखी!",
-            "आज का दिन बहुत खास है, क्योंकि यह दिन हमारे प्यारे रिश्ते का प्रतीक है। मैं प्रार्थना करता हूँ कि हमारा यह बंधन हमेशा ऐसे ही मजबूत बना रहे।",
-            "मेरी शरारतों को सहने वाली और मुझे हमेशा सही रास्ता दिखाने वाली मेरी प्यारी बहना को रक्षाबंधन की हार्दिक शुभकामनाएँ।",
-            "तुम्हारी राखी मेरी कलाई पर एक कवच की तरह है, जो मुझे हर मुश्किल से लड़ने की ताकत देती है। हमेशा खुश रहो, बहना।",
-            "यह सिर्फ एक धागा नहीं है, यह हमारा अटूट विश्वास और प्यार है। भगवान करे, हमारे रिश्ते की यह मिठास कभी कम न हो।",
-            "तुम मेरे जीवन की प्रेरणा हो। तुम्हारी हंसी मेरे लिए सबसे कीमती है। रक्षाबंधन के इस पावन पर्व पर तुम्हें ढेर सारा प्यार।",
-            "हर साल की तरह इस साल भी मैं वादा करता हूँ कि तुम्हारे हर सुख-दुख में तुम्हारा साथ दूंगा। लव यू बहना, हैप्पी रक्षाबंधन!"
-        ],
-        'bhen-to-bhai': [
-            "मेरे प्यारे भाई, तुम्हारी कलाई पर यह राखी बांधकर मैं भगवान से तुम्हारी लंबी उम्र और सफलता की कामना करती हूँ। रक्षाबंधन की शुभकामनाएँ!",
-            "तुम मेरे पहले दोस्त और मेरे सुपरहीरो हो। मुझे हमेशा सुरक्षित महसूस कराने के लिए धन्यवाद। हैप्पी राखी भैया!",
-            "हमारा रिश्ता नोक-झोंक और ढेर सारे प्यार से भरा है। भगवान हमारे इस अनोखे बंधन को हमेशा सलामत रखे। हैप्पी रक्षाबंधन।",
-            "दूर होकर भी तुम हमेशा मेरे दिल के करीब हो। यह राखी मेरा प्यार और आशीर्वाद तुम तक पहुंचाएगी। बहुत याद आती है, भाई।",
-            "बचपन से लेकर आज तक, तुमने हमेशा एक बड़े भाई का फर्ज निभाया है। तुम्हारे जैसा भाई पाकर मैं बहुत भाग्यशाली हूँ।",
-            "यह राखी का धागा तुम्हें हर बुरी नजर से बचाए और तुम्हारे जीवन में खुशियों के नए रंग भरे। सदा खुश रहो, मेरे प्यारे भाई।",
-            "जब भी मुझे किसी सहारे की जरूरत पड़ी, मैंने तुम्हें अपने पास पाया। तुम दुनिया के सबसे अच्छे भाई हो। रक्षाबंधन मुबारक!",
-            "तुम्हारी सफलता और खुशी ही मेरी सबसे बड़ी इच्छा है। यह राखी का त्योहार तुम्हारे लिए ढेर सारी सौगातें लेकर आए।",
-            "याद है कैसे हम छोटी-छोटी बातों पर लड़ते थे? आज वो पल बहुत याद आते हैं। हमारा प्यार हमेशा ऐसा ही बना रहे। हैप्पी राखी!",
-            "मेरे प्यारे भाई, तुम मेरी ताकत और मेरा अभिमान हो। ईश्वर तुम्हें जीवन में वह सब कुछ दे जिसके तुम हकदार हो। रक्षाबंधन की बधाई!"
-        ]
+        'bhai-to-bhen': ["मेरी प्यारी बहना, यह राखी का धागा सिर्फ एक धागा नहीं, बल्कि मेरे प्यार और सुरक्षा का वादा है। रक्षाबंधन की बहुत-बहुत बधाई!", "बचपन की वो खट्टी-मीठी यादें आज भी चेहरे पर मुस्कान ले आती हैं। तुम्हारा होना मेरे जीवन का सबसे बड़ा तोहफा है। हैप्पी रक्षाबंधन!", "तुम सिर्फ मेरी बहन नहीं, मेरी सबसे अच्छी दोस्त भी हो। हर मुश्किल में मेरा साथ देने के लिए धन्यवाद। ईश्वर तुम्हें दुनिया की सारी खुशियाँ दे।", "चाहे हम कितने भी दूर क्यों न हों, इस राखी के दिन मेरा मन हमेशा तुम्हारे पास होता है। तुम्हारा भाई हमेशा तुम्हारे साथ है। हैप्पी राखी!", "आज का दिन बहुत खास है, क्योंकि यह दिन हमारे प्यारे रिश्ते का प्रतीक है। मैं प्रार्थना करता हूँ कि हमारा यह बंधन हमेशा ऐसे ही मजबूत बना रहे।", "मेरी शरारतों को सहने वाली और मुझे हमेशा सही रास्ता दिखाने वाली मेरी प्यारी बहना को रक्षाबंधन की हार्दिक शुभकामनाएँ।", "तुम्हारी राखी मेरी कलाई पर एक कवच की तरह है, जो मुझे हर मुश्किल से लड़ने की ताकत देती है। हमेशा खुश रहो, बहना।", "यह सिर्फ एक धागा नहीं है, यह हमारा अटूट विश्वास और प्यार है। भगवान करे, हमारे रिश्ते की यह मिठास कभी कम न हो।", "तुम मेरे जीवन की प्रेरणा हो। तुम्हारी हंसी मेरे लिए सबसे कीमती है। रक्षाबंधन के इस पावन पर्व पर तुम्हें ढेर सारा प्यार।", "हर साल की तरह इस साल भी मैं वादा करता हूँ कि तुम्हारे हर सुख-दुख में तुम्हारा साथ दूंगा। लव यू बहना, हैप्पी रक्षाबंधन!"],
+        'bhen-to-bhai': ["मेरे प्यारे भाई, तुम्हारी कलाई पर यह राखी बांधकर मैं भगवान से तुम्हारी लंबी उम्र और सफलता की कामना करती हूँ। रक्षाबंधन की शुभकामनाएँ!", "तुम मेरे पहले दोस्त और मेरे सुपरहीरो हो। मुझे हमेशा सुरक्षित महसूस कराने के लिए धन्यवाद। हैप्पी राखी भैया!", "हमारा रिश्ता नोक-झोंक और ढेर सारे प्यार से भरा है। भगवान हमारे इस अनोखे बंधन को हमेशा सलामत रखे। हैप्पी रक्षाबंधन।", "दूर होकर भी तुम हमेशा मेरे दिल के करीब हो। यह राखी मेरा प्यार और आशीर्वाद तुम तक पहुंचाएगी। बहुत याद आती है, भाई।", "बचपन से लेकर आज तक, तुमने हमेशा एक बड़े भाई का फर्ज निभाया है। तुम्हारे जैसा भाई पाकर मैं बहुत भाग्यशाली हूँ।", "यह राखी का धागा तुम्हें हर बुरी नजर से बचाए और तुम्हारे जीवन में खुशियों के नए रंग भरे। सदा खुश रहो, मेरे प्यारे भाई।", "जब भी मुझे किसी सहारे की जरूरत पड़ी, मैंने तुम्हें अपने पास पाया। तुम दुनिया के सबसे अच्छे भाई हो। रक्षाबंधन मुबारक!", "तुम्हारी सफलता और खुशी ही मेरी सबसे बड़ी इच्छा है। यह राखी का त्योहार तुम्हारे लिए ढेर सारी सौगातें लेकर आए।", "याद है कैसे हम छोटी-छोटी बातों पर लड़ते थे? आज वो पल बहुत याद आते हैं। हमारा प्यार हमेशा ऐसा ही बना रहे। हैप्पी राखी!", "मेरे प्यारे भाई, तुम मेरी ताकत और मेरा अभिमान हो। ईश्वर तुम्हें जीवन में वह सब कुछ दे जिसके तुम हकदार हो। रक्षाबंधन की बधाई!"]
     };
 
     function generateShareId() {
@@ -514,24 +545,18 @@
                         window.history.replaceState({}, document.title, window.location.pathname);
                         showPage('landing-page');
                     }, 4000);
-
-                } else {
-                     showPage('landing-page');
+                    return true; // Indicate that a shared message was handled
                 }
             } catch (error) {
                 console.error("Error fetching shared message: ", error);
-                showPage('landing-page');
             }
-        } else {
-            const initialPage = localStorage.getItem('rakshaSutraUserId') ? 'home-page' : 'landing-page';
-            showPage(initialPage);
         }
+        return false; // No shared message was handled
     }
 
     async function loadProfileForEditing() {
         const userId = localStorage.getItem('rakshaSutraUserId');
         if (!userId) {
-            alert("प्रोफ़ाइल देखने के लिए आपका पंजीकृत होना आवश्यक है।");
             showPage('form-page');
             return;
         }
@@ -555,21 +580,13 @@
     function showPage(pageId) {
         pages.forEach(p => p.classList.remove('active'));
         const page = document.getElementById(pageId);
-        if (page) {
-            page.classList.add('active');
-        }
+        if (page) page.classList.add('active');
 
-        if (pageId === 'main-interface-page' || pageId === 'home-page' || pageId === 'landing-page') {
+        if (pageId === 'main-interface-page') {
              startFallingElements();
-        } else {
-            if(fallingElementsInterval) clearInterval(fallingElementsInterval);
+             document.getElementById('main-video-player').play().catch(()=>{});
         }
-
-        if(pageId === 'main-interface-page'){
-            const mainVideoPlayer = document.getElementById('main-video-player');
-            mainVideoPlayer.play().catch(()=>{});
-        }
-
+        
         if (pageId === 'profile-page') {
             loadProfileForEditing();
         }
@@ -613,7 +630,7 @@
     }
 
     function setupMainInterfacePage(userName) {
-        const messageText = `प्रिय ${userName},\n\nरक्षा बंधन की हार्दिक शुभकामनाएँ!\nयह पावन पर्व हमारे रिश्ते की डोर को और भी मज़बूत करता है। ईश्वर से यही प्रार्थना है कि हमारे रिश्ते की मिठास कभी कम न हो और जीवन में हर खुशी आपके कदम चूमे।`;
+        const messageText = `प्रिय ${userName},\n\nरक्षा बंधन की हार्दिक शुभकामनाएँ!\nयह पावन पर्व हमारे रिश्ते की डोर को और भी मज़बूत करता है। ईश्वर से यही प्रार्थना है कि हमारे रिश्ते की मिठास कभी कम न हो।`;
         document.getElementById('main-interface-message').textContent = messageText;
         showPage('main-interface-page');
         setTimeout(() => speakMessage(messageText), 1500);
@@ -633,12 +650,15 @@
     }
 
     function displayCurrentMessage() {
-        const fullMessage = getFormattedMessageText();
-        document.getElementById('message-display-card').textContent = fullMessage;
+        document.getElementById('message-display-card').textContent = getFormattedMessageText();
     }
 
-    window.addEventListener('load', () => {
-        handleSharedMessage();
+    window.addEventListener('load', async () => {
+        const wasMessageHandled = await handleSharedMessage();
+        if (!wasMessageHandled) {
+            // Only show landing page if no shared message was displayed
+            showPage('landing-page');
+        }
     });
 
     speakerIcon.addEventListener('click', toggleMusic);
@@ -656,7 +676,6 @@
         e.preventDefault();
         const submitButton = e.target.querySelector('button[type="submit"]');
         submitButton.disabled = true;
-        submitButton.textContent = 'सबमिट हो रहा है...';
         const phone = document.getElementById('phone').value;
         const name = document.getElementById('name').value;
         const address = document.getElementById('address').value;
@@ -670,7 +689,6 @@
             alert("एक त्रुटि हुई: " + error.message);
         } finally {
             submitButton.disabled = false;
-            submitButton.textContent = 'सबमिट करें';
         }
     });
     
@@ -679,10 +697,7 @@
         if (!userId) return;
         const newName = document.getElementById('profile-name-input').value;
         const newAddress = document.getElementById('profile-address-input').value;
-        if (!newName || !newAddress) {
-            alert("नाम और पता खाली नहीं हो सकता।");
-            return;
-        }
+        if (!newName || !newAddress) return alert("नाम और पता खाली नहीं हो सकता।");
         const userDocRef = doc(db, "users", userId);
         try {
             await updateDoc(userDocRef, { name: newName, address: newAddress });
@@ -694,15 +709,13 @@
     });
 
     document.getElementById('mystery-box-btn').addEventListener('click', () => showPage('home-page'));
-    document.getElementById('message-card-btn').addEventListener('click', () => showPage('message-creator-page'));
     document.getElementById('open-message-creator-btn').addEventListener('click', () => showPage('message-creator-page'));
-    document.getElementById('card-creator-btn').addEventListener('click', () => showPage('card-message-input-page'));
     document.getElementById('open-card-creator-btn').addEventListener('click', () => showPage('card-message-input-page'));
     document.getElementById('change-music-strip').addEventListener('click', () => showPage('music-page'));
     document.getElementById('my-profile-strip').addEventListener('click', () => showPage('profile-page'));
     
     document.getElementById('whatsapp-share-strip').addEventListener('click', () => {
-        const message = encodeURIComponent(`इस रक्षाबंधन, अपने भाई-बहन को एक विशेष डिजिटल राखी भेजें! इस खूबसूरत वेबसाइट को देखें: ${window.location.href}`);
+        const message = encodeURIComponent(`इस रक्षाबंधन, अपने भाई-बहन को एक विशेष डिजिटल राखी भेजें! इस खूबसूरत वेबसाइट को देखें: ${window.location.href.split('?')[0]}`);
         window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
     });
 
@@ -713,7 +726,7 @@
     document.querySelectorAll('.music-btn').forEach(button => {
         button.addEventListener('click', () => {
             audio.src = button.dataset.src;
-            if (audio.paused) toggleMusic(); else audio.play();
+            toggleMusic(); 
             showPage('home-page');
         });
     });
@@ -721,31 +734,31 @@
     document.getElementById('bhai-to-bhen-btn').addEventListener('click', () => { messageType = 'bhai-to-bhen'; showPage('message-name-form-page'); });
     document.getElementById('bhen-to-bhai-btn').addEventListener('click', () => { messageType = 'bhen-to-bhai'; showPage('message-name-form-page'); });
     
-    document.getElementById('message-name-form').addEventListener('submit', async (e) => {
+    document.getElementById('message-name-form').addEventListener('submit', (e) => {
         e.preventDefault();
         currentMessageIndex = 0;
-        const fullMessageText = getFormattedMessageText();
-        document.getElementById('message-display-card').textContent = fullMessageText;
-        currentShareId = generateShareId();
-        try {
-            await addDoc(collection(db, "sharedMessages"), {
-                shareId: currentShareId,
-                fullMessage: fullMessageText,
-                createdAt: serverTimestamp()
-            });
-        } catch (error) {
-            console.error("Error saving message: ", error);
-        }
+        displayCurrentMessage();
         showPage('message-display-page');
     });
     
-    document.getElementById('whatsapp-share-message-btn').addEventListener('click', () => {
-        if (!currentShareId) { alert("कृपया पहले एक संदेश बनाएं।"); return; }
-        const receiverName = document.getElementById('receiver-name').value;
-        const baseUrl = window.location.href.split('?')[0]; 
-        const shareUrl = `${baseUrl}?shareId=${currentShareId}`;
-        const message = encodeURIComponent(`नमस्ते ${receiverName}, आपके लिए एक विशेष रक्षाबंधन संदेश है! इसे देखने के लिए लिंक पर क्लिक करें:\n${shareUrl}`);
-        window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
+    document.getElementById('whatsapp-share-message-btn').addEventListener('click', async () => {
+        const fullMessageText = getFormattedMessageText();
+        const newShareId = generateShareId();
+        try {
+            await addDoc(collection(db, "sharedMessages"), {
+                shareId: newShareId,
+                fullMessage: fullMessageText,
+                createdAt: serverTimestamp()
+            });
+            const receiverName = document.getElementById('receiver-name').value;
+            const baseUrl = window.location.href.split('?')[0]; 
+            const shareUrl = `${baseUrl}?shareId=${newShareId}`;
+            const message = encodeURIComponent(`नमस्ते ${receiverName}, आपके लिए एक विशेष रक्षाबंधन संदेश है! इसे देखने के लिए लिंक पर क्लिक करें:\n${shareUrl}`);
+            window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
+        } catch (error) {
+            console.error("Error saving/sharing message: ", error);
+            alert("संदेश शेयर करने में त्रुटि हुई।");
+        }
     });
 
     let messageTouchStartX = 0;
