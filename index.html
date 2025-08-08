@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,7 +24,6 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            /* *** UPDATED FILE NAME *** */
             background: url('Leonardo_Phoenix_10_A_beautiful_festive_background_for_a_Raks_3.jpg') no-repeat center center/cover;
             overflow: hidden;
             color: var(--text-color);
@@ -128,29 +125,139 @@
         #profile-page .profile-info p { margin-bottom: 20px; color: var(--text-color); font-weight: 600; }
         #profile-page .profile-info span { font-weight: 400; word-break: break-all; background: rgba(0,0,0,0.2); padding: 5px 8px; border-radius: 8px; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); }
 
-        /* --- Main Interface Page --- */
-        #main-interface-page { overflow: hidden; }
-        #main-interface-page .page-content { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; padding-top: 5vh; }
-        .interface-layout { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 25px; width: 100%; max-width: 95vw; padding: 10px; z-index: 1; }
-        #main-interface-video-card { width: 40vw; max-width: 250px; aspect-ratio: 9 / 16; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.4); position: relative; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.5); }
-        #main-interface-video-card video { width: 100%; height: 100%; object-fit: cover; }
-        .date-display { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); color: #fff; background: rgba(233, 77, 110, 0.7); padding: 5px 15px; border-radius: 12px; font-size: clamp(0.8rem, 2.5vw, 1rem); font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); z-index: 5; white-space: nowrap; }
-        .message-card { background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(15px); border: 2px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 2vw; width: 50vw; max-width: 450px; aspect-ratio: 16 / 9; display: flex; flex-direction: column; justify-content: center; position: relative; box-shadow: 0 15px 40px rgba(0,0,0,0.4); opacity: 0; transform: translateX(50px); animation: revealCard 1.5s 0.5s ease-out forwards; }
-        #main-interface-message { color: white; text-shadow: 1px 1px 4px rgba(0,0,0,0.7); font-size: clamp(0.8rem, 1.5vw, 1rem); line-height: 1.7; white-space: pre-wrap; text-align: left; overflow: auto; }
-        #replay-speech-btn { font-size: 1.6rem; cursor: pointer; color: white; background: rgba(0,0,0,0.2); border-radius: 50%; padding: 8px; position: absolute; bottom: 15px; right: 15px; transition: transform 0.2s; }
+        /* --- NEW: Main Interface Page --- */
+        #main-interface-page { justify-content: center; }
+        .dual-card-layout {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 90vw;
+            margin-bottom: 30px;
+        }
+        .interface-card {
+            width: 45%;
+            max-width: 350px;
+            aspect-ratio: 9 / 16;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            border: 2px solid rgba(255,255,255,0.5);
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+        }
+        .video-card-main video { width: 100%; height: 100%; object-fit: cover; }
+        .message-card-main {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 20px;
+            text-align: left;
+        }
+        .date-display {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            background: rgba(233, 77, 110, 0.7);
+            padding: 5px 15px;
+            border-radius: 12px;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            font-weight: 600;
+            z-index: 5;
+            white-space: nowrap;
+        }
+        #main-interface-message {
+            color: white;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+            font-size: clamp(0.8rem, 1.8vw, 1rem);
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        #replay-speech-btn {
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: white;
+            background: rgba(0,0,0,0.2);
+            border-radius: 50%;
+            padding: 8px;
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            transition: transform 0.2s;
+        }
         #replay-speech-btn:hover { transform: scale(1.1); }
-        @keyframes revealCard { to { opacity: 1; transform: translateX(0); } }
-        @media (max-width: 700px) {
-            .interface-layout { flex-direction: column; gap: 20px; }
-            #main-interface-video-card { width: 60vw; max-width: 220px; }
-            .message-card { width: 90vw; max-width: 400px; transform: translateY(50px); aspect-ratio: 16/9; }
-            #main-interface-message { font-size: 0.9rem; }
+        .mystery-box {
+            font-size: 4rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            animation: pulse 2s infinite;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+        }
+        .mystery-box span {
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            margin-top: 10px;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        @media (max-width: 768px) {
+            .dual-card-layout { flex-direction: column; gap: 25px; margin-bottom: 25px; }
+            .interface-card { width: 70vw; max-width: 300px; height: 35vh; }
         }
 
         /* --- Falling Flowers Animation --- */
-        #falling-elements-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 2; pointer-events: none; }
+        #falling-elements-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: -1; pointer-events: none; }
         .falling-element { position: absolute; top: -50px; animation: fall linear infinite; font-size: 1.5rem; }
         @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
+
+        /* --- NEW: Shared Message Viewer --- */
+        #shared-message-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        #shared-message-viewer.visible { display: flex; opacity: 1; }
+        #shared-message-content {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            line-height: 1.7;
+            text-align: center;
+            white-space: pre-wrap;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        #message-display-card {
+            width: 100%; min-height: 250px; padding: 25px; background: rgba(255,255,255,0.7); border-radius: 15px; font-size: 1.1rem; line-height: 1.6; color: var(--text-color); display: flex; align-items: center; justify-content: center; text-align: center; margin-bottom: 20px; white-space: pre-wrap;
+        }
 
     </style>
 </head>
@@ -159,8 +266,13 @@
 <audio id="background-audio" loop><source src="3.m4a" type="audio/mp4"></audio>
 <div id="speaker-icon">🔇</div>
 
+<!-- NEW: Shared Message Viewer -->
+<div id="shared-message-viewer">
+    <div id="shared-message-content"></div>
+</div>
+
 <!-- Page 1: Landing Page -->
-<div id="landing-page" class="page active">
+<div id="landing-page" class="page">
     <h1 class="title">Raksha Sutra</h1>
     <div class="video-card"><video autoplay loop muted playsinline><source src="Generated File August 07, 2025 - 7_34PM.mp4" type="video/mp4"></video></div>
     <p class="subtitle">"रक्षाबंधन सिर्फ एक धागा नहीं, बल्कि दिलों का एक अटूट बंधन है।<br>आइए इस रिश्ते को फिर से महसूस करें, एक प्यार भरी डिजिटल राखी के साथ।"</p>
@@ -180,22 +292,25 @@
     </div>
 </div>
 
-<!-- Page 3: Main Interface Page -->
+<!-- Page 3: Main Interface Page (NEW DESIGN) -->
 <div id="main-interface-page" class="page">
     <div id="falling-elements-container"></div>
-    <div class="page-content">
-        <div class="interface-layout">
-            <div id="main-interface-video-card">
-                 <div class="date-display">शनिवार, 9 अगस्त, 2025</div>
-                <video playsinline id="main-video-player"></video>
-            </div>
-            <div class="message-card">
-                <div id="main-interface-message"></div>
-                <div id="replay-speech-btn">🔊</div>
-            </div>
+    <div class="dual-card-layout">
+        <div class="interface-card video-card-main">
+            <video playsinline autoplay loop muted id="main-video-player">
+                <source src="main interfacemp4.mp4" type="video/mp4">
+            </video>
         </div>
-        <button id="proceed-to-home-btn" class="cta-button">आगे बढ़ें</button>
+        <div class="interface-card message-card-main">
+            <div class="date-display">शनिवार, 9 अगस्त, 2025</div>
+            <div id="main-interface-message"></div>
+            <div id="replay-speech-btn">🔊</div>
+        </div>
     </div>
+    <button id="mystery-box-btn" class="mystery-box">
+        🎁
+        <span>मिस्ट्री बॉक्स</span>
+    </button>
 </div>
 
 <!-- Page 4: Home Page -->
@@ -218,7 +333,7 @@
         <div id="change-music-strip" class="footer-strip">संगीत बदलें</div>
         <div id="whatsapp-share-strip" class="footer-strip">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M.05 22c.12-.59.25-1.18.41-1.76l.09-.32c.31-1.09.7-2.14 1.18-3.15.53-1.12 1.16-2.19 1.88-3.18.82-1.1 1.74-2.1 2.76-3 .2-.18.4-.36.6-.53l.4-.33c.53-.44 1.1-.82 1.7-1.14.99-.53 2.03-.9 3.1-1.1.33-.07.67-.12 1.01-.16.29-.03.59-.05.88-.05.23 0 .46.01.69.03.37.03.74.08 1.1.15.99.19 1.94.55 2.83 1.06.88.5 1.69 1.14 2.41 1.89s1.25 1.53 1.75 2.41c.45.83.78 1.71 1 2.62.22.91.31 1.85.28 2.79-.03.95-.2 1.89-.51 2.79-.31.9-.76 1.76-1.33 2.55-.57.79-1.25 1.5-2.02 2.11-.78.6-1.63 1.1-2.54 1.49-.91.38-1.88.64-2.86.76-.98.12-1.97.1-2.95-.05-.98-.15-1.95-.44-2.88-.86a12.926 12.926 0 01-2.7-1.48c-.24-.13-.47-.27-.7-.41l-1.68-1.02c-.55-.33-1.1-.68-1.64-1.05-.1-.07-.2-.14-.3-.21l-.06-.05c-.62-.48-1.2-1-1.73-1.57-.49-.52-.93-1.08-1.32-1.68-.3-.46-.55-.95-.77-1.45l-.02-.06c-.25-.56-.47-1.14-.65-1.73l-.04-.13c-.22-.72-.39-1.46-.5-2.22-.05-.33-.08-.67-.1-1H.05zM9.3 8.35c.14-.38.33-.74.58-1.06.25-.32.55-.6.88-.82.34-.22.7-.4 1.08-.52s.78-.18 1.18-.18c.39 0 .78.04 1.15.13.37.09.73.23 1.06.41.33.18.64.41.91.68.27.27.5.58.68.91.18.33.31.69.4 1.06.09.37.13.76.13 1.15s-.04.78-.13 1.15c-.09.37-.22.73-.4 1.06-.18.33-.41.64-.68.91-.27.27-.58.5-.91.68-.33.18-.69.32-1.06.41-.37.09-.76.13-1.15.13s-.78-.04-1.15-.13c-.37-.09-.73-.23-1.06-.41-.33-.18-.64-.41-.91-.68-.27-.27-.5-.58-.68-.91-.18-.33-.31-.69-.4-1.06-.09-.37-.13-.76-.13-1.15s.05-.78.14-1.15z"/></svg>
-            <span>व्हाट्सएप पर शेयर करें</span>
+            <span>ऐप शेयर करें</span>
         </div>
     </div>
 </div>
@@ -230,17 +345,14 @@
         <div class="profile-info">
             <p>आपका नाम:</p>
             <div class="input-group"><input type="text" id="profile-name-input" class="input-field" placeholder="आपका नाम" required></div>
-            
             <p>आपका पता:</p>
             <div class="input-group"><textarea id="profile-address-input" class="input-field" placeholder="आपका पता" rows="3" required></textarea></div>
-
             <p>आपकी आईडी: <span id="profile-call-id">रजिस्टर्ड नहीं है</span></p>
         </div>
         <button id="update-profile-btn" class="cta-button">प्रोफाइल अपडेट करें</button>
         <a href="#" class="back-link" data-target="home-page">वापस जाएं</a>
     </div>
 </div>
-
 
 <!-- Page 6: Music Change Page -->
 <div id="music-page" class="page">
@@ -280,8 +392,12 @@
 <div id="message-display-page" class="page">
      <div class="form-container">
         <h2>आपके लिए एक प्यारा संदेश</h2>
-        <div id="message-display-card" style="width: 100%; min-height: 250px; padding: 25px; background: rgba(255,255,255,0.7); border-radius: 15px; font-size: 1.1rem; line-height: 1.6; color: var(--text-color); display: flex; align-items: center; justify-content: center; text-align: center; margin-bottom: 20px; white-space: pre-wrap;"></div>
+        <div id="message-display-card"></div>
         <p style="color: #555; margin-top: 15px; font-style: italic;">अगला संदेश देखने के लिए दाएं या बाएं स्वाइप करें</p>
+        <button id="whatsapp-share-message-btn" class="cta-button" style="margin-top: 20px; background: #25D366;">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF" style="vertical-align: middle; margin-right: 8px;"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M.05 22c.12-.59.25-1.18.41-1.76l.09-.32c.31-1.09.7-2.14 1.18-3.15.53-1.12 1.16-2.19 1.88-3.18.82-1.1 1.74-2.1 2.76-3 .2-.18.4-.36.6-.53l.4-.33c.53-.44 1.1-.82 1.7-1.14.99-.53 2.03-.9 3.1-1.1.33-.07.67-.12 1.01-.16.29-.03.59-.05.88-.05.23 0 .46.01.69.03.37.03.74.08 1.1.15.99.19 1.94.55 2.83 1.06.88.5 1.69 1.14 2.41 1.89s1.25 1.53 1.75 2.41c.45.83.78 1.71 1 2.62.22.91.31 1.85.28 2.79-.03.95-.2 1.89-.51 2.79-.31.9-.76 1.76-1.33 2.55-.57.79-1.25 1.5-2.02 2.11-.78.6-1.63 1.1-2.54 1.49-.91.38-1.88.64-2.86.76-.98.12-1.97.1-2.95-.05-.98-.15-1.95-.44-2.88-.86a12.926 12.926 0 01-2.7-1.48c-.24-.13-.47-.27-.7-.41l-1.68-1.02c-.55-.33-1.1-.68-1.64-1.05-.1-.07-.2-.14-.3-.21l-.06-.05c-.62-.48-1.2-1-1.73-1.57-.49-.52-.93-1.08-1.32-1.68-.3-.46-.55-.95-.77-1.45l-.02-.06c-.25-.56-.47-1.14-.65-1.73l-.04-.13c-.22-.72-.39-1.46-.5-2.22-.05-.33-.08-.67-.1-1H.05zM9.3 8.35c.14-.38.33-.74.58-1.06.25-.32.55-.6.88-.82.34-.22.7-.4 1.08-.52s.78-.18 1.18-.18c.39 0 .78.04 1.15.13.37.09.73.23 1.06.41.33.18.64.41.91.68.27.27.5.58.68.91.18.33.31.69.4 1.06.09.37.13.76.13 1.15s-.04.78-.13 1.15c-.09.37-.22.73-.4 1.06-.18.33-.41.64-.68.91-.27.27-.58.5-.91.68-.33.18-.69.32-1.06.41-.37-.09-.76.13-1.15.13s-.78-.04-1.15-.13c-.37-.09-.73-.23-1.06-.41-.33-.18-.64-.41-.91-.68-.27-.27-.5-.58-.68-.91-.18-.33-.31-.69-.4-1.06-.09-.37-.13-.76-.13-1.15s.05-.78.14-1.15z"/></svg>
+            <span>संदेश शेयर करें</span>
+        </button>
         <a href="#" class="back-link" data-target="message-name-form-page">वापस जाएं</a>
     </div>
 </div>
@@ -305,15 +421,14 @@
         <a id="editor-download-btn" class="editor-btn download-btn" href="#" download="rakhi-wish.png">डाउनलोड</a>
     </div>
     <canvas id="editor-canvas"></canvas>
-    <div id="card-gallery" class="card-gallery-container">
-    </div>
+    <div id="card-gallery" class="card-gallery-container"></div>
 </div>
 
 
 <!-- Firebase SDKs -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
     
     const firebaseConfig = {
         apiKey: "AIzaSyB2PG5JvDko2UmQDlY9gN5lBgga2vQy-Ws",
@@ -334,9 +449,9 @@
     const speakerIcon = document.getElementById('speaker-icon');
     let isMusicPlaying = false;
     let fallingElementsInterval;
+    let currentShareId = null;
     
-    // --- Pre-made Messages ---
-    let messageType = ''; // 'bhai-to-bhen' or 'bhen-to-bhai'
+    let messageType = ''; 
     let currentMessageIndex = 0;
     const messages = {
         'bhai-to-bhen': [
@@ -365,15 +480,53 @@
         ]
     };
 
-    const mainVideoPlayer = document.getElementById('main-video-player');
-    const mainInterfaceVideos = [
-        'main interfacemp4.mp4', 
-        'coming soon rakshabandhan __ 9 August 2025 _comingsoon _rakhi_happyrakshabandhan_status_short(360P).mp4', 
-        'main interface 3.mp4', 
-        'Happy Rakshabandhan 🎊✨🪔 __ Coming soon 🎊 __ _rakshabandhan _status _viral(360P).mp4', 
-        'main interface 4.mp4'
-    ];
-    let currentMainVideoIndex = 0;
+    function generateShareId() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        for (let i = 0; i < 4; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
+
+    async function handleSharedMessage() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const shareId = urlParams.get('shareId');
+
+        if (shareId && shareId.length === 4) {
+            try {
+                const messagesRef = collection(db, "sharedMessages");
+                const q = query(messagesRef, where("shareId", "==", shareId));
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    const docData = querySnapshot.docs[0].data();
+                    const messageText = docData.fullMessage;
+                    
+                    const viewer = document.getElementById('shared-message-viewer');
+                    const contentDiv = document.getElementById('shared-message-content');
+                    
+                    contentDiv.textContent = messageText;
+                    viewer.classList.add('visible');
+
+                    setTimeout(() => {
+                        viewer.classList.remove('visible');
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                        showPage('landing-page');
+                    }, 4000);
+
+                } else {
+                     showPage('landing-page');
+                }
+            } catch (error) {
+                console.error("Error fetching shared message: ", error);
+                showPage('landing-page');
+            }
+        } else {
+            const initialPage = localStorage.getItem('rakshaSutraUserId') ? 'home-page' : 'landing-page';
+            showPage(initialPage);
+        }
+    }
 
     async function loadProfileForEditing() {
         const userId = localStorage.getItem('rakshaSutraUserId');
@@ -382,85 +535,61 @@
             showPage('form-page');
             return;
         }
-
         document.getElementById('profile-call-id').textContent = userId;
-
         try {
             const userDocRef = doc(db, "users", userId);
             const docSnap = await getDoc(userDocRef);
-
             if (docSnap.exists()) {
                 const userData = docSnap.data();
                 document.getElementById('profile-name-input').value = userData.name || '';
                 document.getElementById('profile-address-input').value = userData.address || '';
             } else {
-                console.log("No such document!");
-                alert("आपकी प्रोफ़ाइल का डेटा नहीं मिला।");
                 localStorage.clear();
                 showPage('form-page');
             }
         } catch (error) {
             console.error("Error getting document:", error);
-            alert("आपकी प्रोफ़ाइल लोड करते समय एक त्रुटि हुई: " + error.message);
         }
     }
 
-
     function showPage(pageId) {
-        const activePage = document.querySelector('.page.active');
-        if (activePage) {
-            if (activePage.id === 'main-interface-page') {
-                mainVideoPlayer.pause();
-                mainVideoPlayer.muted = true; 
-                if (localStorage.getItem('musicWasPlaying') === 'true' && audio.paused) {
-                    audio.play().catch(()=>{});
-                }
-            }
-        }
-
         pages.forEach(p => p.classList.remove('active'));
         const page = document.getElementById(pageId);
         if (page) {
             page.classList.add('active');
         }
 
-        if (pageId === 'main-interface-page') {
-            startFallingElements();
-            if (!audio.paused) {
-                audio.pause();
-                localStorage.setItem('musicWasPlaying', 'true');
-            } else {
-                localStorage.setItem('musicWasPlaying', 'false');
-            }
-            mainVideoPlayer.muted = false;
-            mainVideoPlayer.play().catch(e => console.log("Autoplay was prevented."));
+        if (pageId === 'main-interface-page' || pageId === 'home-page' || pageId === 'landing-page') {
+             startFallingElements();
+        } else {
+            if(fallingElementsInterval) clearInterval(fallingElementsInterval);
         }
-        
-        if (pageId === 'home-page') {
-             // Logic for home page if any
-        } else if (pageId === 'profile-page') {
+
+        if(pageId === 'main-interface-page'){
+            const mainVideoPlayer = document.getElementById('main-video-player');
+            mainVideoPlayer.play().catch(()=>{});
+        }
+
+        if (pageId === 'profile-page') {
             loadProfileForEditing();
         }
     }
 
     function toggleMusic() {
         if (audio.paused) {
-            audio.play().then(() => {
-                speakerIcon.textContent = '🔊';
-                isMusicPlaying = true;
-            }).catch(() => { isMusicPlaying = false; });
+            audio.play().then(() => { speakerIcon.textContent = '🔊'; }).catch(() => {});
         } else {
             audio.pause();
             speakerIcon.textContent = '🔇';
-            isMusicPlaying = false;
         }
     }
     
     function startFallingElements() {
         if (fallingElementsInterval) clearInterval(fallingElementsInterval);
         const container = document.getElementById('falling-elements-container');
+        if(!container) return;
         container.innerHTML = '';
-        const elements = ['🌺', '🌹', '🌸', '🌷', '🌼', '🏵️', '💮', '☘️', '🍁'];
+        const elements = ['🌺', '🌹', '🌸', '🌷', '🌼', '🏵️', '💮'];
         fallingElementsInterval = setInterval(() => {
             const element = document.createElement('div');
             element.className = 'falling-element';
@@ -484,48 +613,38 @@
     }
 
     function setupMainInterfacePage(userName) {
-        const messageText = `प्रिय ${userName},\n\nरक्षा बंधन की हार्दिक शुभकामनाएँ!\nये पावन पर्व हमारे रिश्ते की डोर को और भी मज़बूत करता है। बचपन की हंसी-खुशियों से लेकर जीवन के हर उतार-चढ़ाव में, आप हमेशा मेरे साथ रहे। आपकी मुस्कान मेरी ताकत है और आपका सुख मेरी दुआ।\nईश्वर से यही प्रार्थना है कि हमारे रिश्ते की मिठास कभी कम न हो और जीवन में हर खुशी आपके कदम चूमे। आपका साथ और आशीर्वाद हमेशा यूँ ही बना रहे।`;
+        const messageText = `प्रिय ${userName},\n\nरक्षा बंधन की हार्दिक शुभकामनाएँ!\nयह पावन पर्व हमारे रिश्ते की डोर को और भी मज़बूत करता है। ईश्वर से यही प्रार्थना है कि हमारे रिश्ते की मिठास कभी कम न हो और जीवन में हर खुशी आपके कदम चूमे।`;
         document.getElementById('main-interface-message').textContent = messageText;
-        mainVideoPlayer.src = mainInterfaceVideos[currentMainVideoIndex];
         showPage('main-interface-page');
         setTimeout(() => speakMessage(messageText), 1500);
     }
     
-    function playNextMainVideo() {
-        currentMainVideoIndex = (currentMainVideoIndex + 1) % mainInterfaceVideos.length;
-        mainVideoPlayer.src = mainInterfaceVideos[currentMainVideoIndex];
-        mainVideoPlayer.play();
-    }
-    
-    function displayCurrentMessage() {
+    function getFormattedMessageText() {
         const sender = document.getElementById('sender-name').value;
         const receiver = document.getElementById('receiver-name').value;
-        
         let messageTemplate = messages[messageType][currentMessageIndex];
-        
         let formattedMessage = messageTemplate.replace(/मेरी प्यारी बहना/g, `मेरी प्यारी बहना ${receiver}`)
                                             .replace(/प्यारी बहन/g, `प्यारी बहन ${receiver}`)
                                             .replace(/बहना/g, `बहना ${receiver}`)
                                             .replace(/मेरे प्यारे भाई/g, `मेरे प्यारे भाई ${receiver}`)
                                             .replace(/भैया/g, `भैया ${receiver}`)
                                             .replace(/भाई/g, `भाई ${receiver}`);
-
-        document.getElementById('message-display-card').textContent = formattedMessage + `\n\nतुम्हारा/तुम्हारी,\n${sender}`;
+        return formattedMessage + `\n\nतुम्हारा/तुम्हारी,\n${sender}`;
     }
 
-
-    // --- Event Listeners ---
+    function displayCurrentMessage() {
+        const fullMessage = getFormattedMessageText();
+        document.getElementById('message-display-card').textContent = fullMessage;
+    }
 
     window.addEventListener('load', () => {
-        showPage('landing-page');
+        handleSharedMessage();
     });
 
     speakerIcon.addEventListener('click', toggleMusic);
 
     document.getElementById('get-started-btn').addEventListener('click', () => {
-        // A user interaction to enable audio
         audio.play().then(() => audio.pause()).catch(() => {});
-
         if (localStorage.getItem('rakshaSutraUserId')) {
             setupMainInterfacePage(localStorage.getItem('rakshaSutraUserName'));
         } else {
@@ -538,90 +657,43 @@
         const submitButton = e.target.querySelector('button[type="submit"]');
         submitButton.disabled = true;
         submitButton.textContent = 'सबमिट हो रहा है...';
-
         const phone = document.getElementById('phone').value;
         const name = document.getElementById('name').value;
         const address = document.getElementById('address').value;
-
         try {
-            await setDoc(doc(db, "users", phone), { 
-                name: name, 
-                phone: phone, 
-                address: address, 
-                timestamp: serverTimestamp() 
-            });
-
+            await setDoc(doc(db, "users", phone), { name, phone, address, timestamp: serverTimestamp() });
             localStorage.setItem('rakshaSutraUserName', name);
             localStorage.setItem('rakshaSutraUserId', phone);
-            
-            alert(`धन्यवाद, ${name}! आपकी प्रोफ़ाइल बन गई है।\nआपकी आईडी है: ${phone}`);
-            
+            alert(`धन्यवाद, ${name}! आपकी प्रोफ़ाइल बन गई है।`);
             setupMainInterfacePage(name);
-            
         } catch (error) {
-            console.error("Error writing document: ", error);
             alert("एक त्रुटि हुई: " + error.message);
         } finally {
             submitButton.disabled = false;
             submitButton.textContent = 'सबमिट करें';
         }
     });
-
-    mainVideoPlayer.addEventListener('ended', playNextMainVideo);
-
-    let touchstartX = 0;
-    document.getElementById('main-interface-video-card').addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, { passive: true });
-    document.getElementById('main-interface-video-card').addEventListener('touchend', e => {
-        const touchendX = e.changedTouches[0].screenX;
-        if (touchendX < touchstartX - 50) playNextMainVideo();
-        if (touchendX > touchstartX + 50) {
-            currentMainVideoIndex = (currentMainVideoIndex - 1 + mainInterfaceVideos.length) % mainInterfaceVideos.length;
-            mainVideoPlayer.src = mainInterfaceVideos[currentMainVideoIndex];
-            mainVideoPlayer.play();
-        }
-    });
     
     document.getElementById('update-profile-btn').addEventListener('click', async () => {
-        const updateButton = document.getElementById('update-profile-btn');
         const userId = localStorage.getItem('rakshaSutraUserId');
-        
-        if (!userId) {
-            alert("प्रोफ़ाइल अपडेट नहीं कर सकते। उपयोगकर्ता पंजीकृत नहीं है।");
-            return;
-        }
-
+        if (!userId) return;
         const newName = document.getElementById('profile-name-input').value;
         const newAddress = document.getElementById('profile-address-input').value;
-
         if (!newName || !newAddress) {
             alert("नाम और पता खाली नहीं हो सकता।");
             return;
         }
-        
-        updateButton.disabled = true;
-        updateButton.textContent = 'अपडेट हो रहा है...';
-
         const userDocRef = doc(db, "users", userId);
-
         try {
-            await updateDoc(userDocRef, {
-                name: newName,
-                address: newAddress
-            });
-
+            await updateDoc(userDocRef, { name: newName, address: newAddress });
             localStorage.setItem('rakshaSutraUserName', newName);
-
             alert("प्रोफ़ाइल सफलतापूर्वक अपडेट की गई!");
         } catch (error) {
-            console.error("Error updating document: ", error);
             alert("अपडेट करते समय एक त्रुटि हुई: " + error.message);
-        } finally {
-            updateButton.disabled = false;
-            updateButton.textContent = 'प्रोफाइल अपडेट करें';
         }
     });
 
-    document.getElementById('proceed-to-home-btn').addEventListener('click', () => showPage('home-page'));
+    document.getElementById('mystery-box-btn').addEventListener('click', () => showPage('home-page'));
     document.getElementById('message-card-btn').addEventListener('click', () => showPage('message-creator-page'));
     document.getElementById('open-message-creator-btn').addEventListener('click', () => showPage('message-creator-page'));
     document.getElementById('card-creator-btn').addEventListener('click', () => showPage('card-message-input-page'));
@@ -631,59 +703,62 @@
     
     document.getElementById('whatsapp-share-strip').addEventListener('click', () => {
         const message = encodeURIComponent(`इस रक्षाबंधन, अपने भाई-बहन को एक विशेष डिजिटल राखी भेजें! इस खूबसूरत वेबसाइट को देखें: ${window.location.href}`);
-        const whatsappUrl = `https://api.whatsapp.com/send?text=${message}`;
-        window.open(whatsappUrl, '_blank');
+        window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
     });
 
     document.querySelectorAll('.back-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            showPage(link.dataset.target);
-        });
+        link.addEventListener('click', (e) => { e.preventDefault(); showPage(link.dataset.target); });
     });
     
     document.querySelectorAll('.music-btn').forEach(button => {
         button.addEventListener('click', () => {
             audio.src = button.dataset.src;
-            if (audio.paused) {
-                toggleMusic();
-            } else {
-                audio.play();
-            }
+            if (audio.paused) toggleMusic(); else audio.play();
             showPage('home-page');
         });
     });
     
-    // Message creator logic
-    document.getElementById('bhai-to-bhen-btn').addEventListener('click', () => {
-        messageType = 'bhai-to-bhen';
-        showPage('message-name-form-page');
-    });
-
-    document.getElementById('bhen-to-bhai-btn').addEventListener('click', () => {
-        messageType = 'bhen-to-bhai';
-        showPage('message-name-form-page');
-    });
+    document.getElementById('bhai-to-bhen-btn').addEventListener('click', () => { messageType = 'bhai-to-bhen'; showPage('message-name-form-page'); });
+    document.getElementById('bhen-to-bhai-btn').addEventListener('click', () => { messageType = 'bhen-to-bhai'; showPage('message-name-form-page'); });
     
-    document.getElementById('message-name-form').addEventListener('submit', (e) => {
+    document.getElementById('message-name-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        currentMessageIndex = 0; // Reset to first message
-        displayCurrentMessage();
+        currentMessageIndex = 0;
+        const fullMessageText = getFormattedMessageText();
+        document.getElementById('message-display-card').textContent = fullMessageText;
+        currentShareId = generateShareId();
+        try {
+            await addDoc(collection(db, "sharedMessages"), {
+                shareId: currentShareId,
+                fullMessage: fullMessageText,
+                createdAt: serverTimestamp()
+            });
+        } catch (error) {
+            console.error("Error saving message: ", error);
+        }
         showPage('message-display-page');
     });
     
-    // Swipe logic for messages
+    document.getElementById('whatsapp-share-message-btn').addEventListener('click', () => {
+        if (!currentShareId) { alert("कृपया पहले एक संदेश बनाएं।"); return; }
+        const receiverName = document.getElementById('receiver-name').value;
+        const baseUrl = window.location.href.split('?')[0]; 
+        const shareUrl = `${baseUrl}?shareId=${currentShareId}`;
+        const message = encodeURIComponent(`नमस्ते ${receiverName}, आपके लिए एक विशेष रक्षाबंधन संदेश है! इसे देखने के लिए लिंक पर क्लिक करें:\n${shareUrl}`);
+        window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
+    });
+
     let messageTouchStartX = 0;
     const messageCard = document.getElementById('message-display-page');
     messageCard.addEventListener('touchstart', e => { messageTouchStartX = e.changedTouches[0].screenX; }, { passive: true });
     messageCard.addEventListener('touchend', e => {
         const touchendX = e.changedTouches[0].screenX;
         const totalMessages = messages[messageType].length;
-        if (touchendX < messageTouchStartX - 50) { // Swipe left
+        if (touchendX < messageTouchStartX - 50) {
             currentMessageIndex = (currentMessageIndex + 1) % totalMessages;
             displayCurrentMessage();
         }
-        if (touchendX > messageTouchStartX + 50) { // Swipe right
+        if (touchendX > messageTouchStartX + 50) {
             currentMessageIndex = (currentMessageIndex - 1 + totalMessages) % totalMessages;
             displayCurrentMessage();
         }
