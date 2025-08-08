@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -27,7 +25,6 @@
 
     body {
         font-family: 'Poppins', sans-serif;
-        /* Original Background restored */
         background: url('Leonardo_Phoenix_10_A_beautiful_festive_background_for_a_Raks_3.jpg') no-repeat center center/cover;
         overflow: hidden;
         color: var(--text-color);
@@ -129,28 +126,80 @@
     #profile-page .profile-info p { margin-bottom: 20px; color: var(--text-color); font-weight: 600; }
     #profile-page .profile-info span { font-weight: 400; word-break: break-all; background: rgba(0,0,0,0.2); padding: 5px 8px; border-radius: 8px; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); }
 
-    /* --- Main Interface Page (NEW DESIGN) --- */
-    #main-interface-page { overflow: hidden; }
-    #main-interface-page .page-content { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; }
-    .interface-layout { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 15px; width: 100%; max-width: 95vw; }
-    .interface-card { flex-shrink: 0; width: 45vw; max-width: 280px; aspect-ratio: 9 / 16; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.4); position: relative; border: 2px solid rgba(255,255,255,0.5); background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(15px); }
-    .interface-card video { width: 100%; height: 100%; object-fit: cover; }
+    /* --- Main Interface Page (Book Design) --- */
+    #main-interface-page { overflow: hidden; position: relative; }
+    #main-interface-page::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: url('Leonardo_Phoenix_10_A_beautiful_festive_background_for_a_Raks_3.jpg') no-repeat center center/cover;
+        filter: blur(8px);
+        z-index: 0;
+    }
+    #main-interface-page .page-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        position: relative;
+        z-index: 2;
+    }
+    .book-container {
+        display: flex;
+        gap: 15px;
+        perspective: 1500px;
+    }
+    .interface-card {
+        flex-shrink: 0;
+        width: 45vw;
+        max-width: 280px;
+        aspect-ratio: 9 / 16;
+        border-radius: 20px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        position: relative;
+        border: 2px solid rgba(255,255,255,0.5);
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(15px);
+        transform-style: preserve-3d;
+        transition: transform 1s;
+    }
+    #main-interface-page.active .video-card-book {
+        transform: rotateY(0deg);
+        animation: open-left-cover 2s ease-out forwards;
+    }
+    #main-interface-page.active .message-card-book {
+        transform: rotateY(0deg);
+        animation: open-right-cover 2s ease-out forwards;
+    }
+    .video-card-book {
+        transform-origin: right center;
+        transform: rotateY(-180deg);
+    }
+    .message-card-book {
+        transform-origin: left center;
+        transform: rotateY(180deg);
+    }
+    @keyframes open-left-cover { from { transform: rotateY(-180deg); } to { transform: rotateY(0deg); } }
+    @keyframes open-right-cover { from { transform: rotateY(180deg); } to { transform: rotateY(0deg); } }
+
+    .interface-card video { width: 100%; height: 100%; object-fit: cover; border-radius: 18px; }
     .date-display { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); color: #fff; background: rgba(233, 77, 110, 0.7); padding: 5px 15px; border-radius: 12px; font-size: clamp(0.7rem, 2vw, 0.9rem); font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); z-index: 5; white-space: nowrap; }
-    #main-interface-message-container { display: flex; flex-direction: column; justify-content: center; padding: 20px; }
-    #main-interface-message { color: white; text-shadow: 1px 1px 4px rgba(0,0,0,0.7); font-size: clamp(0.7rem, 2.2vw, 0.9rem); line-height: 1.6; text-align: left; overflow: auto; height: 100%; }
+    #main-interface-message-container { display: flex; flex-direction: column; justify-content: center; padding: 25px; overflow: hidden; }
+    #main-interface-message { color: white; text-shadow: 1px 1px 4px rgba(0,0,0,0.8); font-size: clamp(0.85rem, 2vw, 1.1rem); line-height: 1.7; text-align: left; overflow-y: auto; height: 100%; }
     #replay-speech-btn { font-size: 1.6rem; cursor: pointer; color: white; background: rgba(0,0,0,0.2); border-radius: 50%; padding: 8px; position: absolute; bottom: 15px; right: 15px; transition: transform 0.2s; }
     #replay-speech-btn:hover { transform: scale(1.1); }
     #mystery-box-btn { font-size: 4rem; cursor: pointer; margin-top: 20px; background: none; border: none; animation: pulse 2s infinite; text-shadow: 0 0 15px gold; }
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-    /* Mobile view for interface remains side-by-side */
     @media (max-width: 700px) {
-        .interface-layout { gap: 10px; }
+        .book-container { gap: 10px; }
         .interface-card { width: 45vw; }
-        #main-interface-message { font-size: 0.75rem; line-height: 1.5; }
+        #main-interface-message { font-size: 0.8rem; line-height: 1.6; }
     }
 
     /* --- Falling Flowers Animation --- */
-    #falling-elements-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: -1; pointer-events: none; }
+    #falling-elements-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 3; pointer-events: none; }
     .falling-element { position: absolute; top: -50px; animation: fall linear infinite; font-size: 1.5rem; }
     @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
 
@@ -218,14 +267,14 @@
 <div id="main-interface-page" class="page">
     <div id="falling-elements-container"></div>
     <div class="page-content">
-        <div class="interface-layout">
+        <div class="book-container">
             <!-- Video Card -->
-            <div class="interface-card">
+            <div class="interface-card video-card-book">
                  <div class="date-display">शनिवार, 9 अगस्त, 2025</div>
                 <video playsinline="" id="main-video-player"></video>
             </div>
             <!-- Message Card -->
-            <div class="interface-card" id="main-interface-message-container">
+            <div class="interface-card message-card-book" id="main-interface-message-container">
                 <div id="main-interface-message"></div>
                 <div id="replay-speech-btn">🔊</div>
             </div>
@@ -383,26 +432,10 @@
         'bhai-to-bhen': [
             "मेरी प्यारी बहना, यह राखी का धागा सिर्फ एक धागा नहीं, बल्कि मेरे प्यार और सुरक्षा का वादा है जो मैं तुमसे जीवन भर निभाऊंगा। रक्षाबंधन की बहुत-बहुत बधाई!",
             "बचपन की वो खट्टी-मीठी यादें आज भी चेहरे पर मुस्कान ले आती हैं। तुम्हारा होना मेरे जीवन का सबसे बड़ा तोहफा है। हैप्पी रक्षाबंधन, मेरी प्यारी बहन!",
-            "तुम सिर्फ मेरी बहन नहीं, मेरी सबसे अच्छी दोस्त भी हो। हर मुश्किल में मेरा साथ देने के लिए धन्यवाद। ईश्वर तुम्हें दुनिया की सारी खुशियाँ दे।",
-            "चाहे हम कितने भी दूर क्यों न हों, इस राखी के दिन मेरा मन हमेशा तुम्हारे पास होता है। तुम्हारा भाई हमेशा तुम्हारे साथ है। हैप्पी राखी!",
-            "आज का दिन बहुत खास है, क्योंकि यह दिन हमारे प्यारे रिश्ते का प्रतीक है। मैं प्रार्थना करता हूँ कि हमारा यह बंधन हमेशा ऐसे ही मजबूत बना रहे।",
-            "मेरी शरारतों को सहने वाली और मुझे हमेशा सही रास्ता दिखाने वाली मेरी प्यारी बहना को रक्षाबंधन की हार्दिक शुभकामनाएँ।",
-            "तुम्हारी राखी मेरी कलाई पर एक कवच की तरह है, जो मुझे हर मुश्किल से लड़ने की ताकत देती है। हमेशा खुश रहो, बहना।",
-            "यह सिर्फ एक धागा नहीं है, यह हमारा अटूट विश्वास और प्यार है। भगवान करे, हमारे रिश्ते की यह मिठास कभी कम न हो।",
-            "तुम मेरे जीवन की प्रेरणा हो। तुम्हारी हंसी मेरे लिए सबसे कीमती है। रक्षाबंधन के इस पावन पर्व पर तुम्हें ढेर सारा प्यार।",
-            "हर साल की तरह इस साल भी मैं वादा करता हूँ कि तुम्हारे हर सुख-दुख में तुम्हारा साथ दूंगा। लव यू बहना, हैप्पी रक्षाबंधन!"
         ],
         'bhen-to-bhai': [
             "मेरे प्यारे भाई, तुम्हारी कलाई पर यह राखी बांधकर मैं भगवान से तुम्हारी लंबी उम्र और सफलता की कामना करती हूँ। रक्षाबंधन की शुभकामनाएँ!",
             "तुम मेरे पहले दोस्त और मेरे सुपरहीरो हो। मुझे हमेशा सुरक्षित महसूस कराने के लिए धन्यवाद। हैप्पी राखी भैया!",
-            "हमारा रिश्ता नोक-झोंक और ढेर सारे प्यार से भरा है। भगवान हमारे इस अनोखे बंधन को हमेशा सलामत रखे। हैप्पी रक्षाबंधन।",
-            "दूर होकर भी तुम हमेशा मेरे दिल के करीब हो। यह राखी मेरा प्यार और आशीर्वाद तुम तक पहुंचाएगी। बहुत याद आती है, भाई।",
-            "बचपन से लेकर आज तक, तुमने हमेशा एक बड़े भाई का फर्ज निभाया है। तुम्हारे जैसा भाई पाकर मैं बहुत भाग्यशाली हूँ।",
-            "यह राखी का धागा तुम्हें हर बुरी नजर से बचाए और तुम्हारे जीवन में खुशियों के नए रंग भरे। सदा खुश रहो, मेरे प्यारे भाई।",
-            "जब भी मुझे किसी सहारे की जरूरत पड़ी, मैंने तुम्हें अपने पास पाया। तुम दुनिया के सबसे अच्छे भाई हो। रक्षाबंधन मुबारक!",
-            "तुम्हारी सफलता और खुशी ही मेरी सबसे बड़ी इच्छा है। यह राखी का त्योहार तुम्हारे लिए ढेर सारी सौगातें लेकर आए।",
-            "याद है कैसे हम छोटी-छोटी बातों पर लड़ते थे? आज वो पल बहुत याद आते हैं। हमारा प्यार हमेशा ऐसा ही बना रहे। हैप्पी राखी!",
-            "मेरे प्यारे भाई, तुम मेरी ताकत और मेरा अभिमान हो। ईश्वर तुम्हें जीवन में वह सब कुछ दे जिसके तुम हकदार हो। रक्षाबंधन की बधाई!"
         ]
     };
 
@@ -410,9 +443,6 @@
     const mainInterfaceVideos = [
         'main interfacemp4.mp4', 
         'coming soon rakshabandhan __ 9 August 2025 _comingsoon _rakhi_happyrakshabandhan_status_short(360P).mp4', 
-        'main interface 3.mp4', 
-        'Happy Rakshabandhan 🎊✨🪔 __ Coming soon 🎊 __ _rakshabandhan _status _viral(360P).mp4', 
-        'main interface 4.mp4'
     ];
     let currentMainVideoIndex = 0;
     
@@ -426,7 +456,7 @@
         const sharedMessageDisplay = document.getElementById('shared-message-display');
         const sharedMessageContent = document.getElementById('shared-message-content');
         
-        uniqueIdModal.classList.remove('active'); // Hide input modal first
+        uniqueIdModal.classList.remove('active');
         
         try {
             const messageDocRef = doc(db, "sharedMessages", messageId);
@@ -436,7 +466,6 @@
                 sharedMessageDisplay.classList.add('active');
                 setTimeout(() => {
                     sharedMessageDisplay.classList.remove('active');
-                    // Proceed to normal flow after 3 seconds
                     if (localStorage.getItem('rakshaSutraUserId')) {
                        setupMainInterfacePage(localStorage.getItem('rakshaSutraUserName'));
                     } else {
@@ -445,7 +474,7 @@
                 }, 3000); 
             } else {
                 alert("यह संदेश कोड अमान्य है। कृपया पुनः प्रयास करें।");
-                uniqueIdModal.classList.add('active'); // Re-show the modal if code is wrong
+                uniqueIdModal.classList.add('active');
             }
         } catch(e) {
              alert("संदेश लोड करते समय त्रुटि हुई।");
@@ -474,8 +503,6 @@
                 document.getElementById('profile-name-input').value = userData.name || '';
                 document.getElementById('profile-address-input').value = userData.address || '';
             } else {
-                console.log("No such document!");
-                alert("आपकी प्रोफ़ाइल का डेटा नहीं मिला।");
                 localStorage.clear();
                 showPage('form-page');
             }
@@ -489,22 +516,15 @@
     function showPage(pageId) {
         const activePage = document.querySelector('.page.active');
         if (activePage) {
-            if (activePage.id === 'main-interface-page') {
-                mainVideoPlayer.pause();
-                mainVideoPlayer.muted = true; 
-                if (localStorage.getItem('musicWasPlaying') === 'true' && audio.paused) {
-                    audio.play().catch(()=>{});
-                }
-                 if(fallingElementsInterval) clearInterval(fallingElementsInterval);
-            }
+            activePage.classList.remove('active');
         }
-
-        pages.forEach(p => p.classList.remove('active'));
+        
         const page = document.getElementById(pageId);
         if (page) {
             page.classList.add('active');
         }
 
+        // Manage animations based on the new page
         if (pageId === 'main-interface-page') {
             startFallingElements();
             if (!audio.paused) {
@@ -514,12 +534,19 @@
                 localStorage.setItem('musicWasPlaying', 'false');
             }
             mainVideoPlayer.muted = false;
-            mainVideoPlayer.play().catch(e => console.log("Autoplay was prevented. User interaction needed."));
+            mainVideoPlayer.play().catch(e => console.log("Autoplay was prevented."));
+        } else {
+             if (fallingElementsInterval) {
+                clearInterval(fallingElementsInterval);
+                document.getElementById('falling-elements-container').innerHTML = '';
+             }
+             // Resume background music if it was playing before
+             if (localStorage.getItem('musicWasPlaying') === 'true' && audio.paused) {
+                audio.play().catch(()=>{});
+             }
         }
         
-        if (pageId === 'home-page') {
-             if(fallingElementsInterval) clearInterval(fallingElementsInterval);
-        } else if (pageId === 'profile-page') {
+        if (pageId === 'profile-page') {
             loadProfileForEditing();
         }
     }
@@ -529,11 +556,13 @@
             audio.play().then(() => {
                 speakerIcon.textContent = '🔊';
                 isMusicPlaying = true;
+                localStorage.setItem('musicWasPlaying', 'true');
             }).catch(() => { isMusicPlaying = false; });
         } else {
             audio.pause();
             speakerIcon.textContent = '🔇';
             isMusicPlaying = false;
+            localStorage.setItem('musicWasPlaying', 'false');
         }
     }
     
@@ -565,11 +594,13 @@
     }
 
     function setupMainInterfacePage(userName) {
-        const messageText = `प्रिय ${userName},\n\nरक्षा बंधन की हार्दिक शुभकामनाएँ!\nये पावन पर्व हमारे रिश्ते की डोर को और भी मज़बूत करता है। आपका साथ और आशीर्वाद हमेशा यूँ ही बना रहे।`;
+        // UPDATED MESSAGE TEXT
+        const messageText = `प्रिय ${userName},\n\nरक्षाबंधन का यह पावन अवसर प्रेम, विश्वास और सुरक्षा के उस बंधन का प्रतीक है जो हमें जीवनभर जोड़े रखता है।\nहमारे Shubhzone.shop परिवार का हिस्सा बनने के लिए आपका धन्यवाद। आपका विश्वास हमारे लिए वैसा ही है जैसे एक बहन के लिए अपने भाई का वचन— हमेशा साथ निभाने का।\n\nइस त्योहार पर हमारी यही शुभकामना है कि आपके जीवन में हमेशा खुशियां, सफलता और रिश्तों की गर्माहट बनी रहे।\n\nरक्षाबंधन की हार्दिक शुभकामनाएं!\nसप्रेम,\nShubhzone.shop परिवार`;
+        
         document.getElementById('main-interface-message').textContent = messageText;
         mainVideoPlayer.src = mainInterfaceVideos[currentMainVideoIndex];
         showPage('main-interface-page');
-        setTimeout(() => speakMessage(messageText), 1500);
+        setTimeout(() => speakMessage(messageText), 2500); // Delay speech until book opens
     }
     
     function playNextMainVideo() {
@@ -663,7 +694,7 @@
     mainVideoPlayer.addEventListener('ended', playNextMainVideo);
 
     let touchstartX = 0;
-    const videoCardForSwipe = document.querySelector('.interface-card video').parentElement;
+    const videoCardForSwipe = document.querySelector('.video-card-book');
     videoCardForSwipe.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, { passive: true });
     videoCardForSwipe.addEventListener('touchend', e => {
         const touchendX = e.changedTouches[0].screenX;
