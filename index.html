@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 
 <html lang="en">
@@ -416,7 +418,6 @@
     const mainInterfaceVideos = [ 'main interfacemp4.mp4', 'coming soon rakshabandhan __ 9 August 2025 _comingsoon _rakhi_happyrakshabandhan_status_short(360P).mp4', ];
     let currentMainVideoIndex = 0;
     
-    // --- Unique ID and Sharing Logic (5-Digit) ---
     function generateUniqueId() {
         return Math.random().toString(36).substring(2, 7); // 5-char alphanumeric
     }
@@ -434,9 +435,9 @@
             if (docSnap.exists()) {
                 sharedMessageContent.textContent = docSnap.data().message;
                 sharedMessageDisplay.classList.add('active');
-                // The "Open" button will handle the next step, no more timeout.
             } else {
                 alert("यह संदेश कोड अमान्य है। कृपया पुनः प्रयास करें।");
+                uniqueIdModal.classList.add('active');
             }
         } catch(e) {
              alert("संदेश लोड करते समय त्रुटि हुई।");
@@ -474,17 +475,12 @@
         const page = document.getElementById(pageId);
         if (page) {
             page.classList.add('active');
-        } else {
-            console.error(`Page with ID "${pageId}" not found.`);
-            return;
         }
 
         if (pageId === 'main-interface-page') {
             startFallingElements();
-            if (localStorage.getItem('musicWasPlaying') === 'true') {
+            if (localStorage.getItem('musicWasPlaying') === 'true' && !audio.playing) {
                 audio.play().catch(()=>{});
-            } else {
-                audio.pause();
             }
             mainVideoPlayer.muted = false;
             mainVideoPlayer.play().catch(e => console.log("Autoplay was prevented."));
@@ -565,163 +561,115 @@
     }
 
     // --- Event Listeners ---
-    window.addEventListener('load', () => {
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Page Navigation ---
+        document.getElementById('get-started-btn').addEventListener('click', () => {
+            audio.play().then(() => audio.pause()).catch(() => {});
+            if (localStorage.getItem('rakshaSutraUserId')) {
+                setupMainInterfacePage(localStorage.getItem('rakshaSutraUserName'));
+            } else {
+                showPage('form-page');
+            }
+        });
+        document.getElementById('mystery-box-btn').addEventListener('click', () => showPage('home-page'));
+        document.getElementById('open-message-creator-btn').addEventListener('click', () => showPage('message-creator-page'));
+        document.getElementById('open-card-creator-btn').addEventListener('click', () => showPage('card-message-input-page'));
+        document.getElementById('change-music-strip').addEventListener('click', () => showPage('music-page'));
+        document.getElementById('my-profile-strip').addEventListener('click', () => showPage('profile-page'));
+        document.getElementById('view-shared-message-btn').addEventListener('click', () => document.getElementById('unique-id-modal').classList.add('active'));
+        
+        document.querySelectorAll('.back-link').forEach(link => {
+            link.addEventListener('click', (e) => { e.preventDefault(); showPage(link.dataset.target); });
+        });
+        
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('msg')) {
             document.getElementById('unique-id-modal').classList.add('active');
         } else {
             showPage('landing-page');
         }
-    });
-
-    document.getElementById('unique-id-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const enteredId = document.getElementById('unique-id-input').value.toLowerCase();
-        if (enteredId && enteredId.length === 5) {
-            showSharedMessage(enteredId);
-        } else {
-            alert("कृपया 5-अंकीय कोड डालें।");
-        }
-    });
-
-    document.getElementById('shared-message-open-btn').addEventListener('click', () => {
-        document.getElementById('shared-message-display').classList.remove('active');
-        if (localStorage.getItem('rakshaSutraUserId')) {
-            setupMainInterfacePage(localStorage.getItem('rakshaSutraUserName'));
-        } else {
-            showPage('form-page');
-        }
-    });
-
-    speakerIcon.addEventListener('click', toggleMusic);
-
-    document.getElementById('get-started-btn').addEventListener('click', () => {
-        audio.play().then(() => audio.pause()).catch(() => {});
-        if (localStorage.getItem('rakshaSutraUserId')) {
-            setupMainInterfacePage(localStorage.getItem('rakshaSutraUserName'));
-        } else {
-            showPage('form-page');
-        }
-    });
-
-    document.getElementById('info-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = e.target.querySelector('button[type="submit"]');
-        btn.disabled = true;
-        btn.textContent = 'सबमिट हो रहा है...';
-        const phone = document.getElementById('phone').value, name = document.getElementById('name').value, address = document.getElementById('address').value;
-        try {
-            await setDoc(doc(db, "users", phone), { name, phone, address, timestamp: serverTimestamp() });
-            localStorage.setItem('rakshaSutraUserName', name);
-            localStorage.setItem('rakshaSutraUserId', phone);
-            alert(`धन्यवाद, ${name}! आपकी प्रोफ़ाइल बन गई है।`);
-            setupMainInterfacePage(name);
-        } catch (error) {
-            console.error("Error: ", error);
-            alert("एक त्रुटि हुई: " + error.message);
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'सबमिट करें';
-        }
-    });
-
-    mainVideoPlayer.addEventListener('ended', playNextMainVideo);
-
-    let touchstartX = 0;
-    const videoCardForSwipe = document.querySelector('.video-card-book');
-    videoCardForSwipe.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, { passive: true });
-    videoCardForSwipe.addEventListener('touchend', e => {
-        const touchendX = e.changedTouches[0].screenX;
-        if (touchendX < touchstartX - 50) playNextMainVideo();
-        if (touchendX > touchstartX + 50) {
-            currentMainVideoIndex = (currentMainVideoIndex - 1 + mainInterfaceVideos.length) % mainInterfaceVideos.length;
-            mainVideoPlayer.src = mainInterfaceVideos[currentMainVideoIndex];
-            mainVideoPlayer.play();
-        }
-    });
-    
-    document.getElementById('update-profile-btn').addEventListener('click', async () => {
-        const btn = document.getElementById('update-profile-btn');
-        const userId = localStorage.getItem('rakshaSutraUserId');
-        if (!userId) return;
-        const newName = document.getElementById('profile-name-input').value;
-        const newAddress = document.getElementById('profile-address-input').value;
-        if (!newName || !newAddress) { alert("नाम और पता खाली नहीं हो सकता।"); return; }
-        btn.disabled = true;
-        btn.textContent = 'अपडेट हो रहा है...';
-        try {
-            await updateDoc(doc(db, "users", userId), { name: newName, address: newAddress });
-            localStorage.setItem('rakshaSutraUserName', newName);
-            alert("प्रोफ़ाइल सफलतापूर्वक अपडेट की गई!");
-        } catch (error) {
-            alert("अपडेट करते समय एक त्रुटि हुई: " + error.message);
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'प्रोफाइल अपडेट करें';
-        }
-    });
-    
-    document.getElementById('mystery-box-btn').addEventListener('click', () => showPage('home-page'));
-    document.getElementById('open-message-creator-btn').addEventListener('click', () => showPage('message-creator-page'));
-    document.getElementById('open-card-creator-btn').addEventListener('click', () => showPage('card-message-input-page'));
-    document.getElementById('change-music-strip').addEventListener('click', () => showPage('music-page'));
-    document.getElementById('my-profile-strip').addEventListener('click', () => showPage('profile-page'));
-    document.getElementById('view-shared-message-btn').addEventListener('click', () => document.getElementById('unique-id-modal').classList.add('active'));
-    
-    document.getElementById('whatsapp-share-strip').addEventListener('click', () => {
-        const message = encodeURIComponent(`इस रक्षाबंधन, अपने भाई-बहन को एक विशेष डिजिटल राखी भेजें! इस खूबसूरत वेबसाइट को देखें: ${window.location.origin}`);
-        window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
-    });
-
-    document.querySelectorAll('.back-link').forEach(link => {
-        link.addEventListener('click', (e) => {
+        
+        // --- Forms ---
+        document.getElementById('info-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            showPage(link.dataset.target);
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = 'सबमिट हो रहा है...';
+            const phone = document.getElementById('phone').value, name = document.getElementById('name').value, address = document.getElementById('address').value;
+            try {
+                await setDoc(doc(db, "users", phone), { name, phone, address, timestamp: serverTimestamp() });
+                localStorage.setItem('rakshaSutraUserName', name);
+                localStorage.setItem('rakshaSutraUserId', phone);
+                alert(`धन्यवाद, ${name}! आपकी प्रोफ़ाइल बन गई है।`);
+                setupMainInterfacePage(name);
+            } catch (error) {
+                alert("एक त्रुटि हुई: " + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'सबमिट करें';
+            }
         });
-    });
-    
-    document.querySelectorAll('.music-btn').forEach(button => {
-        button.addEventListener('click', () => {
-            audio.src = button.dataset.src;
-            if (isMusicPlaying) audio.play(); else toggleMusic();
-            showPage('home-page');
+        
+        document.getElementById('unique-id-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const enteredId = document.getElementById('unique-id-input').value.toLowerCase();
+            if (enteredId && enteredId.length === 5) {
+                showSharedMessage(enteredId);
+            } else {
+                alert("कृपया 5-अंकीय कोड डालें।");
+            }
         });
-    });
-    
-    document.getElementById('bhai-to-bhen-btn').addEventListener('click', () => { messageType = 'bhai-to-bhen'; showPage('message-name-form-page'); });
-    document.getElementById('bhen-to-bhai-btn').addEventListener('click', () => { messageType = 'bhen-to-bhai'; showPage('message-name-form-page'); });
-    
-    document.getElementById('message-name-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        currentMessageIndex = 0;
-        displayCurrentMessage();
-        showPage('message-display-page');
-    });
-    
-    let msgTouchStartX = 0;
-    const msgDisplayContainer = document.getElementById('message-display-card-container');
-    msgDisplayContainer.addEventListener('touchstart', e => { msgTouchStartX = e.changedTouches[0].screenX; }, { passive: true });
-    msgDisplayContainer.addEventListener('touchend', e => {
-        const touchendX = e.changedTouches[0].screenX;
-        const total = messages[messageType].length;
-        if (touchendX < msgTouchStartX - 50) currentMessageIndex = (currentMessageIndex + 1) % total;
-        if (touchendX > msgTouchStartX + 50) currentMessageIndex = (currentMessageIndex - 1 + total) % total;
-        displayCurrentMessage();
-    });
-    
-    document.getElementById('whatsapp-share-icon').addEventListener('click', async () => {
-        const messageToShare = document.getElementById('message-display-card').textContent;
-        const uniqueId = generateUniqueId();
-        try {
-            await setDoc(doc(db, "sharedMessages", uniqueId), { message: messageToShare, createdAt: serverTimestamp() });
-            const shareUrl = `${window.location.origin}${window.location.pathname}?msg=true`;
-            const shareText = encodeURIComponent(`आपके लिए एक खास रक्षाबंधन संदेश है! 🎁\n\nइसे देखने के लिए लिंक पर क्लिक करें और यह यूनिक कोड डालें: *${uniqueId.toUpperCase()}*\n\n${shareUrl}`);
-            window.open(`https://api.whatsapp.com/send?text=${shareText}`, '_blank');
-        } catch(e) {
-            alert("शेयर लिंक बनाते समय त्रुटि हुई।");
-        }
+        
+        document.getElementById('message-name-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            currentMessageIndex = 0;
+            displayCurrentMessage();
+            showPage('message-display-page');
+        });
+        
+        // --- Other Functionality ---
+        speakerIcon.addEventListener('click', toggleMusic);
+        mainVideoPlayer.addEventListener('ended', playNextMainVideo);
+        
+        document.getElementById('shared-message-open-btn').addEventListener('click', () => {
+            document.getElementById('shared-message-display').classList.remove('active');
+            if (localStorage.getItem('rakshaSutraUserId')) {
+                setupMainInterfacePage(localStorage.getItem('rakshaSutraUserName'));
+            } else {
+                showPage('form-page');
+            }
+        });
+
+        document.getElementById('whatsapp-share-strip').addEventListener('click', () => {
+            const message = encodeURIComponent(`इस रक्षाबंधन, अपने भाई-बहन को एक विशेष डिजिटल राखी भेजें! इस खूबसूरत वेबसाइट को देखें: ${window.location.origin}`);
+            window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
+        });
+        
+        document.getElementById('whatsapp-share-icon').addEventListener('click', async () => {
+            const messageToShare = document.getElementById('message-display-card').textContent;
+            const uniqueId = generateUniqueId();
+            try {
+                await setDoc(doc(db, "sharedMessages", uniqueId), { message: messageToShare, createdAt: serverTimestamp() });
+                const shareUrl = `${window.location.origin}${window.location.pathname}?msg=true`;
+                const shareText = encodeURIComponent(`आपके लिए एक खास रक्षाबंधन संदेश है! 🎁\n\nइसे देखने के लिए लिंक पर क्लिक करें और यह यूनिक कोड डालें: *${uniqueId.toUpperCase()}*\n\n${shareUrl}`);
+                window.open(`https://api.whatsapp.com/send?text=${shareText}`, '_blank');
+            } catch(e) {
+                alert("शेयर लिंक बनाते समय त्रुटि हुई।");
+            }
+        });
+
+        document.querySelectorAll('.music-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                audio.src = button.dataset.src;
+                if (isMusicPlaying) audio.play(); else toggleMusic();
+                showPage('home-page');
+            });
+        });
+
+        document.getElementById('bhai-to-bhen-btn').addEventListener('click', () => { messageType = 'bhai-to-bhen'; showPage('message-name-form-page'); });
+        document.getElementById('bhen-to-bhai-btn').addEventListener('click', () => { messageType = 'bhen-to-bhai'; showPage('message-name-form-page'); });
     });
 </script>
 
 </body>
-</html>
+</html>```
