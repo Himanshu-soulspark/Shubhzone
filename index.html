@@ -38,7 +38,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: url('https://raw.githubusercontent.com/Himanshu-bot-user/Shubhzone/main/Leonardo_Phoenix_10_A_beautiful_festive_background_for_a_Raks_3.jpg') no-repeat center center/cover;
+        background: url('Leonardo_Phoenix_10_A_beautiful_festive_background_for_a_Raks_3.jpg') no-repeat center center/cover;
         filter: blur(8px);
         z-index: -1; 
     }
@@ -136,7 +136,7 @@
     
     /* --- Profile Page --- */
     #profile-page .profile-info { text-align: left; width: 100%; }
-    #profile-page .profile-info p { margin-bottom: 10px; color: var(--text-color); font-weight: 600; }
+    #profile-page .profile-info p { margin-bottom: 20px; color: var(--text-color); font-weight: 600; }
     #profile-page .profile-info span { font-weight: 400; word-break: break-all; background: rgba(0,0,0,0.2); padding: 5px 8px; border-radius: 8px; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); }
 
     /* --- Main Interface Page (Book Design) --- */
@@ -166,83 +166,70 @@
     .falling-element { position: absolute; top: -50px; animation: fall linear infinite; font-size: 1.5rem; }
     @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
     
-    /* --- Card Viewer Page (NEW & IMPROVED) --- */
-    #message-display-page, #custom-card-display-page {
-        justify-content: flex-start;
-        padding-top: 70px; /* Space for header */
-    }
+    /* --- Card Viewer Page (Message Display) --- */
+    #message-display-page, #custom-card-display-page { justify-content: flex-start; padding-top: 80px; }
     .card-viewer-header {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
-        padding: 15px 20px;
+        padding: 20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         z-index: 10;
+        background: rgba(0,0,0,0.1);
+        backdrop-filter: blur(5px);
     }
     .header-btn {
-        padding: 8px 20px;
+        padding: 10px 25px;
         font-size: 1rem;
         font-weight: 600;
         color: #fff;
-        background: rgba(0,0,0,0.3);
-        backdrop-filter: blur(5px);
+        background: rgba(255,255,255,0.2);
         border: 1px solid rgba(255,255,255,0.4);
-        border-radius: 20px;
+        border-radius: 25px;
         cursor: pointer;
-        transition: background 0.3s;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        transition: all 0.3s;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
     }
-    .header-btn:hover { background: rgba(0,0,0,0.5); }
+    .header-btn:hover { background: rgba(255,255,255,0.4); transform: translateY(-2px); }
     .card-viewer-container {
         width: 100%;
         max-width: 400px;
         aspect-ratio: 9 / 16;
         border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        padding: 40px 25px;
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
-        position: relative;
         overflow: hidden;
         background-size: cover;
         background-position: center;
         transition: background-image 0.4s ease-in-out;
     }
     #message-display-card, #custom-card-display-content {
-        width: 100%;
-        height: 100%;
-        padding: 30px 25px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: clamp(1rem, 4vw, 1.3rem);
+        font-size: clamp(1rem, 4vw, 1.25rem);
         line-height: 1.7;
-        color: white;
+        color: #fff;
+        font-weight: 600;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0,0,0,0.6);
         text-align: center;
         white-space: pre-wrap;
         overflow-y: auto;
-        background-color: rgba(0, 0, 0, 0.35); /* Dark overlay for readability */
-        backdrop-filter: blur(4px); /* Blur the background image behind this element */
-        text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+        width: 100%;
+        height: 100%;
     }
-    /* --- Card Animation --- */
-    @keyframes card-fade-in {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    .card-content-animated {
-        animation: card-fade-in 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    }
+    #swipe-indicator { margin-top: 20px; color: #fff; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
     
-    #swipe-indicator {
-        margin-top: 15px;
-        color: white;
-        font-style: italic;
-        font-weight: 500;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    @keyframes fadeInScaleUp {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .card-animation {
+        animation: fadeInScaleUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
     }
     
 
@@ -250,13 +237,23 @@
     #unique-id-modal, #shared-message-display { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; z-index: 2000; flex-direction: column; background: rgba(0,0,0,0.7); }
     #unique-id-modal.active, #shared-message-display.active { display: flex; }
     #shared-message-content { background: var(--card-bg); backdrop-filter: var(--blur-effect); padding: 40px; border-radius: 20px; color: var(--text-color); text-shadow: 1px 1px 2px rgba(255,255,255,0.4); max-width: 90%; text-align: center; font-size: 1.2rem; line-height: 1.7; font-weight: 600; white-space: pre-wrap; }
+    .modal-button-group {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+        margin-top: 10px;
+    }
+    .modal-button-group .cta-button {
+        flex: 1;
+        margin-top: 0;
+    }
 
 </style>
 </head>
 <body>
 
 
-<audio id="background-audio" loop><source src="https://github.com/Himanshu-bot-user/Shubhzone/raw/main/3.m4a" type="audio/mp4"></source></audio>
+<audio id="background-audio" loop volume="0.4"><source src="3.m4a" type="audio/mp4"></source></audio>
 
 <div id="speaker-icon">🔇</div>
 
@@ -273,8 +270,10 @@
         <h2>मित्र का संदेश देखें</h2>
         <form id="unique-id-form">
             <div class="input-group"><input type="text" id="unique-id-input" class="input-field" placeholder="प्राप्त हुआ 5-अंकीय कोड डालें" required="" maxlength="5" minlength="5"></div>
-            <button type="submit" class="cta-button">संदेश देखें</button>
-            <a href="#" id="close-modal-btn" class="back-link">वापस</a>
+            <div class="modal-button-group">
+                 <button type="button" id="close-unique-id-modal-btn" class="cta-button" style="background: #6c757d;">वापस</button>
+                 <button type="submit" class="cta-button">संदेश देखें</button>
+            </div>
         </form>
     </div>
 </div>
@@ -282,7 +281,7 @@
 <!-- Page 1: Landing Page -->
 <div id="landing-page" class="page active">
     <h1 class="title">Raksha Sutra</h1>
-    <div class="video-card"><video autoplay="" loop="" muted="" playsinline=""><source src="https://github.com/Himanshu-bot-user/Shubhzone/raw/main/Generated%20File%20August%2007%2C%202025%20-%207_34PM.mp4" type="video/mp4"></video></div>
+    <div class="video-card"><video autoplay="" loop="" muted="" playsinline=""><source src="Generated File August 07, 2025 - 7_34PM.mp4" type="video/mp4"></video></div>
     <p class="subtitle">"रक्षाबंधन सिर्फ एक धागा नहीं, बल्कि दिलों का एक अटूट बंधन है।<br>आइए इस रिश्ते को फिर से महसूस करें, एक प्यार भरी डिजिटल राखी के साथ।"</p>
     <button id="get-started-btn" class="cta-button">शुरू करें</button>
 </div>
@@ -305,10 +304,12 @@
     <div id="falling-elements-container"></div>
     <div class="page-content">
         <div class="book-container">
+            <!-- Video Card -->
             <div class="interface-card video-card-book">
                  <div class="date-display">शनिवार, 9 अगस्त, 2025</div>
                 <video playsinline="" id="main-video-player"></video>
             </div>
+            <!-- Message Card -->
             <div class="interface-card message-card-book" id="main-interface-message-container">
                 <div id="main-interface-message"></div>
                 <div id="replay-speech-btn">🔊</div>
@@ -326,11 +327,11 @@
     <div class="content-area">
         <div class="cards-container">
             <div class="home-card-wrapper">
-                <div class="home-card" style="background-image: url('https://github.com/Himanshu-bot-user/Shubhzone/raw/main/IMG-20250807-WA0000.jpg');" onclick="document.getElementById('open-message-creator-btn').click();"></div>
+                <div id="message-card-btn" class="home-card" style="background-image: url('IMG-20250807-WA0000.jpg');"></div>
                 <button id="open-message-creator-btn" class="cta-button">संदेश भेजें</button>
             </div>
             <div class="home-card-wrapper">
-                <div class="home-card" style="background-image: url('https://raw.githubusercontent.com/Himanshu-bot-user/Shubhzone/main/Leonardo_Phoenix_10_A_beautifully_designed_Raksha_Bandhan_Mass_1.jpg');" onclick="document.getElementById('open-card-creator-btn').click();"></div>
+                <div id="card-creator-btn" class="home-card" style="background-image: url('Leonardo_Phoenix_10_A_beautifully_designed_Raksha_Bandhan_Mass_1.jpg');"></div>
                 <button id="open-card-creator-btn" class="cta-button">कार्ड बनाएं</button>
             </div>
         </div>
@@ -365,9 +366,9 @@
 <div id="music-page" class="page">
      <div class="form-container">
         <h2>संगीत बदलें</h2>
-        <button class="cta-button music-btn" data-src="https://github.com/Himanshu-bot-user/Shubhzone/raw/main/1.m4a">रक्षा सूत्र संगीत 1</button>
-        <button class="cta-button music-btn" data-src="https://github.com/Himanshu-bot-user/Shubhzone/raw/main/2.m4a">रक्षा सूत्र संगीत 2</button>
-        <button class="cta-button music-btn" data-src="https://github.com/Himanshu-bot-user/Shubhzone/raw/main/3.m4a">रक्षा सूत्र संगीत 3</button>
+        <button class="cta-button music-btn" data-src="1.m4a">रक्षा सूत्र संगीत 1</button>
+        <button class="cta-button music-btn" data-src="2.m4a">रक्षा सूत्र संगीत 2</button>
+        <button class="cta-button music-btn" data-src="3.m4a">रक्षा सूत्र संगीत 3</button>
         <a href="#" class="back-link" data-target="home-page">वापस जाएं</a>
     </div>
 </div>
@@ -452,19 +453,19 @@
     const db = getFirestore(app);
 
     const audio = document.getElementById('background-audio');
+    audio.volume = 0.4;
     const speakerIcon = document.getElementById('speaker-icon');
     let isMusicPlaying = false;
     let fallingElementsInterval;
     
-    // --- Message Data ---
     let messageType = ''; 
     let currentMessageIndex = 0;
 
     const cardBackgroundImages = [
-        'https://github.com/Himanshu-bot-user/Shubhzone/raw/main/IMG-20250807-WA0001.jpg',
-        'https://github.com/Himanshu-bot-user/Shubhzone/raw/main/IMG-20250807-WA0002.jpg',
-        'https://github.com/Himanshu-bot-user/Shubhzone/raw/main/IMG-20250807-WA0003.jpg',
-        'https://github.com/Himanshu-bot-user/Shubhzone/raw/main/IMG-20250807-WA0004.jpg'
+        'IMG-20250807-WA0001.jpg',
+        'IMG-20250807-WA0002.jpg',
+        'IMG-20250807-WA0003.jpg',
+        'IMG-20250807-WA0004.jpg'
     ];
     
     const bhenToBhaiMessages = [
@@ -514,7 +515,7 @@
     ];
     
     const mainVideoPlayer = document.getElementById('main-video-player');
-    const mainInterfaceVideos = [ 'https://github.com/Himanshu-bot-user/Shubhzone/raw/main/main%20interfacemp4.mp4', 'https://github.com/Himanshu-bot-user/Shubhzone/raw/main/Happy%20Rakshabandhan%20%F0%9F%A5%B3%F0%9F%99%8C%ud83c%udf1b%20_%20Coming%20s....mp4' ];
+    const mainInterfaceVideos = [ 'main interfacemp4.mp4', 'coming soon rakshabandhan __ 9 August 2025 _comingsoon _rakhi_happyrakshabandhan_status_short(360P).mp4' ];
     let currentMainVideoIndex = 0;
     
     // --- Unique ID and Sharing Logic ---
@@ -529,6 +530,7 @@
                 message: messageText,
                 createdAt: serverTimestamp()
             });
+
             const baseUrl = `${window.location.origin}${window.location.pathname}`;
             const shareUrl = `${baseUrl}?msg=true`;
             const introText = "आपके लिए एक खास रक्षाबंधन संदेश है! 🎁\n\n";
@@ -546,12 +548,18 @@
         const uniqueIdModal = document.getElementById('unique-id-modal');
         const sharedMessageDisplay = document.getElementById('shared-message-display');
         const sharedMessageContent = document.getElementById('shared-message-content');
+        
         uniqueIdModal.classList.remove('active');
+        
         try {
             const messageDocRef = doc(db, "sharedMessages", messageId);
             const docSnap = await getDoc(messageDocRef);
             if (docSnap.exists()) {
                 sharedMessageContent.textContent = docSnap.data().message;
+                const bgIndex = Math.floor(Math.random() * cardBackgroundImages.length);
+                sharedMessageContent.parentElement.style.backgroundImage = `url('${cardBackgroundImages[bgIndex]}')`;
+                sharedMessageContent.parentElement.style.backgroundSize = 'cover';
+                sharedMessageContent.parentElement.style.backgroundPosition = 'center';
                 sharedMessageDisplay.classList.add('active');
             } else {
                 alert("यह संदेश कोड अमान्य है। कृपया पुनः प्रयास करें।");
@@ -564,6 +572,7 @@
         }
     }
 
+
     async function loadProfileForEditing() {
         const userId = localStorage.getItem('rakshaSutraUserId');
         if (!userId) {
@@ -571,10 +580,13 @@
             showPage('form-page');
             return;
         }
+
         document.getElementById('profile-call-id').textContent = userId;
+
         try {
             const userDocRef = doc(db, "users", userId);
             const docSnap = await getDoc(userDocRef);
+
             if (docSnap.exists()) {
                 const userData = docSnap.data();
                 document.getElementById('profile-name-input').value = userData.name || '';
@@ -589,12 +601,14 @@
         }
     }
 
+
     function showPage(pageId) {
         document.querySelectorAll('.page.active').forEach(p => p.classList.remove('active'));
         const page = document.getElementById(pageId);
         if (page) {
             page.classList.add('active');
         }
+
         if (pageId === 'main-interface-page') {
             startFallingElements();
             if (!audio.paused) {
@@ -612,10 +626,10 @@
                 if (container) container.innerHTML = '';
              }
              if (localStorage.getItem('musicWasPlaying') === 'true' && audio.paused) {
-                audio.volume = 0.4;
                 audio.play().catch(()=>{});
              }
         }
+        
         if (pageId === 'profile-page') {
             loadProfileForEditing();
         }
@@ -623,7 +637,6 @@
 
     function toggleMusic() {
         if (audio.paused) {
-            audio.volume = 0.4; // Set low volume
             audio.play().then(() => {
                 speakerIcon.textContent = '🔊';
                 isMusicPlaying = true;
@@ -667,6 +680,7 @@
 
     function setupMainInterfacePage(userName) {
         const messageText = `प्रिय ${userName},\n\nरक्षाबंधन का यह पावन अवसर प्रेम, विश्वास और सुरक्षा के उस बंधन का प्रतीक है जो हमें जीवनभर जोड़े रखता है।\nहमारे Shubhzone.shop परिवार का हिस्सा बनने के लिए आपका धन्यवाद। आपका विश्वास हमारे लिए वैसा ही है जैसे एक बहन के लिए अपने भाई का वचन— हमेशा साथ निभाने का।\n\nइस त्योहार पर हमारी यही शुभकामना है कि आपके जीवन में हमेशा खुशियां, सफलता और रिश्तों की गर्माहट बनी रहे।\n\nरक्षाबंधन की हार्दिक शुभकामनाएं!\nसप्रेम,\nShubhzone.shop परिवार`;
+        
         document.getElementById('main-interface-message').textContent = messageText;
         mainVideoPlayer.src = mainInterfaceVideos[currentMainVideoIndex];
         showPage('main-interface-page');
@@ -683,23 +697,26 @@
         const sender = document.getElementById('sender-name').value;
         const receiver = document.getElementById('receiver-name').value;
         const messages = messageType === 'bhai-to-bhen' ? bhaiToBhenMessages : bhenToBhaiMessages;
+        
         let messageTemplate = messages[currentMessageIndex];
+        
         let formattedMessage = messageTemplate
                                .replace(/\[भाई का नाम\]/g, receiver)
                                .replace(/\[नाम\]/g, receiver)
                                .replace(/प्रिय बहना/g, `प्रिय बहना ${receiver}`);
+
+        const cardElement = document.getElementById('message-display-card');
+        const containerElement = document.getElementById('message-viewer-container');
         
-        // --- NEW --- Animate card and change background
-        const cardContainer = document.getElementById('message-viewer-container');
-        const imageIndex = currentMessageIndex % cardBackgroundImages.length;
-        cardContainer.style.backgroundImage = `url('${cardBackgroundImages[imageIndex]}')`;
-
-        const messageCard = document.getElementById('message-display-card');
-        messageCard.classList.remove('card-content-animated');
-        void messageCard.offsetWidth; // Trigger reflow to restart animation
-        messageCard.classList.add('card-content-animated');
-
-        messageCard.textContent = formattedMessage + `\n\nस्नेह सहित,\n${sender}`;
+        // Apply animation
+        cardElement.classList.remove('card-animation');
+        void cardElement.offsetWidth; // Trigger reflow
+        cardElement.classList.add('card-animation');
+        
+        // Set text and background
+        cardElement.textContent = formattedMessage + `\n\nस्नेह सहित,\n${sender}`;
+        const bgIndex = currentMessageIndex % cardBackgroundImages.length;
+        containerElement.style.backgroundImage = `url('${cardBackgroundImages[bgIndex]}')`;
     }
 
     // --- Event Listeners ---
@@ -714,16 +731,15 @@
 
     document.getElementById('unique-id-form').addEventListener('submit', (e) => {
         e.preventDefault();
-        const enteredId = document.getElementById('unique-id-input').value.toLowerCase();
+        const enteredId = document.getElementById('unique-id-input').value.toLowerCase().trim();
         if(enteredId && enteredId.length === 5) {
              showSharedMessage(enteredId);
         } else {
             alert("कृपया 5-अंकीय कोड डालें।");
         }
     });
-    
-    document.getElementById('close-modal-btn').addEventListener('click', (e) => {
-        e.preventDefault();
+
+    document.getElementById('close-unique-id-modal-btn').addEventListener('click', () => {
         document.getElementById('unique-id-modal').classList.remove('active');
     });
     
@@ -754,11 +770,13 @@
         const submitButton = e.target.querySelector('button[type="submit"]');
         submitButton.disabled = true;
         submitButton.textContent = 'सबमिट हो रहा है...';
+
         const phone = document.getElementById('phone').value;
         const name = document.getElementById('name').value;
         const address = document.getElementById('address').value;
+
         try {
-            await setDoc(doc(db, "users", phone), { name, phone, address, timestamp: serverTimestamp() });
+            await setDoc(doc(db, "users", phone), { name: name, phone: phone, address: address, timestamp: serverTimestamp() });
             localStorage.setItem('rakshaSutraUserName', name);
             localStorage.setItem('rakshaSutraUserId', phone);
             alert(`धन्यवाद, ${name}! आपकी प्रोफ़ाइल बन गई है।\nआपकी आईडी है: ${phone}`);
@@ -774,12 +792,14 @@
     mainVideoPlayer.addEventListener('ended', playNextMainVideo);
     
     document.getElementById('update-profile-btn').addEventListener('click', async () => {
+        const updateButton = document.getElementById('update-profile-btn');
         const userId = localStorage.getItem('rakshaSutraUserId');
         if (!userId) { alert("उपयोगकर्ता पंजीकृत नहीं है।"); return; }
+        
         const newName = document.getElementById('profile-name-input').value;
         const newAddress = document.getElementById('profile-address-input').value;
         if (!newName || !newAddress) { alert("नाम और पता खाली नहीं हो सकता।"); return; }
-        const updateButton = document.getElementById('update-profile-btn');
+        
         updateButton.disabled = true;
         updateButton.textContent = 'अपडेट हो रहा है...';
         try {
@@ -796,33 +816,42 @@
     
     // Home Page Buttons
     document.getElementById('open-message-creator-btn').addEventListener('click', () => showPage('message-creator-page'));
+    document.getElementById('message-card-btn').addEventListener('click', () => showPage('message-creator-page'));
     document.getElementById('open-card-creator-btn').addEventListener('click', () => showPage('card-message-input-page'));
+    document.getElementById('card-creator-btn').addEventListener('click', () => showPage('card-message-input-page'));
     document.getElementById('change-music-strip').addEventListener('click', () => showPage('music-page'));
     document.getElementById('my-profile-strip').addEventListener('click', () => showPage('profile-page'));
     document.getElementById('view-message-strip').addEventListener('click', () => document.getElementById('unique-id-modal').classList.add('active'));
+
     document.getElementById('whatsapp-share-strip').addEventListener('click', () => {
         const message = encodeURIComponent(`इस रक्षाबंधन, अपने भाई-बहन को एक विशेष डिजिटल राखी भेजें! इस खूबसूरत वेबसाइट को देखें: ${window.location.origin}`);
         window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
     });
 
     document.querySelectorAll('.back-link').forEach(link => {
-        link.addEventListener('click', (e) => { e.preventDefault(); showPage(link.dataset.target); });
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage(link.dataset.target);
+        });
     });
     
     document.querySelectorAll('.music-btn').forEach(button => {
         button.addEventListener('click', () => {
             audio.src = button.dataset.src;
-            if (!isMusicPlaying) {
-                toggleMusic(); 
-            } else {
-                audio.play();
-            }
+            toggleMusic(); 
             showPage('home-page');
         });
     });
     
-    document.getElementById('bhai-to-bhen-btn').addEventListener('click', () => { messageType = 'bhai-to-bhen'; showPage('message-name-form-page'); });
-    document.getElementById('bhen-to-bhai-btn').addEventListener('click', () => { messageType = 'bhen-to-bhai'; showPage('message-name-form-page'); });
+    document.getElementById('bhai-to-bhen-btn').addEventListener('click', () => {
+        messageType = 'bhai-to-bhen';
+        showPage('message-name-form-page');
+    });
+
+    document.getElementById('bhen-to-bhai-btn').addEventListener('click', () => {
+        messageType = 'bhen-to-bhai';
+        showPage('message-name-form-page');
+    });
     
     document.getElementById('message-name-form').addEventListener('submit', (e) => {
         e.preventDefault();
@@ -836,36 +865,38 @@
     document.getElementById('message-viewer-container').addEventListener('touchend', e => {
         const touchendX = e.changedTouches[0].screenX;
         const totalMessages = (messageType === 'bhai-to-bhen' ? bhaiToBhenMessages : bhenToBhaiMessages).length;
-        if (touchendX < messageTouchStartX - 50) { currentMessageIndex = (currentMessageIndex + 1) % totalMessages; } 
-        else if (touchendX > messageTouchStartX + 50) { currentMessageIndex = (currentMessageIndex - 1 + totalMessages) % totalMessages; } 
-        else { return; }
+        if (touchendX < messageTouchStartX - 50) { // Swipe left
+            currentMessageIndex = (currentMessageIndex + 1) % totalMessages;
+        } else if (touchendX > messageTouchStartX + 50) { // Swipe right
+            currentMessageIndex = (currentMessageIndex - 1 + totalMessages) % totalMessages;
+        } else {
+            return;
+        }
         displayCurrentMessage();
     });
 
     document.getElementById('message-display-share-btn').addEventListener('click', () => {
-        shareMessage(document.getElementById('message-display-card').textContent);
+        const messageToShare = document.getElementById('message-display-card').textContent;
+        shareMessage(messageToShare);
     });
     document.getElementById('message-display-back-btn').addEventListener('click', () => showPage('message-name-form-page'));
 
     // --- Custom Card Creator Flow ---
     document.getElementById('go-to-custom-card-btn').addEventListener('click', () => {
         const wishText = document.getElementById('card-wish-input').value;
-        if (!wishText.trim()) { alert("कृपया अपनी शुभकामना लिखें।"); return; }
-
-        const cardContainer = document.getElementById('custom-card-viewer-container');
-        cardContainer.style.backgroundImage = `url('${cardBackgroundImages[0]}')`; // Use the first image
-        
-        const cardContent = document.getElementById('custom-card-display-content');
-        cardContent.textContent = wishText;
-        cardContent.classList.remove('card-content-animated');
-        void cardContent.offsetWidth;
-        cardContent.classList.add('card-content-animated');
-
+        if (!wishText.trim()) {
+            alert("कृपया अपनी शुभकामना लिखें।");
+            return;
+        }
+        document.getElementById('custom-card-display-content').textContent = wishText;
+        const bgIndex = Math.floor(Math.random() * cardBackgroundImages.length);
+        document.getElementById('custom-card-viewer-container').style.backgroundImage = `url('${cardBackgroundImages[bgIndex]}')`;
         showPage('custom-card-display-page');
     });
 
     document.getElementById('custom-card-share-btn').addEventListener('click', () => {
-        shareMessage(document.getElementById('custom-card-display-content').textContent);
+        const messageToShare = document.getElementById('custom-card-display-content').textContent;
+        shareMessage(messageToShare);
     });
     document.getElementById('custom-card-back-btn').addEventListener('click', () => showPage('card-message-input-page'));
 
