@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -119,14 +120,9 @@
         .home-card { width: 100%; aspect-ratio: 1 / 1; background-size: cover; background-position: center; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.3s ease; }
         .home-card:hover { transform: scale(1.05); }
         #home-page .cta-button { margin-top: 0; width: 100%; padding: 12px 20px; font-size: 1rem; }
-        .home-footer { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; margin-top: auto; }
-        .footer-strip { width: 100%; padding: 15px 25px; font-size: 1.1rem; font-weight: 600; color: #fff; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; cursor: pointer; transition: all 0.3s ease; }
-        .call-details { padding: 20px; border-radius: 15px; display: flex; flex-direction: column; gap: 15px; color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.4); transition: all 0.5s ease; max-height: 0; overflow: hidden; padding: 0 20px; opacity: 0; }
-        .call-details.visible { max-height: 500px; padding: 20px; opacity: 1; margin-top: 15px; }
-        #user-call-id-display { font-weight: 600; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px; }
-        .call-buttons-container { display: flex; gap: 10px; justify-content: center; }
-        .call-buttons-container .cta-button { margin-top: 5px; width: auto; }
-
+        .home-footer { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; margin-top: auto; padding-top:20px; }
+        .footer-strip { width: 100%; padding: 15px 25px; font-size: 1.1rem; font-weight: 600; color: #fff; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        
         /* --- Profile Page --- */
         #profile-page .profile-info { text-align: left; width: 100%; }
         #profile-page .profile-info p { margin-bottom: 20px; color: var(--text-color); font-weight: 600; }
@@ -156,15 +152,6 @@
         .falling-element { position: absolute; top: -50px; animation: fall linear infinite; font-size: 1.5rem; }
         @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
 
-        /* --- Call Page --- */
-        #call-page { background-color: #2c3e50; gap: 10px; }
-        #videos-container { width: 100%; height: 100%; position: relative; }
-        #remote-video { width: 100%; height: 100%; object-fit: cover; background-color: #000; }
-        #local-video { position: absolute; bottom: 20px; right: 20px; width: 30vw; max-width: 150px; aspect-ratio: 9/16; object-fit: cover; border-radius: 15px; border: 2px solid rgba(255,255,255,0.5); box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
-        #call-controls { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; background: rgba(0,0,0,0.4); padding: 10px 20px; border-radius: 50px; }
-        .control-btn { font-size: 1.8rem; color: white; cursor: pointer; background: none; border: none; padding: 10px; border-radius: 50%; transition: background-color 0.3s; }
-        #hangup-btn { color: #e74c3c; }
-
     </style>
 </head>
 <body>
@@ -175,21 +162,20 @@
 <!-- Page 1: Landing Page -->
 <div id="landing-page" class="page active">
     <h1 class="title">Raksha Sutra</h1>
-    <!-- *** UPDATED FILE NAME *** -->
     <div class="video-card"><video autoplay loop muted playsinline><source src="Generated File August 07, 2025 - 7_34PM.mp4" type="video/mp4"></video></div>
-    <p class="subtitle">"Raksha Bandhan is not just a thread, it's an unbreakable bond of hearts.<br>Let's feel this relationship again, with a loving digital Rakhi."</p>
-    <button id="get-started-btn" class="cta-button">Get Started</button>
+    <p class="subtitle">"रक्षाबंधन सिर्फ एक धागा नहीं, बल्कि दिलों का एक अटूट बंधन है।<br>आइए इस रिश्ते को फिर से महसूस करें, एक प्यार भरी डिजिटल राखी के साथ।"</p>
+    <button id="get-started-btn" class="cta-button">शुरू करें</button>
 </div>
 
 <!-- Page 2: Info Form Page -->
 <div id="form-page" class="page">
     <div class="form-container">
-        <h2>Fill Your Information</h2>
+        <h2>अपनी जानकारी भरें</h2>
         <form id="info-form">
-            <div class="input-group"><input type="text" id="name" class="input-field" placeholder="Full Name" required></div>
-            <div class="input-group"><input type="tel" id="phone" class="input-field" placeholder="Mobile Number (Your Call ID)" required></div>
-            <div class="input-group"><textarea id="address" rows="3" class="input-field" placeholder="Full Address" required></textarea></div>
-            <button type="submit" class="cta-button">Submit</button>
+            <div class="input-group"><input type="text" id="name" class="input-field" placeholder="पूरा नाम" required></div>
+            <div class="input-group"><input type="tel" id="phone" class="input-field" placeholder="मोबाइल नंबर (यह आपकी पहचान होगी)" required></div>
+            <div class="input-group"><textarea id="address" rows="3" class="input-field" placeholder="पूरा पता" required></textarea></div>
+            <button type="submit" class="cta-button">सबमिट करें</button>
         </form>
     </div>
 </div>
@@ -200,7 +186,7 @@
     <div class="page-content">
         <div class="interface-layout">
             <div id="main-interface-video-card">
-                 <div class="date-display">Sat, 9 Aug, 2025</div>
+                 <div class="date-display">शनिवार, 9 अगस्त, 2025</div>
                 <video playsinline id="main-video-player"></video>
             </div>
             <div class="message-card">
@@ -208,41 +194,31 @@
                 <div id="replay-speech-btn">🔊</div>
             </div>
         </div>
-        <button id="proceed-to-home-btn" class="cta-button">Proceed</button>
+        <button id="proceed-to-home-btn" class="cta-button">आगे बढ़ें</button>
     </div>
 </div>
 
 <!-- Page 4: Home Page -->
 <div id="home-page" class="page">
-    <header class="home-header"><h1 class="title">Raksha Sutra</h1></header>
+    <header class="home-header"><h1 class="title">रक्षा सूत्र</h1></header>
     <div class="content-area">
         <div class="cards-container">
             <div class="home-card-wrapper">
-                <!-- *** UPDATED FILE NAME *** -->
                 <div id="message-card-btn" class="home-card" style="background-image: url('IMG-20250807-WA0000.jpg');"></div>
-                <button id="open-message-creator-btn" class="cta-button">Open</button>
+                <button id="open-message-creator-btn" class="cta-button">संदेश भेजें</button>
             </div>
             <div class="home-card-wrapper">
-                <!-- *** UPDATED FILE NAME *** -->
                 <div id="card-creator-btn" class="home-card" style="background-image: url('Leonardo_Phoenix_10_A_beautifully_designed_Raksha_Bandhan_Mass_1.jpg');"></div>
-                <button id="open-card-creator-btn" class="cta-button">Open</button>
+                <button id="open-card-creator-btn" class="cta-button">कार्ड बनाएं</button>
             </div>
         </div>
     </div>
     <div class="home-footer">
-        <div id="my-profile-strip" class="footer-strip">My Profile</div>
-        <div id="change-music-strip" class="footer-strip">Change Music</div>
-        <div id="toggle-call-section-strip" class="footer-strip">Audio / Video Call</div>
-        <div id="call-details-section" class="call-details">
-            <h3>Connect with loved ones</h3>
-            <p>Your Call ID: <strong id="user-call-id-display">Not registered</strong></p>
-            <div class="input-group">
-                <input type="tel" id="callee-id-input" class="input-field" placeholder="Enter friend's Call ID">
-            </div>
-            <div class="call-buttons-container">
-                <button id="audio-call-btn" class="cta-button">Audio Call</button>
-                <button id="video-call-btn" class="cta-button">Video Call</button>
-            </div>
+        <div id="my-profile-strip" class="footer-strip">मेरी प्रोफाइल</div>
+        <div id="change-music-strip" class="footer-strip">संगीत बदलें</div>
+        <div id="whatsapp-share-strip" class="footer-strip">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M.05 22c.12-.59.25-1.18.41-1.76l.09-.32c.31-1.09.7-2.14 1.18-3.15.53-1.12 1.16-2.19 1.88-3.18.82-1.1 1.74-2.1 2.76-3 .2-.18.4-.36.6-.53l.4-.33c.53-.44 1.1-.82 1.7-1.14.99-.53 2.03-.9 3.1-1.1.33-.07.67-.12 1.01-.16.29-.03.59-.05.88-.05.23 0 .46.01.69.03.37.03.74.08 1.1.15.99.19 1.94.55 2.83 1.06.88.5 1.69 1.14 2.41 1.89s1.25 1.53 1.75 2.41c.45.83.78 1.71 1 2.62.22.91.31 1.85.28 2.79-.03.95-.2 1.89-.51 2.79-.31.9-.76 1.76-1.33 2.55-.57.79-1.25 1.5-2.02 2.11-.78.6-1.63 1.1-2.54 1.49-.91.38-1.88.64-2.86.76-.98.12-1.97.1-2.95-.05-.98-.15-1.95-.44-2.88-.86a12.926 12.926 0 01-2.7-1.48c-.24-.13-.47-.27-.7-.41l-1.68-1.02c-.55-.33-1.1-.68-1.64-1.05-.1-.07-.2-.14-.3-.21l-.06-.05c-.62-.48-1.2-1-1.73-1.57-.49-.52-.93-1.08-1.32-1.68-.3-.46-.55-.95-.77-1.45l-.02-.06c-.25-.56-.47-1.14-.65-1.73l-.04-.13c-.22-.72-.39-1.46-.5-2.22-.05-.33-.08-.67-.1-1H.05zM9.3 8.35c.14-.38.33-.74.58-1.06.25-.32.55-.6.88-.82.34-.22.7-.4 1.08-.52s.78-.18 1.18-.18c.39 0 .78.04 1.15.13.37.09.73.23 1.06.41.33.18.64.41.91.68.27.27.5.58.68.91.18.33.31.69.4 1.06.09.37.13.76.13 1.15s-.04.78-.13 1.15c-.09.37-.22.73-.4 1.06-.18.33-.41.64-.68.91-.27.27-.58.5-.91.68-.33.18-.69.32-1.06.41-.37.09-.76.13-1.15.13s-.78-.04-1.15-.13c-.37-.09-.73-.23-1.06-.41-.33-.18-.64-.41-.91-.68-.27-.27-.5-.58-.68-.91-.18-.33-.31-.69-.4-1.06-.09-.37-.13-.76-.13-1.15s.05-.78.14-1.15z"/></svg>
+            <span>व्हाट्सएप पर शेयर करें</span>
         </div>
     </div>
 </div>
@@ -250,18 +226,18 @@
 <!-- Page 5: My Profile Page -->
 <div id="profile-page" class="page">
     <div class="form-container">
-        <h2>My Profile</h2>
+        <h2>मेरी प्रोफाइल</h2>
         <div class="profile-info">
-            <p>Your Name:</p>
-            <div class="input-group"><input type="text" id="profile-name-input" class="input-field" placeholder="Your Name" required></div>
+            <p>आपका नाम:</p>
+            <div class="input-group"><input type="text" id="profile-name-input" class="input-field" placeholder="आपका नाम" required></div>
             
-            <p>Your Address:</p>
-            <div class="input-group"><textarea id="profile-address-input" class="input-field" placeholder="Your Address" rows="3" required></textarea></div>
+            <p>आपका पता:</p>
+            <div class="input-group"><textarea id="profile-address-input" class="input-field" placeholder="आपका पता" rows="3" required></textarea></div>
 
-            <p>Your Call ID: <span id="profile-call-id">Not Registered</span></p>
+            <p>आपकी आईडी: <span id="profile-call-id">रजिस्टर्ड नहीं है</span></p>
         </div>
-        <button id="update-profile-btn" class="cta-button">Update Profile</button>
-        <a href="#" class="back-link" data-target="home-page">Go Back</a>
+        <button id="update-profile-btn" class="cta-button">प्रोफाइल अपडेट करें</button>
+        <a href="#" class="back-link" data-target="home-page">वापस जाएं</a>
     </div>
 </div>
 
@@ -269,90 +245,76 @@
 <!-- Page 6: Music Change Page -->
 <div id="music-page" class="page">
      <div class="form-container">
-        <h2>Change Music</h2>
-        <button class="cta-button music-btn" data-src="1.m4a">Raksha Sutra Music 1</button>
-        <button class="cta-button music-btn" data-src="2.m4a">Raksha Sutra Music 2</button>
-        <button class="cta-button music-btn" data-src="3.m4a">Raksha Sutra Music 3</button>
-        <a href="#" class="back-link" data-target="home-page">Go Back</a>
+        <h2>संगीत बदलें</h2>
+        <button class="cta-button music-btn" data-src="1.m4a">रक्षा सूत्र संगीत 1</button>
+        <button class="cta-button music-btn" data-src="2.m4a">रक्षा सूत्र संगीत 2</button>
+        <button class="cta-button music-btn" data-src="3.m4a">रक्षा सूत्र संगीत 3</button>
+        <a href="#" class="back-link" data-target="home-page">वापस जाएं</a>
     </div>
 </div>
 
 <!-- Page 7: Pre-made Message Creator Page -->
 <div id="message-creator-page" class="page">
     <div class="form-container">
-        <h2 id="message-creator-title">Create a Message</h2>
-        <button id="bhai-to-bhen-btn" class="cta-button" style="width:100%; margin-bottom: 15px;">From Brother to Sister</button>
-        <button id="bhen-to-bhai-btn" class="cta-button" style="width:100%;">From Sister to Brother</button>
-         <a href="#" class="back-link" data-target="home-page">Go Back</a>
+        <h2 id="message-creator-title">एक संदेश बनाएं</h2>
+        <button id="bhai-to-bhen-btn" class="cta-button" style="width:100%; margin-bottom: 15px;">भाई की तरफ से बहन के लिए</button>
+        <button id="bhen-to-bhai-btn" class="cta-button" style="width:100%;">बहन की तरफ से भाई के लिए</button>
+         <a href="#" class="back-link" data-target="home-page">वापस जाएं</a>
     </div>
 </div>
 
 <!-- Page 8: Name Input for Messages -->
 <div id="message-name-form-page" class="page">
     <div class="form-container">
-        <h2 id="message-name-title">Enter Names</h2>
+        <h2 id="message-name-title">नाम दर्ज करें</h2>
         <form id="message-name-form">
-            <div class="input-group"><input type="text" id="sender-name" class="input-field" placeholder="Your Name" required></div>
-            <div class="input-group"><input type="text" id="receiver-name" class="input-field" placeholder="Brother's/Sister's Name" required></div>
-            <button type="submit" class="cta-button">See Message</button>
+            <div class="input-group"><input type="text" id="sender-name" class="input-field" placeholder="आपका नाम" required></div>
+            <div class="input-group"><input type="text" id="receiver-name" class="input-field" placeholder="भाई/बहन का नाम" required></div>
+            <button type="submit" class="cta-button">संदेश देखें</button>
         </form>
-        <a href="#" class="back-link" data-target="message-creator-page">Go Back</a>
+        <a href="#" class="back-link" data-target="message-creator-page">वापस जाएं</a>
     </div>
 </div>
 
 <!-- Page 9: Message Display Page -->
 <div id="message-display-page" class="page">
      <div class="form-container">
-        <h2>A Lovely Message For You</h2>
+        <h2>आपके लिए एक प्यारा संदेश</h2>
         <div id="message-display-card" style="width: 100%; min-height: 250px; padding: 25px; background: rgba(255,255,255,0.7); border-radius: 15px; font-size: 1.1rem; line-height: 1.6; color: var(--text-color); display: flex; align-items: center; justify-content: center; text-align: center; margin-bottom: 20px; white-space: pre-wrap;"></div>
-        <p style="color: #555; margin-top: 15px; font-style: italic;">Swipe left or right to change the message</p>
-        <a href="#" class="back-link" data-target="message-name-form-page">Go Back</a>
+        <p style="color: #555; margin-top: 15px; font-style: italic;">अगला संदेश देखने के लिए दाएं या बाएं स्वाइप करें</p>
+        <a href="#" class="back-link" data-target="message-name-form-page">वापस जाएं</a>
     </div>
 </div>
 
 <!-- Page 10: Card Message Input Page -->
 <div id="card-message-input-page" class="page">
     <div class="form-container">
-        <h2>Write Your Message</h2>
+        <h2>अपना संदेश लिखें</h2>
         <div class="input-group">
-            <textarea id="card-wish-input" class="input-field" placeholder="Write your wish here..." required rows="5"></textarea>
+            <textarea id="card-wish-input" class="input-field" placeholder="यहां अपनी शुभकामना लिखें..." required rows="5"></textarea>
         </div>
-        <button id="go-to-editor-btn" class="cta-button">Create Image</button>
-        <a href="#" class="back-link" data-target="home-page">Go Back</a>
+        <button id="go-to-editor-btn" class="cta-button">इमेज बनाएं</button>
+        <a href="#" class="back-link" data-target="home-page">वापस जाएं</a>
     </div>
 </div>
 
 <!-- Page 11: Card Editor Page -->
 <div id="card-editor-page" class="page">
     <div class="editor-header">
-        <button id="editor-back-btn" class="editor-btn">Back</button>
-        <a id="editor-download-btn" class="editor-btn download-btn" href="#" download="rakhi-wish.png">Download</a>
+        <button id="editor-back-btn" class="editor-btn">वापस</button>
+        <a id="editor-download-btn" class="editor-btn download-btn" href="#" download="rakhi-wish.png">डाउनलोड</a>
     </div>
     <canvas id="editor-canvas"></canvas>
     <div id="card-gallery" class="card-gallery-container">
     </div>
 </div>
 
-<!-- Page 12: Call Page -->
-<div id="call-page" class="page">
-    <div id="videos-container">
-        <video id="remote-video" autoplay playsinline></video>
-        <video id="local-video" autoplay playsinline muted></video>
-    </div>
-    <div id="call-controls">
-        <button id="toggle-mic-btn" class="control-btn">🎙️</button>
-        <button id="toggle-cam-btn" class="control-btn">📷</button>
-        <button id="hangup-btn" class="control-btn">📞</button>
-    </div>
-</div>
 
 <!-- Firebase SDKs -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-analytics.js";
     import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-    import { getDatabase, ref, set, onValue, off, remove } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
-
+    
     const firebaseConfig = {
         apiKey: "AIzaSyB2PG5JvDko2UmQDlY9gN5lBgga2vQy-Ws",
         authDomain: "conceptra-c1000.firebaseapp.com",
@@ -366,16 +328,44 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const rtdb = getDatabase(app);
 
     const pages = document.querySelectorAll('.page');
     const audio = document.getElementById('background-audio');
     const speakerIcon = document.getElementById('speaker-icon');
     let isMusicPlaying = false;
     let fallingElementsInterval;
+    
+    // --- Pre-made Messages ---
+    let messageType = ''; // 'bhai-to-bhen' or 'bhen-to-bhai'
+    let currentMessageIndex = 0;
+    const messages = {
+        'bhai-to-bhen': [
+            "मेरी प्यारी बहना, यह राखी का धागा सिर्फ एक धागा नहीं, बल्कि मेरे प्यार और सुरक्षा का वादा है जो मैं तुमसे जीवन भर निभाऊंगा। रक्षाबंधन की बहुत-बहुत बधाई!",
+            "बचपन की वो खट्टी-मीठी यादें आज भी चेहरे पर मुस्कान ले आती हैं। तुम्हारा होना मेरे जीवन का सबसे बड़ा तोहफा है। हैप्पी रक्षाबंधन, मेरी प्यारी बहन!",
+            "तुम सिर्फ मेरी बहन नहीं, मेरी सबसे अच्छी दोस्त भी हो। हर मुश्किल में मेरा साथ देने के लिए धन्यवाद। ईश्वर तुम्हें दुनिया की सारी खुशियाँ दे।",
+            "चाहे हम कितने भी दूर क्यों न हों, इस राखी के दिन मेरा मन हमेशा तुम्हारे पास होता है। तुम्हारा भाई हमेशा तुम्हारे साथ है। हैप्पी राखी!",
+            "आज का दिन बहुत खास है, क्योंकि यह दिन हमारे प्यारे रिश्ते का प्रतीक है। मैं प्रार्थना करता हूँ कि हमारा यह बंधन हमेशा ऐसे ही मजबूत बना रहे।",
+            "मेरी शरारतों को सहने वाली और मुझे हमेशा सही रास्ता दिखाने वाली मेरी प्यारी बहना को रक्षाबंधन की हार्दिक शुभकामनाएँ।",
+            "तुम्हारी राखी मेरी कलाई पर एक कवच की तरह है, जो मुझे हर मुश्किल से लड़ने की ताकत देती है। हमेशा खुश रहो, बहना।",
+            "यह सिर्फ एक धागा नहीं है, यह हमारा अटूट विश्वास और प्यार है। भगवान करे, हमारे रिश्ते की यह मिठास कभी कम न हो।",
+            "तुम मेरे जीवन की प्रेरणा हो। तुम्हारी हंसी मेरे लिए सबसे कीमती है। रक्षाबंधन के इस पावन पर्व पर तुम्हें ढेर सारा प्यार।",
+            "हर साल की तरह इस साल भी मैं वादा करता हूँ कि तुम्हारे हर सुख-दुख में तुम्हारा साथ दूंगा। लव यू बहना, हैप्पी रक्षाबंधन!"
+        ],
+        'bhen-to-bhai': [
+            "मेरे प्यारे भाई, तुम्हारी कलाई पर यह राखी बांधकर मैं भगवान से तुम्हारी लंबी उम्र और सफलता की कामना करती हूँ। रक्षाबंधन की शुभकामनाएँ!",
+            "तुम मेरे पहले दोस्त और मेरे सुपरहीरो हो। मुझे हमेशा सुरक्षित महसूस कराने के लिए धन्यवाद। हैप्पी राखी भैया!",
+            "हमारा रिश्ता नोक-झोंक और ढेर सारे प्यार से भरा है। भगवान हमारे इस अनोखे बंधन को हमेशा सलामत रखे। हैप्पी रक्षाबंधन।",
+            "दूर होकर भी तुम हमेशा मेरे दिल के करीब हो। यह राखी मेरा प्यार और आशीर्वाद तुम तक पहुंचाएगी। बहुत याद आती है, भाई।",
+            "बचपन से लेकर आज तक, तुमने हमेशा एक बड़े भाई का फर्ज निभाया है। तुम्हारे जैसा भाई पाकर मैं बहुत भाग्यशाली हूँ।",
+            "यह राखी का धागा तुम्हें हर बुरी नजर से बचाए और तुम्हारे जीवन में खुशियों के नए रंग भरे। सदा खुश रहो, मेरे प्यारे भाई।",
+            "जब भी मुझे किसी सहारे की जरूरत पड़ी, मैंने तुम्हें अपने पास पाया। तुम दुनिया के सबसे अच्छे भाई हो। रक्षाबंधन मुबारक!",
+            "तुम्हारी सफलता और खुशी ही मेरी सबसे बड़ी इच्छा है। यह राखी का त्योहार तुम्हारे लिए ढेर सारी सौगातें लेकर आए।",
+            "याद है कैसे हम छोटी-छोटी बातों पर लड़ते थे? आज वो पल बहुत याद आते हैं। हमारा प्यार हमेशा ऐसा ही बना रहे। हैप्पी राखी!",
+            "मेरे प्यारे भाई, तुम मेरी ताकत और मेरा अभिमान हो। ईश्वर तुम्हें जीवन में वह सब कुछ दे जिसके तुम हकदार हो। रक्षाबंधन की बधाई!"
+        ]
+    };
 
     const mainVideoPlayer = document.getElementById('main-video-player');
-    // *** UPDATED FILE NAMES ***
     const mainInterfaceVideos = [
         'main interfacemp4.mp4', 
         'coming soon rakshabandhan __ 9 August 2025 _comingsoon _rakhi_happyrakshabandhan_status_short(360P).mp4', 
@@ -385,24 +375,18 @@
     ];
     let currentMainVideoIndex = 0;
 
-    const servers = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
-    let peerConnection;
-    let localStream;
-    let remoteStream;
-    let currentCallRef;
-
     async function loadProfileForEditing() {
-        const userCallId = localStorage.getItem('rakshaSutraUserCallId');
-        if (!userCallId) {
-            alert("You must be registered to view your profile.");
+        const userId = localStorage.getItem('rakshaSutraUserId');
+        if (!userId) {
+            alert("प्रोफ़ाइल देखने के लिए आपका पंजीकृत होना आवश्यक है।");
             showPage('form-page');
             return;
         }
 
-        document.getElementById('profile-call-id').textContent = userCallId;
+        document.getElementById('profile-call-id').textContent = userId;
 
         try {
-            const userDocRef = doc(db, "users", userCallId);
+            const userDocRef = doc(db, "users", userId);
             const docSnap = await getDoc(userDocRef);
 
             if (docSnap.exists()) {
@@ -411,13 +395,13 @@
                 document.getElementById('profile-address-input').value = userData.address || '';
             } else {
                 console.log("No such document!");
-                alert("Could not find your profile data.");
+                alert("आपकी प्रोफ़ाइल का डेटा नहीं मिला।");
                 localStorage.clear();
                 showPage('form-page');
             }
         } catch (error) {
             console.error("Error getting document:", error);
-            alert("Error fetching your profile: " + error.message);
+            alert("आपकी प्रोफ़ाइल लोड करते समय एक त्रुटि हुई: " + error.message);
         }
     }
 
@@ -431,9 +415,6 @@
                 if (localStorage.getItem('musicWasPlaying') === 'true' && audio.paused) {
                     audio.play().catch(()=>{});
                 }
-            }
-            if (activePage.id === 'call-page') {
-                endCall();
             }
         }
 
@@ -452,14 +433,11 @@
                 localStorage.setItem('musicWasPlaying', 'false');
             }
             mainVideoPlayer.muted = false;
-            mainVideoPlayer.play();
+            mainVideoPlayer.play().catch(e => console.log("Autoplay was prevented."));
         }
         
         if (pageId === 'home-page') {
-            const userCallId = localStorage.getItem('rakshaSutraUserCallId');
-            if(document.getElementById('user-call-id-display')) {
-                document.getElementById('user-call-id-display').textContent = userCallId || 'Not registered';
-            }
+             // Logic for home page if any
         } else if (pageId === 'profile-page') {
             loadProfileForEditing();
         }
@@ -506,7 +484,7 @@
     }
 
     function setupMainInterfacePage(userName) {
-        const messageText = `प्रिय ${userName},\n\nरक्षाबंधन एक ऐसा पवित्र अवसर है जो भाई-बहन के रिश्ते को सम्मान, विश्वास और सुरक्षा के बंधन में जोड़ता है।\nइस खास दिन पर, हम अपने जीवन में उन रिश्तों का आभार व्यक्त करते हैं जो हर परिस्थिति में हमारे साथ खड़े रहते हैं।`;
+        const messageText = `प्रिय ${userName},\n\nरक्षा बंधन की हार्दिक शुभकामनाएँ!\nये पावन पर्व हमारे रिश्ते की डोर को और भी मज़बूत करता है। बचपन की हंसी-खुशियों से लेकर जीवन के हर उतार-चढ़ाव में, आप हमेशा मेरे साथ रहे। आपकी मुस्कान मेरी ताकत है और आपका सुख मेरी दुआ।\nईश्वर से यही प्रार्थना है कि हमारे रिश्ते की मिठास कभी कम न हो और जीवन में हर खुशी आपके कदम चूमे। आपका साथ और आशीर्वाद हमेशा यूँ ही बना रहे।`;
         document.getElementById('main-interface-message').textContent = messageText;
         mainVideoPlayer.src = mainInterfaceVideos[currentMainVideoIndex];
         showPage('main-interface-page');
@@ -518,166 +496,37 @@
         mainVideoPlayer.src = mainInterfaceVideos[currentMainVideoIndex];
         mainVideoPlayer.play();
     }
-
-    async function initiateCall(isVideo) {
-        // This is where the browser checks for a secure context (https or localhost)
-        // If the context is not secure, it will not allow access to getUserMedia
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            alert("कॉलिंग फीचर आपके ब्राउज़र में समर्थित नहीं है या आप एक असुरक्षित (non-https) कनेक्शन पर हैं।");
-            return;
-        }
-
-        const calleeId = document.getElementById('callee-id-input').value;
-        const callerId = localStorage.getItem('rakshaSutraUserCallId');
-        if (!calleeId || !callerId) {
-            alert("कृपया मित्र की वैध कॉल आईडी दर्ज करें। आपको पहले पंजीकरण करना होगा।");
-            return;
-        }
-        
-        try {
-            localStream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true });
-            document.getElementById('local-video').srcObject = localStream;
-        } catch (error) {
-            console.error("Error accessing media devices.", error);
-            alert("कैमरा/माइक्रोफ़ोन तक पहुँचने में विफल। कृपया अनुमति दें और सुनिश्चित करें कि आप एक सुरक्षित (https) कनेक्शन पर हैं।");
-            return;
-        }
-
-        currentCallRef = ref(rtdb, `calls/${calleeId}`);
-        peerConnection = new RTCPeerConnection(servers);
-
-        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-        
-        peerConnection.ontrack = event => {
-            if (event.streams && event.streams[0]) {
-                document.getElementById('remote-video').srcObject = event.streams[0];
-            }
-        };
-
-        peerConnection.onicecandidate = event => {
-            if (event.candidate) {
-                set(ref(rtdb, `calls/${calleeId}/iceCandidates/caller`), event.candidate.toJSON());
-            }
-        };
-        
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-        
-        const offerPayload = { sdp: offer.sdp, type: offer.type, callerId: callerId, isVideo: isVideo };
-        await set(ref(rtdb, `calls/${calleeId}/offer`), offerPayload);
-
-        onValue(ref(rtdb, `calls/${calleeId}/answer`), async (snapshot) => {
-            if (snapshot.exists() && !peerConnection.currentRemoteDescription) {
-                await peerConnection.setRemoteDescription(new RTCSessionDescription(snapshot.val()));
-            }
-        }, { onlyOnce: true });
-
-        onValue(ref(rtdb, `calls/${calleeId}/iceCandidates/callee`), (snapshot) => {
-            if (snapshot.exists()) {
-                peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val()));
-            }
-        });
-        
-        showPage('call-page');
-    }
-
-    function listenForCalls() {
-        const myCallId = localStorage.getItem('rakshaSutraUserCallId');
-        if (!myCallId) return;
-
-        const callRef = ref(rtdb, `calls/${myCallId}`);
-        onValue(callRef, async (snapshot) => {
-            if (snapshot.hasChild('offer')) {
-                const { callerId, isVideo } = snapshot.val().offer;
-                const confirmed = confirm(`(${callerId}) से एक ${isVideo ? 'वीडियो' : 'ऑडियो'} कॉल आ रहा है। स्वीकार करें?`);
-                if (confirmed) {
-                    await answerCall(myCallId, snapshot.val().offer);
-                } else {
-                    await remove(callRef);
-                }
-            }
-        });
-    }
     
-    async function answerCall(myCallId, offer) {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            alert("कॉलिंग फीचर आपके ब्राउज़र में समर्थित नहीं है।");
-            return;
-        }
-
-        try {
-            localStream = await navigator.mediaDevices.getUserMedia({ video: offer.isVideo, audio: true });
-            document.getElementById('local-video').srcObject = localStream;
-        } catch (error) {
-            console.error("Error accessing media devices.", error);
-            alert("कैमरा/माइक्रोफ़ोन तक पहुँचने में विफल। कृपया अनुमति दें।");
-            return;
-        }
-
-        currentCallRef = ref(rtdb, `calls/${myCallId}`);
-        peerConnection = new RTCPeerConnection(servers);
+    function displayCurrentMessage() {
+        const sender = document.getElementById('sender-name').value;
+        const receiver = document.getElementById('receiver-name').value;
         
-        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-
-        peerConnection.ontrack = event => {
-            if (event.streams && event.streams[0]) {
-                document.getElementById('remote-video').srcObject = event.streams[0];
-            }
-        };
-
-        peerConnection.onicecandidate = event => {
-            if (event.candidate) {
-                set(ref(rtdb, `calls/${myCallId}/iceCandidates/callee`), event.candidate.toJSON());
-            }
-        };
+        let messageTemplate = messages[messageType][currentMessageIndex];
         
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-        
-        const answer = await peerConnection.createAnswer();
-        await peerConnection.setLocalDescription(answer);
+        let formattedMessage = messageTemplate.replace(/मेरी प्यारी बहना/g, `मेरी प्यारी बहना ${receiver}`)
+                                            .replace(/प्यारी बहन/g, `प्यारी बहन ${receiver}`)
+                                            .replace(/बहना/g, `बहना ${receiver}`)
+                                            .replace(/मेरे प्यारे भाई/g, `मेरे प्यारे भाई ${receiver}`)
+                                            .replace(/भैया/g, `भैया ${receiver}`)
+                                            .replace(/भाई/g, `भाई ${receiver}`);
 
-        await set(ref(rtdb, `calls/${myCallId}/answer`), { sdp: answer.sdp, type: answer.type });
-
-        onValue(ref(rtdb, `calls/${myCallId}/iceCandidates/caller`), (snapshot) => {
-            if (snapshot.exists()) {
-                peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val()));
-            }
-        });
-
-        showPage('call-page');
+        document.getElementById('message-display-card').textContent = formattedMessage + `\n\nतुम्हारा/तुम्हारी,\n${sender}`;
     }
-    
-    function endCall() {
-        if (localStream) {
-            localStream.getTracks().forEach(track => track.stop());
-            localStream = null;
-        }
-        if (peerConnection) {
-            peerConnection.close();
-            peerConnection = null;
-        }
-        if (currentCallRef) {
-            remove(currentCallRef);
-            currentCallRef = null;
-        }
-        if (document.querySelector('.page.active').id === 'call-page') {
-             showPage('home-page');
-        }
-    }
+
 
     // --- Event Listeners ---
 
     window.addEventListener('load', () => {
         showPage('landing-page');
-        if (localStorage.getItem('rakshaSutraUserCallId')) {
-            listenForCalls();
-        }
     });
 
     speakerIcon.addEventListener('click', toggleMusic);
 
     document.getElementById('get-started-btn').addEventListener('click', () => {
-        if (localStorage.getItem('rakshaSutraUserCallId')) {
+        // A user interaction to enable audio
+        audio.play().then(() => audio.pause()).catch(() => {});
+
+        if (localStorage.getItem('rakshaSutraUserId')) {
             setupMainInterfacePage(localStorage.getItem('rakshaSutraUserName'));
         } else {
             showPage('form-page');
@@ -688,7 +537,7 @@
         e.preventDefault();
         const submitButton = e.target.querySelector('button[type="submit"]');
         submitButton.disabled = true;
-        submitButton.textContent = 'Submitting...';
+        submitButton.textContent = 'सबमिट हो रहा है...';
 
         const phone = document.getElementById('phone').value;
         const name = document.getElementById('name').value;
@@ -703,11 +552,10 @@
             });
 
             localStorage.setItem('rakshaSutraUserName', name);
-            localStorage.setItem('rakshaSutraUserCallId', phone);
+            localStorage.setItem('rakshaSutraUserId', phone);
             
-            alert(`धन्यवाद, ${name}! आपकी प्रोफ़ाइल बन गई है।\nआपकी कॉल आईडी है: ${phone}`);
+            alert(`धन्यवाद, ${name}! आपकी प्रोफ़ाइल बन गई है।\nआपकी आईडी है: ${phone}`);
             
-            listenForCalls();
             setupMainInterfacePage(name);
             
         } catch (error) {
@@ -715,7 +563,7 @@
             alert("एक त्रुटि हुई: " + error.message);
         } finally {
             submitButton.disabled = false;
-            submitButton.textContent = 'Submit';
+            submitButton.textContent = 'सबमिट करें';
         }
     });
 
@@ -735,10 +583,10 @@
     
     document.getElementById('update-profile-btn').addEventListener('click', async () => {
         const updateButton = document.getElementById('update-profile-btn');
-        const userCallId = localStorage.getItem('rakshaSutraUserCallId');
+        const userId = localStorage.getItem('rakshaSutraUserId');
         
-        if (!userCallId) {
-            alert("Cannot update profile. User is not registered.");
+        if (!userId) {
+            alert("प्रोफ़ाइल अपडेट नहीं कर सकते। उपयोगकर्ता पंजीकृत नहीं है।");
             return;
         }
 
@@ -746,14 +594,14 @@
         const newAddress = document.getElementById('profile-address-input').value;
 
         if (!newName || !newAddress) {
-            alert("Name and Address cannot be empty.");
+            alert("नाम और पता खाली नहीं हो सकता।");
             return;
         }
         
         updateButton.disabled = true;
-        updateButton.textContent = 'Updating...';
+        updateButton.textContent = 'अपडेट हो रहा है...';
 
-        const userDocRef = doc(db, "users", userCallId);
+        const userDocRef = doc(db, "users", userId);
 
         try {
             await updateDoc(userDocRef, {
@@ -763,13 +611,13 @@
 
             localStorage.setItem('rakshaSutraUserName', newName);
 
-            alert("Profile updated successfully!");
+            alert("प्रोफ़ाइल सफलतापूर्वक अपडेट की गई!");
         } catch (error) {
             console.error("Error updating document: ", error);
-            alert("An error occurred while updating: " + error.message);
+            alert("अपडेट करते समय एक त्रुटि हुई: " + error.message);
         } finally {
             updateButton.disabled = false;
-            updateButton.textContent = 'Update Profile';
+            updateButton.textContent = 'प्रोफाइल अपडेट करें';
         }
     });
 
@@ -780,28 +628,11 @@
     document.getElementById('open-card-creator-btn').addEventListener('click', () => showPage('card-message-input-page'));
     document.getElementById('change-music-strip').addEventListener('click', () => showPage('music-page'));
     document.getElementById('my-profile-strip').addEventListener('click', () => showPage('profile-page'));
-
-    document.getElementById('toggle-call-section-strip').addEventListener('click', () => {
-        document.getElementById('call-details-section').classList.toggle('visible');
-    });
     
-    document.getElementById('video-call-btn').addEventListener('click', () => initiateCall(true));
-    document.getElementById('audio-call-btn').addEventListener('click', () => initiateCall(false));
-    document.getElementById('hangup-btn').addEventListener('click', endCall);
-
-    document.getElementById('toggle-mic-btn').addEventListener('click', () => {
-        if (localStream) {
-            localStream.getAudioTracks().forEach(track => {
-                track.enabled = !track.enabled;
-            });
-        }
-    });
-    document.getElementById('toggle-cam-btn').addEventListener('click', () => {
-        if (localStream) {
-            localStream.getVideoTracks().forEach(track => {
-                track.enabled = !track.enabled;
-            });
-        }
+    document.getElementById('whatsapp-share-strip').addEventListener('click', () => {
+        const message = encodeURIComponent(`इस रक्षाबंधन, अपने भाई-बहन को एक विशेष डिजिटल राखी भेजें! इस खूबसूरत वेबसाइट को देखें: ${window.location.href}`);
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${message}`;
+        window.open(whatsappUrl, '_blank');
     });
 
     document.querySelectorAll('.back-link').forEach(link => {
@@ -821,6 +652,41 @@
             }
             showPage('home-page');
         });
+    });
+    
+    // Message creator logic
+    document.getElementById('bhai-to-bhen-btn').addEventListener('click', () => {
+        messageType = 'bhai-to-bhen';
+        showPage('message-name-form-page');
+    });
+
+    document.getElementById('bhen-to-bhai-btn').addEventListener('click', () => {
+        messageType = 'bhen-to-bhai';
+        showPage('message-name-form-page');
+    });
+    
+    document.getElementById('message-name-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        currentMessageIndex = 0; // Reset to first message
+        displayCurrentMessage();
+        showPage('message-display-page');
+    });
+    
+    // Swipe logic for messages
+    let messageTouchStartX = 0;
+    const messageCard = document.getElementById('message-display-page');
+    messageCard.addEventListener('touchstart', e => { messageTouchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    messageCard.addEventListener('touchend', e => {
+        const touchendX = e.changedTouches[0].screenX;
+        const totalMessages = messages[messageType].length;
+        if (touchendX < messageTouchStartX - 50) { // Swipe left
+            currentMessageIndex = (currentMessageIndex + 1) % totalMessages;
+            displayCurrentMessage();
+        }
+        if (touchendX > messageTouchStartX + 50) { // Swipe right
+            currentMessageIndex = (currentMessageIndex - 1 + totalMessages) % totalMessages;
+            displayCurrentMessage();
+        }
     });
 
 </script>
