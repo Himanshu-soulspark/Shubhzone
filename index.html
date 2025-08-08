@@ -1,7 +1,8 @@
 
 
 <!DOCTYPE html>
-<html lang="hi">
+
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,242 +11,193 @@
         /* --- Google Fonts --- */
         @import url('https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi:wght@400&family=Poppins:wght@400;600;700&display=swap');
 
-        /* --- CSS Variables --- */
-        :root {
-            --primary-color: #e94d6e;
-            --secondary-color: #f06595;
-            --text-color: #34495e;
-            --light-text-color: #f0f0f0;
-            --card-bg: rgba(255, 255, 255, 0.4);
-            --blur-effect: blur(10px);
-        }
+/* --- CSS Variables --- */
+    :root {
+        --primary-color: #e94d6e;
+        --secondary-color: #f06595;
+        --text-color: #34495e;
+        --light-text-color: #f0f0f0;
+        --card-bg: rgba(255, 255, 255, 0.4);
+        --blur-effect: blur(10px);
+    }
 
-        /* --- General Styles --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; }
+    /* --- General Styles --- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #333; /* Fallback color */
-            overflow: hidden;
-            color: var(--text-color);
-        }
-        
-        /* NEW: Blurred Background Image using pseudo-element */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: url('Leonardo_Phoenix_10_A_beautiful_festive_background_for_a_Raks_3.jpg') no-repeat center center/cover;
-            filter: blur(5px);
-            z-index: -1;
-        }
-        
-        /* --- Page Container --- */
-        .page {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            transition: opacity 0.7s ease-in-out, transform 0.7s ease-in-out;
-            opacity: 0;
-            transform: scale(0.95);
-            pointer-events: none;
-            padding: 10px;
-            text-align: center;
-            overflow-y: auto;
-        }
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: url('https://img.freepik.com/free-photo/beautiful-rakhi-with-sweets-coin-rice-grains-puja-thali-special-hindu-festival-raksha-bandhan_181624-37559.jpg?w=1380&t=st=1723108151~exp=1723108751~hmac=32f8190d7963d33075b9f71c4c8780709b19e276067b5e43a6d71b315266858a') no-repeat center center/cover;
+        overflow: hidden;
+        color: var(--text-color);
+    }
+    
+    /* --- Page Container --- */
+    .page {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        transition: opacity 0.7s ease-in-out, transform 0.7s ease-in-out;
+        opacity: 0;
+        transform: scale(0.95);
+        pointer-events: none;
+        padding: 20px;
+        text-align: center;
+        overflow-y: auto;
+    }
 
-        .page.active {
-            opacity: 1;
-            transform: scale(1);
-            pointer-events: auto;
-        }
+    .page.active {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto;
+    }
 
-        /* --- Landing Page --- */
-        .title {
-            font-family: 'Tiro Devanagari Hindi', serif;
-            font-size: clamp(2.8rem, 8vw, 4.5rem);
-            color: #fff;
-            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
-            margin-bottom: 20px;
-        }
+    /* --- Landing Page --- */
+    .title {
+        font-family: 'Tiro Devanagari Hindi', serif;
+        font-size: clamp(2.8rem, 8vw, 4.5rem);
+        color: #fff;
+        text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+        margin-bottom: 20px;
+    }
 
-        .video-card {
-            position: relative;
-            width: 90vw;
-            max-width: 600px;
-            aspect-ratio: 16 / 9;
-            background: var(--card-bg);
-            backdrop-filter: var(--blur-effect);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-        }
+    .video-card {
+        position: relative;
+        width: 90vw;
+        max-width: 600px;
+        aspect-ratio: 16 / 9;
+        background: var(--card-bg);
+        backdrop-filter: var(--blur-effect);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+    }
 
-        .video-card video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-        .subtitle { margin-top: 25px; font-size: clamp(0.9rem, 2.5vw, 1.1rem); color: var(--light-text-color); max-width: 600px; text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5); padding: 0 15px; }
+    .video-card video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+    .subtitle { margin-top: 25px; font-size: clamp(0.9rem, 2.5vw, 1.1rem); color: var(--light-text-color); max-width: 600px; text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5); padding: 0 15px; }
 
-        .cta-button {
-            padding: 15px 40px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #fff;
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            text-decoration: none;
-            box-shadow: 0 10px 25px rgba(233, 77, 110, 0.4);
-            transition: all 0.3s ease;
-            margin-top: 20px;
-        }
-        .cta-button:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(233, 77, 110, 0.5); }
-        .cta-button:disabled { background: #ccc; cursor: not-allowed; }
+    .cta-button {
+        padding: 15px 40px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #fff;
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        text-decoration: none;
+        box-shadow: 0 10px 25px rgba(233, 77, 110, 0.4);
+        transition: all 0.3s ease;
+        margin-top: 20px;
+    }
+    .cta-button:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(233, 77, 110, 0.5); }
+    .cta-button:disabled { background: #ccc; cursor: not-allowed; }
 
-        /* --- Speaker Icon --- */
-        #speaker-icon { position: fixed; top: 20px; right: 20px; font-size: 1.8rem; color: white; cursor: pointer; z-index: 1000; text-shadow: 2px 2px 5px rgba(0,0,0,0.4); }
+    /* --- Speaker Icon --- */
+    #speaker-icon { position: fixed; top: 20px; right: 20px; font-size: 1.8rem; color: white; cursor: pointer; z-index: 1000; text-shadow: 2px 2px 5px rgba(0,0,0,0.4); }
 
-        /* --- Form & Profile Page --- */
-        .form-container { width: 90%; max-width: 450px; padding: 40px 30px; background: var(--card-bg); backdrop-filter: var(--blur-effect); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 20px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); }
-        .form-container h2 { font-family: 'Poppins', serif; font-size: 2rem; color: var(--text-color); margin-bottom: 30px; }
-        .input-group { margin-bottom: 20px; position: relative;}
-        .input-field { width: 100%; padding: 15px; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; background-color: rgba(255,255,255,0.7); font-size: 1rem; color: var(--text-color); }
-        .back-link { display: inline-block; margin-top: 15px; color: var(--text-color); text-decoration: none; font-weight: 600; }
-        
-        /* --- Home Page --- */
-        #home-page { justify-content: space-between; padding: 80px 20px 20px 20px; }
-        .home-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px; background: rgba(0,0,0,0.2); backdrop-filter: blur(5px); z-index: 10; }
-        .home-header .title { margin: 0; font-size: 2rem; text-align: center; }
-        #home-page .content-area { display: flex; flex-direction: column; align-items: center; width: 100%; gap: 25px; max-width: 500px; flex-grow: 1; justify-content: center; }
-        .cards-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; width: 100%; }
-        .home-card-wrapper { display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        .home-card { width: 100%; aspect-ratio: 1 / 1; background-size: cover; background-position: center; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.3s ease; }
-        .home-card:hover { transform: scale(1.05); }
-        #home-page .cta-button { margin-top: 0; width: 100%; padding: 12px 20px; font-size: 1rem; }
-        .home-footer { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; margin-top: auto; padding-top:20px; }
-        .footer-strip { width: 100%; padding: 15px 25px; font-size: 1.1rem; font-weight: 600; color: #fff; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        
-        /* --- FIXED: Main Interface Page Layout --- */
-        #main-interface-page { overflow: hidden; }
-        #main-interface-page .page-content { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 10px; gap: 20px; }
-        .interface-layout { display: flex; flex-direction: row; align-items: stretch; justify-content: center; gap: 10px; width: 100%; height: 75vh; max-height: 550px; }
-        
-        .main-content-card {
-            width: 48%; /* Use percentage for responsiveness */
-            max-width: 300px;
-            aspect-ratio: 9 / 16;
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-            position: relative;
-            flex-shrink: 0;
-            border: 2px solid rgba(255,255,255,0.5);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
+    /* --- Form & Profile Page --- */
+    .form-container { width: 90%; max-width: 450px; padding: 40px 30px; background: var(--card-bg); backdrop-filter: var(--blur-effect); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 20px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); }
+    .form-container h2 { font-family: 'Poppins', serif; font-size: 2rem; color: var(--text-color); margin-bottom: 30px; }
+    .input-group { margin-bottom: 20px; position: relative;}
+    .input-field { width: 100%; padding: 15px; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; background-color: rgba(255,255,255,0.7); font-size: 1rem; color: var(--text-color); }
+    .back-link { display: inline-block; margin-top: 15px; color: var(--text-color); text-decoration: none; font-weight: 600; }
+    
+    /* --- Home Page --- */
+    #home-page { justify-content: space-between; padding: 80px 20px 20px 20px; }
+    .home-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px; background: rgba(0,0,0,0.2); backdrop-filter: blur(5px); z-index: 10; }
+    .home-header .title { margin: 0; font-size: 2rem; text-align: center; }
+    #home-page .content-area { display: flex; flex-direction: column; align-items: center; width: 100%; gap: 25px; max-width: 500px; flex-grow: 1; justify-content: center; }
+    .cards-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; width: 100%; }
+    .home-card-wrapper { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+    .home-card { width: 100%; aspect-ratio: 1 / 1; background-size: cover; background-position: center; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.3s ease; }
+    .home-card:hover { transform: scale(1.05); }
+    #home-page .cta-button { margin-top: 0; width: 100%; padding: 12px 20px; font-size: 1rem; }
+    .home-footer { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; margin-top: auto; padding-top:20px; }
+    .footer-strip { width: 100%; padding: 15px 25px; font-size: 1.1rem; font-weight: 600; color: #fff; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    
+    /* --- Profile Page --- */
+    #profile-page .profile-info { text-align: left; width: 100%; }
+    #profile-page .profile-info p { margin-bottom: 20px; color: var(--text-color); font-weight: 600; }
+    #profile-page .profile-info span { font-weight: 400; word-break: break-all; background: rgba(0,0,0,0.2); padding: 5px 8px; border-radius: 8px; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); }
 
-        #main-interface-video-card video { width: 100%; height: 100%; object-fit: cover; }
-        
-        #main-interface-message-card {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: var(--blur-effect);
-            padding: 20px;
-        }
+    /* --- Main Interface Page (NEW DESIGN) --- */
+    #main-interface-page { overflow: hidden; }
+    #main-interface-page .page-content { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; }
+    .interface-layout { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 20px; width: 100%; max-width: 95vw; }
+    .interface-card { width: 45vw; max-width: 300px; aspect-ratio: 9 / 16; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.4); position: relative; border: 2px solid rgba(255,255,255,0.5); background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(15px); }
+    .interface-card video { width: 100%; height: 100%; object-fit: cover; }
+    .date-display { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); color: #fff; background: rgba(233, 77, 110, 0.7); padding: 5px 15px; border-radius: 12px; font-size: clamp(0.7rem, 2vw, 0.9rem); font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); z-index: 5; white-space: nowrap; }
+    #main-interface-message-container { display: flex; flex-direction: column; justify-content: center; padding: 20px; }
+    #main-interface-message { color: white; text-shadow: 1px 1px 4px rgba(0,0,0,0.7); font-size: clamp(0.8rem, 2vw, 1rem); line-height: 1.6; text-align: left; overflow: auto; height: 100%; }
+    #replay-speech-btn { font-size: 1.6rem; cursor: pointer; color: white; background: rgba(0,0,0,0.2); border-radius: 50%; padding: 8px; position: absolute; bottom: 15px; right: 15px; transition: transform 0.2s; }
+    #replay-speech-btn:hover { transform: scale(1.1); }
+    #mystery-box-btn { font-size: 4rem; cursor: pointer; margin-top: 20px; background: none; border: none; animation: pulse 2s infinite; text-shadow: 0 0 15px gold; }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+    @media (max-width: 700px) {
+        .interface-layout { flex-direction: column; gap: 15px; }
+        .interface-card { width: 70vw; max-width: 250px; height: 60vh; max-height: 440px; }
+        #main-interface-message { font-size: 0.9rem; }
+    }
 
-        #main-interface-message { 
-            color: white; 
-            text-shadow: 1px 1px 4px rgba(0,0,0,0.7); 
-            font-size: clamp(0.7rem, 2vw, 0.8rem); 
-            line-height: 1.6; 
-            white-space: pre-wrap; 
-            text-align: left; 
-            overflow-y: auto; 
-            flex-grow: 1;
-        }
-        
-        #mystery-box-btn { font-size: 3rem; padding: 10px; width: auto; border:none; background: none; cursor: pointer; transition: all 0.3s ease; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.4)); animation: pulse 2s infinite; }
-        #mystery-box-btn:hover { animation: none; transform: scale(1.1); }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* --- Attractive Message Display Page --- */
-        #message-display-page { padding: 0; background: linear-gradient(45deg, #6a11cb, #2575fc); }
-        .full-screen-card {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            position: relative;
-        }
-        .message-card-header {
-            position: absolute;
-            top: 20px;
-            width: calc(100% - 40px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 10;
-        }
-        .card-action-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            backdrop-filter: blur(5px);
-        }
-        #message-display-content {
-            width: 90vw;
-            max-width: 400px;
-            height: 75vh;
-            max-height: 600px;
-            background: var(--card-bg);
-            backdrop-filter: var(--blur-effect);
-            border-radius: 25px;
-            padding: 40px 25px;
-            color: var(--text-color);
-            font-size: 1.1rem;
-            line-height: 1.8;
-            text-align: center;
-            overflow-y: auto;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        .swipe-hint {
-            position: absolute;
-            bottom: 25px;
-            color: rgba(255, 255, 255, 0.8);
-            font-style: italic;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-        }
-    </style>
+    /* --- Falling Flowers Animation --- */
+    #falling-elements-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: -1; pointer-events: none; }
+    .falling-element { position: absolute; top: -50px; animation: fall linear infinite; font-size: 1.5rem; }
+    @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
+
+    /* --- Message Display Page Specific --- */
+    #message-display-page .form-container { display: flex; flex-direction: column; }
+    #message-display-card-container { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; flex-grow: 1; }
+    #message-display-card { width: 100%; min-height: 250px; flex-grow: 1; padding: 25px; background: rgba(255,255,255,0.7); border-radius: 15px; font-size: 1.1rem; line-height: 1.6; color: var(--text-color); display: flex; align-items: center; justify-content: center; text-align: center; margin-bottom: 10px; white-space: pre-wrap; }
+    #whatsapp-share-icon { font-size: 3rem; color: #25D366; cursor: pointer; margin-top: 10px; }
+
+    /* --- Unique ID Modal & Shared Message Display --- */
+    #unique-id-modal, #shared-message-display { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; z-index: 2000; }
+    #unique-id-modal { background: rgba(0,0,0,0.7); }
+    #shared-message-display { background: url('https://img.freepik.com/free-photo/beautiful-rakhi-with-sweets-coin-rice-grains-puja-thali-special-hindu-festival-raksha-bandhan_181624-37559.jpg?w=1380&t=st=1723108151~exp=1723108751~hmac=32f8190d7963d33075b9f71c4c8780709b19e276067b5e43a6d71b315266858a') no-repeat center center/cover; z-index: 3000; }
+    #unique-id-modal.active, #shared-message-display.active { display: flex; }
+    #shared-message-content { background: var(--card-bg); backdrop-filter: var(--blur-effect); padding: 40px; border-radius: 20px; color: var(--text-color); text-shadow: 1px 1px 2px rgba(255,255,255,0.4); max-width: 90%; text-align: center; font-size: 1.2rem; line-height: 1.7; font-weight: 600; }
+
+</style>
 </head>
 <body>
 
-<audio id="background-audio" loop><source src="3.m4a" type="audio/mp4"></audio>
-<audio id="shubhzone-audio" loop><source src="shubhzone_message.m4a" type="audio/mp4"></audio>
+
+<audio id="background-audio" loop><source src="3.m4a" type="audio/mp4"></source></audio>
 
 <div id="speaker-icon">🔇</div>
+
+<!-- Shared Message Display -->
+<div id="shared-message-display">
+    <div id="shared-message-content"></div>
+</div>
+
+
+<!-- Unique ID Input Modal -->
+<div id="unique-id-modal">
+    <div class="form-container">
+        <h2>मित्र का संदेश देखें</h2>
+        <form id="unique-id-form">
+            <div class="input-group"><input type="text" id="unique-id-input" class="input-field" placeholder="प्राप्त हुआ 4-अंकीय कोड डालें" required="" maxlength="4" minlength="4"></div>
+            <button type="submit" class="cta-button">संदेश देखें</button>
+        </form>
+    </div>
+</div>
 
 <!-- Page 1: Landing Page -->
 <div id="landing-page" class="page active">
     <h1 class="title">Raksha Sutra</h1>
-    <div class="video-card"><video autoplay loop muted playsinline><source src="rakhi_promo.mp4" type="video/mp4"></video></div>
+    <div class="video-card"><video autoplay="" loop="" muted="" playsinline=""><source src="Generated File August 07, 2025 - 7_34PM.mp4" type="video/mp4"></video></div>
     <p class="subtitle">"रक्षाबंधन सिर्फ एक धागा नहीं, बल्कि दिलों का एक अटूट बंधन है।<br>आइए इस रिश्ते को फिर से महसूस करें, एक प्यार भरी डिजिटल राखी के साथ।"</p>
-    <button id="get-started-btn" class.cta-button">शुरू करें</button>
+    <button id="get-started-btn" class="cta-button">शुरू करें</button>
 </div>
 
 <!-- Page 2: Info Form Page -->
@@ -253,9 +205,9 @@
     <div class="form-container">
         <h2>अपनी जानकारी भरें</h2>
         <form id="info-form">
-            <div class="input-group"><input type="text" id="name" class="input-field" placeholder="पूरा नाम" required></div>
-            <div class="input-group"><input type="tel" id="phone" class="input-field" placeholder="मोबाइल नंबर (यह आपकी पहचान होगी)" required></div>
-            <div class="input-group"><textarea id="address" rows="3" class="input-field" placeholder="पूरा पता" required></textarea></div>
+            <div class="input-group"><input type="text" id="name" class="input-field" placeholder="पूरा नाम" required=""></div>
+            <div class="input-group"><input type="tel" id="phone" class="input-field" placeholder="मोबाइल नंबर (यह आपकी पहचान होगी)" required=""></div>
+            <div class="input-group"><textarea id="address" rows="3" class="input-field" placeholder="पूरा पता" required=""></textarea></div>
             <button type="submit" class="cta-button">सबमिट करें</button>
         </form>
     </div>
@@ -263,18 +215,24 @@
 
 <!-- Page 3: Main Interface Page -->
 <div id="main-interface-page" class="page">
+    <div id="falling-elements-container"></div>
     <div class="page-content">
         <div class="interface-layout">
-            <div id="main-interface-video-card" class="main-content-card">
-                <video playsinline id="main-video-player" muted></video>
+            <!-- Video Card -->
+            <div class="interface-card">
+                 <div class="date-display">शनिवार, 9 अगस्त, 2025</div>
+                <video playsinline="" id="main-video-player"></video>
             </div>
-            <div id="main-interface-message-card" class="main-content-card">
+            <!-- Message Card -->
+            <div class="interface-card" id="main-interface-message-container">
                 <div id="main-interface-message"></div>
+                <div id="replay-speech-btn">🔊</div>
             </div>
         </div>
         <button id="mystery-box-btn">🎁</button>
     </div>
 </div>
+
 
 <!-- Page 4: Home Page -->
 <div id="home-page" class="page">
@@ -282,11 +240,11 @@
     <div class="content-area">
         <div class="cards-container">
             <div class="home-card-wrapper">
-                <div class="home-card" style="background-image: url('IMG-20250807-WA0000.jpg');" onclick="document.getElementById('open-message-creator-btn').click();"></div>
+                <div id="message-card-btn" class="home-card" style="background-image: url('IMG-20250807-WA0000.jpg');"></div>
                 <button id="open-message-creator-btn" class="cta-button">संदेश भेजें</button>
             </div>
             <div class="home-card-wrapper">
-                <div class="home-card" style="background-image: url('Leonardo_Phoenix_10_A_beautifully_designed_Raksha_Bandhan_Mass_1.jpg');" onclick="document.getElementById('open-card-creator-btn').click();"></div>
+                <div id="card-creator-btn" class="home-card" style="background-image: url('Leonardo_Phoenix_10_A_beautifully_designed_Raksha_Bandhan_Mass_1.jpg');"></div>
                 <button id="open-card-creator-btn" class="cta-button">कार्ड बनाएं</button>
             </div>
         </div>
@@ -295,28 +253,29 @@
         <div id="my-profile-strip" class="footer-strip">मेरी प्रोफाइल</div>
         <div id="change-music-strip" class="footer-strip">संगीत बदलें</div>
         <div id="whatsapp-share-strip" class="footer-strip">
-             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M.05 22c.12-.59.25-1.18.41-1.76l.09-.32c.31-1.09.7-2.14 1.18-3.15.53-1.12 1.16-2.19 1.88-3.18.82-1.1 1.74-2.1 2.76-3 .2-.18.4-.36.6-.53l.4-.33c.53-.44 1.1-.82 1.7-1.14.99-.53 2.03-.9 3.1-1.1.33-.07.67-.12 1.01-.16.29-.03.59-.05.88-.05.23 0 .46.01.69.03.37.03.74.08 1.1.15.99.19 1.94.55 2.83 1.06.88.5 1.69 1.14 2.41 1.89s1.25 1.53 1.75 2.41c.45.83.78 1.71 1 2.62.22.91.31 1.85.28 2.79-.03.95-.2 1.89-.51 2.79-.31.9-.76 1.76-1.33 2.55-.57.79-1.25 1.5-2.02 2.11-.78.6-1.63 1.1-2.54 1.49-.91.38-1.88.64-2.86.76-.98.12-1.97.1-2.95-.05-.98-.15-1.95-.44-2.88-.86a12.926 12.926 0 01-2.7-1.48c-.24-.13-.47-.27-.7-.41l-1.68-1.02c-.55-.33-1.1-.68-1.64-1.05-.1-.07-.2-.14-.3-.21l-.06-.05c-.62-.48-1.2-1-1.73-1.57-.49-.52-.93-1.08-1.32-1.68-.3-.46-.55-.95-.77-1.45l-.02-.06c-.25-.56-.47-1.14-.65-1.73l-.04-.13c-.22-.72-.39-1.46-.5-2.22-.05-.33-.08-.67-.1-1H.05zM9.3 8.35c.14-.38.33-.74.58-1.06.25-.32.55-.6.88-.82.34-.22.7-.4 1.08-.52s.78-.18 1.18-.18c.39 0 .78.04 1.15.13.37.09.73.23 1.06.41.33.18.64.41.91.68.27.27.5.58.68.91.18.33.31.69.4 1.06.09.37.13.76.13 1.15s-.04.78-.13 1.15c-.09.37-.22.73-.4 1.06-.18.33-.41.64-.68.91-.27.27-.58.5-.91.68-.33.18-.69.32-1.06.41-.37-.09-.76.13-1.15.13s-.78-.04-1.15-.13c-.37-.09-.73-.23-1.06-.41-.33-.18-.64-.41-.91-.68-.27-.27-.5-.58-.68-.91-.18-.33-.31-.69-.4-1.06-.09-.37-.13-.76-.13-1.15s.05-.78.14-1.15z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M.05 22c.12-.59.25-1.18.41-1.76l.09-.32c.31-1.09.7-2.14 1.18-3.15.53-1.12 1.16-2.19 1.88-3.18.82-1.1 1.74-2.1 2.76-3 .2-.18.4-.36.6-.53l.4-.33c.53-.44 1.1-.82 1.7-1.14.99-.53 2.03-.9 3.1-1.1.33-.07.67-.12 1.01-.16.29-.03.59-.05.88-.05.23 0 .46.01.69.03.37.03.74.08 1.1.15.99.19 1.94.55 2.83 1.06.88.5 1.69 1.14 2.41 1.89s1.25 1.53 1.75 2.41c.45.83.78 1.71 1 2.62.22.91.31 1.85.28 2.79-.03.95-.2 1.89-.51 2.79-.31.9-.76 1.76-1.33 2.55-.57.79-1.25 1.5-2.02 2.11-.78.6-1.63 1.1-2.54 1.49-.91.38-1.88.64-2.86.76-.98.12-1.97.1-2.95-.05-.98-.15-1.95-.44-2.88-.86a12.926 12.926 0 01-2.7-1.48c-.24-.13-.47-.27-.7-.41l-1.68-1.02c-.55-.33-1.1-.68-1.64-1.05-.1-.07-.2-.14-.3-.21l-.06-.05c-.62-.48-1.2-1-1.73-1.57-.49-.52-.93-1.08-1.32-1.68-.3-.46-.55-.95-.77-1.45l-.02-.06c-.25-.56-.47-1.14-.65-1.73l-.04-.13c-.22-.72-.39-1.46-.5-2.22-.05-.33-.08-.67-.1-1H.05zM9.3 8.35c.14-.38.33-.74.58-1.06.25-.32.55-.6.88-.82.34-.22.7-.4 1.08-.52s.78-.18 1.18-.18c.39 0 .78.04 1.15.13.37.09.73.23 1.06.41.33.18.64.41.91.68.27.27.5.58.68.91.18.33.31.69.4 1.06.09.37.13.76.13 1.15s-.04.78-.13 1.15c-.09.37-.22.73-.4 1.06-.18.33-.41.64-.68.91-.27.27-.58.5-.91.68-.33.18-.69.32-1.06.41-.37.09-.76.13-1.15.13s-.78-.04-1.15-.13c-.37-.09-.73-.23-1.06-.41-.33-.18-.64-.41-.91-.68-.27-.27-.5-.58-.68-.91-.18-.33-.31-.69-.4-1.06-.09-.37-.13-.76-.13-1.15s.05-.78.14-1.15z"></path></svg>
             <span>व्हाट्सएप पर शेयर करें</span>
         </div>
-        <div id="view-shared-strip" class="footer-strip">प्राप्त संदेश देखें</div>
     </div>
 </div>
 
-<!-- Page 5: Profile Page -->
+<!-- Page 5: My Profile Page -->
 <div id="profile-page" class="page">
     <div class="form-container">
         <h2>मेरी प्रोफाइल</h2>
         <div class="profile-info">
             <p>आपका नाम:</p>
-            <div class="input-group"><input type="text" id="profile-name-input" class="input-field" placeholder="आपका नाम" required></div>
-            <p>आपका पता:</p>
-            <div class="input-group"><textarea id="profile-address-input" class="input-field" placeholder="आपका पता" rows="3" required></textarea></div>
-            <p>आपकी आईडी: <span id="profile-call-id">रजिस्टर्ड नहीं है</span></p>
-        </div>
-        <button id="update-profile-btn" class="cta-button">प्रोफाइल अपडेट करें</button>
-        <a href="#" class="back-link" data-target="home-page">वापस जाएं</a>
+            <div class="input-group"><input type="text" id="profile-name-input" class="input-field" placeholder="आपका नाम" required=""></div>
+
+<p>आपका पता:</p>
+        <div class="input-group"><textarea id="profile-address-input" class="input-field" placeholder="आपका पता" rows="3" required=""></textarea></div>
+
+        <p>आपकी आईडी: <span id="profile-call-id">रजिस्टर्ड नहीं है</span></p>
     </div>
+    <button id="update-profile-btn" class="cta-button">प्रोफाइल अपडेट करें</button>
+    <a href="#" class="back-link" data-target="home-page">वापस जाएं</a>
 </div>
+
 
 <!-- Page 6: Music Change Page -->
 <div id="music-page" class="page">
@@ -329,10 +288,10 @@
     </div>
 </div>
 
-<!-- Page 7: Message Creator Page -->
+<!-- Page 7: Pre-made Message Creator Page -->
 <div id="message-creator-page" class="page">
     <div class="form-container">
-        <h2>एक संदेश बनाएं</h2>
+        <h2 id="message-creator-title">एक संदेश बनाएं</h2>
         <button id="bhai-to-bhen-btn" class="cta-button" style="width:100%; margin-bottom: 15px;">भाई की तरफ से बहन के लिए</button>
         <button id="bhen-to-bhai-btn" class="cta-button" style="width:100%;">बहन की तरफ से भाई के लिए</button>
          <a href="#" class="back-link" data-target="home-page">वापस जाएं</a>
@@ -344,8 +303,8 @@
     <div class="form-container">
         <h2 id="message-name-title">नाम दर्ज करें</h2>
         <form id="message-name-form">
-            <div class="input-group"><input type="text" id="sender-name" class="input-field" placeholder="आपका नाम" required></div>
-            <div class="input-group"><input type="text" id="receiver-name" class="input-field" placeholder="भाई/बहन का नाम" required></div>
+            <div class="input-group"><input type="text" id="sender-name" class="input-field" placeholder="आपका नाम" required=""></div>
+            <div class="input-group"><input type="text" id="receiver-name" class="input-field" placeholder="भाई/बहन का नाम" required=""></div>
             <button type="submit" class="cta-button">संदेश देखें</button>
         </form>
         <a href="#" class="back-link" data-target="message-creator-page">वापस जाएं</a>
@@ -354,14 +313,41 @@
 
 <!-- Page 9: Message Display Page -->
 <div id="message-display-page" class="page">
-     <div class="full-screen-card">
-        <div class="message-card-header">
-            <button id="message-back-btn" class="card-action-btn">वापस</button>
-            <button id="message-share-btn" class="card-action-btn">शेयर</button>
+     <div class="form-container">
+        <h2>आपके लिए एक प्यारा संदेश</h2>
+        <div id="message-display-card-container">
+            <div id="message-display-card"></div>
+            <p style="color: #555; margin-top: 10px; font-style: italic; font-size: 0.9rem;">अगला संदेश देखने के लिए दाएं या बाएं स्वाइप करें</p>
+            <div id="whatsapp-share-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill="#25D366"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.22 13.91c-.2.12-.72.35-1.03.2-1.74-.87-2.86-2.8-2.95-3.03-.09-.23.53-1.08.62-1.2.09-.12.04-.23-.04-.35-.08-.12-.72-.87-.98-1.17-.26-.3-.53-.42-.72-.42-.18 0-.39.06-.58.12-.2.06-1.12.53-1.35 1.74-.23 1.2.78 2.95.87 3.03.09.08 1.74 2.8 4.22 3.72 2.48.92 2.86.72 3.38.66.52-.06 1.63-.66 1.86-1.3.23-.63.23-1.17.17-1.3-.06-.13-.23-.2-.48-.32s-.72-.36-.84-.41c-.12-.06-.2-.09-.29.09s-.32.41-.39.49c-.08.08-.15.09-.29.03z"></path></svg>
+            </div>
         </div>
-        <div id="message-display-content"></div>
-        <p class="swipe-hint">अगला संदेश देखने के लिए दाएं या बाएं स्वाइप करें</p>
-     </div>
+        <a href="#" class="back-link" data-target="message-name-form-page">वापस जाएं</a>
+    </div>
+</div>
+
+
+<!-- Page 10: Card Message Input Page -->
+<div id="card-message-input-page" class="page">
+    <div class="form-container">
+        <h2>अपना संदेश लिखें</h2>
+        <div class="input-group">
+            <textarea id="card-wish-input" class="input-field" placeholder="यहां अपनी शुभकामना लिखें..." required="" rows="5"></textarea>
+        </div>
+        <button id="go-to-editor-btn" class="cta-button">इमेज बनाएं</button>
+        <a href="#" class="back-link" data-target="home-page">वापस जाएं</a>
+    </div>
+</div>
+
+<!-- Page 11: Card Editor Page -->
+<div id="card-editor-page" class="page">
+    <div class="editor-header">
+        <button id="editor-back-btn" class="editor-btn">वापस</button>
+        <a id="editor-download-btn" class="editor-btn download-btn" href="#" download="rakhi-wish.png">डाउनलोड</a>
+    </div>
+    <canvas id="editor-canvas"></canvas>
+    <div id="card-gallery" class="card-gallery-container">
+    </div>
 </div>
 
 <!-- Firebase SDKs -->
@@ -369,7 +355,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
     import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
     
-    // Your Firebase config object
     const firebaseConfig = {
         apiKey: "AIzaSyB2PG5JvDko2UmQDlY9gN5lBgga2vQy-Ws",
         authDomain: "conceptra-c1000.firebaseapp.com",
@@ -381,139 +366,372 @@
         measurementId: "G-QRQYEVSJJ6"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // DOM Elements
     const pages = document.querySelectorAll('.page');
-    const backgroundAudio = document.getElementById('background-audio');
-    const shubhzoneAudio = document.getElementById('shubhzone-audio');
+    const audio = document.getElementById('background-audio');
     const speakerIcon = document.getElementById('speaker-icon');
-    const mainVideoPlayer = document.getElementById('main-video-player');
-
-    // State Variables
     let isMusicPlaying = false;
-    let messageType = ''; 
-    let currentMessageIndex = 0;
+    let fallingElementsInterval;
     
+    // --- Pre-made Messages ---
+    let messageType = ''; // 'bhai-to-bhen' or 'bhen-to-bhai'
+    let currentMessageIndex = 0;
+    const messages = {
+        'bhai-to-bhen': [
+            "मेरी प्यारी बहना, यह राखी का धागा सिर्फ एक धागा नहीं, बल्कि मेरे प्यार और सुरक्षा का वादा है जो मैं तुमसे जीवन भर निभाऊंगा। रक्षाबंधन की बहुत-बहुत बधाई!",
+            "बचपन की वो खट्टी-मीठी यादें आज भी चेहरे पर मुस्कान ले आती हैं। तुम्हारा होना मेरे जीवन का सबसे बड़ा तोहफा है। हैप्पी रक्षाबंधन, मेरी प्यारी बहन!",
+            "तुम सिर्फ मेरी बहन नहीं, मेरी सबसे अच्छी दोस्त भी हो। हर मुश्किल में मेरा साथ देने के लिए धन्यवाद। ईश्वर तुम्हें दुनिया की सारी खुशियाँ दे।",
+            "चाहे हम कितने भी दूर क्यों न हों, इस राखी के दिन मेरा मन हमेशा तुम्हारे पास होता है। तुम्हारा भाई हमेशा तुम्हारे साथ है। हैप्पी राखी!",
+            "आज का दिन बहुत खास है, क्योंकि यह दिन हमारे प्यारे रिश्ते का प्रतीक है। मैं प्रार्थना करता हूँ कि हमारा यह बंधन हमेशा ऐसे ही मजबूत बना रहे।",
+            "मेरी शरारतों को सहने वाली और मुझे हमेशा सही रास्ता दिखाने वाली मेरी प्यारी बहना को रक्षाबंधन की हार्दिक शुभकामनाएँ।",
+            "तुम्हारी राखी मेरी कलाई पर एक कवच की तरह है, जो मुझे हर मुश्किल से लड़ने की ताकत देती है। हमेशा खुश रहो, बहना।",
+            "यह सिर्फ एक धागा नहीं है, यह हमारा अटूट विश्वास और प्यार है। भगवान करे, हमारे रिश्ते की यह मिठास कभी कम न हो।",
+            "तुम मेरे जीवन की प्रेरणा हो। तुम्हारी हंसी मेरे लिए सबसे कीमती है। रक्षाबंधन के इस पावन पर्व पर तुम्हें ढेर सारा प्यार।",
+            "हर साल की तरह इस साल भी मैं वादा करता हूँ कि तुम्हारे हर सुख-दुख में तुम्हारा साथ दूंगा। लव यू बहना, हैप्पी रक्षाबंधन!"
+        ],
+        'bhen-to-bhai': [
+            "मेरे प्यारे भाई, तुम्हारी कलाई पर यह राखी बांधकर मैं भगवान से तुम्हारी लंबी उम्र और सफलता की कामना करती हूँ। रक्षाबंधन की शुभकामनाएँ!",
+            "तुम मेरे पहले दोस्त और मेरे सुपरहीरो हो। मुझे हमेशा सुरक्षित महसूस कराने के लिए धन्यवाद। हैप्पी राखी भैया!",
+            "हमारा रिश्ता नोक-झोंक और ढेर सारे प्यार से भरा है। भगवान हमारे इस अनोखे बंधन को हमेशा सलामत रखे। हैप्पी रक्षाबंधन।",
+            "दूर होकर भी तुम हमेशा मेरे दिल के करीब हो। यह राखी मेरा प्यार और आशीर्वाद तुम तक पहुंचाएगी। बहुत याद आती है, भाई।",
+            "बचपन से लेकर आज तक, तुमने हमेशा एक बड़े भाई का फर्ज निभाया है। तुम्हारे जैसा भाई पाकर मैं बहुत भाग्यशाली हूँ।",
+            "यह राखी का धागा तुम्हें हर बुरी नजर से बचाए और तुम्हारे जीवन में खुशियों के नए रंग भरे। सदा खुश रहो, मेरे प्यारे भाई।",
+            "जब भी मुझे किसी सहारे की जरूरत पड़ी, मैंने तुम्हें अपने पास पाया। तुम दुनिया के सबसे अच्छे भाई हो। रक्षाबंधन मुबारक!",
+            "तुम्हारी सफलता और खुशी ही मेरी सबसे बड़ी इच्छा है। यह राखी का त्योहार तुम्हारे लिए ढेर सारी सौगातें लेकर आए।",
+            "याद है कैसे हम छोटी-छोटी बातों पर लड़ते थे? आज वो पल बहुत याद आते हैं। हमारा प्यार हमेशा ऐसा ही बना रहे। हैप्पी राखी!",
+            "मेरे प्यारे भाई, तुम मेरी ताकत और मेरा अभिमान हो। ईश्वर तुम्हें जीवन में वह सब कुछ दे जिसके तुम हकदार हो। रक्षाबंधन की बधाई!"
+        ]
+    };
+
+    const mainVideoPlayer = document.getElementById('main-video-player');
     const mainInterfaceVideos = [
         'main interfacemp4.mp4', 
-        'Generated File August 07, 2025 - 7_34PM.mp4', 
-        'Happy Rakshabandhan 🎊✨🪔 __ Coming soon 🎊 __ _rakshabandhan _status _viral(360P).mp4'
+        'coming soon rakshabandhan __ 9 August 2025 _comingsoon _rakhi_happyrakshabandhan_status_short(360P).mp4', 
+        'main interface 3.mp4', 
+        'Happy Rakshabandhan 🎊✨🪔 __ Coming soon 🎊 __ _rakshabandhan _status _viral(360P).mp4', 
+        'main interface 4.mp4'
     ];
     let currentMainVideoIndex = 0;
     
-    // --- Core Functions ---
-    function showPage(pageId) {
-        // Stop all media before switching pages
-        backgroundAudio.pause();
-        shubhzoneAudio.pause();
-        mainVideoPlayer.pause();
+    // --- Unique ID and Sharing Logic ---
+    function generateUniqueId() {
+        return Math.random().toString(36).substring(2, 6); // 4-char alphanumeric
+    }
+    
+    async function showSharedMessage(messageId) {
+        const uniqueIdModal = document.getElementById('unique-id-modal');
+        const sharedMessageDisplay = document.getElementById('shared-message-display');
+        const sharedMessageContent = document.getElementById('shared-message-content');
         
-        // Restore background audio volume if it was lowered
-        backgroundAudio.volume = 1.0;
-
-        pages.forEach(p => p.classList.remove('active'));
-        const newPage = document.getElementById(pageId);
-        if (newPage) newPage.classList.add('active');
-
-        // Page-specific actions
-        if (pageId === 'main-interface-page') {
-            speakerIcon.style.display = 'none'; // Hide general music speaker
-            mainVideoPlayer.play().catch(e => console.error("Main video autoplay failed:", e));
-            shubhzoneAudio.play().catch(e => console.error("Shubhzone audio autoplay failed:", e));
-            
-            // Lower background music volume if it's playing
-            if (isMusicPlaying) {
-                backgroundAudio.volume = 0.2; // Lower volume
-                backgroundAudio.play(); // Continue playing at lower volume
+        uniqueIdModal.classList.remove('active'); // Hide input modal first
+        
+        try {
+            const messageDocRef = doc(db, "sharedMessages", messageId);
+            const docSnap = await getDoc(messageDocRef);
+            if (docSnap.exists()) {
+                sharedMessageContent.textContent = docSnap.data().message;
+                sharedMessageDisplay.classList.add('active');
+                setTimeout(() => {
+                    sharedMessageDisplay.classList.remove('active');
+                    // Proceed to normal flow after 3 seconds
+                    if (localStorage.getItem('rakshaSutraUserId')) {
+                       setupMainInterfacePage(localStorage.getItem('rakshaSutraUserName'));
+                    } else {
+                       showPage('form-page');
+                    }
+                }, 3000); 
+            } else {
+                alert("यह संदेश कोड अमान्य है। कृपया पुनः प्रयास करें।");
+                uniqueIdModal.classList.add('active'); // Re-show the modal if code is wrong
             }
-        } else {
-            speakerIcon.style.display = 'block'; // Show general music speaker on other pages
-            if (isMusicPlaying) {
-                backgroundAudio.play();
-            }
+        } catch(e) {
+             alert("संदेश लोड करते समय त्रुटि हुई।");
+             console.error(e);
+             uniqueIdModal.classList.add('active');
         }
     }
 
-    function setupMainInterfacePage(userName) {
-        const messageText = `प्रिय ${userName},\n\nरक्षाबंधन का यह पावन पर्व सिर्फ एक धागा बांधने की परंपरा नहीं, बल्कि प्रेम, सुरक्षा और विश्वास का वह अनमोल वचन है, जो एक भाई-बहन को जीवनभर जोड़े रखता है।\n\nआज, जब दुनिया तेज़ी से बदल रही है और दूरी हमें अलग-अलग शहरों व देशों में ले जाती है, राखी का यह धागा हमें याद दिलाता है कि रिश्ते दूरी से नहीं, दिलों की नज़दीकियों से मजबूत होते हैं।\n\nहमारे Shubhzone.shop परिवार का हिस्सा बनने के लिए हम आपके आभारी हैं। आपका विश्वास और साथ हमारे लिए वैसा ही है जैसा एक बहन के लिए अपने भाई का वचन— हमेशा रक्षा करने और साथ निभाने का।\n\nहमारा वादा है कि जिस तरह एक भाई-बहन जीवन के हर मोड़ पर एक-दूसरे का साथ देते हैं, वैसे ही हम भी हमेशा आपके अनुभव को बेहतर बनाने, आपकी जरूरतों को समझने और आपको सुरक्षित, आसान और आनंददायक सेवा देने के लिए प्रयासरत रहेंगे।\n\nइस रक्षाबंधन पर हम दुआ करते हैं कि आपके जीवन में खुशियों की मिठास, सफलताओं की सौगात और रिश्तों की गर्माहट हमेशा बनी रहे।\n\nहमारी पूरी टीम की ओर से आपको और आपके परिवार को रक्षाबंधन की हार्दिक शुभकामनाएं!\n\nसप्रेम,\nShubhzone.shop परिवार`;
-        
-        document.getElementById('main-interface-message').textContent = messageText;
-        currentMainVideoIndex = 0;
-        mainVideoPlayer.src = mainInterfaceVideos[currentMainVideoIndex];
-        showPage('main-interface-page');
+
+    async function loadProfileForEditing() {
+        const userId = localStorage.getItem('rakshaSutraUserId');
+        if (!userId) {
+            alert("प्रोफ़ाइल देखने के लिए आपका पंजीकृत होना आवश्यक है।");
+            showPage('form-page');
+            return;
+        }
+
+        document.getElementById('profile-call-id').textContent = userId;
+
+        try {
+            const userDocRef = doc(db, "users", userId);
+            const docSnap = await getDoc(userDocRef);
+
+            if (docSnap.exists()) {
+                const userData = docSnap.data();
+                document.getElementById('profile-name-input').value = userData.name || '';
+                document.getElementById('profile-address-input').value = userData.address || '';
+            } else {
+                console.log("No such document!");
+                alert("आपकी प्रोफ़ाइल का डेटा नहीं मिला।");
+                localStorage.clear();
+                showPage('form-page');
+            }
+        } catch (error) {
+            console.error("Error getting document:", error);
+            alert("आपकी प्रोफ़ाइल लोड करते समय एक त्रुटि हुई: " + error.message);
+        }
     }
 
+
+    function showPage(pageId) {
+        const activePage = document.querySelector('.page.active');
+        if (activePage) {
+            if (activePage.id === 'main-interface-page') {
+                mainVideoPlayer.pause();
+                mainVideoPlayer.muted = true; 
+                if (localStorage.getItem('musicWasPlaying') === 'true' && audio.paused) {
+                    audio.play().catch(()=>{});
+                }
+                 if(fallingElementsInterval) clearInterval(fallingElementsInterval);
+            }
+        }
+
+        pages.forEach(p => p.classList.remove('active'));
+        const page = document.getElementById(pageId);
+        if (page) {
+            page.classList.add('active');
+        }
+
+        if (pageId === 'main-interface-page') {
+            startFallingElements();
+            if (!audio.paused) {
+                audio.pause();
+                localStorage.setItem('musicWasPlaying', 'true');
+            } else {
+                localStorage.setItem('musicWasPlaying', 'false');
+            }
+            mainVideoPlayer.muted = false;
+            mainVideoPlayer.play().catch(e => console.log("Autoplay was prevented. User interaction needed."));
+        }
+        
+        if (pageId === 'home-page') {
+             if(fallingElementsInterval) clearInterval(fallingElementsInterval);
+        } else if (pageId === 'profile-page') {
+            loadProfileForEditing();
+        }
+    }
+
+    function toggleMusic() {
+        if (audio.paused) {
+            audio.play().then(() => {
+                speakerIcon.textContent = '🔊';
+                isMusicPlaying = true;
+            }).catch(() => { isMusicPlaying = false; });
+        } else {
+            audio.pause();
+            speakerIcon.textContent = '🔇';
+            isMusicPlaying = false;
+        }
+    }
+    
+    function startFallingElements() {
+        if (fallingElementsInterval) clearInterval(fallingElementsInterval);
+        const container = document.getElementById('falling-elements-container');
+        container.innerHTML = '';
+        const elements = ['🌺', '🌹', '🌸', '🌷', '🌼', '🏵️', '💮'];
+        fallingElementsInterval = setInterval(() => {
+            const element = document.createElement('div');
+            element.className = 'falling-element';
+            element.textContent = elements[Math.floor(Math.random() * elements.length)];
+            element.style.left = Math.random() * 100 + 'vw';
+            element.style.animationDuration = Math.random() * 5 + 5 + 's';
+            element.style.fontSize = Math.random() * 1.5 + 1 + 'rem';
+            container.appendChild(element);
+            setTimeout(() => { element.remove(); }, 10000);
+        }, 300);
+    }
+
+    function speakMessage(text) {
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'hi-IN';
+        utterance.rate = 0.9;
+        utterance.pitch = 1.1;
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function setupMainInterfacePage(userName) {
+        const messageText = `प्रिय ${userName},\n\nरक्षा बंधन की हार्दिक शुभकामनाएँ!\nये पावन पर्व हमारे रिश्ते की डोर को और भी मज़बूत करता है। आपका साथ और आशीर्वाद हमेशा यूँ ही बना रहे।`;
+        document.getElementById('main-interface-message').textContent = messageText;
+        mainVideoPlayer.src = mainInterfaceVideos[currentMainVideoIndex];
+        showPage('main-interface-page');
+        setTimeout(() => speakMessage(messageText), 1500);
+    }
+    
     function playNextMainVideo() {
         currentMainVideoIndex = (currentMainVideoIndex + 1) % mainInterfaceVideos.length;
         mainVideoPlayer.src = mainInterfaceVideos[currentMainVideoIndex];
         mainVideoPlayer.play();
     }
     
+    function displayCurrentMessage() {
+        const sender = document.getElementById('sender-name').value;
+        const receiver = document.getElementById('receiver-name').value;
+        
+        let messageTemplate = messages[messageType][currentMessageIndex];
+        
+        let formattedMessage = messageTemplate.replace(/मेरी प्यारी बहना|प्यारी बहन|बहना/g, `मेरी प्यारी बहना ${receiver}`)
+                                            .replace(/मेरे प्यारे भाई|भैया|भाई/g, `मेरे प्यारे भाई ${receiver}`);
+
+        document.getElementById('message-display-card').textContent = formattedMessage + `\n\nतुम्हारा/तुम्हारी,\n${sender}`;
+    }
+
+
     // --- Event Listeners ---
 
-    // Initial Load
-    window.addEventListener('load', () => showPage('landing-page'));
+    window.addEventListener('load', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const msgParam = urlParams.get('msg');
 
-    // Speaker Icon for General Music
-    speakerIcon.addEventListener('click', () => {
-        if (backgroundAudio.paused) {
-            backgroundAudio.play().then(() => {
-                speakerIcon.textContent = '🔊';
-                isMusicPlaying = true;
-            });
+        if(msgParam) {
+            document.getElementById('unique-id-modal').classList.add('active');
         } else {
-            backgroundAudio.pause();
-            speakerIcon.textContent = '🔇';
-            isMusicPlaying = false;
+             showPage('landing-page');
         }
     });
 
-    // Get Started Button
+    document.getElementById('unique-id-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const enteredId = document.getElementById('unique-id-input').value.toLowerCase();
+        if(enteredId && enteredId.length === 4) {
+             showSharedMessage(enteredId);
+        } else {
+            alert("कृपया 4-अंकीय कोड डालें।");
+        }
+    });
+
+
+    speakerIcon.addEventListener('click', toggleMusic);
+
     document.getElementById('get-started-btn').addEventListener('click', () => {
-        // A user interaction is required for browsers to allow autoplay
-        backgroundAudio.play().then(() => backgroundAudio.pause());
-        shubhzoneAudio.play().then(() => shubhzoneAudio.pause());
-        
-        const userName = localStorage.getItem('rakshaSutraUserName');
-        if (userName) {
-            setupMainInterfacePage(userName);
+        audio.play().then(() => audio.pause()).catch(() => {});
+        if (localStorage.getItem('rakshaSutraUserId')) {
+            setupMainInterfacePage(localStorage.getItem('rakshaSutraUserName'));
         } else {
             showPage('form-page');
         }
     });
-    
-    // Info Form Submission
+
     document.getElementById('info-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.textContent = 'सबमिट हो रहा है...';
+
         const phone = document.getElementById('phone').value;
         const name = document.getElementById('name').value;
         const address = document.getElementById('address').value;
-        
-        // Save to localStorage
-        localStorage.setItem('rakshaSutraUserName', name);
-        localStorage.setItem('rakshaSutraUserId', phone);
-        
-        // Save to Firebase (ensure your rules are open for this to work)
+
         try {
-            await setDoc(doc(db, "users", phone), { name, phone, address });
+            await setDoc(doc(db, "users", phone), { 
+                name: name, 
+                phone: phone, 
+                address: address, 
+                timestamp: serverTimestamp() 
+            });
+
+            localStorage.setItem('rakshaSutraUserName', name);
+            localStorage.setItem('rakshaSutraUserId', phone);
+            
+            alert(`धन्यवाद, ${name}! आपकी प्रोफ़ाइल बन गई है।\nआपकी आईडी है: ${phone}`);
+            
+            setupMainInterfacePage(name);
+            
         } catch (error) {
-            console.error("Firebase write error:", error);
-            alert("प्रोफ़ाइल सहेजते समय एक त्रुटि हुई। कृपया बाद में पुनः प्रयास करें।");
+            console.error("Error writing document: ", error);
+            alert("एक त्रुटि हुई: " + error.message);
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = 'सबमिट करें';
         }
-        
-        setupMainInterfacePage(name);
     });
-    
-    // Main Video Playlist
+
     mainVideoPlayer.addEventListener('ended', playNextMainVideo);
 
-    // Mystery Box Button
+    let touchstartX = 0;
+    const videoCardForSwipe = document.querySelector('.interface-card video').parentElement;
+    videoCardForSwipe.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, { passive: true });
+    videoCardForSwipe.addEventListener('touchend', e => {
+        const touchendX = e.changedTouches[0].screenX;
+        if (touchendX < touchstartX - 50) playNextMainVideo(); // Swipe Left
+        if (touchendX > touchstartX + 50) { // Swipe Right
+            currentMainVideoIndex = (currentMainVideoIndex - 1 + mainInterfaceVideos.length) % mainInterfaceVideos.length;
+            mainVideoPlayer.src = mainInterfaceVideos[currentMainVideoIndex];
+            mainVideoPlayer.play();
+        }
+    });
+    
+    document.getElementById('update-profile-btn').addEventListener('click', async () => {
+        const updateButton = document.getElementById('update-profile-btn');
+        const userId = localStorage.getItem('rakshaSutraUserId');
+        
+        if (!userId) { alert("प्रोफ़ाइल अपडेट नहीं कर सकते। उपयोगकर्ता पंजीकृत नहीं है।"); return; }
+        const newName = document.getElementById('profile-name-input').value;
+        const newAddress = document.getElementById('profile-address-input').value;
+        if (!newName || !newAddress) { alert("नाम और पता खाली नहीं हो सकता।"); return; }
+        
+        updateButton.disabled = true;
+        updateButton.textContent = 'अपडेट हो रहा है...';
+        const userDocRef = doc(db, "users", userId);
+        try {
+            await updateDoc(userDocRef, { name: newName, address: newAddress });
+            localStorage.setItem('rakshaSutraUserName', newName);
+            alert("प्रोफ़ाइल सफलतापूर्वक अपडेट की गई!");
+        } catch (error) {
+            console.error("Error updating document: ", error);
+            alert("अपडेट करते समय एक त्रुटि हुई: " + error.message);
+        } finally {
+            updateButton.disabled = false;
+            updateButton.textContent = 'प्रोफाइल अपडेट करें';
+        }
+    });
+    
     document.getElementById('mystery-box-btn').addEventListener('click', () => showPage('home-page'));
+    document.getElementById('message-card-btn').addEventListener('click', () => showPage('message-creator-page'));
+    document.getElementById('open-message-creator-btn').addEventListener('click', () => showPage('message-creator-page'));
+    document.getElementById('card-creator-btn').addEventListener('click', () => showPage('card-message-input-page'));
+    document.getElementById('open-card-creator-btn').addEventListener('click', () => showPage('card-message-input-page'));
+    document.getElementById('change-music-strip').addEventListener('click', () => showPage('music-page'));
+    document.getElementById('my-profile-strip').addEventListener('click', () => showPage('profile-page'));
+    
+    document.getElementById('whatsapp-share-strip').addEventListener('click', () => {
+        const message = encodeURIComponent(`इस रक्षाबंधन, अपने भाई-बहन को एक विशेष डिजिटल राखी भेजें! इस खूबसूरत वेबसाइट को देखें: ${window.location.origin}`);
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${message}`;
+        window.open(whatsappUrl, '_blank');
+    });
 
-    // --- Buttons on "Create Message" Page ---
+    document.querySelectorAll('.back-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage(link.dataset.target);
+        });
+    });
+    
+    document.querySelectorAll('.music-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            audio.src = button.dataset.src;
+            if (isMusicPlaying) {
+                audio.play();
+            } else {
+                toggleMusic();
+            }
+            showPage('home-page');
+        });
+    });
+    
     document.getElementById('bhai-to-bhen-btn').addEventListener('click', () => {
         messageType = 'bhai-to-bhen';
         showPage('message-name-form-page');
@@ -524,20 +742,54 @@
         showPage('message-name-form-page');
     });
     
-    // Other Buttons from Home Page
-    document.getElementById('open-message-creator-btn').addEventListener('click', () => showPage('message-creator-page'));
-    document.getElementById('my-profile-strip').addEventListener('click', () => showPage('profile-page'));
-    document.getElementById('change-music-strip').addEventListener('click', () => showPage('music-page'));
-    // Add other event listeners as needed...
+    document.getElementById('message-name-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        currentMessageIndex = 0;
+        displayCurrentMessage();
+        showPage('message-display-page');
+    });
+    
+    let messageTouchStartX = 0;
+    const messageDisplayContainer = document.getElementById('message-display-card-container');
+    messageDisplayContainer.addEventListener('touchstart', e => { messageTouchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    messageDisplayContainer.addEventListener('touchend', e => {
+        const touchendX = e.changedTouches[0].screenX;
+        const totalMessages = messages[messageType].length;
+        if (touchendX < messageTouchStartX - 50) { // Swipe left
+            currentMessageIndex = (currentMessageIndex + 1) % totalMessages;
+            displayCurrentMessage();
+        }
+        if (touchendX > messageTouchStartX + 50) { // Swipe right
+            currentMessageIndex = (currentMessageIndex - 1 + totalMessages) % totalMessages;
+            displayCurrentMessage();
+        }
+    });
+    
+    document.getElementById('whatsapp-share-icon').addEventListener('click', async () => {
+        const messageToShare = document.getElementById('message-display-card').textContent;
+        const uniqueId = generateUniqueId();
+        
+        try {
+            await setDoc(doc(db, "sharedMessages", uniqueId), {
+                message: messageToShare,
+                createdAt: serverTimestamp()
+            });
 
-    // Back link functionality
-    document.querySelectorAll('.back-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            showPage(link.dataset.target);
-        });
+            const baseUrl = `${window.location.origin}${window.location.pathname}`;
+            const shareUrl = `${baseUrl}?msg=true`;
+            const shareText = encodeURIComponent(`आपके लिए एक खास रक्षाबंधन संदेश है! 🎁\n\nइसे देखने के लिए लिंक पर क्लिक करें और यह यूनिक कोड डालें: *${uniqueId.toUpperCase()}*\n\n${shareUrl}`);
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${shareText}`;
+            window.open(whatsappUrl, '_blank');
+        } catch(e) {
+            console.error("Error creating share link: ", e);
+            alert("शेयर लिंक बनाते समय त्रुटि हुई।");
+        }
     });
 
 </script>
+
+
+
+
 </body>
 </html>
