@@ -207,14 +207,14 @@
         background-size: cover;
         background-position: center;
         transition: background-image 0.4s ease-in-out;
-        position: relative; /* For Pseudo Element */
+        position: relative; 
     }
     .card-viewer-container::before {
         content: '';
         position: absolute;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.3); /* Dark overlay for readability */
-        backdrop-filter: blur(2px); /* Blur effect on background image */
+        background: rgba(0,0,0,0.3); 
+        backdrop-filter: blur(2px); 
         border-radius: 20px;
         z-index: 1;
     }
@@ -246,9 +246,7 @@
     /* --- Unique ID Modal & Shared Message Display --- */
     #unique-id-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; z-index: 2000; flex-direction: column; background: rgba(0,0,0,0.7); }
     #unique-id-modal.active { display: flex; }
-    /* This #shared-message-display is no longer used but kept to avoid deletion */
-    #shared-message-display { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; z-index: 2000; flex-direction: column; background: rgba(0,0,0,0.7); }
-    #shared-message-content { background: var(--card-bg); backdrop-filter: var(--blur-effect); padding: 40px; border-radius: 20px; color: var(--text-color); text-shadow: 1px 1px 2px rgba(255,255,255,0.4); max-width: 90%; text-align: center; font-size: 1.2rem; line-height: 1.7; font-weight: 600; white-space: pre-wrap; }
+    #shared-message-display { display: none; } /* Kept for code integrity, but not used */
     
     .modal-button-group {
         display: flex;
@@ -266,15 +264,9 @@
 <body>
 
 
-<audio id="background-audio" loop><source src="3.m4a" type="audio/mp4"></source></audio>
+<audio id="background-audio" loop></audio>
 
 <div id="speaker-icon">🔇</div>
-
-<!-- This div is no longer in active use but kept to avoid deleting code. -->
-<div id="shared-message-display">
-    <div id="shared-message-content"></div>
-    <button id="close-shared-message-btn" class="cta-button" style="margin-top: 20px;">आगे बढ़ें</button>
-</div>
 
 
 <!-- Unique ID Input Modal -->
@@ -320,7 +312,7 @@
             <!-- Video Card -->
             <div class="interface-card video-card-book">
                  <div class="date-display">शनिवार, 9 अगस्त, 2025</div>
-                <video playsinline="" id="main-video-player"></video>
+                <video playsinline="" id="main-video-player" volume="0.3"></video>
             </div>
             <!-- Message Card -->
             <div class="interface-card message-card-book" id="main-interface-message-container">
@@ -476,6 +468,8 @@
     const db = getFirestore(app);
 
     const audio = document.getElementById('background-audio');
+    audio.src = '3.m4a';
+    audio.loop = true;
     audio.volume = 0.4;
     const speakerIcon = document.getElementById('speaker-icon');
     let isMusicPlaying = false;
@@ -541,19 +535,47 @@
     const mainInterfaceVideos = [ 'main interfacemp4.mp4', 'coming soon rakshabandhan __ 9 August 2025 _comingsoon _rakhi_happyrakshabandhan_status_short(360P).mp4' ];
     let currentMainVideoIndex = 0;
     
+    let hiVoices = [];
+
+    function loadVoices() {
+        hiVoices = speechSynthesis.getVoices().filter(voice => voice.lang === 'hi-IN');
+    }
+
+    loadVoices();
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    function speakMessage(text, gender = 'female') {
+        if (!window.speechSynthesis || !text) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'hi-IN';
+        utterance.rate = 0.9;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        let selectedVoice = null;
+        if (hiVoices.length > 0) {
+            const genderVoices = hiVoices.filter(voice => voice.gender === gender);
+            selectedVoice = genderVoices.length > 0 ? genderVoices[0] : hiVoices[0];
+        }
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+        }
+        setTimeout(() => {
+            window.speechSynthesis.speak(utterance);
+        }, 100);
+    }
+    
     // --- Unique ID and Sharing Logic ---
     function generateUniqueId() {
-        return Math.random().toString(36).substring(2, 7); // 5-char alphanumeric
+        return Math.random().toString(36).substring(2, 7);
     }
     
     async function shareMessage(messageText) {
         const uniqueId = generateUniqueId();
         try {
-            await setDoc(doc(db, "sharedMessages", uniqueId), {
-                message: messageText,
-                createdAt: serverTimestamp()
-            });
-
+            await setDoc(doc(db, "sharedMessages", uniqueId), { message: messageText, createdAt: serverTimestamp() });
             const baseUrl = `${window.location.origin}${window.location.pathname}`;
             const shareUrl = `${baseUrl}?msg=true`;
             const introText = "आपके लिए एक खास रक्षाबंधन संदेश है! 🎁\n\n";
@@ -568,31 +590,31 @@
     }
     
     async function showSharedMessage(messageId) {
-        const uniqueIdModal = document.getElementById('unique-id-modal');
-        uniqueIdModal.classList.remove('active');
-
+        document.getElementById('unique-id-modal').classList.remove('active');
         try {
             const messageDocRef = doc(db, "sharedMessages", messageId);
             const docSnap = await getDoc(messageDocRef);
             if (docSnap.exists()) {
-                const messageContentEl = document.getElementById('view-shared-message-content');
-                const cardContainerEl = document.getElementById('view-shared-message-container');
-
-                messageContentEl.textContent = docSnap.data().message;
-
+                const messageText = docSnap.data().message;
+                document.getElementById('view-shared-message-content').textContent = messageText;
                 const bgIndex = Math.floor(Math.random() * cardBackgroundImages.length);
-                cardContainerEl.style.backgroundImage = `url('${cardBackgroundImages[bgIndex]}')`;
-
+                document.getElementById('view-shared-message-container').style.backgroundImage = `url('${cardBackgroundImages[bgIndex]}')`;
                 showPage('view-shared-message-page');
+                
+                let gender = 'female'; // Default
+                if (messageText.includes('बहना') || messageText.includes('बहन')) {
+                    gender = 'male';
+                }
+                setTimeout(() => speakMessage(messageText, gender), 500);
 
             } else {
                 alert("यह संदेश कोड अमान्य है। कृपया पुनः प्रयास करें।");
-                uniqueIdModal.classList.add('active');
+                document.getElementById('unique-id-modal').classList.add('active');
             }
         } catch(e) {
              alert("संदेश लोड करते समय त्रुटि हुई।");
              console.error(e);
-             uniqueIdModal.classList.add('active');
+             document.getElementById('unique-id-modal').classList.add('active');
         }
     }
 
@@ -604,13 +626,9 @@
             showPage('form-page');
             return;
         }
-
         document.getElementById('profile-call-id').textContent = userId;
-
         try {
-            const userDocRef = doc(db, "users", userId);
-            const docSnap = await getDoc(userDocRef);
-
+            const docSnap = await getDoc(doc(db, "users", userId));
             if (docSnap.exists()) {
                 const userData = docSnap.data();
                 document.getElementById('profile-name-input').value = userData.name || '';
@@ -627,6 +645,7 @@
 
 
     function showPage(pageId) {
+        window.speechSynthesis.cancel(); // Stop any speech on page change
         document.querySelectorAll('.page.active').forEach(p => p.classList.remove('active'));
         const page = document.getElementById(pageId);
         if (page) {
@@ -692,23 +711,13 @@
         }, 300);
     }
 
-    function speakMessage(text) {
-        if (!window.speechSynthesis) return;
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'hi-IN';
-        utterance.rate = 0.9;
-        utterance.pitch = 1.1;
-        window.speechSynthesis.speak(utterance);
-    }
-
     function setupMainInterfacePage(userName) {
         const messageText = `प्रिय ${userName},\n\nरक्षाबंधन का यह पावन अवसर प्रेम, विश्वास और सुरक्षा के उस बंधन का प्रतीक है जो हमें जीवनभर जोड़े रखता है।\nहमारे Shubhzone.shop परिवार का हिस्सा बनने के लिए आपका धन्यवाद। आपका विश्वास हमारे लिए वैसा ही है जैसे एक बहन के लिए अपने भाई का वचन— हमेशा साथ निभाने का।\n\nइस त्योहार पर हमारी यही शुभकामना है कि आपके जीवन में हमेशा खुशियां, सफलता और रिश्तों की गर्माहट बनी रहे।\n\nरक्षाबंधन की हार्दिक शुभकामनाएं!\nसप्रेम,\nShubhzone.shop परिवार`;
         
         document.getElementById('main-interface-message').textContent = messageText;
         mainVideoPlayer.src = mainInterfaceVideos[currentMainVideoIndex];
         showPage('main-interface-page');
-        setTimeout(() => speakMessage(messageText), 2500);
+        setTimeout(() => speakMessage(messageText, 'female'), 2500);
     }
     
     function playNextMainVideo() {
@@ -721,24 +730,19 @@
         const sender = document.getElementById('sender-name').value;
         const receiver = document.getElementById('receiver-name').value;
         const messages = messageType === 'bhai-to-bhen' ? bhaiToBhenMessages : bhenToBhaiMessages;
-        
         let messageTemplate = messages[currentMessageIndex];
-        
-        let formattedMessage = messageTemplate
-                               .replace(/\[भाई का नाम\]/g, receiver)
-                               .replace(/\[नाम\]/g, receiver)
-                               .replace(/प्रिय बहना/g, `प्रिय बहना ${receiver}`);
-
+        let formattedMessage = messageTemplate.replace(/\[भाई का नाम\]/g, receiver).replace(/\[नाम\]/g, receiver).replace(/प्रिय बहना/g, `प्रिय बहना ${receiver}`);
         const cardElement = document.getElementById('message-display-card');
         const containerElement = document.getElementById('message-viewer-container');
-        
         cardElement.classList.remove('card-animation');
         void cardElement.offsetWidth;
         cardElement.classList.add('card-animation');
-        
-        cardElement.textContent = formattedMessage + `\n\nस्नेह सहित,\n${sender}`;
+        const fullText = formattedMessage + `\n\nस्नेह सहित,\n${sender}`;
+        cardElement.textContent = fullText;
         const bgIndex = currentMessageIndex % cardBackgroundImages.length;
-        containerElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('${cardBackgroundImages[bgIndex]}')`;
+        containerElement.style.backgroundImage = `url('${cardBackgroundImages[bgIndex]}')`;
+        const gender = messageType === 'bhai-to-bhen' ? 'male' : 'female';
+        speakMessage(fullText, gender);
     }
 
     // --- Event Listeners ---
@@ -754,7 +758,7 @@
     document.getElementById('unique-id-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const enteredId = document.getElementById('unique-id-input').value.toLowerCase().trim();
-        if(enteredId && enteredId.length === 5) {
+        if (enteredId.length === 5) {
              showSharedMessage(enteredId);
         } else {
             alert("कृपया 5-अंकीय कोड डालें।");
@@ -763,16 +767,6 @@
 
     document.getElementById('close-unique-id-modal-btn').addEventListener('click', () => {
         document.getElementById('unique-id-modal').classList.remove('active');
-    });
-    
-    // This button is on a div that is no longer used, but listener is kept
-    document.getElementById('close-shared-message-btn')?.addEventListener('click', () => {
-        document.getElementById('shared-message-display').classList.remove('active');
-        if (!localStorage.getItem('rakshaSutraUserId')) {
-           showPage('form-page');
-        } else {
-           showPage('home-page');
-        }
     });
 
     document.getElementById('view-shared-message-back-btn').addEventListener('click', () => {
@@ -797,13 +791,11 @@
         const submitButton = e.target.querySelector('button[type="submit"]');
         submitButton.disabled = true;
         submitButton.textContent = 'सबमिट हो रहा है...';
-
         const phone = document.getElementById('phone').value;
         const name = document.getElementById('name').value;
         const address = document.getElementById('address').value;
-
         try {
-            await setDoc(doc(db, "users", phone), { name: name, phone: phone, address: address, timestamp: serverTimestamp() });
+            await setDoc(doc(db, "users", phone), { name, phone, address, timestamp: serverTimestamp() });
             localStorage.setItem('rakshaSutraUserName', name);
             localStorage.setItem('rakshaSutraUserId', phone);
             alert(`धन्यवाद, ${name}! आपकी प्रोफ़ाइल बन गई है।\nआपकी आईडी है: ${phone}`);
@@ -819,14 +811,12 @@
     mainVideoPlayer.addEventListener('ended', playNextMainVideo);
     
     document.getElementById('update-profile-btn').addEventListener('click', async () => {
-        const updateButton = document.getElementById('update-profile-btn');
         const userId = localStorage.getItem('rakshaSutraUserId');
         if (!userId) { alert("उपयोगकर्ता पंजीकृत नहीं है।"); return; }
-        
         const newName = document.getElementById('profile-name-input').value;
         const newAddress = document.getElementById('profile-address-input').value;
         if (!newName || !newAddress) { alert("नाम और पता खाली नहीं हो सकता।"); return; }
-        
+        const updateButton = document.getElementById('update-profile-btn');
         updateButton.disabled = true;
         updateButton.textContent = 'अपडेट हो रहा है...';
         try {
@@ -865,7 +855,11 @@
     document.querySelectorAll('.music-btn').forEach(button => {
         button.addEventListener('click', () => {
             audio.src = button.dataset.src;
-            toggleMusic(); 
+            if (!isMusicPlaying) {
+                toggleMusic();
+            } else {
+                audio.play();
+            }
             showPage('home-page');
         });
     });
@@ -883,8 +877,9 @@
     document.getElementById('message-name-form').addEventListener('submit', (e) => {
         e.preventDefault();
         currentMessageIndex = 0;
-        displayCurrentMessage();
         showPage('message-display-page');
+        // Delay display to allow page transition
+        setTimeout(displayCurrentMessage, 100);
     });
     
     let messageTouchStartX = 0;
@@ -892,13 +887,11 @@
     document.getElementById('message-viewer-container').addEventListener('touchend', e => {
         const touchendX = e.changedTouches[0].screenX;
         const totalMessages = (messageType === 'bhai-to-bhen' ? bhaiToBhenMessages : bhenToBhaiMessages).length;
-        if (touchendX < messageTouchStartX - 50) { // Swipe left
+        if (touchendX < messageTouchStartX - 50) { 
             currentMessageIndex = (currentMessageIndex + 1) % totalMessages;
-        } else if (touchendX > messageTouchStartX + 50) { // Swipe right
+        } else if (touchendX > messageTouchStartX + 50) {
             currentMessageIndex = (currentMessageIndex - 1 + totalMessages) % totalMessages;
-        } else {
-            return;
-        }
+        } else { return; }
         displayCurrentMessage();
     });
 
@@ -917,7 +910,7 @@
         }
         document.getElementById('custom-card-display-content').textContent = wishText;
         const bgIndex = Math.floor(Math.random() * cardBackgroundImages.length);
-        document.getElementById('custom-card-viewer-container').style.backgroundImage = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('${cardBackgroundImages[bgIndex]}')`;
+        document.getElementById('custom-card-viewer-container').style.backgroundImage = `url('${cardBackgroundImages[bgIndex]}')`;
         showPage('custom-card-display-page');
     });
 
