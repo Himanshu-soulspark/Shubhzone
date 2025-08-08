@@ -125,7 +125,7 @@
         #profile-page .profile-info p { margin-bottom: 20px; color: var(--text-color); font-weight: 600; }
         #profile-page .profile-info span { font-weight: 400; word-break: break-all; background: rgba(0,0,0,0.2); padding: 5px 8px; border-radius: 8px; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); }
 
-        /* --- UPDATED: Main Interface Page --- */
+        /* --- NEW LAYOUT: Main Interface Page --- */
         #main-interface-page { overflow: hidden; }
         #main-interface-page .page-content { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 20px; gap: 30px; }
         .interface-layout { display: flex; flex-direction: row; align-items: stretch; justify-content: center; gap: 20px; width: 100%; height: 70vh; max-height: 500px; z-index: 1; }
@@ -176,9 +176,10 @@
         @keyframes revealCard { to { opacity: 1; transform: translateX(0); } }
         
         @media (max-width: 600px) {
-            .interface-layout { height: 65vh; max-height: 450px; }
-            .main-content-card { width: 48%; }
-            #main-interface-message { font-size: 0.7rem; }
+            .interface-layout { flex-direction: column; height: auto; max-height: none; align-items: center; }
+            .main-content-card { width: 80%; max-width: 250px; height: 30vh;}
+            #main-interface-message-card { height: auto; min-height: 150px; }
+            #main-interface-message { font-size: 0.8rem; }
         }
 
         /* --- Falling Flowers Animation --- */
@@ -403,7 +404,7 @@
     let messageType = ''; 
     let currentMessageIndex = 0;
 
-    // --- NEW: Significantly Longer Messages ---
+    // --- Longer, More Emotional Messages ---
     const messages = {
         'bhai-to-bhen': [
             "मेरी प्यारी बहना, रक्षाबंधन के इस पावन अवसर पर, मैं तुम्हें सिर्फ एक धागा नहीं, बल्कि अपने हृदय की गहराइयों से निकला हुआ स्नेह और विश्वास भेज रहा हूँ। यह रेशम का धागा हमारे उस अनमोल रिश्ते का प्रतीक है, जो बचपन की खिलखिलाहटों, आँगन की धमाचौकड़ी और एक-दूसरे के राज़ों को सहेजने से बना है। मुझे आज भी याद है, कैसे तुम मेरे लिए माँ से लड़ जाती थी और कैसे मेरी हर छोटी-बड़ी जीत पर मुझसे ज़्यादा खुश होती थी। तुम्हारी राखी जब मेरी कलाई पर सजती है, तो यह सिर्फ एक धागा नहीं, बल्कि एक अभेद्य कवच बन जाती है, जो मुझे जीवन की हर चुनौती का सामना करने की शक्ति देती है। मैं ईश्वर से प्रार्थना करता हूँ कि तुम्हारे जीवन का हर पल खुशियों के रंगों से सराबोर हो, तुम्हारी आँखों में कभी कोई आँसू न आए और तुम्हारे चेहरे की यह मुस्कान सदा यूँ ही खिली रहे। चाहे हम कितने भी दूर क्यों न हों, मेरा स्नेह और मेरी शुभकामनाएँ हमेशा तुम्हारे साथ हैं। तुम्हारा भाई होने पर मुझे गर्व है।",
@@ -432,20 +433,10 @@
     let currentMainVideoIndex = 0;
     
     function showPage(pageId) {
-        const activePage = document.querySelector('.page.active');
-        if (activePage) {
-            if (activePage.id === 'main-interface-page') {
-                mainVideoPlayer.pause();
-                if (localStorage.getItem('musicWasPlaying') === 'true' && audio.paused) {
-                    audio.play().catch(()=>{});
-                }
-            }
-        }
-
         pages.forEach(p => p.classList.remove('active'));
-        const page = document.getElementById(pageId);
-        if (page) {
-            page.classList.add('active');
+        const newPage = document.getElementById(pageId);
+        if (newPage) {
+            newPage.classList.add('active');
         }
 
         if (pageId === 'main-interface-page') {
@@ -456,10 +447,14 @@
             } else {
                 localStorage.setItem('musicWasPlaying', 'false');
             }
-            mainVideoPlayer.muted = false; // Unmute the video on this page
+            mainVideoPlayer.muted = false; 
             mainVideoPlayer.play().catch(e => console.log("Autoplay was prevented."));
         } else {
-            if(fallingElementsInterval) clearInterval(fallingElementsInterval);
+             mainVideoPlayer.pause();
+            if (fallingElementsInterval) clearInterval(fallingElementsInterval);
+            if (localStorage.getItem('musicWasPlaying') === 'true' && audio.paused) {
+                audio.play().catch(() => {});
+            }
         }
         
         if (pageId === 'profile-page') {
@@ -576,8 +571,6 @@
 
         const messageToShare = document.getElementById('message-display-card').textContent;
         const receiverName = document.getElementById('receiver-name').value;
-        
-        // Generate a random 5-character ID
         const greetingId = Math.random().toString(36).substring(2, 7).toUpperCase();
 
         try {
@@ -594,7 +587,7 @@
 
         } catch (error) {
             console.error("Error sharing greeting: ", error);
-            alert("संदेश साझा करते समय एक त्रुटि हुई: " + error.message + "\n\nकृपया सुनिश्चित करें कि आपने फायरबेस सुरक्षा नियमों को अपडेट किया है।");
+            alert("संदेश साझा करते समय एक त्रुटि हुई: " + error.message);
         } finally {
             shareButton.style.pointerEvents = 'auto';
             shareButton.style.opacity = '1';
@@ -606,10 +599,8 @@
 
     window.addEventListener('load', () => {
         if (localStorage.getItem('rakshaSutraUserId')) {
-             // If user is already registered, go to home page directly
-             showPage('home-page'); 
+             showPage('home-page');
         } else {
-             // Otherwise, show the landing page
              showPage('landing-page');
         }
     });
@@ -662,7 +653,7 @@
     document.getElementById('update-profile-btn').addEventListener('click', async () => {
         const updateButton = document.getElementById('update-profile-btn');
         const userId = localStorage.getItem('rakshaSutraUserId');
-        if (!userId) { return; }
+        if (!userId) { alert("अपडेट करने के लिए उपयोगकर्ता आईडी नहीं मिली।"); return; }
 
         const newName = document.getElementById('profile-name-input').value;
         const newAddress = document.getElementById('profile-address-input').value;
@@ -675,6 +666,7 @@
             await updateDoc(userDocRef, { name: newName, address: newAddress });
             localStorage.setItem('rakshaSutraUserName', newName);
             alert("प्रोफ़ाइल सफलतापूर्वक अपडेट की गई!");
+            showPage('home-page');
         } catch (error) {
             console.error("Error updating document: ", error);
             alert("अपडेट करते समय एक त्रुटि हुई: " + error.message);
@@ -772,7 +764,7 @@
                     if(document.getElementById('final-greeting-display-page').classList.contains('active')){
                         showPage('home-page');
                     }
-                }, 5000); // 5 सेकंड बाद होम पेज पर वापस
+                }, 5000); 
             } else {
                 alert("गलत कोड। कृपया पुनः प्रयास करें या प्रेषक से पुष्टि करें।");
             }
