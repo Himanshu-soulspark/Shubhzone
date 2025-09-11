@@ -1,16 +1,15 @@
 {
   "name": "symbiote-protocol",
   "version": "1.0.0",
-  "description": "A web application for demonstrating push notifications and service workers.",
+  "description": "My secret command server.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.20.2",
     "express": "^4.19.2",
-    "web-push": "^3.6.7"
+    "web-push": "^3.6.7",
+    "body-parser": "^1.20.2",
+    "firebase-admin": "^11.5.0" 
   }
 }
