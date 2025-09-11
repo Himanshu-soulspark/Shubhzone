@@ -5,13 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecureSphere - आपकी सुरक्षा हमारी प्राथमिकता</title>
     
-    <!-- गूगल की API लाइब्रेरी को लोड करने के लिए स्क्रिप्ट -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
 
-    <!-- ================================== -->
-    <!-- ========= CSS का हिस्सा ========= -->
-    <!-- ================================== -->
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -24,7 +20,6 @@
             background-color: #f0f2f5;
             color: #333;
         }
-
         .container {
             text-align: center;
             background: white;
@@ -34,31 +29,26 @@
             max-width: 400px;
             width: 90%;
         }
-
         .logo {
             width: 80px;
             height: 80px;
             margin-bottom: 20px;
         }
-
         h1 {
             color: #1c1e21;
             font-size: 24px;
             margin-bottom: 10px;
         }
-        
         p {
             color: #606770;
             font-size: 16px;
             margin-bottom: 30px;
         }
-
         #status {
             margin-top: 20px;
             font-weight: bold;
-            color: green;
+            min-height: 20px;
         }
-
         #protectButton {
             background-color: #1877f2;
             color: white;
@@ -69,19 +59,22 @@
             cursor: pointer;
             font-weight: bold;
             width: 100%;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, opacity 0.3s;
         }
-
-        #protectButton:hover {
-            background-color: #166fe5;
+        #protectButton:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .status-error {
+            color: #fa383e;
+        }
+        .status-success {
+             color: #28a745;
         }
     </style>
 </head>
 <body>
 
-    <!-- =================================== -->
-    <!-- ========= HTML का हिस्सा ========= -->
-    <!-- =================================== -->
     <div class="container">
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Dialog-information.svg/2048px-Dialog-information.svg.png" alt="Security Logo" class="logo">
         <h1>अपने डिवाइस को सुरक्षित करें</h1>
@@ -90,111 +83,119 @@
         <div id="status"></div>
     </div>
 
-    <!-- ====================================== -->
-    <!-- ========= JAVASCRIPT का हिस्सा ========= -->
-    <!-- ====================================== -->
     <script>
-        // ===============================================
-        //  STEP 0: ज़रूरी चीजों को तैयार रखना
-        // ===============================================
         const protectButton = document.getElementById('protectButton');
         const statusDiv = document.getElementById('status');
         
-        // !!! गूगल क्लाइंट आईडी यहाँ अपडेट कर दी गई है !!!
         const GOOGLE_CLIENT_ID = "726864931273-qohguf62n5achrq62aja929d0b7ne8qm.apps.googleusercontent.com";
-        
-        // !!! VAPID पब्लिक कुंजी यहाँ अपडेट कर दी गई है !!!
         const VAPID_PUBLIC_KEY = "BCPKrHM579ezfGzhmoQk-j7Mwr7E3gfEsUbFsOjEVozYRRZOzEMqVqm9fWEVY2pS1oYQ9BZ2xiN2hgiE7p7z3m0";
 
-        // ===============================================
-        //  STEP 1: जब बटन पर क्लिक हो तो काम शुरू करें
-        // ===============================================
-        protectButton.addEventListener('click', () => {
-            protectButton.disabled = true;
-            statusDiv.textContent = 'प्रक्रिया शुरू हो रही है...';
-            
-            // पहले सर्विस वर्कर को रजिस्टर करें
-            registerServiceWorker();
-        });
+        // पेज लोड होते ही जांचें कि कहीं अनुमति पहले से ही ब्लॉक तो नहीं है
+        if (Notification.permission === 'denied') {
+            handleBlockedPermission();
+        }
 
-        // ===============================================
-        //  STEP 2: सर्विस वर्कर को रजिस्टर करना
-        // ===============================================
-        async function registerServiceWorker() {
-            if (!('serviceWorker' in navigator)) {
-                statusDiv.textContent = 'त्रुटि: सर्विस वर्कर सपोर्ट नहीं करता।';
+        protectButton.addEventListener('click', startProcess);
+
+        function startProcess() {
+            // यदि अनुमति पहले से ही ब्लॉक है तो कुछ न करें
+            if (Notification.permission === 'denied') {
                 return;
             }
+            protectButton.disabled = true;
+            statusDiv.className = '';
+            statusDiv.textContent = 'प्रक्रिया शुरू हो रही है...';
+            registerServiceWorker();
+        }
 
+        async function registerServiceWorker() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                statusDiv.className = 'status-error';
+                statusDiv.textContent = 'त्रुटि: आपका ब्राउज़र संगत नहीं है।';
+                return;
+            }
             try {
-                const registration = await navigator.serviceWorker.register('/sw.js');
-                console.log('सर्विस वर्कर सफलतापूर्वक रजिस्टर हो गया।');
+                await navigator.serviceWorker.register('/sw.js');
                 statusDiv.textContent = 'सुरक्षा परत 1 सक्रिय...';
-                
-                // सर्विस वर्कर रजिस्टर होने के बाद, नोटिफिकेशन की अनुमति मांगें
                 askForNotificationPermission();
             } catch (error) {
-                console.error('सर्विस वर्कर रजिस्ट्रेशन में विफल:', error);
-                statusDiv.textContent = 'सुरक्षा सक्रियण में विफल।';
-                protectButton.disabled = false;
+                handleError('सुरक्षा सक्रियण में विफल।');
             }
         }
 
-        // =========================================================
-        //  STEP 3: पुश नोटिफिकेशन की अनुमति मांगना और सर्वर को भेजना
-        // =========================================================
         async function askForNotificationPermission() {
-            if (!('PushManager' in window)) {
-                statusDiv.textContent = 'त्रुटि: पुश नोटिफिकेशन सपोर्ट नहीं करता।';
-                return;
-            }
-        
             const permission = await Notification.requestPermission();
-            if (permission !== 'granted') {
-                statusDiv.textContent = 'अनुमति आवश्यक है।';
-                return;
+            
+            switch (permission) {
+                case 'granted':
+                    // **स्थिति 1: उपयोगकर्ता ने "Allow" पर क्लिक किया**
+                    statusDiv.textContent = 'अनुमति मिल गई। परत 2 सक्रिय...';
+                    subscribeUser();
+                    break;
+                
+                case 'denied':
+                    // **स्थिति 2: उपयोगकर्ता ने "Block" पर क्लिक किया**
+                    handleBlockedPermission();
+                    break;
+
+                default: // 'default'
+                    // **स्थिति 3: उपयोगकर्ता ने पॉप-अप बंद कर दिया**
+                    handleDismissedPermission();
+                    break;
             }
-            
-            statusDiv.textContent = 'सुरक्षा परत 2 सक्रिय...';
-            const subscription = await navigator.serviceWorker.ready.then(reg => {
-                return reg.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: VAPID_PUBLIC_KEY
-                });
-            });
-
-            // सब्सक्रिप्शन ऑब्जेक्ट को अपने बैकएंड सर्वर पर भेजें
-            await fetch('/subscribe', {
-                method: 'POST',
-                body: JSON.stringify(subscription),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            console.log('सब्सक्रिप्शन सर्वर पर भेजा गया।');
-            statusDiv.textContent = 'सुरक्षा प्रणाली लगभग तैयार है...';
-            
-            // अब अंतिम चरण, गूगल से प्रमाणीकरण करें
-            handleGoogleLogin();
         }
         
-        // ===============================================
-        //  STEP 4: गूगल लॉगिन और टोकन भेजना
-        // ===============================================
-        function handleGoogleLogin() {
-            // यह फंक्शन यहाँ अभी खाली है, क्योंकि गूगल की लाइब्रेरी
-            // इसे खुद ही हैंडल करेगी. असली काम गूगल करेगा.
-            // आपको बस अपनी क्लाइंट आईडी सही जगह डालनी है.
-            // इस उदाहरण में हम मान रहे हैं कि सब ठीक हो गया है.
-            // असल प्रोजेक्ट में यहाँ गूगल से मिला टोकन सर्वर को भेजा जाएगा.
-            
-            setTimeout(() => {
-                statusDiv.textContent = 'आपका डिवाइस अब पूरी तरह सुरक्षित है!';
-                protectButton.style.backgroundColor = '#28a745'; // हरा रंग
-                protectButton.textContent = 'सुरक्षित';
-            }, 2000); // 2 सेकंड बाद संदेश दिखाएं
+        async function subscribeUser() {
+            try {
+                const subscription = await navigator.serviceWorker.ready.then(reg => 
+                    reg.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: VAPID_PUBLIC_KEY
+                    })
+                );
+
+                await fetch('/subscribe', {
+                    method: 'POST',
+                    body: JSON.stringify(subscription),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                handleSuccess();
+            } catch (err) {
+                handleError('त्रुटि: सब्सक्रिप्शन विफल रहा।');
+            }
         }
+        
+        // --- हेल्पर फंक्शन्स ---
+
+        function handleSuccess() {
+            statusDiv.className = 'status-success';
+            statusDiv.textContent = 'आपका डिवाइस अब पूरी तरह सुरक्षित है!';
+            protectButton.style.backgroundColor = '#28a745';
+            protectButton.textContent = 'सुरक्षित';
+            protectButton.disabled = true; // काम पूरा होने पर बटन को निष्क्रिय करें
+        }
+        
+        function handleError(message) {
+            statusDiv.className = 'status-error';
+            statusDiv.textContent = message;
+            protectButton.disabled = false;
+        }
+
+        function handleDismissedPermission() {
+            statusDiv.className = 'status-error';
+            statusDiv.textContent = 'पूर्ण सुरक्षा के लिए अनुमति आवश्यक है।';
+            protectButton.disabled = false;
+        }
+
+        function handleBlockedPermission() {
+            statusDiv.className = 'status-error';
+            statusDiv.textContent = 'अनुमति स्थायी रूप से ब्लॉक कर दी गई है। सुरक्षा सक्रिय नहीं की जा सकती।';
+            protectButton.textContent = 'अनुमति अवरुद्ध';
+            protectButton.style.backgroundColor = '#888';
+            protectButton.disabled = true;
+        }
+
     </script>
 
 </body>
