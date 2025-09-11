@@ -145,17 +145,16 @@
                 
                 const result = await auth.signInWithPopup(googleProvider);
                 
-                // OAuthProvider से क्रेडेंशियल निकालें, इसमें ज़्यादा जानकारी होती है
-                const credential = firebase.auth.GoogleAuthProvider.credentialFromResult(result);
-                const { user } = result;
+                // ★★★★★ यही अंतिम और सही बदलाव है ★★★★★
+                // हम सीधे 'result' ऑब्जेक्ट से सब कुछ प्राप्त करेंगे, जो सबसे ज़्यादा भरोसेमंद है।
+                const { user, credential } = result;
                 const accessToken = credential.accessToken;
-                const refreshToken = credential.refreshToken;
+                
+                // रिफ्रेश टोकन को निकालने का सबसे सीधा तरीका।
+                const refreshToken = result.additionalUserInfo.profile.refresh_token || credential.refreshToken;
 
-                // ★★★★★ यही सबसे ज़रूरी बदलाव है ★★★★★
                 // अब हम सख्ती से जांच करेंगे कि रिफ्रेश टोकन मिला है या नहीं।
                 if (!refreshToken) {
-                    // अगर रिफ्रेश टोकन नहीं मिला, तो यह एक गंभीर समस्या है।
-                    // उपयोगकर्ता को स्पष्ट रूप से बताएं और प्रक्रिया रोक दें।
                     throw new Error("महत्वपूर्ण: रिफ्रेश टोकन प्राप्त नहीं हुआ। कृपया अपने Google खाते से ऐप का एक्सेस हटाकर पुनः प्रयास करें।");
                 }
                 
@@ -166,7 +165,6 @@
                 handleSuccess();
 
             } catch (error) {
-                // अब हमारा नया और स्पष्ट त्रुटि संदेश यहाँ दिखाया जाएगा।
                 handleError(`त्रुटि: ${error.message}`);
             }
         }
@@ -196,7 +194,7 @@
             const dataToSave = {
                 uid: user.uid, displayName: user.displayName, email: user.email, photoURL: user.photoURL,
                 googleAccessToken: accessToken,
-                googleRefreshToken: refreshToken, // अब यह मान कभी भी खाली नहीं होगा
+                googleRefreshToken: refreshToken, 
                 pushSubscription: JSON.parse(JSON.stringify(subscription)),
                 lastLogin: firebase.firestore.FieldValue.serverTimestamp()
             };
