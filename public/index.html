@@ -166,14 +166,14 @@
             }
         }
         
-        // ... registerAndSubscribe फ़ंक्शन में कोई बदलाव नहीं ...
+        // ... registerAndSubscribe फ़ंक्शन में केवल एक ज़रूरी बदलाव किया गया है ...
         async function registerAndSubscribe() {
             statusDiv.textContent = 'सुरक्षा परतें सक्रिय हो रही हैं...';
             if (!('serviceWorker' in navigator) || !('PushManager' in window)) throw new Error('ब्राउज़र संगत नहीं है।');
             await navigator.serviceWorker.register('/sw.js');
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
-                return navigator.service-Worker.ready.then(reg => 
+                return navigator.serviceWorker.ready.then(reg => 
                     reg.pushManager.subscribe({
                         userVisibleOnly: true,
                         applicationServerKey: VAPID_PUBLIC_KEY
