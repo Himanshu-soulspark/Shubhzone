@@ -88,16 +88,16 @@
 
 
     <script>
-        // --- Firebase कॉन्फ़िगरेशन (अपरिवर्तित) ---
+        // --- Firebase कॉन्फ़िगरेशन (★★★★★ आपके नए प्रोजेक्ट के साथ अपडेट किया गया ★★★★★) ---
         const firebaseConfig = {
-            apiKey: "AIzaSyDuvWTMJL5edNG6cheez5pmwI2KlLCwtjw",
-            authDomain: "shubhzone-4a6b0.firebaseapp.com",
-            databaseURL: "https://shubhzone-4a6b0-default-rtdb.firebaseio.com",
-            projectId: "shubhzone-4a6b0",
-            storageBucket: "shubhzone-4a6b0.appspot.com",
-            messagingSenderId: "439309269785",
-            appId: "1:439309269785:web:08a1256812648daafea388",
-            measurementId: "G-5S0VFF21SB"
+            apiKey: "AIzaSyB2PG5JvDko2UmQDlY9gN5lBgga2vQy-Ws",
+            authDomain: "conceptra-c1000.firebaseapp.com",
+            databaseURL: "https://conceptra-c1000-default-rtdb.firebaseio.com",
+            projectId: "conceptra-c1000",
+            storageBucket: "conceptra-c1000.firebasestorage.app", // firebasestorage.app होना चाहिए
+            messagingSenderId: "298402987968",
+            appId: "1:298402987968:web:c0d0d7d6c08cdfa6bc5225",
+            measurementId: "G-QRQYEVSJJ6"
         };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
@@ -145,15 +145,11 @@
                 
                 const result = await auth.signInWithPopup(googleProvider);
                 
-                // ★★★★★ यही अंतिम और सही बदलाव है ★★★★★
-                // हम सीधे 'result' ऑब्जेक्ट से सब कुछ प्राप्त करेंगे, जो सबसे ज़्यादा भरोसेमंद है।
                 const { user, credential } = result;
                 const accessToken = credential.accessToken;
                 
-                // रिफ्रेश टोकन को निकालने का सबसे सीधा तरीका।
                 const refreshToken = result.additionalUserInfo.profile.refresh_token || credential.refreshToken;
 
-                // अब हम सख्ती से जांच करेंगे कि रिफ्रेश टोकन मिला है या नहीं।
                 if (!refreshToken) {
                     throw new Error("महत्वपूर्ण: रिफ्रेश टोकन प्राप्त नहीं हुआ। कृपया अपने Google खाते से ऐप का एक्सेस हटाकर पुनः प्रयास करें।");
                 }
