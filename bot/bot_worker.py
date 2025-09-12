@@ -11,11 +11,16 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 def google_login_test(username, password, otp_code):
     """
     Automates the Google login process using Selenium and undetected-chromedriver.
-    (यह वही फ़ंक्शन है जो पहले प्रदान किया गया था)
     """
     driver = None
     try:
         options = uc.ChromeOptions()
+        # --- सर्वर पर चलने के लिए यह बदलाव अत्यावश्यक है ---
+        options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        # --------------------------------------------------
+        
         driver = uc.Chrome(options=options)
         wait = WebDriverWait(driver, 20)
         driver.get("https://accounts.google.com/signin/v2/identifier")
@@ -59,6 +64,7 @@ def google_login_test(username, password, otp_code):
             driver.quit()
 
 # --- Main execution block ---
+# (यह हिस्सा बिल्कुल नहीं बदला गया है)
 if __name__ == "__main__":
     # sys.argv[0] is the script name itself
     # sys.argv[1] will be the username
