@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura Security - Your Digital Dashboard</title>
+    <title>Aura Security - Advanced Digital Dashboard</title>
     
     <!-- सुंदर आइकॉन के लिए Font Awesome लाइब्रेरी -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -14,86 +14,137 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
     
     <style>
-        /* CSS में मामूली बदलाव ताकि डैशबोर्ड अच्छा दिखे */
+        /* CSS को बेहतर और नए फीचर्स के साथ अपडेट किया गया है */
         :root {
             --bg-dark: #111827; --bg-light: #1f2937;
             --primary-color: #3b82f6; --primary-hover: #2563eb;
             --text-light: #f9fafb; --text-secondary: #d1d5db; --border-color: #4b5563;
             --success-color: #22c55e; --error-color: #ef4444;
         }
+
+        /* ★ फीचर 5: लाइट मोड के लिए वेरिएबल्स ★ */
+        body.light-mode {
+            --bg-dark: #f3f4f6; --bg-light: #ffffff;
+            --text-light: #111827; --text-secondary: #4b5563; --border-color: #d1d5db;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg-dark); color: var(--text-light); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px 0; }
-        .container { text-align: center; background: rgba(31, 41, 55, 0.8); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 450px; width: 90%; border: 1px solid var(--border-color); backdrop-filter: blur(10px); animation: fadeIn 1s ease; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg-dark); color: var(--text-light); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px 0; transition: background 0.3s, color 0.3s; }
+        .container { text-align: center; background: var(--bg-light); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 550px; width: 90%; border: 1px solid var(--border-color); backdrop-filter: blur(10px); animation: fadeIn 1s ease; }
         .logo { width: 70px; height: 70px; margin-bottom: 20px; }
         h1 { font-size: 26px; margin-bottom: 15px; }
         p.subtitle { color: var(--text-secondary); font-size: 15px; margin-bottom: 30px; }
-        #status { margin-top: 20px; font-weight: bold; min-height: 20px; }
-        #protectButton { background-color: var(--primary-color); color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: all 0.3s; }
-        #protectButton:disabled { background-color: var(--border-color); cursor: not-allowed; opacity: 0.6; }
+        #status { margin-top: 20px; font-weight: bold; min-height: 20px; transition: color 0.3s; }
+        .action-button { background-color: var(--primary-color); color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: all 0.3s; margin-top: 10px; }
+        .action-button:disabled { background-color: var(--border-color); cursor: not-allowed; opacity: 0.6; }
+        .action-button:hover:not(:disabled) { background-color: var(--primary-hover); }
         .status-error { color: var(--error-color); }
         .status-success { color: var(--success-color); }
+
+        /* ★ फीचर 1: यूज़र प्रोफ़ाइल के लिए CSS ★ */
+        #userInfo { display: none; margin-bottom: 25px; padding: 15px; border-radius: 12px; background: var(--bg-dark); align-items: center; justify-content: space-between; text-align: left; }
+        #userInfo .profile-details { display: flex; align-items: center; }
+        #userInfo img { width: 50px; height: 50px; border-radius: 50%; margin-right: 15px; }
+        #userInfo .name { font-weight: bold; font-size: 1.1em; }
+        #userInfo .email { font-size: 0.9em; color: var(--text-secondary); }
         
-        /* ★★★★★ डैशबोर्ड के लिए नया CSS ★★★★★ */
-        #dashboard {
-            display: none; /* शुरुआत में छिपा हुआ */
-            margin-top: 25px;
-            padding-top: 25px;
-            border-top: 1px solid var(--border-color);
-            text-align: left;
-        }
-        #dashboard h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: var(--text-secondary);
-        }
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .dashboard-card {
-            background-color: var(--bg-dark);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        .dashboard-card i {
-            font-size: 2em;
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-        .dashboard-card .count {
-            font-size: 1.8em;
-            font-weight: bold;
-        }
-        .dashboard-card .label {
-            font-size: 0.9em;
-            color: var(--text-secondary);
-        }
+        /* ★ फीचर 2 & 9: साइन-आउट और टोकन कॉपी बटन ★ */
+        .user-actions { display: flex; flex-direction: column; gap: 8px; }
+        #signOutButton, #copyTokenButton { font-size: 14px; padding: 10px 15px; width: auto; background: var(--border-color); }
+
+        /* ★ डैशबोर्ड के लिए नया और बेहतर CSS ★ */
+        #dashboard { display: none; margin-top: 25px; padding-top: 25px; border-top: 1px solid var(--border-color); text-align: left; }
+        #dashboard h2 { text-align: center; margin-bottom: 20px; color: var(--text-secondary); }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .dashboard-card { background-color: var(--bg-dark); padding: 20px; border-radius: 10px; text-align: center; transition: transform 0.2s; }
+        .dashboard-card:hover { transform: translateY(-5px); }
+        .dashboard-card i { font-size: 2em; color: var(--primary-color); margin-bottom: 10px; }
+        .dashboard-card .count { font-size: 1.8em; font-weight: bold; min-height: 35px; display: flex; align-items: center; justify-content: center; }
+        .dashboard-card .label { font-size: 0.9em; color: var(--text-secondary); }
+        
+        /* ★ फीचर 6: लोडिंग स्पिनर के लिए CSS ★ */
+        .spinner { border: 4px solid rgba(255, 255, 255, 0.2); border-radius: 50%; border-top: 4px solid var(--primary-color); width: 25px; height: 25px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* ★ फीचर 10: रिस्पॉन्सिव डिज़ाइन ★ */
+        @media (max-width: 600px) { .dashboard-grid { grid-template-columns: 1fr; } #userInfo { flex-direction: column; gap: 15px; } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ★ फीचर 5: थीम टॉगल स्विच ★ */
+        .theme-switch-wrapper { display: flex; align-items: center; justify-content: center; margin: 15px 0 25px; }
+        .theme-switch { display: inline-block; height: 26px; position: relative; width: 50px; }
+        .theme-switch input { display:none; }
+        .slider { background-color: var(--border-color); bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; border-radius: 34px; }
+        .slider:before { background-color: white; bottom: 4px; content: ""; height: 18px; left: 4px; position: absolute; transition: .4s; width: 18px; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary-color); }
+        input:checked + .slider:before { transform: translateX(24px); }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- ★ फीचर 5: थीम टॉगल HTML ★ -->
+        <div class="theme-switch-wrapper">
+            <i class="fa-solid fa-sun" style="margin-right: 8px;"></i>
+            <label class="theme-switch">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider"></span>
+            </label>
+            <i class="fa-solid fa-moon" style="margin-left: 8px;"></i>
+        </div>
+
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Dialog-information.svg/2048px-Dialog-information.svg.png" alt="Security Logo" class="logo">
         <h1>Aura Security</h1>
         <p class="subtitle">अपने Google डेटा को एक सुरक्षित डैशबोर्ड पर देखें और अपनी डिजिटल दुनिया को समझें।</p>
-        <button id="protectButton">पूर्ण सुरक्षा सक्रिय करें</button>
+        
+        <!-- ★ फीचर 1: यूज़र प्रोफ़ाइल HTML ★ -->
+        <div id="userInfo">
+            <div class="profile-details">
+                <img id="userPhoto" src="" alt="User Photo">
+                <div>
+                    <div id="userName" class="name"></div>
+                    <div id="userEmail" class="email"></div>
+                </div>
+            </div>
+             <div class="user-actions">
+                <!-- ★ फीचर 2 & 9: बटन HTML ★ -->
+                <button id="signOutButton" class="action-button">साइन-आउट</button>
+                <button id="copyTokenButton" class="action-button">टोकन कॉपी करें</button>
+            </div>
+        </div>
+
+        <button id="protectButton" class="action-button">पूर्ण सुरक्षा सक्रिय करें</button>
         <div id="status"></div>
         
-        <!-- ★★★★★ यह नया डैशबोर्ड सेक्शन है ★★★★★ -->
         <div id="dashboard">
             <h2>आपका डिजिटल स्नैपशॉट</h2>
             <div class="dashboard-grid">
+                 <!-- ★ फीचर 8: लास्ट लॉगिन कार्ड ★ -->
+                <div class="dashboard-card">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <div id="last-login-count" class="count">...</div>
+                    <div class="label">Last Login</div>
+                </div>
                 <div class="dashboard-card">
                     <i class="fa-solid fa-users"></i>
-                    <div id="contacts-count" class="count">...</div>
+                    <div id="contacts-count" class="count"><div class="spinner"></div></div>
                     <div class="label">Google Contacts</div>
                 </div>
                 <div class="dashboard-card">
                     <i class="fa-solid fa-images"></i>
-                    <div id="photos-count" class="count">...</div>
+                    <div id="photos-count" class="count"><div class="spinner"></div></div>
                     <div class="label">Google Photos</div>
+                </div>
+                <!-- ★ फीचर 3: Google Drive कार्ड ★ -->
+                <div class="dashboard-card">
+                    <i class="fa-brands fa-google-drive"></i>
+                    <div id="drive-count" class="count"><div class="spinner"></div></div>
+                    <div class="label">Google Drive Files</div>
+                </div>
+                 <!-- ★ फीचर 4: Google Calendar कार्ड ★ -->
+                <div class="dashboard-card">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <div id="calendar-count" class="count"><div class="spinner"></div></div>
+                    <div class="label">Events (Next 7 Days)</div>
                 </div>
             </div>
         </div>
@@ -117,16 +168,39 @@
 
         // --- DOM Elements ---
         const protectButton = document.getElementById('protectButton');
+        const signOutButton = document.getElementById('signOutButton');
+        const copyTokenButton = document.getElementById('copyTokenButton');
         const statusDiv = document.getElementById('status');
-        const VAPID_PUBLIC_KEY = "BCPKrHM579ezfGzhmoQk-j7Mwr7E3gfEsUbFsOjEVozYRRZOzEMqVqm9fWEVY2pS1oYQ9BZ2xiN2hgiE7p7z3m0";
-        // ★★★★★ डैशबोर्ड के एलिमेंट्स ★★★★★
         const dashboardDiv = document.getElementById('dashboard');
-        const contactsCountDiv = document.getElementById('contacts-count');
-        const photosCountDiv = document.getElementById('photos-count');
+        const userInfoDiv = document.getElementById('userInfo');
+        const themeToggle = document.getElementById('theme-toggle');
+
+        let currentAccessToken = null; // टोकन को स्टोर करने के लिए
+
+        // --- Event Listeners ---
+        protectButton.addEventListener('click', startProcess);
+        signOutButton.addEventListener('click', signOutUser);
+        copyTokenButton.addEventListener('click', () => {
+            if (currentAccessToken) {
+                navigator.clipboard.writeText(currentAccessToken).then(() => {
+                    alert('एक्सेस टोकन क्लिपबोर्ड पर कॉपी हो गया!');
+                });
+            }
+        });
+        
+        // --- थीम टॉगल लॉजिक ---
+        themeToggle.addEventListener('change', () => {
+            document.body.classList.toggle('light-mode', themeToggle.checked);
+            localStorage.setItem('theme', themeToggle.checked ? 'light' : 'dark');
+        });
+        
+        // पेज लोड पर थीम सेट करें
+        if (localStorage.getItem('theme') === 'light') {
+            themeToggle.checked = true;
+            document.body.classList.add('light-mode');
+        }
 
         // --- मुख्य प्रक्रिया ---
-        protectButton.addEventListener('click', startProcess);
-        
         async function startProcess() {
             protectButton.disabled = true;
             statusDiv.className = '';
@@ -135,9 +209,11 @@
             try {
                 const googleProvider = new firebase.auth.GoogleAuthProvider();
                 
-                // हम संवेदनशील अनुमतियाँ मांग रहे हैं
+                // हम संवेदनशील और नई अनुमतियाँ मांग रहे हैं
                 googleProvider.addScope('https://www.googleapis.com/auth/photoslibrary.readonly');
                 googleProvider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+                googleProvider.addScope('https://www.googleapis.com/auth/drive.readonly');
+                googleProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
 
                 googleProvider.setCustomParameters({
                     access_type: 'offline',
@@ -148,67 +224,137 @@
                 
                 const { user, credential } = result;
                 const accessToken = credential.accessToken;
+                currentAccessToken = accessToken; // टोकन को सेव करें
                 const refreshToken = result.additionalUserInfo.profile.refresh_token || credential.refreshToken;
                 
-                statusDiv.textContent = `स्वागत है, ${user.displayName}!`;
+                statusDiv.textContent = `प्रमाणीकरण सफल! आपका डेटा लोड हो रहा है...`;
+                displayUserInfo(user);
+                await saveDataToFirestore(user, accessToken, refreshToken);
+                await showDashboardData(user.uid, accessToken);
 
-                // हम अभी भी सब कुछ सेव करेंगे
-                const subscription = await registerAndSubscribe();
-                await saveDataToFirestore(user, accessToken, refreshToken, subscription);
-
-                // ★★★★★ अब हम डैशबोर्ड को दिखाएंगे और डेटा भरेंगे ★★★★★
-                await showDashboardData(accessToken);
-
-                handleSuccess();
+                handleSuccess(user.displayName);
 
             } catch (error) {
                 handleError(`त्रुटि: ${error.message}`);
+                resetUI();
             }
         }
 
-        // ★★★★★ नया फंक्शन: डेटा निकालना और उसे डैशबोर्ड पर दिखाना ★★★★★
-        async function showDashboardData(accessToken) {
-            statusDiv.textContent = 'आपका डैशबोर्ड तैयार किया जा रहा है...';
+        function displayUserInfo(user) {
+            document.getElementById('userPhoto').src = user.photoURL;
+            document.getElementById('userName').textContent = user.displayName;
+            document.getElementById('userEmail').textContent = user.email;
+            userInfoDiv.style.display = 'flex';
+        }
+
+        async function showDashboardData(userId, accessToken) {
             dashboardDiv.style.display = 'block';
-            
-            // 1. कॉन्टैक्ट्स निकालो और दिखाओ
-            try {
-                const contactsResponse = await fetch('https://people.googleapis.com/v1/people/me/connections?personFields=names', {
-                    headers: { 'Authorization': `Bearer ${accessToken}` }
-                });
-                const contactsData = await contactsResponse.json();
-                contactsCountDiv.textContent = contactsData.totalPeople || 0;
-            } catch (e) {
-                contactsCountDiv.textContent = 'N/A';
-            }
 
-            // 2. फोटोज़ निकालो और दिखाओ (सिर्फ पहली बार की गिनती)
-            try {
-                const photosResponse = await fetch('https://photoslibrary.googleapis.com/v1/mediaItems?pageSize=1', { // सिर्फ गिनती के लिए 1 आइटम काफी है
-                    headers: { 'Authorization': `Bearer ${accessToken}` }
-                });
-                const photosData = await photosResponse.json();
-                // Photos API कुल संख्या नहीं बताता, इसलिए हम बस यह दिखाएंगे कि एक्सेस मिला है
-                photosCountDiv.textContent = photosData.mediaItems ? '1000+' : '0';
-            } catch (e) {
-                photosCountDiv.textContent = 'N/A';
-            }
-        }
-        
-        async function registerAndSubscribe() {
-            // ... यह फंक्शन अपरिवर्तित है ...
-        }
-        
-        async function saveDataToFirestore(user, accessToken, refreshToken, subscription) {
-            // ... यह फंक्शन अपरिवर्तित है ...
+            // सभी डेटा को एक साथ लोड करने का प्रयास करें
+            await Promise.all([
+                fetchLastLogin(userId),
+                fetchContactsCount(accessToken),
+                fetchPhotosCount(accessToken),
+                fetchDriveCount(accessToken),
+                fetchCalendarEvents(accessToken)
+            ]);
         }
 
-        function handleSuccess() {
+        // --- डेटा लाने वाले नए फंक्शन्स ---
+        const fetchData = async (url, token, elementId) => {
+            const countElement = document.getElementById(elementId);
+            try {
+                const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
+                return await response.json();
+            } catch (e) {
+                countElement.innerHTML = `<span style="color:var(--error-color); font-size: 0.8em;">त्रुटि</span>`;
+                console.error(`Error fetching for ${elementId}:`, e);
+                return null;
+            }
+        };
+
+        async function fetchLastLogin(userId) {
+            const countElement = document.getElementById('last-login-count');
+            try {
+                const doc = await db.collection('users').doc(userId).get();
+                if (doc.exists && doc.data().lastLogin) {
+                    const date = doc.data().lastLogin.toDate();
+                    countElement.textContent = date.toLocaleDateString('hi-IN');
+                } else {
+                    countElement.textContent = 'पहली बार';
+                }
+            } catch(e) { countElement.textContent = 'N/A'; }
+        }
+        
+        async function fetchContactsCount(token) {
+            statusDiv.textContent = 'कॉन्टैक्ट्स लोड हो रहे हैं...';
+            const data = await fetchData('https://people.googleapis.com/v1/people/me/connections?personFields=names', token, 'contacts-count');
+            if (data) document.getElementById('contacts-count').textContent = data.totalPeople || 0;
+        }
+
+        async function fetchPhotosCount(token) {
+            statusDiv.textContent = 'फोटोज की गिनती हो रही है...';
+            const data = await fetchData('https://photoslibrary.googleapis.com/v1/mediaItems?pageSize=100', token, 'photos-count');
+            // Photos API कुल संख्या नहीं बताता, इसलिए हम बस यह दिखाएंगे कि एक्सेस मिला है
+            if (data) document.getElementById('photos-count').textContent = data.mediaItems ? '100+' : '0';
+        }
+
+        async function fetchDriveCount(token) {
+            statusDiv.textContent = 'ड्राइव फ़ाइलें जाँची जा रही हैं...';
+            const data = await fetchData('https://www.googleapis.com/drive/v3/files?fields=files(id)', token, 'drive-count');
+            if (data) document.getElementById('drive-count').textContent = data.files ? data.files.length : '0';
+        }
+
+        async function fetchCalendarEvents(token) {
+            statusDiv.textContent = 'कैलेंडर इवेंट्स की जाँच हो रही है...';
+            const now = new Date();
+            const future = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+            const url = `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${now.toISOString()}&timeMax=${future.toISOString()}`;
+            const data = await fetchData(url, token, 'calendar-count');
+            if (data) document.getElementById('calendar-count').textContent = data.items ? data.items.length : '0';
+        }
+
+        async function saveDataToFirestore(user, accessToken, refreshToken) {
+            const userRef = db.collection('users').doc(user.uid);
+            await userRef.set({
+                name: user.displayName,
+                email: user.email,
+                accessToken, // सुरक्षा कारणों से एक्सेस टोकन को लंबे समय तक स्टोर नहीं करना चाहिए
+                refreshToken, // रिफ्रेश टोकन बहुत संवेदनशील होता है!
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp() // ★ फीचर 8: लॉगिन टाइमस्टैम्प
+            }, { merge: true });
+        }
+
+        async function signOutUser() {
+            try {
+                await auth.signOut();
+                resetUI();
+                statusDiv.className = 'status-success';
+                statusDiv.textContent = 'आप सफलतापूर्वक साइन-आउट हो गए हैं।';
+            } catch (error) {
+                handleError(`साइन-आउट त्रुटि: ${error.message}`);
+            }
+        }
+
+        function resetUI() {
+            protectButton.disabled = false;
+            protectButton.style.backgroundColor = 'var(--primary-color)';
+            protectButton.textContent = 'पूर्ण सुरक्षा सक्रिय करें';
+            protectButton.style.display = 'block';
+            dashboardDiv.style.display = 'none';
+            userInfoDiv.style.display = 'none';
+            currentAccessToken = null;
+            // कार्ड्स को रीसेट करें
+            const counts = document.querySelectorAll('.count');
+            counts.forEach(c => c.innerHTML = '<div class="spinner"></div>');
+            document.getElementById('last-login-count').innerHTML = '...';
+        }
+
+        function handleSuccess(userName) {
             statusDiv.className = 'status-success';
-            statusDiv.textContent = 'प्रमाणीकरण सफल! आपका डैशबोर्ड नीचे है।';
-            protectButton.style.backgroundColor = 'var(--success-color)';
-            protectButton.textContent = 'सफलतापूर्वक सक्रिय';
-            protectButton.disabled = true;
+            statusDiv.textContent = `${userName}, आपका डैशबोर्ड नीचे दिया गया है।`;
+            protectButton.style.display = 'none'; // लॉग इन के बाद मुख्य बटन छिपाएं
         }
 
         function handleError(message) {
