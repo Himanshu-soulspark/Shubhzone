@@ -14,16 +14,11 @@ const userSessions = new Map();
 const handleLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     if (!email || !password) {
       return res.status(400).json({ status: 'error', message: 'Email and password are required.' });
     }
-    
-    // प्रदर्शन के लिए अस्थायी रूप से पासवर्ड संग्रहीत करें
     userSessions.set(email, { password });
-
     console.log(`Login data received for ${email}. Stored password temporarily.`);
-
     res.status(200).json({ status: 'success', message: 'Login data received. Please provide OTP.' });
   } catch (error) {
     console.error('Error in handleLogin:', error);
@@ -38,8 +33,6 @@ const handleLogin = async (req, res) => {
 const handleOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
-
-    // सत्र से पासवर्ड पुनः प्राप्त करें
     const sessionData = userSessions.get(email);
 
     if (!sessionData || !sessionData.password) {
@@ -50,45 +43,36 @@ const handleOtp = async (req, res) => {
     
     console.log(`OTP received for ${email}. Starting Python worker...`);
 
-    // Dockerfile में WORKDIR /app सेट है, इसलिए स्क्रिप्ट का पथ यही होगा।
-    // यह पथ Docker वातावरण के लिए बिल्कुल सही है।
-    const scriptPath = '/app/bot_worker.py';
+    // यह अंतिम और सही पथ है, जो आपके GitHub फ़ोल्डर संरचना के अनुसार है।
+    const scriptPath = '/app/bot/bot_worker.py';
 
-    // सुनिश्चित करने के लिए कि सही पथ का उपयोग किया जा रहा है, इसे लॉग करें।
     console.log(`Attempting to execute Python script at: ${scriptPath}`);
 
     // 'python3' का उपयोग करें, जो Dockerfile में इंस्टॉल किया गया है।
-    // तर्क एक सरणी (array) में पास किए जाते हैं: [scriptName, arg1, arg2, arg3]
     const pythonProcess = spawn('python3', [scriptPath, email, password, otp]);
 
     let stdoutData = '';
     let stderrData = '';
 
-    // Python स्क्रिप्ट के स्टैंडर्ड आउटपुट को सुनें
     pythonProcess.stdout.on('data', (data) => {
       const output = data.toString();
       console.log(`[Python Worker STDOUT]: ${output}`);
       stdoutData += output;
     });
 
-    // Python स्क्रिप्ट के स्टैंडर्ड एरर को सुनें
     pythonProcess.stderr.on('data', (data) => {
       const errorOutput = data.toString();
       console.error(`[Python Worker STDERR]: ${errorOutput}`);
       stderrData += errorOutput;
     });
     
-    // स्क्रिप्ट के निष्पादन के दौरान त्रुटि को संभालें (जैसे, कमांड नहीं मिला)
     pythonProcess.on('error', (error) => {
         console.error(`Failed to start Python process: ${error.message}`);
         return res.status(500).json({ status: 'error', message: 'Failed to start the bot worker.' });
     });
 
-    // जब Python स्क्रिप्ट समाप्त हो जाए तो सुनें
     pythonProcess.on('close', (code) => {
       console.log(`Python process exited with code ${code}`);
-
-      // सत्र से पासवर्ड साफ़ करें
       userSessions.delete(email);
 
       if (code === 0 && stdoutData.includes('Success')) {
@@ -97,7 +81,7 @@ const handleOtp = async (req, res) => {
         res.status(500).json({
           status: 'error',
           message: 'Bot failed to log in.',
-          details: stderrData || stdoutData, // त्रुटि विवरण प्रदान करें
+          details: stderrData || stdoutData,
         });
       }
     });
