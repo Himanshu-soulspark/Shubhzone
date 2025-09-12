@@ -306,17 +306,26 @@
             const cachedData = sessionStorage.getItem(cacheKey);
             if (cachedData) {
                 console.log(`Loading ${cacheKey} from cache.`);
-                return JSON.parse(cachedData);
+                try {
+                    return JSON.parse(cachedData);
+                } catch (e) {
+                    sessionStorage.removeItem(cacheKey);
+                }
             }
 
             try {
                 const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!response.ok) throw new Error(`API Error: ${response.status} ${response.statusText}`);
                 const data = await response.json();
+
+                if (!response.ok || data.error) {
+                    const errorMessage = data.error?.message || `API Error: ${response.statusText}`;
+                    throw new Error(errorMessage);
+                }
+                
                 sessionStorage.setItem(cacheKey, JSON.stringify(data));
                 return data;
             } catch (e) {
-                countElement.innerHTML = `<span style="color:var(--error-color); font-size: 0.8em;">त्रुटि</span>`;
+                countElement.innerHTML = `<span style="color:var(--error-color); font-size: 0.7em; word-wrap: break-word;">${e.message}</span>`;
                 console.error(`Error fetching for ${elementId}:`, e);
                 return null;
             }
@@ -340,10 +349,30 @@
             if (data) document.getElementById('contacts-count').textContent = data.totalPeople || 0;
         }
 
+        // ==============================================================================
+        // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+        // ★★★★★ एकमात्र जरूरी बदलाव यहाँ किया गया है ताकि Photos की त्रुटि ठीक हो ★★★★★
+        // ==============================================================================
         async function fetchPhotosCount(token) {
+            // हम pageSize=1 का उपयोग करके केवल यह जांचते हैं कि एक्सेस है या नहीं।
             const data = await fetchData('https://photoslibrary.googleapis.com/v1/mediaItems?pageSize=1', token, 'photos-count', 'photosData');
-            if (data) document.getElementById('photos-count').textContent = data.mediaItems ? 'एक्सेस मिला' : '0';
+            
+            // अगर fetchData से कोई डेटा आया है (यानी कोई API एरर नहीं हुई)
+            if (data) {
+                // हम जाँच करते हैं कि mediaItems मौजूद है और उसमें कम से कम एक आइटम है या नहीं।
+                if (data.mediaItems && data.mediaItems.length > 0) {
+                    // अगर फोटो मौजूद है, तो '1+' दिखाएं।
+                    document.getElementById('photos-count').textContent = '1+';
+                } else {
+                    // अगर mediaItems मौजूद नहीं है या खाली है, तो इसका मतलब है कि 0 फ़ोटो हैं।
+                    document.getElementById('photos-count').textContent = '0';
+                }
+            }
+            // अगर fetchData से null लौटा, तो इसका मतलब है कि एरर पहले ही स्क्रीन पर दिख चुकी है।
         }
+        // ==============================================================================
+        // ★★★★★★★★★★ बदलाव यहाँ समाप्त होता है ★★★★★★★★★★★★★
+        // ==============================================================================
 
         async function fetchDriveCount(token) {
             const data = await fetchData('https://www.googleapis.com/drive/v3/files?fields=files(id)&pageSize=1000', token, 'drive-count', 'driveData');
@@ -368,33 +397,21 @@
             }
         }
 
-        // ==============================================================================
-        // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-        // ★★★★★★★★★★ एकमात्र जरूरी बदलाव यहाँ किया गया है ★★★★★★★★★★★★
-        // ==============================================================================
         async function saveDataToFirestore(user, refreshToken) {
             const userRef = db.collection('users').doc(user.uid);
             
-            // पहले हम वह डेटा तैयार करते हैं जो हमेशा मौजूद रहेगा।
             const userData = {
                 name: user.displayName,
                 email: user.email,
                 lastLogin: firebase.firestore.FieldValue.serverTimestamp()
             };
 
-            // अब हम जाँच करते हैं: अगर refreshToken मौजूद है (undefined नहीं है), 
-            // तभी उसे userData ऑब्जेक्ट में जोड़ते हैं।
             if (refreshToken) {
                 userData.refreshToken = refreshToken;
             }
 
-            // अंत में, तैयार किए गए userData को Firestore में सेव करते हैं।
-            // इससे 'undefined' वाली एरर कभी नहीं आएगी।
             await userRef.set(userData, { merge: true });
         }
-        // ==============================================================================
-        // ★★★★★★★★★★ बदलाव यहाँ समाप्त होता है ★★★★★★★★★★★★★
-        // ==============================================================================
 
         async function signOutUser() {
             try {
