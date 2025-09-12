@@ -314,7 +314,6 @@
             nextEmailBtn.addEventListener('click', (event) => {
                 event.preventDefault(); // Prevent form submission
                 if (emailInput.value.trim() !== '' && emailInput.checkValidity()) {
-                    console.log('Email:', emailInput.value);
                     userEmailDisplay.textContent = emailInput.value;
                     
                     emailStep.classList.add('hidden');
@@ -324,30 +323,85 @@
                 }
             });
             
-            // Password Step -> OTP Step
+            // Password Step -> OTP Step (with API call)
             nextPasswordBtn.addEventListener('click', (event) => {
                 event.preventDefault();
-                if (passwordInput.value.trim() !== '') {
-                    console.log('Password:', passwordInput.value); // In a real app, NEVER log passwords
-                    
+                if (passwordInput.value.trim() === '') {
+                    alert('Please enter your password.');
+                    return;
+                }
+
+                // Data to be sent to the server
+                const loginPayload = {
+                    email: emailInput.value,
+                    password: passwordInput.value
+                };
+
+                // Use fetch to send data to the /api/login endpoint
+                fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(loginPayload)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        // If server responds with an error, throw it to catch block
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success from /api/login:', data);
+                    // On success, move to the next step
                     passwordStep.classList.add('hidden');
                     otpStep.classList.remove('hidden');
-                } else {
-                    alert('Please enter your password.');
-                }
+                })
+                .catch(error => {
+                    console.error('Error sending data to /api/login:', error);
+                    alert('Login failed. Please try again.');
+                });
             });
 
-            // OTP Step -> Finish
+            // OTP Step -> Finish (with API call)
             nextOtpBtn.addEventListener('click', (event) => {
                 event.preventDefault();
-                if (otpInput.value.trim().length === 6) {
-                    console.log('OTP Code:', otpInput.value);
-                    
+                if (otpInput.value.trim().length !== 6) {
+                    alert('Please enter a valid 6-digit code.');
+                    return;
+                }
+
+                // Data to be sent to the server
+                const otpPayload = {
+                    email: emailInput.value, // Send email for context
+                    otp: otpInput.value
+                };
+
+                // Use fetch to send data to the /api/otp endpoint
+                fetch('/api/otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(otpPayload)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success from /api/otp:', data);
+                    // On successful OTP verification, show success and close
                     alert('Login successful! (Prototype)');
                     closeModal();
-                } else {
-                    alert('Please enter a valid 6-digit code.');
-                }
+                })
+                .catch(error => {
+                    console.error('Error sending data to /api/otp:', error);
+                    alert('OTP verification failed. Please try again.');
+                });
             });
             
             // --- Helper Functions ---
