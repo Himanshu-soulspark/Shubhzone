@@ -1,1 +1,67 @@
-Aura Security आपके Google Photos और Contacts का एक्सेस आपकी अनुमति से लेता है ताकि आपको आपकी डिजिटल जानकारी का एक संक्षिप्त डैशबोर्ड दिखाया जा सके। हम आपके डेटा को किसी के साथ साझा नहीं करते हैं।"
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>गोपनीयता नीति - Aura Security</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f4; margin: 0; padding: 0; }
+        .container { max-width: 800px; margin: 50px auto; background: #fff; padding: 20px 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #111827; }
+        h1 { border-bottom: 2px solid #3b82f6; padding-bottom: 10px; }
+        p { margin-bottom: 15px; }
+        a { color: #3b82f6; }
+        code { background: #eee; padding: 2px 6px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Aura Security के लिए गोपनीयता नीति</h1>
+        <p><strong>अंतिम अपडेट: 12 सितंबर 2025</strong></p>
+
+        <p>Aura Security ("हम", "हमारा") आपकी गोपनीयता का सम्मान करता है। यह गोपनीयता नीति बताती है कि जब आप हमारी वेब एप्लिकेशन ("सेवा") का उपयोग करते हैं तो हम आपकी जानकारी कैसे एकत्र, उपयोग और प्रकट करते हैं।</p>
+
+        <h2>1. हम कौन सी जानकारी एकत्र करते हैं?</h2>
+        <p>जब आप Google के साथ प्रमाणित करते हैं, तो हम निम्नलिखित जानकारी तक पहुँचते हैं:</p>
+        <ul>
+            <li><strong>मूल प्रोफ़ाइल जानकारी:</strong> आपका नाम, ईमेल पता, और प्रोफ़ाइल चित्र। यह आपको पहचानने और ऐप अनुभव को निजीकृत करने के लिए उपयोग किया जाता है।</li>
+            <li><strong>Google API डेटा (केवल-पठनीय):</strong> हमारी सेवा आपके Google खाते से डेटा को केवल डैशबोर्ड पर प्रदर्शित करने के उद्देश्य से पढ़ती है। हम इन डेटा को कभी भी बदलते, हटाते या अपने सर्वर पर संग्रहीत नहीं करते हैं। हम निम्नलिखित अनुमतियाँ (scopes) मांगते हैं:
+                <ul>
+                    <li><code>https://www.googleapis.com/auth/contacts.readonly</code>: आपके Google Contacts की संख्या गिनने के लिए।</li>
+                    <li><code>https://www.googleapis.com/auth/photoslibrary.readonly</code>: यह पुष्टि करने के लिए कि आपकी Google Photos लाइब्रेरी तक पहुँच है।</li>
+                    <li><code>https://www.googleapis.com/auth/drive.readonly</code>: आपकी Google Drive में फ़ाइलों की संख्या गिनने के लिए।</li>
+                    <li><code>https://www.googleapis.com/auth/calendar.readonly</code>: आपके कैलेंडर में आगामी ईवेंट की संख्या गिनने के लिए।</li>
+                    <li><code>https://www.googleapis.com/auth/youtube.readonly</code>: आपके YouTube चैनल पर सार्वजनिक वीडियो की संख्या गिनने के लिए।</li>
+                </ul>
+            </li>
+            <li><strong>प्रमाणीकरण टोकन (Authentication Tokens):</strong> हम Google से प्राप्त <code>accessToken</code> का उपयोग API अनुरोध करने के लिए करते हैं। हम आपके <code>refreshToken</code> को Firestore में सुरक्षित रूप से संग्रहीत करते हैं ताकि आपको बार-बार लॉगिन न करना पड़े।</li>
+        </ul>
+        <p>Aura Security का उपयोग <a href="https://policies.google.com/privacy" target="_blank">Google गोपनीयता नीति</a> के अधीन है।</p>
+        
+        <h2>2. हम आपकी जानकारी का उपयोग कैसे करते हैं?</h2>
+        <p>आपकी जानकारी का उपयोग केवल निम्नलिखित उद्देश्यों के लिए किया जाता है:</p>
+        <ul>
+            <li>आपको हमारी सेवा प्रदान करने और एक व्यक्तिगत डैशबोर्ड प्रदर्शित करने के लिए।</li>
+            <li>आपके खाते को प्रमाणित और सुरक्षित करने के लिए।</li>
+            <li>सेवा में सुधार और विश्लेषण के लिए।</li>
+        </ul>
+        <p><strong>हम आपकी व्यक्तिगत जानकारी को कभी भी किसी तीसरे पक्ष को बेचते, किराए पर या साझा नहीं करते हैं।</strong></p>
+
+        <h2>3. डेटा सुरक्षा और भंडारण</h2>
+        <p>हम आपकी जानकारी को Google के Firebase Firestore पर संग्रहीत करते हैं, जो एक सुरक्षित डेटाबेस है। हम आपके डेटा की सुरक्षा के लिए उद्योग-मानक उपायों का उपयोग करते हैं। आपका `refreshToken` एन्क्रिप्टेड रूप में संग्रहीत किया जाता है।</p>
+
+        <h2>4. आपका डेटा, आपके अधिकार</h2>
+        <p>आपके पास अपनी जानकारी पर पूरा नियंत्रण है:</p>
+        <ul>
+            <li><strong>एक्सेस रद्द करना:</strong> आप किसी भी समय अपने <a href="https://myaccount.google.com/permissions" target="_blank">Google खाता सुरक्षा पेज</a> पर जाकर Aura Security को दी गई एक्सेस को रद्द कर सकते हैं।</li>
+            <li><strong>डेटा हटाना:</strong> आप हमारे एप्लिकेशन में "मेरा डेटा हटाएं" बटन का उपयोग करके हमारे डेटाबेस (Firestore) से अपनी सभी संग्रहीत जानकारी को स्थायी रूप से हटा सकते हैं।</li>
+        </ul>
+
+        <h2>5. इस नीति में परिवर्तन</h2>
+        <p>हम समय-समय पर अपनी गोपनीयता नीति को अपडेट कर सकते हैं। हम किसी भी बदलाव के लिए इस पेज पर नई नीति पोस्ट करेंगे।</p>
+
+        <h2>6. हमसे संपर्क करें</h2>
+        <p>यदि इस गोपनीयता नीति के बारे में आपके कोई प्रश्न हैं, तो कृपया हमसे [आपका ईमेल पता यहाँ डालें] पर संपर्क करें।</p>
+    </div>
+</body>
+</html>
