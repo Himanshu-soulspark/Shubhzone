@@ -1,30 +1,38 @@
-# ---- बिल्ड स्टेज ----
-FROM node:18-alpine AS build
+# Stage 1: Python और Chrome को बेस के रूप में सेट करें
+FROM python:3.9-slim
 
+# Google Chrome और आवश्यक निर्भरताएँ इंस्टॉल करें
+RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
+    unzip \
+    --no-install-recommends \
+    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python निर्भरताएँ इंस्टॉल करें
 WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# केवल आवश्यक फ़ाइलों को कॉपी करें
-COPY package.json package-lock.json ./
+# Stage 2: Node.js इंस्टॉल करें
+# NodeSource रिपॉजिटरी और Node.js 18.x इंस्टॉल करें
+RUN apt-get update && apt-get install -y curl \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
 
-# उत्पादन निर्भरताएँ स्थापित करें
-RUN npm ci --only=production
-
-# स्रोत कोड कॉपी करें
+# अपने एप्लिकेशन कोड को कॉपी करें
 COPY . .
 
-# ---- उत्पादन स्टेज ----
-FROM node:18-alpine
+# Node.js निर्भरताएँ इंस्टॉल करें
+RUN npm install
 
-WORKDIR /app
+# एप्लिकेशन को चलाने के लिए पोर्ट को उजागर करें
+EXPOSE 10000
 
-# बिल्ड स्टेज से निर्भरताएँ कॉपी करें
-COPY --from=build /app/node_modules ./node_modules
-
-# बिल्ड स्टेज से स्रोत कोड कॉपी करें
-COPY --from=build /app ./
-
-# एप्लिकेशन द्वारा उपयोग किया जाने वाला पोर्ट उजागर करें
-EXPOSE 8080
-
-# एप्लिकेशन चलाने के लिए कमांड
-CMD ["node", "index.js"]tml
+# एप्लिकेशन शुरू करने के लिए कमांड
+CMD ["node", "server/index.js"]
