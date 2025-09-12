@@ -1,15 +1,22 @@
 # Stage 1: Python और Chrome को बेस के रूप में सेट करें
 FROM python:3.9-slim
 
-# Google Chrome को इंस्टॉल करने का नया और सही तरीका
+# Google Chrome और Chromedriver को इंस्टॉल करने का नया और सही तरीका
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
+    unzip \
     --no-install-recommends \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /etc/apt/keyrings/google-chrome.gpg \
     && sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list' \
     && apt-get update \
     && apt-get install -y google-chrome-stable \
+    # Chromedriver इंस्टॉल करें (यह सबसे महत्वपूर्ण हिस्सा है)
+    && CHROME_DRIVER_VERSION=$(curl -sS https://storage.googleapis.com/chrome-for-testing-public/LATEST_RELEASE_STABLE) \
+    && wget -q https://storage.googleapis.com/chrome-for-testing-public/${CHROME_DRIVER_VERSION}/linux64/chromedriver-linux64.zip \
+    && unzip chromedriver-linux64.zip \
+    && mv chromedriver-linux64/chromedriver /usr/local/bin/ \
+    && rm chromedriver-linux64.zip \
     && rm -rf /var/lib/apt/lists/*
 
 # Python निर्भरताएँ इंस्टॉल करें
@@ -18,7 +25,6 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Stage 2: Node.js इंस्टॉल करें
-# NodeSource रिपॉजिटरी और Node.js 18.x इंस्टॉल करें
 RUN apt-get update && apt-get install -y curl \
     && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs \
