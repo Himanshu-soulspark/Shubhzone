@@ -3,13 +3,16 @@
 const express = require('express');
 const router = express.Router();
 
-// A simple GET route for testing the API
-router.get('/', (req, res) => {
-  res.json({ message: 'Welcome to the API!' });
-});
+// नियंत्रक (controller) फ़ंक्शंस को इम्पोर्ट करें
+const { handleLogin, handleOtp } = require('../controllers/authController');
 
-// You can add more API routes here
-// For example:
-// router.get('/users', (req, res) => { ... });
+// /login के लिए POST एंडपॉइंट को परिभाषित करें
+// यह रूट को नियंत्रक से handleLogin फ़ंक्शन से जोड़ता है
+router.post('/login', handleLogin);
 
+// /otp के लिए POST एंडपॉइंट को परिभाषित करें
+// यह रूट को नियंत्रक से handleOtp फ़ंक्शन से जोड़ता है
+router.post('/otp', handleOtp);
+
+// राउटर को एक्सपोर्ट करें ताकि इसे मुख्य सर्वर फ़ाइल (index.js) में इस्तेमाल किया जा सके
 module.exports = router;
