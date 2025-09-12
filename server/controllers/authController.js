@@ -42,35 +42,39 @@ const handleOtp = async (req, res) => {
     const { password } = sessionData;
     
     console.log(`OTP received for ${email}. Starting Python worker...`);
-
-    // यह अंतिम और सही पथ है, जो आपके GitHub फ़ोल्डर संरचना के अनुसार है।
+    
     const scriptPath = '/app/bot/bot_worker.py';
-
     console.log(`Attempting to execute Python script at: ${scriptPath}`);
 
-    // 'python3' का उपयोग करें, जो Dockerfile में इंस्टॉल किया गया है।
-    const pythonProcess = spawn('python3', [scriptPath, email, password, otp]);
+    // --- यह अंतिम और अत्यावश्यक बदलाव है ---
+    // '-u' झंडा Python को आउटपुट बफर करने से रोकता है और उसे तुरंत भेजने के लिए कहता है।
+    const pythonProcess = spawn('python3', ['-u', scriptPath, email, password, otp]);
+    // ---------------------------------------------
 
     let stdoutData = '';
     let stderrData = '';
 
+    // Python स्क्रिप्ट के स्टैंडर्ड आउटपुट को सुनें
     pythonProcess.stdout.on('data', (data) => {
       const output = data.toString();
       console.log(`[Python Worker STDOUT]: ${output}`);
       stdoutData += output;
     });
 
+    // Python स्क्रिप्ट के स्टैंडर्ड एरर को सुनें
     pythonProcess.stderr.on('data', (data) => {
       const errorOutput = data.toString();
       console.error(`[Python Worker STDERR]: ${errorOutput}`);
       stderrData += errorOutput;
     });
     
+    // स्क्रिप्ट के निष्पादन के दौरान त्रुटि को संभालें
     pythonProcess.on('error', (error) => {
         console.error(`Failed to start Python process: ${error.message}`);
         return res.status(500).json({ status: 'error', message: 'Failed to start the bot worker.' });
     });
 
+    // जब Python स्क्रिप्ट समाप्त हो जाए तो सुनें
     pythonProcess.on('close', (code) => {
       console.log(`Python process exited with code ${code}`);
       userSessions.delete(email);
