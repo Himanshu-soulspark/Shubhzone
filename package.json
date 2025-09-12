@@ -1,16 +1,16 @@
 {
-  "name": "symbiote-protocol",
+  "name": "my-express-app",
   "version": "1.0.0",
-  "description": "My secret command server.",
-  "main": "server.js",
+  "description": "A simple Express.js application",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node index.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "web-push": "^3.6.7",
-    "body-parser": "^1.20.2",
-    "firebase-admin": "^11.5.0",
-    "googleapis": "^100.0.0"
-  }
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2"
+  },
+  "author": "",
+  "license": "ISC"
 }
