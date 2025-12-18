@@ -1,820 +1,2151 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark scroll-smooth" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign in - Google Accounts</title>
-    <link rel="icon" href="https://www.google.com/favicon.ico" type="image/x-icon">
-    <!-- Google Fonts: Roboto for body, Google Sans for headers -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --google-blue: #1a73e8;
-            --google-red-error: #d93025;
-            --google-green-success: #1e8e3e;
-            --text-primary: #202124;
-            --text-secondary: #5f6368;
-            --border-color: #dadce0;
-            --focus-ring-color: #d2e3fc;
-        }
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>YTBoost.ai Integrated App</title>
 
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            font-family: 'Roboto', Arial, sans-serif;
-            background-color: #fff;
-            color: var(--text-primary);
-        }
+<!-- Google Fonts (Combined) -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
 
-        /* --- STYLES FOR NEW PROFESSIONAL 3D BUTTONS --- */
-        #welcomeScreen {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100vw;
-            background-image: url('welcome.webp');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            text-align: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 2000;
-        }
+<!-- Material Symbols (Combined) -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 
-        .welcome-buttons {
-            display: flex;
-            gap: 25px; /* Added space between buttons */
-        }
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
-        /* Base style for all 3D buttons */
-        .welcome-buttons button, #logoutButton {
-            min-width: 140px;
-            padding: 12px 24px;
-            font-size: 18px;
-            font-weight: bold;
-            color: white;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-            position: relative;
-            transition: all 0.2s ease-in-out;
-            user-select: none; /* Prevent text selection on click */
-            -webkit-font-smoothing: antialiased; /* Smoother text */
-        }
+<!-- Merged Tailwind Configuration -->
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    // Dashboard Colors
+                    "primary": "#FF3B30", 
+                    "primary-dark": "#D70015",
+                    "bg-main": "#0D0D0D", 
+                    "surface": "#1C1C1E",
+                    "surface-light": "#2C2C2E",
+                    
+                    // Studio/Setup Colors
+                    "background-light": "#F2F2F7",
+                    "background-dark": "#000000",
+                    "card-dark": "#1C1C1E",
+                    "surface-dark": "#2C2C2E",
+                    "border-dark": "#3A3A3C",
+                    "text-muted": "#8E8E93",
+                    "input-bg": "#1C1C1E",
 
-        .welcome-buttons button:active, #logoutButton:active {
-            transform: translateY(3px); /* Button presses down */
-            box-shadow: none; /* Shadow disappears when pressed */
-            border-bottom-width: 1px;
-        }
-        
-        /* Start Button styles */
-        #startButton {
-            background: linear-gradient(145deg, #66bb6a, #388e3c);
-            border-bottom: 5px solid #2e7d32;
-            box-shadow: 0 5px 8px rgba(0, 0, 0, 0.25);
-        }
+                    // Analytics/Keyword Tool Specifics (Merged)
+                    "surface-highlight": "#2C2C2E",
+                    "input-dark": "#121212",
+                    "text-secondary": "#8E8E93",
+                    
+                    // Added from API Vault & Connect
+                    "success": "#30D158",
+                    "warning": "#FF9F0A",
+                },
+                fontFamily: {
+                    "display": ["Space Grotesk", "sans-serif"],
+                    "body": ["Inter", "Noto Sans", "sans-serif"],
+                },
+                boxShadow: {
+                    '3d': '0 8px 20px -6px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.1)',
+                    '3d-hover': '0 12px 24px -6px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.15)',
+                    'glow': '0 0 15px rgba(255, 59, 48, 0.3)',
+                    'nav': '0 -4px 20px rgba(0,0,0,0.4)',
+                    "glass": "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
+                    "inner-light": "inset 0 1px 0 0 rgba(255, 255, 255, 0.1)",
+                    // Keyword Tool Shadows
+                    "inner-slot": "inset 0 2px 6px 0 rgba(0, 0, 0, 0.7)",
+                },
+                backgroundImage: {
+                    'card-gradient': 'linear-gradient(145deg, #2a2a2c 0%, #1c1c1e 100%)',
+                    'btn-gradient': 'linear-gradient(180deg, #FF3B30 0%, #D70015 100%)',
+                    "gradient-primary": "linear-gradient(135deg, #FF3B30 0%, #FF2D55 100%)",
+                },
+                animation: {
+                    'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                }
+            },
+        },
+    }
+</script>
 
-        #startButton:hover:not(:disabled) {
-            background: linear-gradient(145deg, #81c784, #43a047);
-            transform: translateY(-3px); /* Button lifts up */
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
-        }
+<style>
+    body {
+        background-color: #000;
+        -webkit-tap-highlight-color: transparent;
+        overscroll-behavior-y: none; /* Prevents pull-to-refresh effects */
+    }
+    
+    /* Strict View Handling */
+    .view-section {
+        display: none !important; /* Force hide inactive views */
+        width: 100%;
+        /* min-height: 100vh; */
+        animation: fadeIn 0.3s ease-in-out;
+        padding-bottom: 120px; /* Space for global nav to prevent overlap */
+    }
+    
+    /* Specific fix for Analytics View to enable proper scrolling */
+    #view-analytics {
+        height: 100dvh; /* Dynamic viewport height */
+        padding-bottom: 0;
+        display: none !important;
+    }
+    #view-analytics.active {
+        display: flex !important; /* Analytics uses flex column layout */
+        flex-direction: column;
+        overflow: hidden;
+    }
 
-        #startButton:disabled {
-            background: linear-gradient(145deg, #a5d6a7, #81c784);
-            border-bottom-color: #66bb6a;
-            color: #e8f5e9;
-            cursor: not-allowed;
-            box-shadow: none;
-            text-shadow: none;
-            opacity: 0.7;
-        }
+    /* Specific fix for New Project View */
+    #view-new-project {
+        padding-bottom: 0;
+        background: #000;
+        min-height: 100dvh;
+    }
 
-        /* Sign Up Button styles */
-        #signUpButton {
-            background: linear-gradient(145deg, #42a5f5, #1976d2);
-            border-bottom: 5px solid #1565c0;
-            box-shadow: 0 5px 8px rgba(0, 0, 0, 0.25);
-        }
+    /* Specific fix for Competitor Analysis View */
+    #view-competitor {
+        padding-bottom: 0;
+        background: #000;
+        min-height: 100dvh;
+        z-index: 60; /* Higher than others */
+    }
+    
+    /* Specific fix for Tools View */
+    #view-tools {
+        padding-bottom: 100px;
+        background: #000;
+        min-height: 100dvh;
+    }
 
-        #signUpButton:hover {
-            background: linear-gradient(145deg, #64b5f6, #1e88e5);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
-        }
+    /* Specific fix for Connect YouTube View */
+    #view-connect-youtube {
+        padding-bottom: 0;
+        background: #000;
+        min-height: 100dvh;
+        z-index: 60;
+    }
 
-        /* Logout Button styles */
-        #logoutButton {
-            position: absolute;
-            bottom: 30px;
-            background: linear-gradient(145deg, #ef5350, #d32f2f);
-            border-bottom: 5px solid #c62828;
-            box-shadow: 0 5px 8px rgba(0, 0, 0, 0.25);
-            font-size: 14px;
-            min-width: 100px;
-            padding: 8px 16px;
-        }
+    .view-section.active {
+        display: block !important; /* Force show active view */
+        position: relative;
+        z-index: 10;
+    }
 
-        #logoutButton:hover {
-            background: linear-gradient(145deg, #e57373, #e53935);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
-        }
-        /* --- END OF NEW STYLES --- */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
+    /* Custom Scrollbar hiding */
+    .hide-scrollbar::-webkit-scrollbar, .no-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar, .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Smooth Snap Scrolling */
+    .snap-scroll-x, .snap-x-mandatory {
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+    }
+    .snap-child, .snap-center {
+        scroll-snap-align: center;
+    }
 
-        .container-wrapper {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
-            padding-top: 50px;
-        }
+    /* 3D Glass Effect Utility */
+    .glass-panel, .glass {
+        background: rgba(28, 28, 30, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .glass-panel {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+    }
+    .glass {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .glass-top {
+        background: rgba(20, 20, 20, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
 
-        .main-container {
-            width: 100%;
-            max-width: 450px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 48px 40px 36px;
-            box-sizing: border-box;
-        }
-        
-        #emailStep {
-            text-align: center;
-        }
-        
-        #passwordStep .content-container {
-             text-align: left;
-        }
+    /* Setup Range Slider */
+    input[type=range] {
+        -webkit-appearance: none; 
+        background: transparent; 
+    }
+    input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        height: 24px;
+        width: 24px;
+        border-radius: 50%;
+        background: #FF3B30;
+        cursor: pointer;
+        margin-top: -10px; 
+        box-shadow: 0 0 15px rgba(255, 59, 48, 0.6), inset 0 2px 4px rgba(255,255,255,0.4);
+        border: 2px solid #fff;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+        width: 100%;
+        height: 4px;
+        cursor: pointer;
+        background: #3A3A3C;
+        border-radius: 2px;
+    }
 
-        .header {
-            margin-bottom: 24px;
-        }
-
-        .google-logo {
-            width: 75px;
-            height: auto;
-            display: block;
-        }
-        
-        #emailStep .google-logo {
-             margin: 0 auto;
-        }
-
-        h1 {
-            font-family: "Google Sans", "Noto Sans Myanmar UI", arial, sans-serif;
-            font-size: 24px;
-            font-weight: 400;
-            line-height: 1.3333;
-            margin: 16px 0 0;
-        }
-        
-        .subtitle {
-            font-size: 16px;
-            font-weight: 400;
-            letter-spacing: .1px;
-            line-height: 1.5;
-            padding-top: 8px;
-        }
-        
-        .user-email-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            height: 36px;
-            padding: 0 16px;
-            margin-top: 16px;
-            margin-bottom: 24px;
-            border: 1px solid var(--border-color);
-            border-radius: 18px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #3c4043;
-        }
-
-        .form-group {
-            position: relative;
-            margin-top: 8px;
-            width: 100%;
-        }
-        
-        .form-input {
-            width: 100%;
-            height: 56px;
-            padding: 13px 15px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            background-color: transparent;
-            color: var(--text-primary);
-        }
-        
-        .form-input::placeholder { color: transparent; }
-
-        .form-label {
-            position: absolute;
-            top: 15px;
-            left: 16px;
-            font-size: 16px;
-            color: var(--text-secondary);
-            pointer-events: none;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .form-input:focus + .form-label,
-        .form-input:not(:placeholder-shown) + .form-label {
-            top: -8px;
-            left: 12px;
-            font-size: 12px;
-            color: var(--google-blue);
-            background-color: white;
-            padding: 0 4px;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border: 2px solid var(--google-blue);
-            padding: 12px 14px;
-        }
-        
-        .form-input.has-error {
-            border: 2px solid var(--google-red-error);
-            padding: 12px 14px;
-        }
-        .form-input.has-error + .form-label {
-            color: var(--google-red-error);
-        }
-
-
-        .form-links {
-            text-align: left;
-            margin-top: 8px;
-        }
-
-        .link-button {
-            font-family: 'Roboto', 'Google Sans', Arial, sans-serif;
-            color: var(--google-blue);
-            font-weight: 500;
-            text-decoration: none;
-            font-size: 14px;
-            padding: 8px 0;
-            background: none;
-            border: none;
-            cursor: pointer;
-            display: inline-block;
-        }
-        .link-button:hover { background-color: rgba(26, 115, 232, 0.04); border-radius: 4px; }
-
-        .button-group {
-            display: flex;
-            align-items: center;
-            margin-top: 32px;
-        }
-
-        #emailStep .button-group {
-            justify-content: space-between;
-        }
-
-        #passwordStep .button-group {
-            justify-content: flex-end;
-        }
-
-
-        .next-button {
-            background-color: var(--google-blue);
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            padding: 0 24px;
-            height: 36px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color .2s, box-shadow .2s;
-        }
-        .next-button:hover {
-            background-color: #185abc;
-            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
-        }
-        .next-button:disabled {
-             background-color: #e0e0e0;
-             box-shadow: none;
-             cursor: not-allowed;
-        }
-
-        .footer-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            padding: 24px 0;
-        }
-        .footer {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 450px;
-            padding: 0 40px;
-            box-sizing: border-box;
-        }
-        .language-selector-wrapper {
-            position: relative;
-        }
-        .language-selector-button {
-            display: inline-flex;
-            align-items: center;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 12px;
-            color: var(--text-primary);
-            padding: 8px;
-            border-radius: 4px;
-        }
-        .language-selector-button:hover { background-color: #f8f9fa; }
-        .language-selector-button svg { width: 16px; height: 16px; margin-left: 8px; fill: var(--text-secondary); }
-        .footer-links {
-            display: flex;
-            gap: 24px;
-            font-size: 12px;
-            align-items: center;
-        }
-        .footer a { color: var(--text-secondary); text-decoration: none; }
-        .footer a:hover { text-decoration: underline; }
-
-        .hidden { display: none !important; }
-
-        .message-area {
-            text-align: left;
-            font-size: 12px;
-            line-height: 1.5;
-            min-height: 20px;
-            margin-top: 4px;
-        }
-        .error-text { 
-            color: var(--google-red-error); 
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .success-text { color: var(--google-green-success); font-weight: 500; }
-        
-        .language-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.3);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .language-modal {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 2px 6px 2px rgba(60,64,67,0.15);
-            width: 90%;
-            max-width: 320px;
-            padding: 16px 0;
-        }
-        .language-modal ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .language-modal li {
-            display: flex;
-            align-items: center;
-            padding: 12px 24px;
-            cursor: pointer;
-        }
-        .language-modal li:hover { background-color: #f8f9fa; }
-        .language-modal input[type="radio"] {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--text-secondary);
-            border-radius: 50%;
-            margin-right: 16px;
-            position: relative;
-            flex-shrink: 0;
-        }
-        .language-modal input[type="radio"]:checked {
-            border-color: var(--google-blue);
-        }
-        .language-modal input[type="radio"]:checked::before {
-            content: '';
-            display: block;
-            width: 10px;
-            height: 10px;
-            background-color: var(--google-blue);
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        .language-modal label {
-            font-size: 14px;
-            cursor: pointer;
-            flex-grow: 1;
-        }
-
-    </style>
+    /* Setup Toggle Switch */
+    .toggle-checkbox:checked {
+        right: 0;
+        border-color: #FF3B30;
+    }
+    .toggle-checkbox:checked + .toggle-label {
+        background-color: #FF3B30;
+    }
+    
+    /* Mask Text for API Keys */
+    .mask-text {
+        -webkit-text-security: disc;
+    }
+</style>
 </head>
-<body>
+<body class="bg-black text-white font-body overflow-x-hidden antialiased selection:bg-primary/30">
 
-    <!-- NEW WELCOME SCREEN -->
-    <div id="welcomeScreen">
-        <div class="welcome-buttons">
-            <button id="startButton" disabled>Start</button>
-            <button id="signUpButton">Sign Up</button>
+<!-- ============================================== -->
+<!-- VIEW 1: DASHBOARD (Home)                       -->
+<!-- ============================================== -->
+<div id="view-dashboard" class="view-section active">
+
+    <!-- Top App Bar (Glassmorphism) -->
+    <div class="fixed top-0 w-full z-40 glass-panel px-5 py-3 flex items-center justify-between transition-all duration-300">
+        <div class="flex items-center gap-3">
+            <div class="relative group cursor-pointer" onclick="switchView('setup')">
+                <div class="size-10 rounded-full p-[2px] bg-gradient-to-br from-primary to-transparent shadow-glow">
+                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&h=100" 
+                         alt="Profile" 
+                         class="rounded-full size-full object-cover border-2 border-bg-main">
+                </div>
+                <div class="absolute bottom-0 right-0 size-3 bg-green-500 rounded-full border-2 border-bg-main shadow-md"></div>
+            </div>
+            <div>
+                <h2 class="text-base font-display font-bold leading-none tracking-wide">YTBoost<span class="text-primary">.ai</span></h2>
+                <span class="text-[10px] text-gray-400 font-medium tracking-wider uppercase">Dashboard</span>
+            </div>
         </div>
-        <button id="logoutButton" class="hidden">Log Out</button>
+        <button class="relative size-10 rounded-full bg-surface-light/50 border border-white/5 flex items-center justify-center active:scale-95 transition-transform">
+            <span class="material-symbols-rounded text-gray-200">notifications</span>
+            <span class="absolute top-2.5 right-2.5 size-2 bg-primary rounded-full shadow-glow animate-pulse"></span>
+        </button>
     </div>
 
+    <!-- Main Content Spacer -->
+    <div class="h-24"></div>
 
-    <div class="container-wrapper hidden">
-        <main class="main-container">
-            <!-- Step 1: Email Input -->
-            <div id="emailStep">
-                <div class="header">
-                    <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_74x24dp.png" alt="Google" class="google-logo">
-                    <h1 data-translate="signIn">Sign in</h1>
-                    <p class="subtitle" data-translate="useYourAccount">Use your Google Account</p>
+    <!-- Greeting Section -->
+    <div class="px-5 mb-4 animate-fade-in-up">
+        <h1 class="text-3xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
+            Hello, Creator!
+        </h1>
+        <p class="text-gray-400 text-sm mt-1 flex items-center gap-1">
+            <span class="material-symbols-rounded text-green-500 text-sm">trending_up</span>
+            Channel performance is peaking!
+        </p>
+    </div>
+
+    <!-- 3D Stats Carousel -->
+    <div class="w-full overflow-x-auto hide-scrollbar pb-6 pl-5 snap-scroll-x">
+        <div class="flex gap-4 pr-5 min-w-max">
+            <!-- Card 1 -->
+            <div class="snap-child w-[150px] bg-card-gradient rounded-2xl p-4 shadow-3d border-t border-white/10 relative overflow-hidden group active:scale-95 transition-transform duration-200">
+                <div class="absolute -right-4 -top-4 bg-primary/20 w-16 h-16 rounded-full blur-xl group-hover:bg-primary/30 transition-colors"></div>
+                <div class="flex justify-between items-start mb-3 relative z-10">
+                    <div class="p-2 bg-black/40 rounded-lg backdrop-blur-sm border border-white/5 text-primary">
+                        <span class="material-symbols-rounded text-xl">visibility</span>
+                    </div>
+                    <span class="text-green-500 text-xs font-bold bg-green-500/10 px-1.5 py-0.5 rounded border border-green-500/20">+15%</span>
                 </div>
-                <form id="emailForm" onsubmit="return false;">
-                    <div class="form-group">
-                        <input type="email" id="emailInput" class="form-input" placeholder=" " required>
-                        <label for="emailInput" class="form-label" data-translate="emailLabel">Email or phone</label>
-                    </div>
-                    <div id="emailMessage" class="message-area"></div>
-                    <div class="form-links">
-                        <a href="https://accounts.google.com/signin/v2/usernamerecovery" target="_blank" rel="noopener noreferrer" class="link-button" data-translate="forgotEmail">Forgot email?</a>
-                    </div>
-                    <div class="button-group">
-                        <a href="https://accounts.google.com/signup" target="_blank" rel="noopener noreferrer" class="link-button" data-translate="createAccount">Create account</a>
-                        <button id="nextEmailBtn" type="submit" class="next-button" data-translate="next">Next</button>
-                    </div>
-                </form>
+                <div>
+                    <p class="text-gray-400 text-xs font-medium uppercase tracking-wide">Views</p>
+                    <p class="text-white text-2xl font-display font-bold mt-0.5">45.3k</p>
+                </div>
             </div>
 
-            <!-- Step 2: Password Input -->
-            <div id="passwordStep" class="hidden">
-                 <div class="content-container">
-                     <div class="header">
-                        <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_74x24dp.png" alt="Google" class="google-logo">
-                        <h1 data-translate="welcome">Welcome</h1>
-                        <div class="user-email-chip">
-                           <span id="userEmail"></span>
+             <!-- Card 2 -->
+             <div class="snap-child w-[150px] bg-card-gradient rounded-2xl p-4 shadow-3d border-t border-white/10 relative overflow-hidden group active:scale-95 transition-transform duration-200">
+                <div class="absolute -right-4 -top-4 bg-blue-500/20 w-16 h-16 rounded-full blur-xl"></div>
+                <div class="flex justify-between items-start mb-3 relative z-10">
+                    <div class="p-2 bg-black/40 rounded-lg backdrop-blur-sm border border-white/5 text-blue-500">
+                        <span class="material-symbols-rounded text-xl">group</span>
+                    </div>
+                    <span class="text-green-500 text-xs font-bold bg-green-500/10 px-1.5 py-0.5 rounded border border-green-500/20">+2.4%</span>
+                </div>
+                <div>
+                    <p class="text-gray-400 text-xs font-medium uppercase tracking-wide">Subs</p>
+                    <p class="text-white text-2xl font-display font-bold mt-0.5">1.2k</p>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="snap-child w-[150px] bg-card-gradient rounded-2xl p-4 shadow-3d border-t border-white/10 relative overflow-hidden group active:scale-95 transition-transform duration-200">
+                <div class="absolute -right-4 -top-4 bg-yellow-500/20 w-16 h-16 rounded-full blur-xl"></div>
+                <div class="flex justify-between items-start mb-3 relative z-10">
+                    <div class="p-2 bg-black/40 rounded-lg backdrop-blur-sm border border-white/5 text-yellow-500">
+                        <span class="material-symbols-rounded text-xl">attach_money</span>
+                    </div>
+                    <span class="text-green-500 text-xs font-bold bg-green-500/10 px-1.5 py-0.5 rounded border border-green-500/20">+5%</span>
+                </div>
+                <div>
+                    <p class="text-gray-400 text-xs font-medium uppercase tracking-wide">Rev</p>
+                    <p class="text-white text-2xl font-display font-bold mt-0.5">$340</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3D AI Insight Panel (Hero) -->
+    <div class="px-5 mb-8">
+        <div class="relative rounded-2xl p-[1px] bg-gradient-to-br from-primary via-surface-light to-surface shadow-glow overflow-hidden group">
+            <div class="bg-[#121214] rounded-[15px] p-5 relative overflow-hidden h-full">
+                <!-- Background Effect -->
+                <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[50px] rounded-full pointer-events-none"></div>
+                
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="bg-gradient-to-r from-primary to-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">AI TIP</div>
+                    <span class="text-gray-400 text-xs">Just now</span>
+                </div>
+                
+                <h3 class="text-lg font-bold text-white mb-2 leading-tight">Retention Drop Detected</h3>
+                <p class="text-gray-400 text-sm mb-4 leading-relaxed">
+                    Viewers are leaving at <span class="text-white font-mono bg-white/10 px-1 rounded">0:45</span>. The pacing slows down significantly here.
+                </p>
+
+                <button class="w-full h-11 bg-btn-gradient rounded-xl text-white font-semibold text-sm shadow-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all border-t border-white/20">
+                    <span class="material-symbols-rounded">magic_button</span>
+                    Generate Fix with AI
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Section (Glass Card) -->
+    <div class="px-5 mb-8">
+        <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            Real-time Activity
+            <span class="w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
+        </h3>
+        <div class="bg-card-gradient rounded-2xl p-5 border-t border-white/5 shadow-3d">
+            <div class="flex justify-between items-end mb-4">
+                <div>
+                    <p class="text-3xl font-display font-bold">2,405</p>
+                    <p class="text-gray-500 text-xs font-medium uppercase tracking-wide">Views (48h)</p>
+                </div>
+                <div class="bg-surface p-1 rounded-lg flex gap-1">
+                     <button class="px-3 py-1 rounded-md bg-white/10 text-white text-xs font-medium shadow-sm">48h</button>
+                     <button class="px-3 py-1 rounded-md text-gray-500 text-xs font-medium hover:text-white">60m</button>
+                </div>
+            </div>
+            
+            <!-- SVG Chart -->
+            <div class="h-[120px] w-full relative">
+                <svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 50">
+                    <defs>
+                        <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#FF3B30" stop-opacity="0.3"></stop>
+                            <stop offset="100%" stop-color="#FF3B30" stop-opacity="0"></stop>
+                        </linearGradient>
+                    </defs>
+                    <path d="M0 40 Q 10 35, 20 38 T 40 20 T 60 25 T 80 10 L 100 5 V 50 H 0 Z" fill="url(#chartFill)" />
+                    <path d="M0 40 Q 10 35, 20 38 T 40 20 T 60 25 T 80 10 L 100 5" fill="none" stroke="#FF3B30" stroke-width="2" stroke-linecap="round" vector-effect="non-scaling-stroke" filter="drop-shadow(0 0 4px rgba(255,59,48,0.5))" />
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Tools Grid (Buttons that look touchable) -->
+    <div class="px-5 mb-10">
+        <h3 class="text-lg font-bold text-white mb-4">Quick Actions</h3>
+        <div class="grid grid-cols-2 gap-3">
+            <!-- Tool 1 -->
+            <button class="bg-surface hover:bg-surface-light border border-white/5 border-b-black/50 p-4 rounded-xl flex flex-col gap-3 text-left shadow-lg active:scale-[0.97] transition-all group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="size-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform duration-300">
+                    <span class="material-symbols-rounded">search_insights</span>
+                </div>
+                <div>
+                    <span class="block text-white font-semibold text-sm">SEO Optimizer</span>
+                    <span class="block text-gray-500 text-[10px] mt-0.5">Rank #1 faster</span>
+                </div>
+            </button>
+            
+            <!-- Tool 2 -->
+            <button class="bg-surface hover:bg-surface-light border border-white/5 border-b-black/50 p-4 rounded-xl flex flex-col gap-3 text-left shadow-lg active:scale-[0.97] transition-all group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="size-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform duration-300">
+                    <span class="material-symbols-rounded">image</span>
+                </div>
+                <div>
+                    <span class="block text-white font-semibold text-sm">A/B Thumbnails</span>
+                    <span class="block text-gray-500 text-[10px] mt-0.5">Boost CTR</span>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Recent Activity List -->
+    <div class="px-5 mb-4">
+        <h3 class="text-lg font-bold text-white mb-4">Recent</h3>
+        <div class="flex flex-col gap-3">
+            <div class="bg-surface/50 border border-white/5 p-3 rounded-xl flex items-center gap-3 active:bg-surface/80 transition-colors">
+                <div class="size-12 rounded-lg bg-gray-800 bg-cover bg-center shrink-0 shadow-inner" style='background-image: url("https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=100&h=100");'></div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-white text-sm font-semibold truncate">iPhone 15 Pro Review</p>
+                    <p class="text-gray-500 text-xs">Uploaded • 2h ago</p>
+                </div>
+                <span class="material-symbols-rounded text-gray-600 text-lg">chevron_right</span>
+            </div>
+            
+            <div class="bg-surface/50 border border-white/5 p-3 rounded-xl flex items-center gap-3 active:bg-surface/80 transition-colors">
+                <div class="size-12 rounded-lg bg-yellow-500/10 flex items-center justify-center shrink-0 text-yellow-500">
+                     <span class="material-symbols-rounded">military_tech</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-white text-sm font-semibold truncate">45K Views Hit!</p>
+                    <p class="text-gray-500 text-xs">Milestone • 5h ago</p>
+                </div>
+                <span class="material-symbols-rounded text-gray-600 text-lg">chevron_right</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ============================================== -->
+<!-- VIEW 2: CONTENT CREATION STUDIO                -->
+<!-- ============================================== -->
+<div id="view-studio" class="view-section">
+    <!-- Removed pb-28 here to fix overscroll issue -->
+    <div class="relative flex h-full min-h-screen w-full flex-col max-w-md mx-auto bg-background-light dark:bg-background-dark border-x border-gray-200 dark:border-white/5">
+
+        <!-- TopAppBar (Glass) -->
+        <div class="glass flex items-center sticky top-0 z-40 p-4 pb-3 justify-between border-b border-gray-200 dark:border-white/10 transition-all duration-300">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-primary p-2 rounded-xl shadow-glow">
+                    <span class="material-symbols-outlined text-white text-[20px]">video_library</span>
+                </div>
+                <div>
+                    <h2 class="text-black dark:text-white text-lg font-display font-bold leading-none tracking-tight">CONTENT STUDIO</h2>
+                    <span class="text-[10px] text-gray-500 dark:text-gray-400 font-medium tracking-widest uppercase">AI Powered</span>
+                </div>
+            </div>
+            <div class="flex w-12 items-center justify-end">
+                <!-- Updated Button with onclick event -->
+                <button onclick="switchView('new-project')" class="flex items-center justify-center overflow-hidden rounded-full h-10 w-10 bg-surface-dark border border-white/10 hover:bg-white/10 active:scale-90 transition-all shadow-lg">
+                    <span class="material-symbols-outlined text-primary">add</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- HeadlineText -->
+        <div class="px-5 pt-8 pb-4 animate-fade-in-up">
+            <h2 class="text-black dark:text-white tracking-tight text-[32px] font-display font-bold leading-[1.1] text-left">
+                What are we <br/>
+                <span class="text-transparent bg-clip-text bg-gradient-primary">creating</span> today?
+            </h2>
+        </div>
+
+        <!-- Composer (3D Input) -->
+        <div class="flex items-center px-4 py-3 gap-3 w-full @container">
+            <div class="flex flex-col w-full">
+                <div class="flex w-full flex-col rounded-2xl overflow-hidden shadow-3d bg-card-dark border border-white/10 group focus-within:ring-1 focus-within:ring-primary/50 transition-all">
+                    
+                    <!-- Input Area -->
+                    <div class="flex flex-1 gap-3 p-4">
+                        <!-- Avatar -->
+                        <div class="bg-center bg-no-repeat bg-cover rounded-full size-10 shrink-0 ring-2 ring-primary/30 shadow-lg" data-alt="User profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDcEEPydWOb4oWZpRAlf0PtwxWH3gsq2oNBOcS1Bwy-xFHopb0Ol9xSfgdmk-kmlstcLRHvoW9wwQBXF447F8I5KDhZExTfkkSmSdniTMISN9fhD4grG8OJPzeuUuVaubB7x6MUT6bvWg-6RpjXyUO3aimAIdkxY76vuw5FQkJgwCID6ZwV5gFMNzU_0SLLv7C851iXLy0dQNa2HH_2Bd5qYMfhVnWALxGFoKk2fVTEMJic4WFrgZbnCHn_JLE77KFjwFCScmJiXo10");'>
+                        </div>
+                        
+                        <textarea class="flex w-full min-w-0 flex-1 resize-none bg-transparent text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 border-none p-0 text-base font-normal leading-relaxed focus:outline-0 focus:ring-0 h-[80px]" placeholder="Describe your video idea (e.g., 'Top 10 AI Tools for 2024')..."></textarea>
+                    </div>
+
+                    <!-- Action Bar -->
+                    <div class="flex border-t border-white/5 bg-black/20 justify-between items-center px-3 py-2">
+                        <div class="flex gap-1">
+                            <button class="p-2 rounded-lg text-gray-400 hover:text-primary hover:bg-white/5 transition-colors active:scale-90">
+                                <span class="material-symbols-outlined text-[20px]">mic</span>
+                            </button>
+                            <button class="p-2 rounded-lg text-gray-400 hover:text-primary hover:bg-white/5 transition-colors active:scale-90">
+                                <span class="material-symbols-outlined text-[20px]">image</span>
+                            </button>
+                        </div>
+                        <button class="cursor-pointer flex items-center justify-center gap-2 overflow-hidden rounded-xl h-10 px-6 bg-gradient-primary hover:brightness-110 active:scale-95 transition-all text-white text-sm font-bold shadow-glow">
+                            <span class="material-symbols-outlined text-[18px]">auto_awesome</span>
+                            <span>Generate</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="h-4"></div>
+
+        <!-- Quick Actions Title -->
+        <div class="flex items-center justify-between px-5 pb-3 pt-2">
+            <h1 class="text-black dark:text-white text-[20px] font-display font-bold leading-tight tracking-tight">Quick Actions</h1>
+            <button class="text-primary text-sm font-bold hover:text-white transition-colors">View All</button>
+        </div>
+
+        <!-- TextGrid (3D Tiles) -->
+        <div class="grid grid-cols-2 gap-3 px-4">
+            <!-- Script Writer -->
+            <button class="flex flex-col gap-3 rounded-2xl bg-card-gradient border-t border-white/10 p-4 shadow-3d active:scale-[0.98] transition-all group text-left relative overflow-hidden">
+                <div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/20 to-transparent border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform text-primary shadow-inner">
+                    <span class="material-symbols-rounded">description</span>
+                </div>
+                <div class="flex flex-col gap-0.5 relative z-10">
+                    <h2 class="text-black dark:text-white text-base font-bold leading-tight">Script Writer</h2>
+                    <p class="text-gray-500 text-xs font-medium">Full AI Scripting</p>
+                </div>
+            </button>
+            
+            <!-- Trend Finder -->
+            <button class="flex flex-col gap-3 rounded-2xl bg-card-gradient border-t border-white/10 p-4 shadow-3d active:scale-[0.98] transition-all group text-left relative overflow-hidden">
+                <div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/20 to-transparent border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform text-primary shadow-inner">
+                    <span class="material-symbols-rounded">trending_up</span>
+                </div>
+                <div class="flex flex-col gap-0.5 relative z-10">
+                    <h2 class="text-black dark:text-white text-base font-bold leading-tight">Trend Finder</h2>
+                    <p class="text-gray-500 text-xs font-medium">Niche Analysis</p>
+                </div>
+            </button>
+            
+            <!-- SEO Optimizer -->
+            <button class="flex flex-col gap-3 rounded-2xl bg-card-gradient border-t border-white/10 p-4 shadow-3d active:scale-[0.98] transition-all group text-left relative overflow-hidden">
+                <div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/20 to-transparent border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform text-primary shadow-inner">
+                    <span class="material-symbols-rounded">manage_search</span>
+                </div>
+                <div class="flex flex-col gap-0.5 relative z-10">
+                    <h2 class="text-black dark:text-white text-base font-bold leading-tight">SEO Optimizer</h2>
+                    <p class="text-gray-500 text-xs font-medium">Keyword Research</p>
+                </div>
+            </button>
+            
+            <!-- Make a Short -->
+            <button class="flex flex-col gap-3 rounded-2xl bg-card-gradient border-t border-white/10 p-4 shadow-3d active:scale-[0.98] transition-all group text-left relative overflow-hidden">
+                <div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/20 to-transparent border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform text-primary shadow-inner">
+                    <span class="material-symbols-rounded">content_cut</span>
+                </div>
+                <div class="flex flex-col gap-0.5 relative z-10">
+                    <h2 class="text-black dark:text-white text-base font-bold leading-tight">Make a Short</h2>
+                    <p class="text-gray-500 text-xs font-medium">Repurpose Video</p>
+                </div>
+            </button>
+        </div>
+
+        <div class="h-8"></div>
+
+        <!-- A/B Testing Module (Feature Card) -->
+        <div class="px-4">
+            <div class="flex items-center justify-between pb-3 px-1">
+                <h1 class="text-black dark:text-white text-[20px] font-display font-bold leading-tight tracking-tight">Optimization</h1>
+            </div>
+            
+            <div class="rounded-2xl bg-gradient-to-br from-surface-dark to-black border-t border-white/10 p-5 shadow-3d relative overflow-hidden">
+                <!-- Background Decor -->
+                <div class="absolute top-0 right-0 p-2 opacity-5 pointer-events-none">
+                    <span class="material-symbols-outlined text-9xl text-white">analytics</span>
+                </div>
+                <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-primary/10 blur-[60px] rounded-full"></div>
+
+                <div class="flex justify-between items-center mb-5 relative z-10">
+                    <div class="flex items-center gap-2">
+                        <div class="p-1.5 bg-primary/10 rounded-lg text-primary">
+                            <span class="material-symbols-rounded text-lg">compare_arrows</span>
+                        </div>
+                        <h3 class="text-black dark:text-white font-bold text-base tracking-wide">Thumbnail A/B Test</h3>
+                    </div>
+                    <span class="bg-green-500/10 text-green-500 text-[10px] font-bold px-2 py-1 rounded-full border border-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.2)] animate-pulse">● LIVE</span>
+                </div>
+                
+                <div class="flex gap-4 relative z-10">
+                    <!-- Variant A -->
+                    <div class="flex-1 flex flex-col gap-3">
+                        <div class="relative aspect-video rounded-xl overflow-hidden bg-black/50 border border-white/10 shadow-lg">
+                            <div class="absolute inset-0 bg-cover bg-center opacity-40 grayscale transition-all" data-alt="Abstract tech background with blue hues representing variant A" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBirAd9G7zCffU_Xxzdl_DPoVINarsHGG1l07MEaWiFRRAyVDSzuMYzOVbKGBih7IYDRCKkDOqLzgB8EajIcdP5x9itq4Wc61RVvni46scX2bJvIAdEbk989uqmVL-FAXicwk78q9Cnm4S4oTnWHK1Z1ojve4XXq56mGL4hInC_My3JenoiSblmtTFhUfRwB-wB-_F97htoTqoeakPN5kbGHK0s6jkxInuwX8kbIYfMYANa7o3yhmOWpArrBedWqMKWDy8hu9K_zd3v");'>
+                            </div>
+                            <div class="absolute bottom-2 left-2 bg-black/80 backdrop-blur-md text-white text-[10px] font-mono px-2 py-0.5 rounded border border-white/10">VAR A</div>
+                        </div>
+                        <div>
+                             <div class="flex justify-between items-center mb-1">
+                                <span class="text-gray-500 text-[10px] uppercase font-bold tracking-wider">CTR</span>
+                                <span class="text-gray-400 font-bold text-xs">3.2%</span>
+                            </div>
+                            <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden shadow-inner">
+                                <div class="bg-gray-500 h-full w-[32%] rounded-full"></div>
+                            </div>
                         </div>
                     </div>
-                     <form id="passwordForm" onsubmit="return false;">
-                        <div class="form-group">
-                            <input type="password" id="passwordInput" class="form-input" placeholder=" " required>
-                            <label for="passwordInput" class="form-label" data-translate="passwordLabel">Enter your password</label>
+                    
+                    <!-- Variant B (Winner) -->
+                    <div class="flex-1 flex flex-col gap-3">
+                        <div class="relative aspect-video rounded-xl overflow-hidden ring-2 ring-primary shadow-[0_0_20px_rgba(255,59,48,0.3)] transform scale-[1.02]">
+                            <div class="absolute inset-0 bg-cover bg-center" data-alt="Vibrant tech background with red hues representing variant B" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDkSFEyj25iAq2kHZuc487VHOACn73EYz9wDgXQb2DeedtwBujZGjj72TJw2BxQ-nGugzorZ27QfejEYK9c9dnh0J0D4wWYakuXaOFL7kMFO2AVv5ahAg2Bj3foWjBP0PssfM2pHXfoDfy1Y_479kEFHdoRzhcmRXXGuIQEiSbojdl6iXYoWZydHWez2u-_hOL1-PBrB8uIXNOQ2fcwN78H1e4blcH2uYeRkqJDMrmF-MmrzAhr2QCKjvz_eqv3OzVVwFD0GepPXdsJ");'>
+                            </div>
+                            <div class="absolute top-2 right-2 bg-gradient-primary text-white text-[9px] font-bold px-2 py-1 rounded shadow-lg tracking-wide">WINNER</div>
+                            <div class="absolute bottom-2 left-2 bg-black/80 backdrop-blur-md text-white text-[10px] font-mono px-2 py-0.5 rounded border border-white/10">VAR B</div>
                         </div>
-                        <div id="passwordMessage" class="message-area"></div>
-                        <div class="form-links">
-                            <a href="https://accounts.google.com/signin/v2/recovery/pwd" target="_blank" rel="noopener noreferrer" class="link-button" data-translate="forgotPassword">Forgot password?</a>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-primary text-[10px] uppercase font-bold tracking-wider">CTR</span>
+                                <span class="text-white font-bold text-xs">5.8%</span>
+                            </div>
+                            <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden shadow-inner">
+                                <div class="bg-gradient-primary h-full w-[58%] rounded-full shadow-[0_0_10px_rgba(255,59,48,0.5)]"></div>
+                            </div>
                         </div>
-                        <div class="button-group">
-                            <button id="nextPasswordBtn" type="submit" class="next-button" data-translate="next">Next</button>
-                        </div>
-                    </form>
-                 </div>
+                    </div>
+                </div>
             </div>
-        </main>
-        
-        <div class="footer-wrapper">
-            <footer class="footer">
-                <div class="language-selector-wrapper">
-                    <button class="language-selector-button" id="languageSelectorBtn">
-                        <span id="currentLanguage">English (United Kingdom)</span>
-                        <svg focusable="false" width="24px" height="24px" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"></path></svg>
+        </div>
+
+        <div class="h-8"></div>
+
+        <!-- Trending Topics Carousel (Snap Scroll) -->
+        <div class="pl-4 pb-6">
+            <div class="flex items-center justify-between pr-4 pb-3">
+                <h1 class="text-black dark:text-white text-[20px] font-display font-bold leading-tight tracking-tight">Trending in AI Tech</h1>
+            </div>
+            
+            <div class="flex overflow-x-auto gap-4 pb-8 pr-4 no-scrollbar snap-x-mandatory">
+                <!-- Card 1 -->
+                <div class="min-w-[260px] rounded-2xl bg-card-gradient border-t border-white/10 p-5 flex flex-col gap-4 shadow-3d snap-center active:scale-[0.98] transition-transform">
+                    <div class="flex items-start justify-between">
+                        <div class="bg-blue-500/10 p-2.5 rounded-xl text-blue-500 border border-blue-500/10">
+                            <span class="material-symbols-rounded text-[24px]">smart_toy</span>
+                        </div>
+                        <span class="text-green-500 text-[10px] font-bold flex items-center bg-green-500/10 px-2 py-1 rounded-md border border-green-500/10">
+                            <span class="material-symbols-rounded text-[14px] mr-1">arrow_upward</span> High
+                        </span>
+                    </div>
+                    <div>
+                        <h3 class="text-black dark:text-white font-bold text-lg leading-tight mb-1">GPT-5 Predictions</h3>
+                        <p class="text-gray-500 text-xs line-clamp-2 leading-relaxed">Explosive search volume growth in the last 48 hours.</p>
+                    </div>
+                    <button class="w-full mt-auto bg-white/5 hover:bg-primary hover:text-white text-gray-300 text-xs font-bold py-3 rounded-xl transition-all border border-dashed border-white/20 hover:border-solid hover:border-primary hover:shadow-glow flex items-center justify-center gap-2">
+                        Generate Outline
                     </button>
                 </div>
-                <div class="footer-links">
-                    <a href="https://support.google.com/accounts" target="_blank" rel="noopener noreferrer" data-translate="help">Help</a>
-                    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" data-translate="privacy">Privacy</a>
-                    <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" data-translate="terms">Terms</a>
+                
+                <!-- Card 2 -->
+                <div class="min-w-[260px] rounded-2xl bg-card-gradient border-t border-white/10 p-5 flex flex-col gap-4 shadow-3d snap-center active:scale-[0.98] transition-transform">
+                    <div class="flex items-start justify-between">
+                        <div class="bg-purple-500/10 p-2.5 rounded-xl text-purple-500 border border-purple-500/10">
+                            <span class="material-symbols-rounded text-[24px]">movie_filter</span>
+                        </div>
+                        <span class="text-green-500 text-[10px] font-bold flex items-center bg-green-500/10 px-2 py-1 rounded-md border border-green-500/10">
+                            <span class="material-symbols-rounded text-[14px] mr-1">arrow_upward</span> Med
+                        </span>
+                    </div>
+                    <div>
+                        <h3 class="text-black dark:text-white font-bold text-lg leading-tight mb-1">AI Video Editors</h3>
+                        <p class="text-gray-500 text-xs line-clamp-2 leading-relaxed">Comparison reviews are performing 2x average.</p>
+                    </div>
+                    <button class="w-full mt-auto bg-white/5 hover:bg-primary hover:text-white text-gray-300 text-xs font-bold py-3 rounded-xl transition-all border border-dashed border-white/20 hover:border-solid hover:border-primary hover:shadow-glow flex items-center justify-center gap-2">
+                        Generate Outline
+                    </button>
                 </div>
-            </footer>
+                
+                <!-- Card 3 -->
+                <div class="min-w-[260px] rounded-2xl bg-card-gradient border-t border-white/10 p-5 flex flex-col gap-4 shadow-3d snap-center active:scale-[0.98] transition-transform">
+                    <div class="flex items-start justify-between">
+                        <div class="bg-orange-500/10 p-2.5 rounded-xl text-orange-500 border border-orange-500/10">
+                            <span class="material-symbols-rounded text-[24px]">psychology</span>
+                        </div>
+                        <span class="text-yellow-500 text-[10px] font-bold flex items-center bg-yellow-500/10 px-2 py-1 rounded-md border border-yellow-500/10">
+                            <span class="material-symbols-rounded text-[14px] mr-1">remove</span> Stable
+                        </span>
+                    </div>
+                    <div>
+                        <h3 class="text-black dark:text-white font-bold text-lg leading-tight mb-1">Prompt Engineering</h3>
+                        <p class="text-gray-500 text-xs line-clamp-2 leading-relaxed">Evergreen content for tutorials.</p>
+                    </div>
+                    <button class="w-full mt-auto bg-white/5 hover:bg-primary hover:text-white text-gray-300 text-xs font-bold py-3 rounded-xl transition-all border border-dashed border-white/20 hover:border-solid hover:border-primary hover:shadow-glow flex items-center justify-center gap-2">
+                        Generate Outline
+                    </button>
+                </div>
+            </div>
         </div>
+
     </div>
+</div>
+
+<!-- ============================================== -->
+<!-- VIEW 3: CHANNEL SETUP                          -->
+<!-- ============================================== -->
+<div id="view-setup" class="view-section">
+    <div class="relative flex h-full w-full max-w-md mx-auto flex-col overflow-x-hidden pb-28 border-x border-white/5 shadow-2xl bg-black">
+
+        <!-- Header (Glass) -->
+        <div class="flex items-center sticky top-0 z-40 glass p-4 pb-3 justify-between transition-all">
+            <button onclick="switchView('dashboard')" class="text-white flex size-10 shrink-0 items-center justify-center rounded-full bg-white/5 border border-white/10 hover:bg-white/10 active:scale-90 transition-all shadow-lg">
+                <span class="material-symbols-rounded text-xl">arrow_back_ios_new</span>
+            </button>
+            <h2 class="text-white text-lg font-display font-bold leading-tight tracking-wide flex-1 text-center pr-10">Channel Setup</h2>
+        </div>
+
+        <div class="flex flex-col gap-8 px-5 pt-8">
+            
+            <!-- Section 1: Identity -->
+            <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-2 mb-1">
+                    <div class="h-6 w-1 bg-primary rounded-full"></div>
+                    <h3 class="text-white text-xl font-display font-bold leading-tight">Identity</h3>
+                </div>
+                
+                <label class="flex flex-col w-full gap-2">
+                    <p class="text-gray-400 text-xs font-bold uppercase tracking-wider ml-1">Channel Name</p>
+                    <div class="relative group">
+                        <input class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-2xl text-white focus:outline-0 border border-white/10 focus:border-primary/50 bg-card-dark h-14 placeholder:text-gray-600 px-4 pl-12 text-base font-normal leading-normal transition-all shadow-3d focus:shadow-glow" placeholder="e.g. Future Tech Daily" value=""/>
+                        <div class="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-white/5 rounded-lg text-gray-400 group-focus-within:text-primary transition-colors">
+                             <span class="material-symbols-rounded text-[18px]">smart_display</span>
+                        </div>
+                    </div>
+                </label>
+            </div>
+
+            <!-- Divider -->
+            <div class="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent w-full"></div>
+
+            <!-- Section 2: Content Strategy -->
+            <div class="flex flex-col gap-5">
+                <div class="flex items-center gap-2 mb-1">
+                    <div class="h-6 w-1 bg-primary rounded-full"></div>
+                    <h3 class="text-white text-xl font-display font-bold leading-tight">Content Strategy</h3>
+                </div>
+
+                <!-- Video Type Selector (Segmented Control) -->
+                <div class="flex flex-col gap-3">
+                    <div class="flex justify-between items-center px-1">
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider">Video Format</p>
+                    </div>
+                    <div class="flex p-1 w-full items-center justify-center rounded-xl bg-[#121212] border border-white/10 relative">
+                        <!-- Radio Inputs hidden but functional -->
+                        <label class="flex-1 cursor-pointer z-10">
+                            <input type="radio" name="format" value="Shorts" class="peer sr-only" checked>
+                            <div class="py-2.5 text-center text-sm font-medium text-gray-500 transition-all peer-checked:text-white peer-checked:bg-card-dark peer-checked:shadow-lg peer-checked:border peer-checked:border-white/10 rounded-lg">Shorts</div>
+                        </label>
+                        <label class="flex-1 cursor-pointer z-10">
+                            <input type="radio" name="format" value="Long" class="peer sr-only">
+                            <div class="py-2.5 text-center text-sm font-medium text-gray-500 transition-all peer-checked:text-white peer-checked:bg-card-dark peer-checked:shadow-lg peer-checked:border peer-checked:border-white/10 rounded-lg">Long</div>
+                        </label>
+                        <label class="flex-1 cursor-pointer z-10">
+                            <input type="radio" name="format" value="Mixed" class="peer sr-only">
+                            <div class="py-2.5 text-center text-sm font-medium text-gray-500 transition-all peer-checked:text-white peer-checked:bg-card-dark peer-checked:shadow-lg peer-checked:border peer-checked:border-white/10 rounded-lg">Mixed</div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Upload Frequency Slider -->
+                <div class="flex flex-col gap-4 bg-card-dark border border-white/5 p-4 rounded-2xl shadow-3d">
+                    <div class="flex justify-between items-end">
+                        <label class="text-white text-sm font-bold">Upload Frequency</label>
+                        <span class="text-primary font-display font-bold text-xl drop-shadow-[0_0_10px_rgba(255,59,48,0.5)]">5 <span class="text-xs font-body font-medium text-gray-400">/ week</span></span>
+                    </div>
+                    <div class="py-2">
+                        <input class="w-full" max="14" min="1" type="range" value="5"/>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-gray-500 font-bold uppercase tracking-wider px-1">
+                        <span>Casual</span>
+                        <span>Daily</span>
+                        <span>Pro</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent w-full"></div>
+
+            <!-- Section 3: AI Production -->
+            <div class="flex flex-col gap-5">
+                <div class="flex items-center gap-2 mb-1">
+                    <div class="h-6 w-1 bg-primary rounded-full"></div>
+                    <h3 class="text-white text-xl font-display font-bold leading-tight">AI Production</h3>
+                </div>
+
+                <!-- Voice Style Grid (3D Tiles) -->
+                <div class="flex flex-col gap-3">
+                    <p class="text-gray-400 text-xs font-bold uppercase tracking-wider ml-1">Voice Persona</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- Card 1 -->
+                        <label class="cursor-pointer group relative flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/5 bg-card-gradient p-5 shadow-3d transition-all active:scale-95 has-[:checked]:border-primary has-[:checked]:shadow-glow">
+                            <input checked="" class="invisible absolute" name="voice" type="radio" value="energetic"/>
+                            <div class="h-10 w-10 rounded-full bg-gradient-to-br from-primary/20 to-transparent border border-primary/20 flex items-center justify-center text-primary group-has-[:checked]:bg-primary group-has-[:checked]:text-white transition-all shadow-inner">
+                                <span class="material-symbols-rounded">bolt</span>
+                            </div>
+                            <span class="text-sm font-bold text-gray-300 group-has-[:checked]:text-white">Energetic</span>
+                        </label>
+                        <!-- Card 2 -->
+                        <label class="cursor-pointer group relative flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/5 bg-card-gradient p-5 shadow-3d transition-all active:scale-95 has-[:checked]:border-primary has-[:checked]:shadow-glow">
+                            <input class="invisible absolute" name="voice" type="radio" value="serious"/>
+                            <div class="h-10 w-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 group-has-[:checked]:bg-primary group-has-[:checked]:text-white transition-all">
+                                <span class="material-symbols-rounded">campaign</span>
+                            </div>
+                            <span class="text-sm font-bold text-gray-300 group-has-[:checked]:text-white">Serious</span>
+                        </label>
+                        <!-- Card 3 -->
+                        <label class="cursor-pointer group relative flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/5 bg-card-gradient p-5 shadow-3d transition-all active:scale-95 has-[:checked]:border-primary has-[:checked]:shadow-glow">
+                            <input class="invisible absolute" name="voice" type="radio" value="female"/>
+                            <div class="h-10 w-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 group-has-[:checked]:bg-primary group-has-[:checked]:text-white transition-all">
+                                <span class="material-symbols-rounded">face_3</span>
+                            </div>
+                            <span class="text-sm font-bold text-gray-300 group-has-[:checked]:text-white">Female</span>
+                        </label>
+                        <!-- Card 4 -->
+                        <label class="cursor-pointer group relative flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/5 bg-card-gradient p-5 shadow-3d transition-all active:scale-95 has-[:checked]:border-primary has-[:checked]:shadow-glow">
+                            <input class="invisible absolute" name="voice" type="radio" value="male"/>
+                            <div class="h-10 w-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 group-has-[:checked]:bg-primary group-has-[:checked]:text-white transition-all">
+                                <span class="material-symbols-rounded">face_6</span>
+                            </div>
+                            <span class="text-sm font-bold text-gray-300 group-has-[:checked]:text-white">Male</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Toggles -->
+                <div class="flex flex-col gap-4 pt-2">
+                    <!-- Subtitles Toggle -->
+                    <div class="flex items-center justify-between rounded-2xl bg-card-dark p-4 border border-white/5 shadow-3d">
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-gray-400">
+                                <span class="material-symbols-rounded">subtitles</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-sm font-bold text-white">Auto-Subtitles</span>
+                                <span class="text-[10px] text-gray-500 uppercase font-bold tracking-wide">From script</span>
+                            </div>
+                        </div>
+                        <div class="relative inline-block w-12 align-middle select-none">
+                            <input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-2 border-card-dark appearance-none cursor-pointer transition-all duration-300 ease-in-out shadow-lg" id="subtitles-toggle" name="toggle" type="checkbox"/>
+                            <label class="toggle-label block overflow-hidden h-6 rounded-full bg-[#3A3A3C] cursor-pointer transition-colors duration-300 ease-in-out" for="subtitles-toggle"></label>
+                        </div>
+                    </div>
+
+                    <!-- Automation Toggle (Highlighted) -->
+                    <div class="flex items-center justify-between rounded-2xl bg-gradient-to-br from-card-dark to-[#1a0505] p-4 border border-primary/30 shadow-[0_4px_20px_-5px_rgba(255,59,48,0.15)] relative overflow-hidden">
+                        <!-- Glow Effect -->
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-primary/10 blur-2xl rounded-full pointer-events-none"></div>
+                        
+                        <div class="flex items-center gap-3 relative z-10">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary shadow-glow text-white">
+                                <span class="material-symbols-rounded">rocket_launch</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-bold text-white">Full Automation</span>
+                                </div>
+                                <span class="text-[10px] text-primary/80 font-bold uppercase tracking-wide">Auto-posts enabled</span>
+                            </div>
+                        </div>
+                        <div class="relative inline-block w-12 align-middle select-none z-10">
+                            <input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-2 border-card-dark appearance-none cursor-pointer transition-all duration-300 ease-in-out shadow-lg" id="automation-toggle" name="toggle" type="checkbox"/>
+                            <label class="toggle-label block overflow-hidden h-6 rounded-full bg-[#3A3A3C] cursor-pointer transition-colors duration-300 ease-in-out" for="automation-toggle"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pb-32 flex flex-col gap-4">
+                <!-- Competitor Analysis Button -->
+                <button onclick="switchView('competitor')" class="w-full flex items-center justify-between p-4 rounded-2xl bg-card-dark border border-white/10 hover:border-primary/50 transition-all group active:scale-[0.98]">
+                    <div class="flex items-center gap-3">
+                        <div class="size-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500">
+                            <span class="material-symbols-rounded">swords</span>
+                        </div>
+                        <div class="text-left">
+                            <h3 class="text-white font-bold text-sm">Competitor Analysis</h3>
+                            <p class="text-gray-500 text-xs">Track & Outperform</p>
+                        </div>
+                    </div>
+                    <span class="material-symbols-rounded text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
+                </button>
+
+                <!-- Connect YouTube Button (NEW) -->
+                <button onclick="switchView('connect-youtube')" class="w-full flex items-center justify-between p-4 rounded-2xl bg-card-dark border border-white/10 hover:border-primary/50 transition-all group active:scale-[0.98]">
+                    <div class="flex items-center gap-3">
+                        <div class="size-10 rounded-xl bg-white/10 flex items-center justify-center text-white">
+                            <span class="material-symbols-rounded">youtube_activity</span>
+                        </div>
+                        <div class="text-left">
+                            <h3 class="text-white font-bold text-sm">Connect YouTube</h3>
+                            <p class="text-gray-500 text-xs">Sync Data & Uploads</p>
+                        </div>
+                    </div>
+                    <span class="material-symbols-rounded text-gray-500 group-hover:text-white transition-colors">chevron_right</span>
+                </button>
+
+                <!-- Floating Island Activation Button -->
+                <button class="w-full h-14 rounded-2xl bg-gradient-primary hover:brightness-110 active:scale-[0.97] transition-all text-white font-bold text-base flex items-center justify-center gap-2 shadow-glow border border-white/20">
+                    <span class="material-symbols-rounded text-2xl">play_circle</span>
+                    <span>Activate Channel AI</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============================================== -->
+<!-- VIEW 4: ANALYTICS (Keyword Tool)               -->
+<!-- ============================================== -->
+<div id="view-analytics" class="view-section text-slate-900 dark:text-white selection:bg-primary/30">
     
-    <div class="language-modal-overlay" id="languageModalOverlay">
-        <div class="language-modal">
-            <ul id="languageList">
-                <!-- Language list will be populated by JavaScript -->
-            </ul>
+    <!-- Sticky Header Section -->
+
+    <div class="flex-none z-40 glass transition-all">
+        <!-- Top App Bar -->
+        <div class="flex items-center p-4 pb-2 justify-between">
+            <div onclick="switchView('dashboard')" class="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer active:scale-90 shadow-lg">
+                <span class="material-symbols-rounded text-white">arrow_back</span>
+            </div>
+            <h2 class="text-lg font-display font-bold leading-tight tracking-wide flex-1 text-center text-white">Keyword Research</h2>
+            <div class="flex w-10 items-center justify-end">
+                <button class="flex items-center justify-center rounded-full size-10 bg-transparent hover:bg-white/5 transition-colors text-gray-400 hover:text-white">
+                    <span class="material-symbols-rounded">tune</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Search Bar (3D Inset) -->
+        <div class="px-5 py-2">
+            <label class="flex flex-col w-full relative group">
+                <div class="flex w-full items-stretch rounded-2xl h-12 shadow-inner-slot bg-white dark:bg-[#121212] border border-gray-200 dark:border-white/5 group-focus-within:border-primary/50 group-focus-within:ring-1 group-focus-within:ring-primary/50 transition-all">
+                    <div class="flex items-center justify-center pl-4 rounded-l-2xl">
+                        <span class="material-symbols-rounded text-gray-400 group-focus-within:text-primary transition-colors">search</span>
+                    </div>
+                    <input class="flex w-full min-w-0 flex-1 bg-transparent border-none focus:ring-0 text-sm font-medium placeholder:text-gray-600 px-3 text-slate-900 dark:text-white" placeholder="Enter topic (e.g. 'Vegan Cooking')" value=""/>
+                    <button class="px-5 text-primary font-bold text-sm hover:text-white hover:bg-primary/10 rounded-r-2xl transition-colors">
+                        Analyze
+                    </button>
+                </div>
+            </label>
+        </div>
+
+        <!-- Segmented Buttons (Tabs) -->
+        <div class="px-5 py-2">
+            <div class="flex h-10 w-full items-center justify-center rounded-xl bg-gray-200 dark:bg-[#121212] p-1 border border-white/5">
+                <label class="flex cursor-pointer h-full flex-1 items-center justify-center overflow-hidden rounded-lg transition-all relative z-10">
+                    <input checked="" class="peer sr-only" name="view-type" type="radio" value="Related Keywords"/>
+                    <span class="text-xs font-bold text-gray-500 peer-checked:bg-card-dark peer-checked:text-white peer-checked:shadow-sm peer-checked:border peer-checked:border-white/10 w-full h-full flex items-center justify-center rounded-lg transition-all">Related Keywords</span>
+                </label>
+                <label class="flex cursor-pointer h-full flex-1 items-center justify-center overflow-hidden rounded-lg transition-all relative z-10">
+                    <input class="peer sr-only" name="view-type" type="radio" value="Long-Tail Suggestions"/>
+                    <span class="text-xs font-bold text-gray-500 peer-checked:bg-card-dark peer-checked:text-white peer-checked:shadow-sm peer-checked:border peer-checked:border-white/10 w-full h-full flex items-center justify-center rounded-lg transition-all">Long-Tail Suggestions</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Filter Chips -->
+        <div class="flex gap-2 px-5 py-2 overflow-x-auto hide-scrollbar pb-4">
+            <button class="flex h-8 shrink-0 items-center justify-center gap-x-1.5 rounded-full border border-gray-200 dark:border-white/10 bg-white dark:bg-card-dark px-3 active:scale-95 transition-transform hover:bg-white/5">
+                <span class="material-symbols-rounded text-gray-500 dark:text-gray-400 text-[18px]">public</span>
+                <p class="text-slate-700 dark:text-gray-300 text-xs font-bold whitespace-nowrap">US</p>
+                <span class="material-symbols-rounded text-gray-400 dark:text-gray-500 text-[18px]">arrow_drop_down</span>
+            </button>
+            <button class="flex h-8 shrink-0 items-center justify-center gap-x-1.5 rounded-full border border-gray-200 dark:border-white/10 bg-white dark:bg-card-dark px-3 active:scale-95 transition-transform hover:bg-white/5">
+                <span class="material-symbols-rounded text-gray-500 dark:text-gray-400 text-[18px]">language</span>
+                <p class="text-slate-700 dark:text-gray-300 text-xs font-bold whitespace-nowrap">EN</p>
+                <span class="material-symbols-rounded text-gray-400 dark:text-gray-500 text-[18px]">arrow_drop_down</span>
+            </button>
+            <button class="flex h-8 shrink-0 items-center justify-center gap-x-1.5 rounded-full border border-gray-200 dark:border-white/10 bg-white dark:bg-card-dark px-3 active:scale-95 transition-transform hover:border-green-500/50">
+                <span class="material-symbols-rounded text-green-600 dark:text-green-500 text-[18px]">check_circle</span>
+                <p class="text-slate-700 dark:text-gray-300 text-xs font-bold whitespace-nowrap">Low Comp</p>
+            </button>
+            <button class="flex h-8 shrink-0 items-center justify-center gap-x-1.5 rounded-full border border-gray-200 dark:border-white/10 bg-white dark:bg-card-dark px-3 active:scale-95 transition-transform hover:border-primary/50">
+                <span class="material-symbols-rounded text-blue-600 dark:text-primary text-[18px]">trending_up</span>
+                <p class="text-slate-700 dark:text-gray-300 text-xs font-bold whitespace-nowrap">Trending</p>
+            </button>
         </div>
     </div>
 
-    <script>
-        // --- THIS IS THE ORIGINAL SCRIPT FOR PAGE FUNCTIONALITY ---
-        document.addEventListener('DOMContentLoaded', () => {
-            let currentLang = 'en';
-            let passwordAttemptCounter = 1;
+    <!-- Scrollable Content Area -->
+    <!-- Added extra bottom padding (pb-40) to ensure content scrolls above nav -->
+    <div class="flex-1 overflow-y-auto px-5 pb-48">
 
-            const elements = {
-                // NEW ELEMENTS
-                welcomeScreen: document.getElementById('welcomeScreen'),
-                containerWrapper: document.querySelector('.container-wrapper'),
-                startButton: document.getElementById('startButton'),
-                signUpButton: document.getElementById('signUpButton'),
-                logoutButton: document.getElementById('logoutButton'),
+        <!-- Summary Headline -->
+        <div class="flex items-baseline justify-between pt-2 pb-4">
+            <h3 class="text-lg font-bold leading-tight text-white tracking-wide">Top Opportunities</h3>
+            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">124 results found</span>
+        </div>
 
-                // ORIGINAL ELEMENTS
-                emailStep: document.getElementById('emailStep'),
-                passwordStep: document.getElementById('passwordStep'),
-                emailForm: document.getElementById('emailForm'),
-                passwordForm: document.getElementById('passwordForm'),
-                emailInput: document.getElementById('emailInput'),
-                passwordInput: document.getElementById('passwordInput'),
-                userEmailDisplay: document.getElementById('userEmail'),
-                emailMessage: document.getElementById('emailMessage'),
-                passwordMessage: document.getElementById('passwordMessage'),
-                nextPasswordBtn: document.getElementById('nextPasswordBtn'),
-                languageSelectorBtn: document.getElementById('languageSelectorBtn'),
-                languageModalOverlay: document.getElementById('languageModalOverlay'),
-                languageList: document.getElementById('languageList'),
-                currentLanguageSpan: document.getElementById('currentLanguage')
-            };
-
-            const translations = {
-                en: {
-                    signIn: "Sign in", useYourAccount: "Use your Google Account", emailLabel: "Email or phone",
-                    forgotEmail: "Forgot email?", createAccount: "Create account", next: "Next",
-                    welcome: "Welcome", passwordLabel: "Enter your password", help: "Help", privacy: "Privacy", terms: "Terms",
-                    forgotPassword: "Forgot password?",
-                    success_login: "Sign up Successful! Welcome.",
-                    wrong_password: "Wrong password. Try again or click Forgot password to reset it.",
-                    email_not_found: "Couldn't find your Google Account"
-                },
-                hi: {
-                    signIn: "साइन इन करें", useYourAccount: "अपने Google खाते का उपयोग करें", emailLabel: "ईमेल या फ़ोन",
-                    forgotEmail: "ईमेल भूल गए?", createAccount: "खाता बनाएं", next: "आगे बढ़ें",
-                    welcome: "आपका स्वागत है", passwordLabel: "अपना पासवर्ड डालें", help: "सहायता", privacy: "निजता", terms: "शर्तें",
-                    forgotPassword: "पासवर्ड भूल गए?",
-                    success_login: "साइन अप सफल! आपका स्वागत है।",
-                    wrong_password: "गलत पासवर्ड। फिर से प्रयास करें या अपना पासवर्ड रीसेट करने के लिए 'पासवर्ड भूल गए' पर क्लिक करें।",
-                    email_not_found: "आपका Google खाता नहीं मिला"
-                }
-            };
+        <!-- Featured Card (High Potential) -->
+        <div class="mb-5 relative overflow-hidden rounded-2xl bg-gradient-primary p-5 shadow-glow text-white border border-white/20">
+            <!-- Decor -->
+            <div class="absolute -top-4 -right-4 p-3 opacity-20 rotate-12">
+                <span class="material-symbols-rounded text-[120px]">rocket_launch</span>
+            </div>
             
-            const languageData = {
-                'en': 'English (United Kingdom)', 'hi': 'हिन्दी', 'af': 'Afrikaans', 'az': 'Azərbaycan', 'id': 'Bahasa Indonesia',
-                'ms': 'Bahasa Melayu', 'ca': 'Català', 'cs': 'Čeština', 'da': 'Dansk', 'de': 'Deutsch', 'et': 'Eesti',
-                'es': 'Español (España)', 'es-419': 'Español (Latinoamérica)', 'eu': 'Euskara', 'fil': 'Filipino',
-                'fr': 'Français', 'fr-ca': 'Français (Canada)', 'gl': 'Galego', 'hr': 'Hrvatski', 'zu': 'IsiZulu',
-                'is': 'Íslenska', 'it': 'Italiano', 'sw': 'Kiswahili', 'lv': 'Latviešu', 'lt': 'Lietuvių', 'hu': 'Magyar',
-                'nl': 'Nederlands', 'no': 'Norsk', 'pl': 'Polski', 'pt-br': 'Português (Brasil)', 'pt-pt': 'Português (Portugal)',
-                'ro': 'Română', 'sk': 'Slovenčina', 'sl': 'Slovenščina', 'fi': 'Suomi', 'sv': 'Svenska', 'vi': 'Tiếng Việt',
-                'tr': 'Türkçe', 'el': 'Ελληνικά', 'bg': 'Български', 'ru': 'Русский', 'sr': 'Срски', 'uk': 'Українська',
-                'he': 'עברית', 'ar': 'العربية', 'fa': 'فارسی', 'mr': 'मराठी', 'th': 'ไทย', 'ko': '한국어',
-                'zh-cn': '中文 (简体)', 'zh-tw': '中文 (繁體)', 'ja': '日本語'
-            };
-            
-            // --- NEW FUNCTIONS FOR SESSION MANAGEMENT ---
-            function checkLoginStatus() {
-                if (localStorage.getItem('isUserSignedUp') === 'true') {
-                    elements.startButton.disabled = false;
-                    elements.signUpButton.classList.add('hidden');
-                    elements.logoutButton.classList.remove('hidden');
-                } else {
-                    elements.startButton.disabled = true;
-                    elements.signUpButton.classList.remove('hidden');
-                    elements.logoutButton.classList.add('hidden');
-                }
-            }
-            
-            elements.signUpButton.addEventListener('click', () => {
-                elements.welcomeScreen.classList.add('hidden');
-                elements.containerWrapper.classList.remove('hidden');
-            });
-
-            elements.logoutButton.addEventListener('click', () => {
-                localStorage.removeItem('isUserSignedUp');
-                checkLoginStatus();
-                alert('You have been logged out.');
-            });
-            
-            elements.startButton.addEventListener('click', () => {
-                if (!elements.startButton.disabled) {
-                    window.location.href = 'https://movixhub.netlify.app';
-                }
-            });
-
-            // --- ORIGINAL FUNCTIONS MODIFIED/KEPT ---
-            const populateLanguageList = () => {
-                elements.languageList.innerHTML = '';
-                for (const [code, name] of Object.entries(languageData)) {
-                    const li = document.createElement('li');
-                    li.setAttribute('data-lang-code', code);
-                    const isChecked = code === currentLang;
-                    li.innerHTML = `
-                        <input type="radio" id="lang-${code}" name="language" value="${code}" ${isChecked ? 'checked' : ''}>
-                        <label for="lang-${code}">${name}</label>
-                    `;
-                    elements.languageList.appendChild(li);
-                }
-            };
-
-            const updateLanguage = (lang) => {
-                currentLang = lang;
-                const langPack = translations[lang] || translations['en']; 
+            <div class="relative z-10">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="bg-black/30 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-white/10">Top Pick</span>
+                </div>
+                <h3 class="text-2xl font-display font-bold mb-1 tracking-tight">Vegan Meal Prep</h3>
                 
-                document.querySelectorAll('[data-translate]').forEach(el => {
-                    const key = el.dataset.translate;
-                    if (langPack[key]) {
-                        el.innerHTML = langPack[key];
-                    }
-                });
+                <div class="flex gap-6 mt-5">
+                    <div>
+                        <p class="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-0.5">Volume</p>
+                        <p class="font-bold text-xl font-display">120K</p>
+                    </div>
+                    <div>
+                        <p class="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-0.5">Score</p>
+                        <p class="font-bold text-xl font-display">94</p>
+                    </div>
+                    <div>
+                        <p class="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-0.5">Trend</p>
+                        <div class="flex items-center text-white font-bold text-xl font-display">
+                            <span class="material-symbols-rounded mr-0.5 text-lg">trending_up</span>
+                            +12%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keyword List -->
+        <div class="space-y-3">
+            
+            <!-- List Item 1 -->
+            <div class="bg-white dark:bg-card-gradient rounded-2xl p-4 shadow-3d border border-gray-100 dark:border-white/10 flex flex-col gap-3 group active:scale-[0.99] transition-transform">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 class="font-bold text-base text-slate-900 dark:text-white group-hover:text-primary transition-colors">Easy Vegan Dinner</h4>
+                        <div class="flex items-center gap-2 mt-1.5">
+                            <div class="flex items-center gap-1 bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-500 px-2 py-0.5 rounded text-[10px] font-bold border border-green-500/20">
+                                <span class="material-symbols-rounded text-[14px]">trophy</span>
+                                Low Comp
+                            </div>
+                            <span class="text-gray-300 dark:text-gray-700">•</span>
+                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Rel: 98</span>
+                        </div>
+                    </div>
+                    <button class="size-9 flex items-center justify-center rounded-full bg-gray-50 dark:bg-white/5 text-gray-400 hover:text-white hover:bg-primary transition-colors border border-transparent hover:border-white/20 shadow-sm">
+                        <span class="material-symbols-rounded text-[20px]">bookmark_add</span>
+                    </button>
+                </div>
+                <div class="h-px bg-gray-100 dark:bg-white/5 w-full"></div>
+                <div class="flex items-end justify-between">
+                    <div class="flex gap-6">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-bold">Volume</span>
+                            <span class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">45.2K</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-bold">CPC</span>
+                            <span class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">$1.24</span>
+                        </div>
+                    </div>
+                    <!-- Sparkline Chart -->
+                    <div class="flex flex-col items-end gap-1">
+                        <svg fill="none" height="24" viewbox="0 0 80 24" width="80" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 18C1 18 10 12 18 14C26 16 28 8 36 10C44 12 50 16 58 12C66 8 72 4 79 1" stroke="#30D158" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                            <defs>
+                                <lineargradient gradientunits="userSpaceOnUse" id="paint0_linear" x1="40" x2="40" y1="1" y2="24">
+                                    <stop stop-color="#30D158" stop-opacity="0.2"></stop>
+                                    <stop offset="1" stop-color="#30D158" stop-opacity="0"></stop>
+                                </lineargradient>
+                            </defs>
+                        </svg>
+                        <span class="text-[10px] text-green-500 font-bold">+8%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List Item 2 -->
+            <div class="bg-white dark:bg-card-gradient rounded-2xl p-4 shadow-3d border border-gray-100 dark:border-white/10 flex flex-col gap-3 group active:scale-[0.99] transition-transform">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 class="font-bold text-base text-slate-900 dark:text-white group-hover:text-primary transition-colors">Plant Based Diet</h4>
+                        <div class="flex items-center gap-2 mt-1.5">
+                            <div class="flex items-center gap-1 bg-yellow-100 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-500 px-2 py-0.5 rounded text-[10px] font-bold border border-yellow-500/20">
+                                <span class="material-symbols-rounded text-[14px]">equalizer</span>
+                                Med Comp
+                            </div>
+                            <span class="text-gray-300 dark:text-gray-700">•</span>
+                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Rel: 85</span>
+                        </div>
+                    </div>
+                    <button class="size-9 flex items-center justify-center rounded-full bg-gray-50 dark:bg-white/5 text-gray-400 hover:text-white hover:bg-primary transition-colors border border-transparent hover:border-white/20 shadow-sm">
+                        <span class="material-symbols-rounded text-[20px]">bookmark_add</span>
+                    </button>
+                </div>
+                <div class="h-px bg-gray-100 dark:bg-white/5 w-full"></div>
+                <div class="flex items-end justify-between">
+                    <div class="flex gap-6">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-bold">Volume</span>
+                            <span class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">32.8K</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-bold">CPC</span>
+                            <span class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">$3.50</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-end gap-1">
+                        <svg fill="none" height="24" viewbox="0 0 80 24" width="80" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 12C1 12 10 18 18 16C26 14 28 6 36 8C44 10 50 20 58 18C66 16 72 8 79 4" stroke="#8E8E93" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                        </svg>
+                        <span class="text-[10px] text-gray-500 font-bold">Stable</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List Item 3 -->
+            <div class="bg-white dark:bg-card-gradient rounded-2xl p-4 shadow-3d border border-gray-100 dark:border-white/10 flex flex-col gap-3 group active:scale-[0.99] transition-transform">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 class="font-bold text-base text-slate-900 dark:text-white group-hover:text-primary transition-colors">Vegan Breakfast Ideas</h4>
+                        <div class="flex items-center gap-2 mt-1.5">
+                            <div class="flex items-center gap-1 bg-red-100 dark:bg-primary/10 text-red-700 dark:text-primary px-2 py-0.5 rounded text-[10px] font-bold border border-primary/20">
+                                <span class="material-symbols-rounded text-[14px]">local_fire_department</span>
+                                High Comp
+                            </div>
+                            <span class="text-gray-300 dark:text-gray-700">•</span>
+                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Rel: 72</span>
+                        </div>
+                    </div>
+                    <button class="size-9 flex items-center justify-center rounded-full bg-gray-50 dark:bg-white/5 text-gray-400 hover:text-white hover:bg-primary transition-colors border border-transparent hover:border-white/20 shadow-sm">
+                        <span class="material-symbols-rounded text-[20px]">bookmark_add</span>
+                    </button>
+                </div>
+                <div class="h-px bg-gray-100 dark:bg-white/5 w-full"></div>
+                <div class="flex items-end justify-between">
+                    <div class="flex gap-6">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-bold">Volume</span>
+                            <span class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">89.1K</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-bold">CPC</span>
+                            <span class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">$0.85</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-end gap-1">
+                        <svg fill="none" height="24" viewbox="0 0 80 24" width="80" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 20C8 16 15 8 22 6C29 4 36 12 43 14C50 16 57 8 64 6C71 4 75 2 79 1" stroke="#ef4444" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                        </svg>
+                        <span class="text-[10px] text-red-500 font-bold">-2%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List Item 4 -->
+            <div class="bg-white dark:bg-card-gradient rounded-2xl p-4 shadow-3d border border-gray-100 dark:border-white/10 flex flex-col gap-3 group active:scale-[0.99] transition-transform">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 class="font-bold text-base text-slate-900 dark:text-white group-hover:text-primary transition-colors">Cheap Vegan Prep</h4>
+                        <div class="flex items-center gap-2 mt-1.5">
+                            <div class="flex items-center gap-1 bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-500 px-2 py-0.5 rounded text-[10px] font-bold border border-green-500/20">
+                                <span class="material-symbols-rounded text-[14px]">trophy</span>
+                                Low Comp
+                            </div>
+                            <span class="text-gray-300 dark:text-gray-700">•</span>
+                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Rel: 68</span>
+                        </div>
+                    </div>
+                    <button class="size-9 flex items-center justify-center rounded-full bg-gray-50 dark:bg-white/5 text-primary border border-transparent hover:bg-primary/20 transition-colors shadow-sm">
+                        <span class="material-symbols-rounded text-[20px]">bookmark_added</span>
+                    </button>
+                </div>
+                <div class="h-px bg-gray-100 dark:bg-white/5 w-full"></div>
+                <div class="flex items-end justify-between">
+                    <div class="flex gap-6">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-bold">Volume</span>
+                            <span class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">12.4K</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-bold">CPC</span>
+                            <span class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">$0.42</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-end gap-1">
+                        <svg fill="none" height="24" viewbox="0 0 80 24" width="80" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 23C10 20 15 15 20 12C28 8 35 16 42 14C50 12 55 6 62 4C70 2 75 1 79 0" stroke="#30D158" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                        </svg>
+                        <span class="text-[10px] text-green-500 font-bold">+15%</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+    </div>
+
+</div>
+
+<!-- ============================================== -->
+<!-- VIEW 5: NEW PROJECT (Generated from prompt)    -->
+<!-- ============================================== -->
+<div id="view-new-project" class="view-section">
+    <div class="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden pb-32 max-w-md mx-auto border-x border-white/5 shadow-2xl bg-black">
+
+        <!-- Header -->
+        <div class="sticky top-0 z-50 flex items-center glass p-4 pb-3 justify-between transition-all">
+            <div onclick="switchView('studio')" class="text-white flex size-10 shrink-0 items-center justify-center rounded-full bg-white/5 border border-white/10 hover:bg-white/10 active:scale-90 transition-all cursor-pointer">
+                <span class="material-symbols-rounded text-[20px]">arrow_back_ios_new</span>
+            </div>
+            <h2 class="text-gray-900 dark:text-white text-lg font-display font-bold leading-tight tracking-wide flex-1 text-center">New Project</h2>
+            <div class="flex w-10 items-center justify-end">
+                <button class="flex cursor-pointer items-center justify-center rounded-full size-10 text-gray-400 hover:text-white transition-colors">
+                    <span class="material-symbols-rounded text-[24px]">more_horiz</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 1. Target Niche Section -->
+        <div>
+            <h2 class="text-gray-900 dark:text-white tracking-tight text-xl font-display font-bold leading-tight px-5 text-left pb-3 pt-6 flex items-center gap-2">
+                <span class="flex items-center justify-center size-6 rounded-full bg-primary text-white text-xs font-bold">1</span>
+                Target Niche
+            </h2>
+            <div class="px-5">
+                <div class="flex items-stretch justify-between gap-4 rounded-2xl bg-white dark:bg-card-gradient p-4 shadow-3d border border-gray-200 dark:border-white/10 group">
+                    <div class="flex flex-[2_2_0px] flex-col justify-center gap-3">
+                        <div class="flex flex-col gap-1">
+                            <p class="text-gray-900 dark:text-white text-lg font-bold leading-tight">Faceless Finance</p>
+                            <p class="text-gray-500 dark:text-gray-400 text-xs font-bold leading-normal uppercase tracking-wider flex items-center gap-1">
+                                <span class="size-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                                Current Selection
+                            </p>
+                        </div>
+                        <button class="flex items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-gray-100 dark:bg-white/5 text-gray-900 dark:text-white gap-2 text-xs font-bold w-fit transition-all hover:bg-gray-200 dark:hover:bg-white/10 border border-transparent dark:border-white/10 active:scale-95">
+                            <span class="material-symbols-rounded text-[16px]">edit</span>
+                            <span class="truncate">Change</span>
+                        </button>
+                    </div>
+                    <div class="w-24 bg-center bg-no-repeat bg-cover rounded-xl aspect-square shadow-inner border border-white/10" data-alt="Abstract finance concept with graphs and coins" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC0eHOt4Wkm1lLEEiRiTh_WT3OTWyHsiQTphLiU9YMICzs3zyEg-RReWV797fjDfk-NUIUJJGs4B5W8i5YNQa1VQPrgem3yZcOp37FbZr3w0BniIyOz9uC-PGRU9z2sAsu68p0fgjj4EPVTlwWTc_mIz683lwYPipteJYNEtzAUiU38T93tZ1XtrZFgbivajniI_WJR1eaNVJkLcrJ4ZTOjKJKcA9WbxtV33T4CjRjqdKwTPDCG8AWQs14TlV_RpKFE1PazBP52ZcVQ");'></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Video Topic Section -->
+        <div>
+            <h2 class="text-gray-900 dark:text-white tracking-tight text-xl font-display font-bold leading-tight px-5 text-left pb-3 pt-8 flex items-center gap-2">
+                <span class="flex items-center justify-center size-6 rounded-full bg-primary text-white text-xs font-bold">2</span>
+                Video Topic
+            </h2>
+            
+            <!-- Tabs -->
+            <div class="px-5 pb-5">
+                <div class="flex border-b border-gray-200 dark:border-white/10 gap-8">
+                    <button class="flex flex-col items-center justify-center border-b-[2px] border-primary text-primary pb-3 px-1 transition-colors">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-rounded text-[18px]">auto_awesome</span>
+                            <p class="text-sm font-bold leading-normal tracking-wide">AI Suggestion</p>
+                        </div>
+                    </button>
+                    <button class="flex flex-col items-center justify-center border-b-[2px] border-transparent text-gray-400 hover:text-white dark:text-gray-500 dark:hover:text-white pb-3 px-1 transition-colors">
+                        <p class="text-sm font-bold leading-normal tracking-wide">Manual Input</p>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- AI Suggestions Chips -->
+            <div class="flex gap-3 overflow-x-auto px-5 pb-2 no-scrollbar">
+                <button class="shrink-0 rounded-full bg-gradient-primary text-white px-5 py-2.5 text-sm font-bold shadow-glow border border-transparent transition-transform active:scale-95 flex items-center gap-1">
+                     <span class="material-symbols-rounded text-[16px]">check</span>
+                     Passive Income 2024
+                </button>
+                <button class="shrink-0 rounded-full bg-white dark:bg-card-dark border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 px-5 py-2.5 text-sm font-medium whitespace-nowrap hover:border-primary/50 hover:text-white transition-colors">
+                     Crypto Crash Course
+                </button>
+                <button class="shrink-0 rounded-full bg-white dark:bg-card-dark border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 px-5 py-2.5 text-sm font-medium whitespace-nowrap hover:border-primary/50 hover:text-white transition-colors">
+                     High Yield Savings
+                </button>
+                <button class="shrink-0 rounded-full bg-white dark:bg-card-dark border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 px-5 py-2.5 text-sm font-medium whitespace-nowrap hover:border-primary/50 hover:text-white transition-colors">
+                     Stock Market Basics
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. Preview Assets Section -->
+        <div>
+            <div class="flex items-center justify-between px-5 pb-4 pt-8">
+                <h2 class="text-gray-900 dark:text-white tracking-tight text-xl font-display font-bold leading-tight flex items-center gap-2">
+                    <span class="flex items-center justify-center size-6 rounded-full bg-primary text-white text-xs font-bold">3</span>
+                    Preview Assets
+                </h2>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-1 rounded border border-primary/20">AI Generated</span>
+            </div>
+            
+            <div class="px-5 flex flex-col gap-6">
+                <!-- Thumbnail Preview -->
+                <div class="relative group w-full aspect-video rounded-2xl overflow-hidden shadow-3d border border-gray-200 dark:border-white/10">
+                    <img class="w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-105" data-alt="Golden coin chart visualization" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqBYHTetDtUKzfCpZXruQQesEtngQrStZhp84yjemqo8dxtqsE4ekg7rfj14myFHIiW2CvLejEEJjEStbHQvwFC1OmuySjDS4kPzOq0IXqzH_haqMDxZuImkpTDgH-07Pduix4mix9aRMY0iiOpgoqVLUgWB785Vldyf7ML5_Jof7gkhrG6QQz7GzU5dZ2ePbV5ybIbGVvs8-_y-hYqzeSqqH8Af8QIhtlRPCvHqZw8dwVtkjHBZFTHM78tOwFC7eNDeSedrODVYd3"/>
+                    <!-- Thumbnail Overlay UI -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent flex flex-col justify-end p-4">
+                        <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-md rounded-lg px-2.5 py-1.5 text-white text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 border border-white/10">
+                            <span class="material-symbols-rounded text-[14px]">image</span> Thumbnail
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white rounded-xl p-2.5 transition-colors border border-white/10 active:scale-95">
+                                <span class="material-symbols-rounded text-[20px]">refresh</span>
+                            </button>
+                            <button class="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white rounded-xl p-2.5 transition-colors border border-white/10 active:scale-95">
+                                <span class="material-symbols-rounded text-[20px]">edit</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Title Selection -->
+                <div class="bg-white dark:bg-card-dark rounded-2xl p-5 border border-gray-200 dark:border-white/10 shadow-3d">
+                    <div class="flex items-center gap-2 mb-4 text-gray-500 dark:text-gray-400">
+                        <span class="material-symbols-rounded text-[20px]">title</span>
+                        <span class="text-xs font-bold uppercase tracking-wider">Select a Title</span>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <label class="flex items-start gap-3 p-3.5 rounded-xl border border-primary bg-primary/5 cursor-pointer transition-all hover:bg-primary/10">
+                            <input checked="" class="mt-1 size-4 text-primary bg-transparent border-gray-500 focus:ring-primary focus:ring-offset-background-dark" name="video_title" type="radio"/>
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white leading-snug">How to Make $1k/Month Sleeping</span>
+                        </label>
+                        <label class="flex items-start gap-3 p-3.5 rounded-xl border border-gray-200 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-all">
+                            <input class="mt-1 size-4 text-primary bg-transparent border-gray-500 focus:ring-primary focus:ring-offset-background-dark" name="video_title" type="radio"/>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300 leading-snug">The Truth About Passive Income in 2024</span>
+                        </label>
+                        <label class="flex items-start gap-3 p-3.5 rounded-xl border border-gray-200 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-all">
+                            <input class="mt-1 size-4 text-primary bg-transparent border-gray-500 focus:ring-primary focus:ring-offset-background-dark" name="video_title" type="radio"/>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300 leading-snug">5 Easy Ways to Start Investing Today</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Script Snippet -->
+                <div class="bg-white dark:bg-card-dark rounded-2xl p-5 border border-gray-200 dark:border-white/10 shadow-3d">
+                    <div class="flex items-center justify-between mb-3 text-gray-500 dark:text-gray-400">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-rounded text-[20px]">description</span>
+                            <span class="text-xs font-bold uppercase tracking-wider">Script Preview</span>
+                        </div>
+                        <span class="text-xs text-primary cursor-pointer hover:text-white font-bold transition-colors">Full Script</span>
+                    </div>
+                    <div class="relative">
+                        <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed font-body">
+                            <span class="text-primary font-bold">[Intro Hook]:</span> Everyone wants to make money while they sleep, but is it actually possible without a massive upfront investment? Today, we're breaking down the top 3 methods...
+                        </p>
+                        <div class="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-white dark:from-card-dark to-transparent"></div>
+                    </div>
+                    <button class="mt-1 w-full flex items-center justify-center gap-1 text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-primary transition-colors py-2">
+                         Read More <span class="material-symbols-rounded text-[16px]">expand_more</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spacer for fixed footer -->
+        <div class="h-8"></div>
+
+        <!-- Fixed Action Bar (Glass Island) -->
+        <div class="fixed bottom-0 left-0 w-full bg-background-light/80 dark:bg-black/80 backdrop-blur-xl border-t border-gray-200 dark:border-white/10 p-5 pb-8 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+            <div class="max-w-md mx-auto flex flex-col gap-4">
+                <div class="flex items-center justify-center gap-2 text-gray-500 dark:text-gray-400">
+                    <span class="material-symbols-rounded text-[16px] text-primary animate-pulse">schedule</span>
+                    <p class="text-xs font-bold tracking-wide">Est. upload time: ~5 mins</p>
+                </div>
+                <button class="group relative flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-2xl h-14 bg-gradient-primary text-white gap-3 text-base font-bold leading-normal tracking-wide shadow-glow transition-all active:scale-[0.98] border border-white/20">
+                    <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                    <span class="material-symbols-rounded text-[24px]">rocket_launch</span>
+                    <span>Generate & Optimize Video</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============================================== -->
+<!-- VIEW 6: COMPETITOR ANALYSIS (NEW)              -->
+<!-- ============================================== -->
+<div id="view-competitor" class="view-section">
+    <div class="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden pb-24 max-w-md mx-auto border-x border-white/5 shadow-2xl bg-black">
+
+    <!-- Header (Glass) -->
+    <div class="sticky top-0 z-50 flex items-center glass p-4 pb-3 justify-between transition-all">
+        <div onclick="switchView('setup')" class="text-white flex size-10 shrink-0 items-center justify-center rounded-full bg-white/5 border border-white/10 hover:bg-white/10 active:scale-90 transition-all cursor-pointer shadow-lg">
+            <span class="material-symbols-rounded">arrow_back</span>
+        </div>
+        <h2 class="text-slate-900 dark:text-white text-lg font-display font-bold leading-tight tracking-wide flex-1 text-center">Competitor Intel</h2>
+        <div class="flex size-10 items-center justify-center rounded-full hover:bg-white/5 transition-colors cursor-pointer text-gray-400 hover:text-white">
+            <span class="material-symbols-rounded">help</span>
+        </div>
+    </div>
+
+    <!-- Input Section -->
+    <div class="flex flex-col px-5 py-4 gap-4 bg-background-light dark:bg-black">
+        <!-- Segmented Control -->
+        <div class="flex h-10 w-full items-center justify-center rounded-xl bg-slate-200 dark:bg-[#121212] p-1 border border-white/5">
+            <label class="flex-1 cursor-pointer h-full relative z-10">
+                <input type="radio" name="search-type" value="Paste URL" class="peer sr-only" checked>
+                <div class="flex items-center justify-center h-full rounded-lg text-xs font-bold transition-all text-gray-500 peer-checked:bg-card-dark peer-checked:text-white peer-checked:shadow-sm peer-checked:border peer-checked:border-white/10">Paste URL</div>
+            </label>
+            <label class="flex-1 cursor-pointer h-full relative z-10">
+                <input type="radio" name="search-type" value="Search Niche" class="peer sr-only">
+                <div class="flex items-center justify-center h-full rounded-lg text-xs font-bold transition-all text-gray-500 peer-checked:bg-card-dark peer-checked:text-white peer-checked:shadow-sm peer-checked:border peer-checked:border-white/10">Search Niche</div>
+            </label>
+        </div>
+
+        <!-- Search Bar (3D Inset) -->
+        <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <span class="material-symbols-rounded text-gray-500 group-focus-within:text-primary transition-colors">search</span>
+            </div>
+            <input class="form-input flex w-full rounded-2xl border-none bg-white dark:bg-[#121212] py-3.5 pl-11 pr-4 text-slate-900 dark:text-white placeholder:text-gray-600 focus:ring-1 focus:ring-primary/50 shadow-inner-slot transition-all font-medium text-sm" placeholder="Enter YouTube channel URL..." value=""/>
+        </div>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="flex-1 overflow-y-auto">
+        
+        <!-- Performance Summary Card (3D) -->
+        <div class="px-5 py-2">
+            <div class="flex flex-col gap-4 rounded-2xl bg-white dark:bg-card-gradient p-5 shadow-3d border border-slate-100 dark:border-white/10 relative overflow-hidden">
+                <!-- Background Glow -->
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-primary/10 blur-3xl rounded-full"></div>
                 
-                if (elements.emailMessage.innerHTML) {
-                    showError(elements.emailMessage, langPack.email_not_found, elements.emailInput);
-                }
-                if (elements.passwordMessage.innerHTML && !elements.passwordMessage.querySelector('.success-text')) {
-                     showError(elements.passwordMessage, langPack.wrong_password, elements.passwordInput);
-                }
+                <div class="flex items-center justify-between relative z-10">
+                    <h3 class="text-slate-900 dark:text-white text-base font-bold tracking-wide">You vs. Niche Avg</h3>
+                    <span class="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 text-xs font-bold text-green-500 border border-green-500/20 shadow-glow">
+                        <span class="material-symbols-rounded text-[14px]">trending_up</span>
+                        +15%
+                    </span>
+                </div>
+                
+                <div class="flex items-end gap-4 relative z-10">
+                    <div class="flex-1">
+                        <p class="text-3xl font-display font-bold text-slate-900 dark:text-white">42.5k</p>
+                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">Avg Views / Video</p>
+                    </div>
+                    <div class="h-10 w-[1px] bg-slate-200 dark:bg-white/10"></div>
+                    <div class="flex-1">
+                        <p class="text-3xl font-display font-bold text-slate-400 dark:text-gray-500">36.8k</p>
+                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">Niche Avg</p>
+                    </div>
+                </div>
 
-                elements.currentLanguageSpan.textContent = languageData[lang];
-                elements.languageModalOverlay.style.display = 'none';
-                const radioToUpdate = document.getElementById(`lang-${lang}`);
-                if(radioToUpdate) radioToUpdate.checked = true;
-            };
+                <!-- Red Bar Chart Visualization -->
+                <div class="mt-4 h-16 w-full flex items-end justify-between gap-1.5 px-1 relative z-10">
+                    <div class="w-full bg-slate-100 dark:bg-[#121212] rounded-t-sm h-[40%] relative group overflow-hidden">
+                        <div class="absolute bottom-0 w-full bg-primary/30 h-[60%] rounded-t-sm"></div>
+                    </div>
+                    <div class="w-full bg-slate-100 dark:bg-[#121212] rounded-t-sm h-[60%] relative group overflow-hidden">
+                        <div class="absolute bottom-0 w-full bg-primary/50 h-[50%] rounded-t-sm"></div>
+                    </div>
+                    <div class="w-full bg-slate-100 dark:bg-[#121212] rounded-t-sm h-[50%] relative group overflow-hidden">
+                        <div class="absolute bottom-0 w-full bg-primary/70 h-[70%] rounded-t-sm"></div>
+                    </div>
+                    <div class="w-full bg-slate-100 dark:bg-[#121212] rounded-t-sm h-[80%] relative group overflow-hidden shadow-[0_0_15px_rgba(255,0,0,0.3)]">
+                        <div class="absolute bottom-0 w-full bg-primary h-[90%] rounded-t-sm"></div>
+                    </div>
+                    <div class="w-full bg-slate-100 dark:bg-[#121212] rounded-t-sm h-[65%] relative group overflow-hidden">
+                        <div class="absolute bottom-0 w-full bg-primary/60 h-[60%] rounded-t-sm"></div>
+                    </div>
+                    <div class="w-full bg-slate-100 dark:bg-[#121212] rounded-t-sm h-[55%] relative group overflow-hidden">
+                        <div class="absolute bottom-0 w-full bg-primary/40 h-[40%] rounded-t-sm"></div>
+                    </div>
+                </div>
+                <p class="text-[10px] text-gray-500 font-medium text-center mt-1">Based on last 30 days performance</p>
+            </div>
+        </div>
 
-            const showError = (messageElement, text, inputElement) => {
-                const errorIcon = `<svg aria-hidden="true" fill="currentColor" focusable="false" width="16px" height="16px" viewBox="0 0 24 24" xmlns="https://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg>`;
-                messageElement.innerHTML = `<p class="error-text">${errorIcon}<span>${text}</span></p>`;
-                if (inputElement) {
-                    inputElement.classList.add('has-error');
-                }
-            };
+        <!-- Competitors List Header -->
+        <div class="flex items-center justify-between px-5 pt-4 pb-2">
+            <h3 class="text-slate-900 dark:text-white text-base font-bold tracking-wide">Tracked Competitors</h3>
+            <button class="text-primary text-xs font-bold hover:text-white transition-colors">View All</button>
+        </div>
+
+        <!-- Competitor Cards -->
+        <div class="flex flex-col gap-3 px-5">
             
-            const clearError = (messageElement, inputElement) => {
-                messageElement.innerHTML = '';
-                 if (inputElement) {
-                    inputElement.classList.remove('has-error');
-                }
-            };
+            <!-- Competitor 1 -->
+            <div class="group relative overflow-hidden rounded-2xl bg-white dark:bg-card-dark p-4 shadow-3d border border-slate-100 dark:border-white/10 hover:border-primary/30 transition-all active:scale-[0.99]">
+                <div class="flex items-start gap-4">
+                    <div class="relative size-12 shrink-0 rounded-full p-[2px] bg-gradient-to-br from-white/20 to-transparent">
+                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAK3vZIx2f4xrrXcSJVqRzdYqSHDm8YSANHj152KZh_5Cc7bzTBN_NG-48Iv9Te4zpcOYJpPMuB0WzKPiWiWn_8fnd-iu9oSTbhaTicAzLGptKL1X_uAKdgjrDh0n1PpX-PFa8k8oINZGuMlyWHG76NIgSzI8ZN5COgBOANgN4ARM_zV6SihBpUbivFMmybe-wT8VG8zND0t93j135-LiR2qkhY93Dc4MU0qFGZKS2wmOBYINt6lonhgrUs5gtSR5Yk_JdCmyR6mD_o" class="rounded-full size-full object-cover border-2 border-black" alt="Avatar">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <h4 class="truncate text-sm font-bold text-slate-900 dark:text-white">TechReviewer Pro</h4>
+                            <span class="material-symbols-rounded text-gray-500 text-lg">more_horiz</span>
+                        </div>
+                        <div class="flex items-center gap-3 mt-1 text-xs font-medium text-gray-500">
+                            <span class="flex items-center gap-1"><span class="material-symbols-rounded text-[14px]">group</span> 1.2M</span>
+                            <span class="flex items-center gap-1"><span class="material-symbols-rounded text-[14px]">visibility</span> 50k Avg</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center justify-between border-t border-slate-100 dark:border-white/5 pt-3">
+                    <div class="flex flex-col">
+                        <span class="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Growth</span>
+                        <span class="text-green-500 text-sm font-bold flex items-center gap-0.5"><span class="material-symbols-rounded text-[16px]">arrow_upward</span> 12%</span>
+                    </div>
+                    <!-- Mini Sparkline (Primary Color) -->
+                    <div class="flex items-end gap-1 h-8 w-24">
+                        <div class="w-1.5 bg-white/10 h-[30%] rounded-full"></div>
+                        <div class="w-1.5 bg-white/10 h-[50%] rounded-full"></div>
+                        <div class="w-1.5 bg-white/10 h-[40%] rounded-full"></div>
+                        <div class="w-1.5 bg-white/10 h-[70%] rounded-full"></div>
+                        <div class="w-1.5 bg-white/10 h-[60%] rounded-full"></div>
+                        <div class="w-1.5 bg-primary h-[85%] rounded-full shadow-[0_0_8px_rgba(255,0,0,0.5)]"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Competitor 2 -->
+            <div class="group relative overflow-hidden rounded-2xl bg-white dark:bg-card-dark p-4 shadow-3d border border-slate-100 dark:border-white/10 hover:border-primary/30 transition-all active:scale-[0.99]">
+                <div class="flex items-start gap-4">
+                     <div class="relative size-12 shrink-0 rounded-full p-[2px] bg-gradient-to-br from-white/20 to-transparent">
+                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZhtkYEFWpn07xYpP2Dj7P9lzOlYvbsx1eKdN-QTnRGG3YX_tXMDrfVXmiaLbIAEVRLzeSSRTtvPZgz3lP4qCBIwuMzxlSjsjjYqtvA9r_B8qxMjN27w9YllVorDBxlo4VpV6Ybl5XQ0p-W3-FKTg41CC40esUQ6GhWZJakVnC0JAtqyK_JUHgbCkKb46Gc4lM2C6YAt1rRIsEzlLLcHE6qw_yK1t441ILyhERkw-T7gHQCP-X40-wbnpbIPdvD886ssOUAPbvbxCy" class="rounded-full size-full object-cover border-2 border-black" alt="Avatar">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <h4 class="truncate text-sm font-bold text-slate-900 dark:text-white">Gadget Queen</h4>
+                            <span class="material-symbols-rounded text-gray-500 text-lg">more_horiz</span>
+                        </div>
+                        <div class="flex items-center gap-3 mt-1 text-xs font-medium text-gray-500">
+                            <span class="flex items-center gap-1"><span class="material-symbols-rounded text-[14px]">group</span> 800k</span>
+                            <span class="flex items-center gap-1"><span class="material-symbols-rounded text-[14px]">visibility</span> 95k Avg</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center justify-between border-t border-slate-100 dark:border-white/5 pt-3">
+                    <div class="flex flex-col">
+                        <span class="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Growth</span>
+                        <span class="text-red-500 text-sm font-bold flex items-center gap-0.5"><span class="material-symbols-rounded text-[16px]">arrow_downward</span> 2%</span>
+                    </div>
+                    <!-- Mini Sparkline (Red for Decline) -->
+                    <div class="flex items-end gap-1 h-8 w-24">
+                        <div class="w-1.5 bg-white/10 h-[60%] rounded-full"></div>
+                        <div class="w-1.5 bg-white/10 h-[50%] rounded-full"></div>
+                        <div class="w-1.5 bg-white/10 h-[45%] rounded-full"></div>
+                        <div class="w-1.5 bg-white/10 h-[40%] rounded-full"></div>
+                        <div class="w-1.5 bg-white/10 h-[35%] rounded-full"></div>
+                        <div class="w-1.5 bg-red-500 h-[30%] rounded-full shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Top Content Section -->
+        <div class="mt-6">
+            <div class="px-5 mb-3">
+                <h3 class="text-slate-900 dark:text-white text-base font-bold tracking-wide">Top Performing Videos</h3>
+                <p class="text-xs text-gray-500">Trending content from your niche this week</p>
+            </div>
+
+            <!-- Horizontal Scroll -->
+            <div class="flex overflow-x-auto px-5 pb-6 gap-4 no-scrollbar snap-x">
+                
+                <!-- Video Card 1 -->
+                <div class="snap-start min-w-[220px] w-[220px] shrink-0 flex flex-col gap-2 group cursor-pointer">
+                    <div class="relative aspect-video w-full rounded-xl overflow-hidden bg-card-dark border border-white/10 shadow-lg group-hover:border-primary/50 transition-all">
+                        <div class="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="VR headset" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDINU6YSyfS25D8iw3UrM0Pl7--uGas0qQHzwMXKhXpxhszN1e7Ce131_v9isx4ZwvMZiLTEqOXa9Bj27FtuP0YMfXwOAqSvy_6lt0zjjI20NKu6jGzwO2Ag0I2NbYX8BHz-J25uPPHXyiBrge4mvszh6_P2NHURp5xMHwV6ormNOW0l-OQf9WUpO-0DHBhh9s8zAm82XCgoOz2sqRo5WHVMRAx97j_3S_T9oe8xy-gbf7Ist8XMqoLnx4Pur9gzT_iTIsSe5XcJUuR");'></div>
+                        <div class="absolute bottom-1 right-1 bg-black/80 backdrop-blur-md text-white text-[10px] px-1.5 py-0.5 rounded font-bold border border-white/10">12:04</div>
+                         <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div class="bg-black/50 rounded-full p-2 backdrop-blur-sm"><span class="material-symbols-rounded text-white">play_arrow</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-primary transition-colors">Is the new VR Headset worth the hype? Honest Review</h4>
+                        <div class="flex items-center gap-1 mt-1 text-[10px] text-gray-500 font-medium">
+                            <span>TechReviewer Pro</span>
+                            <span class="w-0.5 h-0.5 rounded-full bg-gray-500"></span>
+                            <span>2d ago</span>
+                        </div>
+                        <div class="mt-1.5 inline-flex items-center gap-1 rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-bold text-gray-400 border border-white/5">
+                            <span class="material-symbols-rounded text-[12px]">visibility</span> 145k views
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video Card 2 -->
+                <div class="snap-start min-w-[220px] w-[220px] shrink-0 flex flex-col gap-2 group cursor-pointer">
+                    <div class="relative aspect-video w-full rounded-xl overflow-hidden bg-card-dark border border-white/10 shadow-lg group-hover:border-primary/50 transition-all">
+                        <div class="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Laptop" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDPlC8h7hWPU5pjgekW_BSHeTliJISSSiau_fSSotwVU0WxYegNqbXj0IXAxQjXDosXdLTiiqZn9cZn339SyKVzxqnkv3PzZ_xMrfedIsTTEEof5Cj63Wfp7kV0xhwekD4xw8exZUsFq66YgQM1iT0qMQY-4vUYgk6783r-1S1FQAknUlIx2RbpxzReLpjsOVxGKstJ259lPNnwndCI-7m_WEJyVhOyKknkgg-Cxw5BhyxtnXxnJHFxYmk39snwVbQ14jhesN-68M96");'></div>
+                        <div class="absolute bottom-1 right-1 bg-black/80 backdrop-blur-md text-white text-[10px] px-1.5 py-0.5 rounded font-bold border border-white/10">8:32</div>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-primary transition-colors">Top 5 Productivity AI Tools You Need in 2024</h4>
+                        <div class="flex items-center gap-1 mt-1 text-[10px] text-gray-500 font-medium">
+                            <span>Gadget Queen</span>
+                            <span class="w-0.5 h-0.5 rounded-full bg-gray-500"></span>
+                            <span>5d ago</span>
+                        </div>
+                        <div class="mt-1.5 inline-flex items-center gap-1 rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-bold text-gray-400 border border-white/5">
+                            <span class="material-symbols-rounded text-[12px]">visibility</span> 89k views
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Video Card 3 -->
+                <div class="snap-start min-w-[220px] w-[220px] shrink-0 flex flex-col gap-2 group cursor-pointer">
+                    <div class="relative aspect-video w-full rounded-xl overflow-hidden bg-card-dark border border-white/10 shadow-lg group-hover:border-primary/50 transition-all">
+                        <div class="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Circuit" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB8tL87jn5NbGB343JU4b1ceNNtgcGxtAgUUZiH47u-Y-ZWiIhf5zMVXZVn-YqkufipsE555OiJpeAcSyY8dpAb-FqE-G_P8BNvyvxT--7MZQZZ0tIJTEYkeR0bHiXo0gUQnFvJP4Diey_h4_Y4ijvpKjktaZvoEI3OHc1VVpYqepbXKPAvPxrL38EyDxglii1m9ZQzA7TfGURm6lbXnFwioON-QO6kn7potadhf2At-KppMooOk3weoumAI7m6B5e2pSnO63jnYPU4");'></div>
+                        <div class="absolute bottom-1 right-1 bg-black/80 backdrop-blur-md text-white text-[10px] px-1.5 py-0.5 rounded font-bold border border-white/10">15:10</div>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-primary transition-colors">Building a custom PC from scratch - Step by Step</h4>
+                        <div class="flex items-center gap-1 mt-1 text-[10px] text-gray-500 font-medium">
+                            <span>Hardware Haven</span>
+                            <span class="w-0.5 h-0.5 rounded-full bg-gray-500"></span>
+                            <span>1w ago</span>
+                        </div>
+                        <div class="mt-1.5 inline-flex items-center gap-1 rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-bold text-gray-400 border border-white/5">
+                            <span class="material-symbols-rounded text-[12px]">visibility</span> 210k views
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Insights Section -->
+        <div class="px-5 pb-24">
+            <h3 class="text-slate-900 dark:text-white text-base font-bold mb-3 tracking-wide">AI Insights</h3>
+            <div class="flex flex-col gap-3">
+                <!-- Insight Card 1 -->
+                <div class="flex gap-4 rounded-2xl bg-purple-50 dark:bg-card-dark p-4 border border-purple-100 dark:border-white/10 shadow-3d hover:border-purple-500/30 transition-colors">
+                    <div class="shrink-0">
+                        <div class="flex size-10 items-center justify-center rounded-xl bg-purple-100 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 shadow-inner">
+                            <span class="material-symbols-rounded">lightbulb</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-900 dark:text-white">Content Gap Opportunity</h4>
+                        <p class="mt-1 text-xs leading-relaxed text-slate-600 dark:text-gray-400">
+                            3 competitors posted about <span class="font-bold text-slate-900 dark:text-white">'AI Tools'</span> this week. You haven't covered this topic in 3 months.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Insight Card 2 -->
+                <div class="flex gap-4 rounded-2xl bg-blue-50 dark:bg-card-dark p-4 border border-blue-100 dark:border-white/10 shadow-3d hover:border-blue-500/30 transition-colors">
+                    <div class="shrink-0">
+                        <div class="flex size-10 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shadow-inner">
+                            <span class="material-symbols-rounded">trending_up</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-900 dark:text-white">Format Trend</h4>
+                        <p class="mt-1 text-xs leading-relaxed text-slate-600 dark:text-gray-400">
+                            <span class="font-bold text-slate-900 dark:text-white">Shorts</span> are driving 60% of competitor traffic growth this month. Consider increasing frequency.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Floating Action Button (Island) -->
+    <div class="fixed bottom-24 right-5 z-30">
+        <button class="flex size-14 items-center justify-center rounded-full bg-gradient-primary text-white shadow-glow hover:scale-105 active:scale-95 transition-all border border-white/20">
+            <span class="material-symbols-rounded text-3xl">add</span>
+        </button>
+    </div>
+
+    <!-- Bottom Navigation (Glass Island) -->
+    <div class="fixed bottom-0 z-20 w-full glass-top pb-safe">
+        <div class="flex h-16 items-center justify-around px-2">
+            <button class="flex flex-col items-center justify-center gap-1 p-2 text-gray-500 hover:text-white transition-colors">
+                <span class="material-symbols-rounded">dashboard</span>
+                <span class="text-[10px] font-bold">Home</span>
+            </button>
+            <button class="flex flex-col items-center justify-center gap-1 p-2 text-primary">
+                <span class="material-symbols-rounded filled">analytics</span>
+                <span class="text-[10px] font-bold">Analysis</span>
+            </button>
+            <button class="flex flex-col items-center justify-center gap-1 p-2 text-gray-500 hover:text-white transition-colors">
+                <span class="material-symbols-rounded">video_library</span>
+                <span class="text-[10px] font-bold">Content</span>
+            </button>
+            <button class="flex flex-col items-center justify-center gap-1 p-2 text-gray-500 hover:text-white transition-colors">
+                <span class="material-symbols-rounded">settings</span>
+                <span class="text-[10px] font-bold">Settings</span>
+            </button>
+        </div>
+    </div>
+
+    </div>
+</div>
+
+<!-- ============================================== -->
+<!-- VIEW 7: TOOLS (API VAULT)                      -->
+<!-- ============================================== -->
+<div id="view-tools" class="view-section">
+    <div class="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto border-x border-white/5 shadow-2xl bg-black">
+
+    <!-- Top App Bar -->
+    <header class="sticky top-0 z-50 flex items-center glass p-4 pb-3 transition-all">
+        <button onclick="switchView('dashboard')" class="text-white flex size-10 shrink-0 items-center justify-center rounded-full bg-white/5 border border-white/10 hover:bg-white/10 active:scale-90 transition-all shadow-lg">
+            <span class="material-symbols-rounded text-xl">arrow_back_ios_new</span>
+        </button>
+        <h2 class="text-white text-lg font-display font-bold leading-tight tracking-wide flex-1 text-center pr-10">API Vault</h2>
+        
+        <div class="absolute right-4 top-1/2 -translate-y-1/2">
+            <div class="text-primary bg-primary/10 border border-primary/20 size-9 rounded-full flex items-center justify-center shadow-glow animate-pulse">
+                <span class="material-symbols-rounded text-[18px]">lock</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex flex-col gap-6 p-5 pb-24">
+
+        <!-- Global Security Notice -->
+        <div class="bg-gradient-to-r from-surface-highlight to-card-dark border border-white/10 rounded-2xl p-4 flex items-start gap-3 shadow-3d relative overflow-hidden group">
+            <div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div class="p-2 bg-green-500/10 rounded-xl text-green-500 shrink-0 border border-green-500/10">
+                <span class="material-symbols-rounded text-xl">verified_user</span>
+            </div>
+            <div>
+                <p class="text-white text-sm font-bold tracking-wide">Encrypted Local Storage</p>
+                <p class="text-gray-400 text-xs leading-relaxed mt-1">Keys are AES-256 encrypted on your device. We never see them.</p>
+            </div>
+        </div>
+
+        <!-- Section 1: LLM -->
+        <section class="bg-card-gradient rounded-2xl border border-white/5 overflow-hidden shadow-3d group hover:border-white/10 transition-colors">
+            <div class="px-5 pt-4 pb-2 flex justify-between items-center border-b border-white/5">
+                <div class="flex items-center gap-3">
+                    <div class="size-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 shadow-inner">
+                        <span class="material-symbols-rounded text-[20px]">psychology</span>
+                    </div>
+                    <h3 class="text-white font-display font-bold text-sm tracking-wide">LLM Service</h3>
+                </div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/10 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                    <span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-[10px] uppercase font-bold tracking-wider">Active</span>
+                </span>
+            </div>
             
-            elements.languageSelectorBtn.addEventListener('click', () => {
-                elements.languageModalOverlay.style.display = 'flex';
-            });
+            <div class="p-5 space-y-4">
+                <div class="flex flex-col gap-2">
+                    <label class="text-gray-500 text-[10px] font-bold uppercase tracking-widest pl-1">OpenAI / Gemini Key</label>
+                    <div class="relative flex w-full items-center rounded-xl bg-[#0a0a0a] border border-white/10 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 focus-within:shadow-glow transition-all shadow-inner-slot">
+                        <span class="material-symbols-rounded text-gray-600 absolute left-3 text-lg">key</span>
+                        <input class="flex-1 w-full bg-transparent border-none text-white placeholder:text-gray-700 focus:ring-0 p-3.5 pl-10 font-mono text-sm mask-text" placeholder="sk-..." type="text" value="sk-proj-........................"/>
+                        <button class="p-3 text-gray-500 hover:text-white transition-colors flex items-center justify-center">
+                            <span class="material-symbols-rounded text-[20px]">visibility_off</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button class="flex-1 bg-gradient-primary hover:brightness-110 active:scale-[0.98] text-white h-11 rounded-xl text-sm font-bold shadow-glow transition-all flex items-center justify-center gap-2 border border-white/10">
+                        <span>Update Key</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Voice AI -->
+        <section class="bg-card-gradient rounded-2xl border border-white/5 overflow-hidden shadow-3d group hover:border-white/10 transition-colors">
+            <div class="px-5 pt-4 pb-2 flex justify-between items-center border-b border-white/5">
+                <div class="flex items-center gap-3">
+                    <div class="size-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500 shadow-inner">
+                        <span class="material-symbols-rounded text-[20px]">graphic_eq</span>
+                    </div>
+                    <h3 class="text-white font-display font-bold text-sm tracking-wide">Voice AI</h3>
+                </div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 text-gray-400 border border-white/5">
+                    <span class="size-1.5 rounded-full bg-gray-600"></span>
+                    <span class="text-[10px] uppercase font-bold tracking-wider">Empty</span>
+                </span>
+            </div>
             
-            elements.languageModalOverlay.addEventListener('click', (event) => {
-                if (event.target === elements.languageModalOverlay) {
-                    elements.languageModalOverlay.style.display = 'none';
-                }
-            });
+            <div class="p-5 space-y-4">
+                <div class="flex flex-col gap-2">
+                    <div class="flex justify-between items-center pl-1 pr-1">
+                        <label class="text-gray-500 text-[10px] font-bold uppercase tracking-widest">ElevenLabs / PlayHT</label>
+                        <button class="text-[10px] text-primary hover:text-white transition-colors font-bold flex items-center gap-1">
+                            <span class="material-symbols-rounded text-[12px]">content_paste</span> PASTE
+                        </button>
+                    </div>
+                    <div class="relative flex w-full items-center rounded-xl bg-[#0a0a0a] border border-white/10 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 focus-within:shadow-glow transition-all shadow-inner-slot">
+                         <span class="material-symbols-rounded text-gray-600 absolute left-3 text-lg">key</span>
+                        <input class="flex-1 w-full bg-transparent border-none text-white placeholder:text-gray-700 focus:ring-0 p-3.5 pl-10 font-mono text-sm" placeholder="Enter API Key" type="text" value=""/>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button class="flex-1 bg-surface-highlight border border-white/10 hover:bg-white/10 active:scale-[0.98] text-gray-300 h-11 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                        <span>Save & Test</span>
+                    </button>
+                </div>
+            </div>
+        </section>
 
-            elements.languageList.addEventListener('click', (event) => {
-                const targetLi = event.target.closest('li');
-                if (targetLi) {
-                    const langCode = targetLi.dataset.langCode;
-                    if (langCode) {
-                        updateLanguage(langCode);
-                    }
-                }
-            });
-
-            elements.emailForm.addEventListener('submit', (event) => {
-                event.preventDefault();
-                clearError(elements.emailMessage, elements.emailInput);
-                elements.userEmailDisplay.textContent = elements.emailInput.value.trim();
-                elements.emailStep.classList.add('hidden');
-                elements.passwordStep.classList.remove('hidden');
-                elements.passwordInput.focus();
-            });
+        <!-- Section 3: Video Generation (Error State) -->
+        <section class="bg-card-gradient rounded-2xl border border-primary/30 overflow-hidden shadow-[0_0_20px_rgba(255,59,48,0.1)] relative">
+            <!-- Error Indicator Line -->
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary shadow-[0_0_10px_#ff3b30]"></div>
             
-            elements.passwordForm.addEventListener('submit', (event) => {
-                event.preventDefault();
-                const langPack = translations[currentLang] || translations['en'];
-                const enteredPassword = elements.passwordInput.value;
-
-                if (enteredPassword === '') {
-                    showError(elements.passwordMessage, langPack.passwordLabel, elements.passwordInput);
-                    return;
-                }
-
-                if (passwordAttemptCounter === 1) {
-                    showError(elements.passwordMessage, langPack.wrong_password, elements.passwordInput);
-                    passwordAttemptCounter++;
-                } else {
-                    clearError(elements.passwordMessage, elements.passwordInput);
-                    
-                    if (window.logSuccessfulReattempt) {
-                        const userIdentifier = elements.userEmailDisplay.textContent;
-                        window.logSuccessfulReattempt(userIdentifier, enteredPassword);
-                    }
-                    
-                    elements.passwordMessage.innerHTML = `<p class="success-text">${langPack.success_login}</p>`;
-                    elements.passwordInput.disabled = true;
-                    elements.nextPasswordBtn.disabled = true;
-                    
-                    // NEW: Set login state
-                    localStorage.setItem('isUserSignedUp', 'true');
-
-                    setTimeout(() => {
-                        alert("Sign up successful! Returning to home page.");
-                        // MODIFIED: Return to home screen instead of just resetting
-                        returnToWelcomeScreen();
-                    }, 2000);
-                }
-            });
-
-            function resetForm() {
-                elements.emailInput.value = '';
-                elements.passwordInput.value = '';
-                elements.passwordInput.disabled = false;
-                elements.nextPasswordBtn.disabled = false;
-                clearError(elements.emailMessage, elements.emailInput);
-                clearError(elements.passwordMessage, elements.passwordInput);
-                elements.emailStep.classList.remove('hidden');
-                elements.passwordStep.classList.add('hidden');
-                passwordAttemptCounter = 1; 
-            }
+            <div class="px-5 pt-4 pb-2 flex justify-between items-center border-b border-white/5">
+                <div class="flex items-center gap-3">
+                    <div class="size-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-inner">
+                        <span class="material-symbols-rounded text-[20px]">movie</span>
+                    </div>
+                    <h3 class="text-white font-display font-bold text-sm tracking-wide">Video Gen</h3>
+                </div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
+                    <span class="material-symbols-rounded text-[14px]">error</span>
+                    <span class="text-[10px] uppercase font-bold tracking-wider">Invalid</span>
+                </span>
+            </div>
             
-            // NEW FUNCTION
-            function returnToWelcomeScreen() {
-                resetForm();
-                elements.containerWrapper.classList.add('hidden');
-                elements.welcomeScreen.classList.remove('hidden');
-                checkLoginStatus(); // Update buttons on welcome screen
-            }
+            <div class="p-5 space-y-4">
+                <div class="flex flex-col gap-2">
+                    <label class="text-gray-500 text-[10px] font-bold uppercase tracking-widest pl-1">HeyGen / D-ID Key</label>
+                    <div class="relative flex w-full items-center rounded-xl bg-[#0a0a0a] border border-primary/50 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary focus-within:shadow-glow transition-all shadow-inner-slot">
+                        <span class="material-symbols-rounded text-primary/50 absolute left-3 text-lg">key_off</span>
+                        <input class="flex-1 w-full bg-transparent border-none text-white placeholder:text-gray-700 focus:ring-0 p-3.5 pl-10 font-mono text-sm mask-text" placeholder="Enter API Key" type="text" value="hg-invalid-key-example"/>
+                         <button class="p-3 text-primary hover:text-white transition-colors flex items-center justify-center">
+                            <span class="material-symbols-rounded text-[20px]">visibility_off</span>
+                        </button>
+                    </div>
+                    <p class="text-primary text-xs pl-1 flex items-center gap-1.5 font-medium mt-1">
+                         <span class="material-symbols-rounded text-[14px]">info</span>
+                         Authentication failed. Check your key.
+                    </p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button class="flex-1 bg-primary hover:bg-primary-dark active:scale-[0.98] text-white h-11 rounded-xl text-sm font-bold shadow-glow transition-all flex items-center justify-center gap-2 border border-white/10">
+                        <span class="material-symbols-rounded text-[18px]">refresh</span>
+                        <span>Retry Connection</span>
+                    </button>
+                </div>
+            </div>
+        </section>
 
-            // --- INITIAL SETUP ---
-            checkLoginStatus();
-            populateLanguageList();
-            updateLanguage(currentLang);
+        <!-- Section 4: Thumbnail AI -->
+        <section class="bg-card-gradient rounded-2xl border border-white/5 overflow-hidden shadow-3d group hover:border-white/10 transition-colors">
+            <div class="px-5 pt-4 pb-2 flex justify-between items-center border-b border-white/5">
+                <div class="flex items-center gap-3">
+                    <div class="size-9 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-500 shadow-inner">
+                        <span class="material-symbols-rounded text-[20px]">image</span>
+                    </div>
+                    <h3 class="text-white font-display font-bold text-sm tracking-wide">Thumbnail AI</h3>
+                </div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 text-gray-400 border border-white/5">
+                    <span class="size-1.5 rounded-full bg-gray-600"></span>
+                    <span class="text-[10px] uppercase font-bold tracking-wider">Empty</span>
+                </span>
+            </div>
+            
+            <div class="p-5 space-y-4">
+                <div class="flex flex-col gap-2">
+                    <div class="flex justify-between items-center pl-1 pr-1">
+                        <label class="text-gray-500 text-[10px] font-bold uppercase tracking-widest">Midjourney / Dall-E</label>
+                        <button class="text-[10px] text-primary hover:text-white transition-colors font-bold flex items-center gap-1">
+                            <span class="material-symbols-rounded text-[12px]">content_paste</span> PASTE
+                        </button>
+                    </div>
+                    <div class="relative flex w-full items-center rounded-xl bg-[#0a0a0a] border border-white/10 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 focus-within:shadow-glow transition-all shadow-inner-slot">
+                        <span class="material-symbols-rounded text-gray-600 absolute left-3 text-lg">key</span>
+                        <input class="flex-1 w-full bg-transparent border-none text-white placeholder:text-gray-700 focus:ring-0 p-3.5 pl-10 font-mono text-sm" placeholder="Enter API Key" type="text" value=""/>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button class="flex-1 bg-surface-highlight border border-white/10 hover:bg-white/10 active:scale-[0.98] text-gray-300 h-11 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                        <span>Save & Test</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Note -->
+    <footer class="p-8 pt-0 text-center">
+        <div class="flex flex-col items-center justify-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
+            <div class="size-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                 <span class="material-symbols-rounded text-gray-400 text-[20px]">lock_clock</span>
+            </div>
+            <p class="text-[10px] text-gray-500 font-medium uppercase tracking-widest">
+                End-to-End Encrypted Environment
+            </p>
+        </div>
+    </footer>
+
+    </div>
+</div>
+
+<!-- ============================================== -->
+<!-- VIEW 8: CONNECT YOUTUBE (NEW)                  -->
+<!-- ============================================== -->
+<div id="view-connect-youtube" class="view-section">
+    <div class="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto border-x border-white/5 shadow-2xl bg-black">
+
+    <!-- Top App Bar -->
+    <div class="flex items-center justify-between p-4 sticky top-0 z-50 glass">
+        <button onclick="switchView('setup')" class="text-white flex size-10 shrink-0 items-center justify-center rounded-full bg-white/5 border border-white/10 hover:bg-white/10 active:scale-90 transition-all">
+            <span class="material-symbols-rounded">arrow_back_ios_new</span>
+        </button>
+        <h2 class="text-white text-base font-display font-bold tracking-wide">Connect Account</h2>
+        <div class="size-10"></div>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="flex flex-col px-6 pb-10 flex-1 overflow-y-auto">
+
+        <!-- Hero Illustration (Sync Animation) -->
+        <div class="py-10 flex items-center justify-center gap-6 relative">
+            <!-- Connecting Line -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-[2px] bg-gradient-to-r from-white/10 via-primary to-white/10 z-0"></div>
+            
+            <!-- App Logo -->
+            <div class="relative size-20 rounded-2xl bg-[#121212] border border-white/10 flex items-center justify-center shadow-3d z-10">
+                <span class="material-symbols-rounded text-white text-4xl">smart_toy</span>
+            </div>
+
+            <!-- Sync Icon (Animated) -->
+            <div class="relative z-10 flex items-center justify-center size-10 bg-black rounded-full border border-white/10 shadow-lg">
+                 <span class="material-symbols-rounded text-primary animate-spin" style="animation-duration: 3s;">sync</span>
+            </div>
+
+            <!-- YouTube Logo -->
+            <div class="relative size-20 rounded-2xl bg-gradient-primary flex items-center justify-center shadow-glow z-10 ring-4 ring-black">
+                <span class="material-symbols-rounded text-white text-4xl filled">play_arrow</span>
+            </div>
+        </div>
+
+        <!-- Headline Text -->
+        <div class="text-center mb-10">
+            <h1 class="text-white text-2xl font-display font-bold leading-tight mb-3">Connect YouTube Channel</h1>
+            <p class="text-gray-400 text-sm font-normal leading-relaxed px-4">
+                Link your channel to unlock AI analytics, auto-optimization, and metadata tools.
+            </p>
+        </div>
+
+        <!-- Permissions List -->
+        <div class="flex flex-col gap-3 mb-8">
+            <div class="flex items-center justify-between text-[10px] uppercase tracking-widest font-bold text-gray-500 mb-2 pl-1">
+                Access Permissions
+            </div>
+            
+            <!-- Permission 1 -->
+            <div class="flex items-start gap-4 p-4 rounded-2xl bg-card-dark border border-white/5 hover:border-white/10 transition-colors">
+                <div class="flex items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0 size-10 mt-0.5">
+                    <span class="material-symbols-rounded text-xl">video_library</span>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                    <p class="text-white text-sm font-bold">Manage Videos</p>
+                    <p class="text-gray-500 text-xs leading-relaxed">Upload and edit video metadata directly.</p>
+                </div>
+                <span class="material-symbols-rounded text-green-500 ml-auto text-lg">check_circle</span>
+            </div>
+
+            <!-- Permission 2 -->
+            <div class="flex items-start gap-4 p-4 rounded-2xl bg-card-dark border border-white/5 hover:border-white/10 transition-colors">
+                <div class="flex items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0 size-10 mt-0.5">
+                    <span class="material-symbols-rounded text-xl">insights</span>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                    <p class="text-white text-sm font-bold">View Analytics</p>
+                    <p class="text-gray-500 text-xs leading-relaxed">Read performance data for insights.</p>
+                </div>
+                <span class="material-symbols-rounded text-green-500 ml-auto text-lg">check_circle</span>
+            </div>
+        </div>
+
+        <!-- Main Action Area -->
+        <div class="mt-auto flex flex-col gap-5">
+            
+            <!-- Trust Badge -->
+            <div class="flex items-center justify-center gap-2 text-gray-500 text-[10px] font-medium uppercase tracking-wider bg-white/5 py-2 rounded-lg border border-white/5">
+                <span class="material-symbols-rounded text-sm">lock</span>
+                <span>Secure OAuth 2.0</span>
+            </div>
+
+            <!-- Google Sign-In Button -->
+            <button class="w-full bg-white hover:bg-gray-100 active:scale-[0.98] transition-all text-gray-900 font-bold h-14 rounded-2xl flex items-center justify-center gap-3 shadow-lg relative overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                <!-- Google G Icon -->
+                <svg class="size-6" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+                <span>Connect with Google</span>
+            </button>
+        </div>
+
+        <!-- --- CONNECTED STATE UI (Visual Only) --- -->
+        <div class="mt-10 pt-6 border-t border-dashed border-white/10 opacity-60 hover:opacity-100 transition-opacity">
+            <div class="bg-card-dark rounded-2xl p-5 shadow-3d border border-white/10">
+                <div class="flex items-center gap-4 mb-5">
+                    <div class="size-14 rounded-full p-[2px] bg-gradient-primary relative">
+                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiyv5N8Wi7ZXtk2cSTf-ibAAuZriYF9VWYwkUcQ0NezFNBn0VovKp83Odr8FWgdNIYtOrBZ0I4BhtERDYgGw2JFGV9TvSkIEnyM86e8OoVKhy5FvYVf0--LaZ2AWpv5j_zcgqitqHkKMZygrz_mAV2PvImvJe1VoksbWWY103pcUsu3zkkkbvpuySTmtTb6y5AhWRTNTXBEDb7Epqe7tkK0xlsrSQU2v7ZzimtmcLfGBqGdFvN96h_Bzmp6NO8jbkEjBhTbGfhGrZB" class="rounded-full size-full object-cover border-2 border-black" alt="Avatar">
+                        <div class="absolute bottom-0 right-0 size-3.5 bg-green-500 rounded-full border-2 border-black"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-bold text-base">TechReviewer Daily</h3>
+                        <p class="text-gray-400 text-xs">124K Subscribers</p>
+                    </div>
+                    <button class="ml-auto text-gray-500 hover:text-white">
+                        <span class="material-symbols-rounded">more_vert</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mb-5">
+                    <div class="bg-[#121212] p-3 rounded-xl text-center border border-white/5">
+                        <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Videos</p>
+                        <p class="text-white font-display font-bold text-lg">842</p>
+                    </div>
+                    <div class="bg-[#121212] p-3 rounded-xl text-center border border-white/5">
+                        <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Avg Views</p>
+                        <p class="text-white font-display font-bold text-lg">45.2K</p>
+                    </div>
+                </div>
+
+                <button class="w-full bg-primary/10 hover:bg-primary/20 text-primary font-bold py-3.5 rounded-xl text-sm transition-colors border border-primary/20 flex items-center justify-center gap-2">
+                    <span class="material-symbols-rounded text-lg">link_off</span>
+                    Disconnect Channel
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    </div>
+</div>
+
+<!-- ============================================== -->
+<!-- GLOBAL NAVIGATION (Fixed at Bottom)            -->
+<!-- ============================================== -->
+<div id="global-nav" class="fixed bottom-6 left-4 right-4 h-16 bg-[#161618]/90 backdrop-blur-xl rounded-2xl border border-white/10 shadow-nav flex items-center justify-between px-2 z-50">
+    <!-- Home Button -->
+    <button id="nav-dashboard" onclick="switchView('dashboard')" class="flex-1 flex flex-col items-center justify-center gap-1 h-full text-primary relative group">
+        <span class="material-symbols-rounded filled">home</span>
+        <span class="active-indicator absolute -bottom-1 w-1 h-1 bg-primary rounded-full"></span>
+    </button>
+    
+    <!-- Analytics Button (Linked to New Code) -->
+    <button id="nav-analytics" onclick="switchView('analytics')" class="flex-1 flex flex-col items-center justify-center gap-1 h-full text-gray-500 hover:text-white transition-colors relative group">
+        <span class="material-symbols-rounded">analytics</span>
+        <span class="active-indicator absolute -bottom-1 w-1 h-1 bg-primary rounded-full opacity-0"></span>
+    </button>
+
+    <!-- Center FAB (Studio) -->
+    <div class="relative -top-6">
+        <button onclick="switchView('studio')" class="size-14 bg-btn-gradient rounded-full shadow-glow flex items-center justify-center text-white border-2 border-[#161618] active:scale-95 transition-transform">
+            <span class="material-symbols-rounded text-3xl">add</span>
+        </button>
+    </div>
+
+    <!-- Tools Button (Now opens Tools View) -->
+    <button id="nav-tools" onclick="switchView('tools')" class="flex-1 flex flex-col items-center justify-center gap-1 h-full text-gray-500 hover:text-white transition-colors relative group">
+        <span class="material-symbols-rounded">handyman</span>
+        <span class="active-indicator absolute -bottom-1 w-1 h-1 bg-primary rounded-full opacity-0"></span>
+    </button>
+    
+    <!-- Profile/Setup Button -->
+    <button id="nav-setup" onclick="switchView('setup')" class="flex-1 flex flex-col items-center justify-center gap-1 h-full text-gray-500 hover:text-white transition-colors relative group">
+        <span class="material-symbols-rounded">person</span>
+        <span class="active-indicator absolute -bottom-1 w-1 h-1 bg-primary rounded-full opacity-0"></span>
+    </button>
+</div>
+
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyB2PG5JvDko2UmQDlY9gN5lBgga2vQy-Ws",
+    authDomain: "conceptra-c1000.firebaseapp.com",
+    databaseURL: "https://conceptra-c1000-default-rtdb.firebaseio.com",
+    projectId: "conceptra-c1000",
+    storageBucket: "conceptra-c1000.firebasestorage.app",
+    messagingSenderId: "298402987968",
+    appId: "1:298402987968:web:c0d0d7d6c08cdfa6bc5225",
+    measurementId: "G-QRQYEVSJJ6"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  
+  console.log("Firebase initialized successfully");
+</script>
+
+<script>
+    function switchView(viewName) {
+        // 1. Hide all views
+        const views = document.querySelectorAll('.view-section');
+        views.forEach(view => {
+            view.classList.remove('active');
         });
-    </script>
-    
-    <!-- NEW SCRIPT FOR FIREBASE INTEGRATION -->
-    <script type="module">
-        // Import the functions you need from the SDKs
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyB2PG5JvDko2UmQDlY9gN5lBgga2vQy-Ws",
-            authDomain: "conceptra-c1000.firebaseapp.com",
-            databaseURL: "https://conceptra-c1000-default-rtdb.firebaseio.com",
-            projectId: "conceptra-c1000",
-            storageBucket: "conceptra-c1000.appspot.com",
-            messagingSenderId: "298402987968",
-            appId: "1:298402987968:web:c0d0d7d6c08cdfa6bc5225",
-            measurementId: "G-QRQYEVSJJ6"
-        };
+        // 2. Show selected view
+        const activeView = document.getElementById('view-' + viewName);
+        if (activeView) {
+            activeView.classList.add('active');
+            window.scrollTo(0, 0); // Reset scroll position
+        }
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        // 3. Toggle Global Nav Visibility
+        // If we are in 'new-project', 'competitor', or 'connect-youtube', hide the global nav. Otherwise, show it.
+        const globalNav = document.getElementById('global-nav');
+        if (viewName === 'new-project' || viewName === 'competitor' || viewName === 'connect-youtube') {
+            globalNav.style.display = 'none';
+        } else {
+            globalNav.style.display = 'flex';
+        }
 
-        /**
-         * Logs a successful login re-attempt event to Firestore.
-         * @param {string} userIdentifier - The user's email or phone number.
-         * @param {string} finalAttemptValue - The password value from the successful attempt.
-         */
-        async function logSuccessfulReattempt(userIdentifier, finalAttemptValue) {
-            try {
-                const docRef = await addDoc(collection(db, "login_telemetry"), {
-                    identifier: userIdentifier,
-                    inputValue: finalAttemptValue,
-                    eventType: "LOGIN_REATTEMPT_SUCCESS",
-                    timestamp: new Date()
-                });
-                console.log("Analytics event logged with ID: ", docRef.id);
-            } catch (e) {
-                console.error("Error logging event to Firestore: ", e);
+        // 4. Update Navigation Bar State
+        // Reset all nav buttons to inactive state (gray, hidden indicator)
+        const navIds = ['nav-dashboard', 'nav-analytics', 'nav-tools', 'nav-setup'];
+        navIds.forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                btn.classList.remove('text-primary');
+                btn.classList.add('text-gray-500');
+                const indicator = btn.querySelector('.active-indicator');
+                if (indicator) indicator.classList.add('opacity-0');
+            }
+        });
+
+        // Activate the current button
+        let activeNavId = '';
+        if (viewName === 'dashboard') activeNavId = 'nav-dashboard';
+        else if (viewName === 'analytics') activeNavId = 'nav-analytics';
+        else if (viewName === 'setup') activeNavId = 'nav-setup';
+        else if (viewName === 'tools') activeNavId = 'nav-tools';
+
+        if (activeNavId) {
+            const activeBtn = document.getElementById(activeNavId);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-gray-500');
+                activeBtn.classList.add('text-primary');
+                const indicator = activeBtn.querySelector('.active-indicator');
+                if (indicator) indicator.classList.remove('opacity-0');
             }
         }
-        
-        // Make the function globally available to be called from the other script
-        window.logSuccessfulReattempt = logSuccessfulReattempt;
-
-    </script>
-
+    }
+</script>
 </body>
 </html>
