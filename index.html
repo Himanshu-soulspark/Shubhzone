@@ -26,12 +26,12 @@
             extend: {
                 colors: {
                     // Dashboard Colors
-                    "primary": "#FF3B30", 
+                    "primary": "#FF3B30",
                     "primary-dark": "#D70015",
-                    "bg-main": "#0D0D0D", 
+                    "bg-main": "#0D0D0D",
                     "surface": "#1C1C1E",
                     "surface-light": "#2C2C2E",
-                    
+
                     // Studio/Setup Colors
                     "background-light": "#F2F2F7",
                     "background-dark": "#000000",
@@ -45,7 +45,7 @@
                     "surface-highlight": "#2C2C2E",
                     "input-dark": "#121212",
                     "text-secondary": "#8E8E93",
-                    
+
                     // Added from API Vault & Connect
                     "success": "#30D158",
                     "warning": "#FF9F0A",
@@ -83,7 +83,7 @@
         -webkit-tap-highlight-color: transparent;
         overscroll-behavior-y: none; /* Prevents pull-to-refresh effects */
     }
-    
+
     /* Strict View Handling */
     .view-section {
         display: none !important; /* Force hide inactive views */
@@ -92,7 +92,7 @@
         animation: fadeIn 0.3s ease-in-out;
         padding-bottom: 120px; /* Space for global nav to prevent overlap */
     }
-    
+
     /* Specific fix for Analytics View to enable proper scrolling */
     #view-analytics {
         height: 100dvh; /* Dynamic viewport height */
@@ -119,10 +119,10 @@
         min-height: 100dvh;
         z-index: 60; /* Higher than others */
     }
-    
+
     /* Specific fix for Tools View */
     #view-tools {
-        padding-bottom: 100px;
+        padding-bottom: 150px; /* Increased padding for floating buttons */
         background: #000;
         min-height: 100dvh;
     }
@@ -149,7 +149,7 @@
     /* Custom Scrollbar hiding */
     .hide-scrollbar::-webkit-scrollbar, .no-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar, .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    
+
     /* Smooth Snap Scrolling */
     .snap-scroll-x, .snap-x-mandatory {
         scroll-snap-type: x mandatory;
@@ -181,8 +181,8 @@
 
     /* Setup Range Slider */
     input[type=range] {
-        -webkit-appearance: none; 
-        background: transparent; 
+        -webkit-appearance: none;
+        background: transparent;
     }
     input[type=range]::-webkit-slider-thumb {
         -webkit-appearance: none;
@@ -191,7 +191,7 @@
         border-radius: 50%;
         background: #FF3B30;
         cursor: pointer;
-        margin-top: -10px; 
+        margin-top: -10px;
         box-shadow: 0 0 15px rgba(255, 59, 48, 0.6), inset 0 2px 4px rgba(255,255,255,0.4);
         border: 2px solid #fff;
     }
@@ -211,7 +211,7 @@
     .toggle-checkbox:checked + .toggle-label {
         background-color: #FF3B30;
     }
-    
+
     /* Mask Text for API Keys */
     .mask-text {
         -webkit-text-security: disc;
@@ -230,8 +230,8 @@
         <div class="flex items-center gap-3">
             <div class="relative group cursor-pointer" onclick="switchView('setup')">
                 <div class="size-10 rounded-full p-[2px] bg-gradient-to-br from-primary to-transparent shadow-glow">
-                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&h=100" 
-                         alt="Profile" 
+                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&h=100"
+                         alt="Profile"
                          class="rounded-full size-full object-cover border-2 border-bg-main">
                 </div>
                 <div class="absolute bottom-0 right-0 size-3 bg-green-500 rounded-full border-2 border-bg-main shadow-md"></div>
@@ -317,12 +317,12 @@
             <div class="bg-[#121214] rounded-[15px] p-5 relative overflow-hidden h-full">
                 <!-- Background Effect -->
                 <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[50px] rounded-full pointer-events-none"></div>
-                
+
                 <div class="flex items-center gap-2 mb-3">
                     <div class="bg-gradient-to-r from-primary to-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">AI TIP</div>
                     <span class="text-gray-400 text-xs">Just now</span>
                 </div>
-                
+
                 <h3 class="text-lg font-bold text-white mb-2 leading-tight">Retention Drop Detected</h3>
                 <p class="text-gray-400 text-sm mb-4 leading-relaxed">
                     Viewers are leaving at <span class="text-white font-mono bg-white/10 px-1 rounded">0:45</span>. The pacing slows down significantly here.
@@ -353,7 +353,7 @@
                      <button class="px-3 py-1 rounded-md text-gray-500 text-xs font-medium hover:text-white">60m</button>
                 </div>
             </div>
-            
+
             <!-- SVG Chart -->
             <div class="h-[120px] w-full relative">
                 <svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 50">
@@ -385,7 +385,7 @@
                     <span class="block text-gray-500 text-[10px] mt-0.5">Rank #1 faster</span>
                 </div>
             </button>
-            
+
             <!-- Tool 2 -->
             <button class="bg-surface hover:bg-surface-light border border-white/5 border-b-black/50 p-4 rounded-xl flex flex-col gap-3 text-left shadow-lg active:scale-[0.97] transition-all group relative overflow-hidden">
                 <div class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -412,7 +412,7 @@
                 </div>
                 <span class="material-symbols-rounded text-gray-600 text-lg">chevron_right</span>
             </div>
-            
+
             <div class="bg-surface/50 border border-white/5 p-3 rounded-xl flex items-center gap-3 active:bg-surface/80 transition-colors">
                 <div class="size-12 rounded-lg bg-yellow-500/10 flex items-center justify-center shrink-0 text-yellow-500">
                      <span class="material-symbols-rounded">military_tech</span>
@@ -466,13 +466,13 @@
         <div class="flex items-center px-4 py-3 gap-3 w-full @container">
             <div class="flex flex-col w-full">
                 <div class="flex w-full flex-col rounded-2xl overflow-hidden shadow-3d bg-card-dark border border-white/10 group focus-within:ring-1 focus-within:ring-primary/50 transition-all">
-                    
+
                     <!-- Input Area (UPDATED WITH ID) -->
                     <div class="flex flex-1 gap-3 p-4">
                         <!-- Avatar -->
-                        <div class="bg-center bg-no-repeat bg-cover rounded-full size-10 shrink-0 ring-2 ring-primary/30 shadow-lg" data-alt="User profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDcEEPydWOb4oWZpRAlf0PtwxWH3gsq2oNBOcS1Bwy-xFHopb0Ol9xSfgdmk-kmlstcLRHvoW9wwQBXF447F8I5KDhZExTfkkSmSdniTMISN9fhD4grG8OJPzeuUuVaubB7x6MUT6bvWg-6RpjXyUO3aimAIdkxY76vuw5FQkJgwCID6ZwV5gFMNzU_0SLLv7C851iXLy0dQNa2HH_2Bd5qYMfhVnWALxGFoKk2fVTEMJic4WFrgZbnCHn_JLE77KFjwFCScmJiXo10");'>
+                        <div class="bg-center bg-no-repeat bg-cover rounded-full size-10 shrink-0 ring-2 ring-primary/30 shadow-lg" data-alt="User profile avatar" style='background-image: url("https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&h=100");'>
                         </div>
-                        
+
                         <textarea id="video-topic" class="flex w-full min-w-0 flex-1 resize-none bg-transparent text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 border-none p-0 text-base font-normal leading-relaxed focus:outline-0 focus:ring-0 h-[80px]" placeholder="Describe your video idea (e.g., 'Top 10 AI Tools for 2024')..."></textarea>
                     </div>
 
@@ -494,7 +494,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- NEW OUTPUT BOX FOR GENERATED SCRIPT -->
         <div id="ai-output-box" class="mx-4 hidden p-4 rounded-xl bg-black/40 border border-white/10 text-gray-300 text-sm h-64 overflow-y-auto mt-2"></div>
 
@@ -519,7 +519,7 @@
                     <p class="text-gray-500 text-xs font-medium">Full AI Scripting</p>
                 </div>
             </button>
-            
+
             <!-- Trend Finder -->
             <button class="flex flex-col gap-3 rounded-2xl bg-card-gradient border-t border-white/10 p-4 shadow-3d active:scale-[0.98] transition-all group text-left relative overflow-hidden">
                 <div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -531,7 +531,7 @@
                     <p class="text-gray-500 text-xs font-medium">Niche Analysis</p>
                 </div>
             </button>
-            
+
             <!-- SEO Optimizer -->
             <button class="flex flex-col gap-3 rounded-2xl bg-card-gradient border-t border-white/10 p-4 shadow-3d active:scale-[0.98] transition-all group text-left relative overflow-hidden">
                 <div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -543,7 +543,7 @@
                     <p class="text-gray-500 text-xs font-medium">Keyword Research</p>
                 </div>
             </button>
-            
+
             <!-- Make a Short -->
             <button class="flex flex-col gap-3 rounded-2xl bg-card-gradient border-t border-white/10 p-4 shadow-3d active:scale-[0.98] transition-all group text-left relative overflow-hidden">
                 <div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -564,7 +564,7 @@
             <div class="flex items-center justify-between pb-3 px-1">
                 <h1 class="text-black dark:text-white text-[20px] font-display font-bold leading-tight tracking-tight">Optimization</h1>
             </div>
-            
+
             <div class="rounded-2xl bg-gradient-to-br from-surface-dark to-black border-t border-white/10 p-5 shadow-3d relative overflow-hidden">
                 <!-- Background Decor -->
                 <div class="absolute top-0 right-0 p-2 opacity-5 pointer-events-none">
@@ -581,7 +581,7 @@
                     </div>
                     <span class="bg-green-500/10 text-green-500 text-[10px] font-bold px-2 py-1 rounded-full border border-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.2)] animate-pulse">● LIVE</span>
                 </div>
-                
+
                 <div class="flex gap-4 relative z-10">
                     <!-- Variant A -->
                     <div class="flex-1 flex flex-col gap-3">
@@ -600,7 +600,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Variant B (Winner) -->
                     <div class="flex-1 flex flex-col gap-3">
                         <div class="relative aspect-video rounded-xl overflow-hidden ring-2 ring-primary shadow-[0_0_20px_rgba(255,59,48,0.3)] transform scale-[1.02]">
@@ -630,7 +630,7 @@
             <div class="flex items-center justify-between pr-4 pb-3">
                 <h1 class="text-black dark:text-white text-[20px] font-display font-bold leading-tight tracking-tight">Trending in AI Tech</h1>
             </div>
-            
+
             <div class="flex overflow-x-auto gap-4 pb-8 pr-4 no-scrollbar snap-x-mandatory">
                 <!-- Card 1 -->
                 <div class="min-w-[260px] rounded-2xl bg-card-gradient border-t border-white/10 p-5 flex flex-col gap-4 shadow-3d snap-center active:scale-[0.98] transition-transform">
@@ -650,7 +650,7 @@
                         Generate Outline
                     </button>
                 </div>
-                
+
                 <!-- Card 2 -->
                 <div class="min-w-[260px] rounded-2xl bg-card-gradient border-t border-white/10 p-5 flex flex-col gap-4 shadow-3d snap-center active:scale-[0.98] transition-transform">
                     <div class="flex items-start justify-between">
@@ -669,7 +669,7 @@
                         Generate Outline
                     </button>
                 </div>
-                
+
                 <!-- Card 3 -->
                 <div class="min-w-[260px] rounded-2xl bg-card-gradient border-t border-white/10 p-5 flex flex-col gap-4 shadow-3d snap-center active:scale-[0.98] transition-transform">
                     <div class="flex items-start justify-between">
@@ -709,14 +709,14 @@
         </div>
 
         <div class="flex flex-col gap-8 px-5 pt-8">
-            
+
             <!-- Section 1: Identity -->
             <div class="flex flex-col gap-4">
                 <div class="flex items-center gap-2 mb-1">
                     <div class="h-6 w-1 bg-primary rounded-full"></div>
                     <h3 class="text-white text-xl font-display font-bold leading-tight">Identity</h3>
                 </div>
-                
+
                 <label class="flex flex-col w-full gap-2">
                     <p class="text-gray-400 text-xs font-bold uppercase tracking-wider ml-1">Channel Name</p>
                     <div class="relative group">
@@ -849,7 +849,7 @@
                     <div class="flex items-center justify-between rounded-2xl bg-gradient-to-br from-card-dark to-[#1a0505] p-4 border border-primary/30 shadow-[0_4px_20px_-5px_rgba(255,59,48,0.15)] relative overflow-hidden">
                         <!-- Glow Effect -->
                         <div class="absolute top-0 right-0 w-20 h-20 bg-primary/10 blur-2xl rounded-full pointer-events-none"></div>
-                        
+
                         <div class="flex items-center gap-3 relative z-10">
                             <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary shadow-glow text-white">
                                 <span class="material-symbols-rounded">rocket_launch</span>
@@ -868,7 +868,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="pb-32 flex flex-col gap-4">
                 <!-- Competitor Analysis Button -->
                 <button onclick="switchView('competitor')" class="w-full flex items-center justify-between p-4 rounded-2xl bg-card-dark border border-white/10 hover:border-primary/50 transition-all group active:scale-[0.98]">
@@ -913,7 +913,7 @@
 <!-- VIEW 4: ANALYTICS (Keyword Tool)               -->
 <!-- ============================================== -->
 <div id="view-analytics" class="view-section text-slate-900 dark:text-white selection:bg-primary/30">
-    
+
     <!-- Sticky Header Section -->
 
     <div class="flex-none z-40 glass transition-all">
@@ -998,13 +998,13 @@
             <div class="absolute -top-4 -right-4 p-3 opacity-20 rotate-12">
                 <span class="material-symbols-rounded text-[120px]">rocket_launch</span>
             </div>
-            
+
             <div class="relative z-10">
                 <div class="flex items-center gap-2 mb-3">
                     <span class="bg-black/30 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-white/10">Top Pick</span>
                 </div>
                 <h3 class="text-2xl font-display font-bold mb-1 tracking-tight">Vegan Meal Prep</h3>
-                
+
                 <div class="flex gap-6 mt-5">
                     <div>
                         <p class="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-0.5">Volume</p>
@@ -1027,7 +1027,7 @@
 
         <!-- Keyword List -->
         <div class="space-y-3">
-            
+
             <!-- List Item 1 -->
             <div class="bg-white dark:bg-card-gradient rounded-2xl p-4 shadow-3d border border-gray-100 dark:border-white/10 flex flex-col gap-3 group active:scale-[0.99] transition-transform">
                 <div class="flex justify-between items-start">
@@ -1192,7 +1192,7 @@
             </div>
 
         </div>
-        
+
     </div>
 
 </div>
@@ -1248,7 +1248,7 @@
                 <span class="flex items-center justify-center size-6 rounded-full bg-primary text-white text-xs font-bold">2</span>
                 Video Topic
             </h2>
-            
+
             <!-- Tabs -->
             <div class="px-5 pb-5">
                 <div class="flex border-b border-gray-200 dark:border-white/10 gap-8">
@@ -1263,7 +1263,7 @@
                     </button>
                 </div>
             </div>
-            
+
             <!-- AI Suggestions Chips -->
             <div class="flex gap-3 overflow-x-auto px-5 pb-2 no-scrollbar">
                 <button class="shrink-0 rounded-full bg-gradient-primary text-white px-5 py-2.5 text-sm font-bold shadow-glow border border-transparent transition-transform active:scale-95 flex items-center gap-1">
@@ -1291,7 +1291,7 @@
                 </h2>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-1 rounded border border-primary/20">AI Generated</span>
             </div>
-            
+
             <div class="px-5 flex flex-col gap-6">
                 <!-- Thumbnail Preview -->
                 <div class="relative group w-full aspect-video rounded-2xl overflow-hidden shadow-3d border border-gray-200 dark:border-white/10">
@@ -1389,7 +1389,7 @@
             <span class="material-symbols-rounded text-xl">arrow_back_ios_new</span>
         </button>
         <h2 class="text-white text-lg font-display font-bold leading-tight tracking-wide flex-1 text-center pr-10">API Vault</h2>
-        
+
         <div class="absolute right-4 top-1/2 -translate-y-1/2">
             <div class="text-primary bg-primary/10 border border-primary/20 size-9 rounded-full flex items-center justify-center shadow-glow animate-pulse">
                 <span class="material-symbols-rounded text-[18px]">lock</span>
@@ -1398,7 +1398,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex flex-col gap-6 p-5 pb-24">
+    <main class="flex flex-col gap-6 p-5">
 
         <!-- Global Security Notice -->
         <div class="bg-gradient-to-r from-surface-highlight to-card-dark border border-white/10 rounded-2xl p-4 flex items-start gap-3 shadow-3d relative overflow-hidden group">
@@ -1408,171 +1408,27 @@
             </div>
             <div>
                 <p class="text-white text-sm font-bold tracking-wide">Encrypted Local Storage</p>
-                <p class="text-gray-400 text-xs leading-relaxed mt-1">Keys are AES-256 encrypted on your device. We never see them.</p>
+                <p class="text-gray-400 text-xs leading-relaxed mt-1">Your keys are saved securely in your browser. We never see them.</p>
             </div>
         </div>
 
-        <!-- Section 1: LLM (UPDATED WITH ID AND ONCLICK) -->
-        <section class="bg-card-gradient rounded-2xl border border-white/5 overflow-hidden shadow-3d group hover:border-white/10 transition-colors">
-            <div class="px-5 pt-4 pb-2 flex justify-between items-center border-b border-white/5">
-                <div class="flex items-center gap-3">
-                    <div class="size-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 shadow-inner">
-                        <span class="material-symbols-rounded text-[20px]">psychology</span>
-                    </div>
-                    <h3 class="text-white font-display font-bold text-sm tracking-wide">LLM Service</h3>
-                </div>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/10 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-                    <span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-[10px] uppercase font-bold tracking-wider">Active</span>
-                </span>
-            </div>
-            
-            <div class="p-5 space-y-4">
-                <div class="flex flex-col gap-2">
-                    <label class="text-gray-500 text-[10px] font-bold uppercase tracking-widest pl-1">OpenAI / Gemini Key</label>
-                    <div class="relative flex w-full items-center rounded-xl bg-[#0a0a0a] border border-white/10 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 focus-within:shadow-glow transition-all shadow-inner-slot">
-                        <span class="material-symbols-rounded text-gray-600 absolute left-3 text-lg">key</span>
-                        <input id="api-key-input" class="flex-1 w-full bg-transparent border-none text-white placeholder:text-gray-700 focus:ring-0 p-3.5 pl-10 font-mono text-sm mask-text" placeholder="Paste your OpenAI Key here (sk-...)" type="password" value=""/>
-                        <button class="p-3 text-gray-500 hover:text-white transition-colors flex items-center justify-center">
-                            <span class="material-symbols-rounded text-[20px]">visibility_off</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button onclick="saveApiKey()" class="flex-1 bg-gradient-primary hover:brightness-110 active:scale-[0.98] text-white h-11 rounded-xl text-sm font-bold shadow-glow transition-all flex items-center justify-center gap-2 border border-white/10">
-                        <span>Save Key Securely</span>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 2: Voice AI -->
-        <section class="bg-card-gradient rounded-2xl border border-white/5 overflow-hidden shadow-3d group hover:border-white/10 transition-colors">
-            <div class="px-5 pt-4 pb-2 flex justify-between items-center border-b border-white/5">
-                <div class="flex items-center gap-3">
-                    <div class="size-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500 shadow-inner">
-                        <span class="material-symbols-rounded text-[20px]">graphic_eq</span>
-                    </div>
-                    <h3 class="text-white font-display font-bold text-sm tracking-wide">Voice AI</h3>
-                </div>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 text-gray-400 border border-white/5">
-                    <span class="size-1.5 rounded-full bg-gray-600"></span>
-                    <span class="text-[10px] uppercase font-bold tracking-wider">Empty</span>
-                </span>
-            </div>
-            
-            <div class="p-5 space-y-4">
-                <div class="flex flex-col gap-2">
-                    <div class="flex justify-between items-center pl-1 pr-1">
-                        <label class="text-gray-500 text-[10px] font-bold uppercase tracking-widest">ElevenLabs / PlayHT</label>
-                        <button class="text-[10px] text-primary hover:text-white transition-colors font-bold flex items-center gap-1">
-                            <span class="material-symbols-rounded text-[12px]">content_paste</span> PASTE
-                        </button>
-                    </div>
-                    <div class="relative flex w-full items-center rounded-xl bg-[#0a0a0a] border border-white/10 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 focus-within:shadow-glow transition-all shadow-inner-slot">
-                         <span class="material-symbols-rounded text-gray-600 absolute left-3 text-lg">key</span>
-                        <input class="flex-1 w-full bg-transparent border-none text-white placeholder:text-gray-700 focus:ring-0 p-3.5 pl-10 font-mono text-sm" placeholder="Enter API Key" type="text" value=""/>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button class="flex-1 bg-surface-highlight border border-white/10 hover:bg-white/10 active:scale-[0.98] text-gray-300 h-11 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
-                        <span>Save & Test</span>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 3: Video Generation (Error State) -->
-        <section class="bg-card-gradient rounded-2xl border border-primary/30 overflow-hidden shadow-[0_0_20px_rgba(255,59,48,0.1)] relative">
-            <!-- Error Indicator Line -->
-            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary shadow-[0_0_10px_#ff3b30]"></div>
-            
-            <div class="px-5 pt-4 pb-2 flex justify-between items-center border-b border-white/5">
-                <div class="flex items-center gap-3">
-                    <div class="size-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-inner">
-                        <span class="material-symbols-rounded text-[20px]">movie</span>
-                    </div>
-                    <h3 class="text-white font-display font-bold text-sm tracking-wide">Video Gen</h3>
-                </div>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
-                    <span class="material-symbols-rounded text-[14px]">error</span>
-                    <span class="text-[10px] uppercase font-bold tracking-wider">Invalid</span>
-                </span>
-            </div>
-            
-            <div class="p-5 space-y-4">
-                <div class="flex flex-col gap-2">
-                    <label class="text-gray-500 text-[10px] font-bold uppercase tracking-widest pl-1">HeyGen / D-ID Key</label>
-                    <div class="relative flex w-full items-center rounded-xl bg-[#0a0a0a] border border-primary/50 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary focus-within:shadow-glow transition-all shadow-inner-slot">
-                        <span class="material-symbols-rounded text-primary/50 absolute left-3 text-lg">key_off</span>
-                        <input class="flex-1 w-full bg-transparent border-none text-white placeholder:text-gray-700 focus:ring-0 p-3.5 pl-10 font-mono text-sm mask-text" placeholder="Enter API Key" type="text" value="hg-invalid-key-example"/>
-                         <button class="p-3 text-primary hover:text-white transition-colors flex items-center justify-center">
-                            <span class="material-symbols-rounded text-[20px]">visibility_off</span>
-                        </button>
-                    </div>
-                    <p class="text-primary text-xs pl-1 flex items-center gap-1.5 font-medium mt-1">
-                         <span class="material-symbols-rounded text-[14px]">info</span>
-                         Authentication failed. Check your key.
-                    </p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button class="flex-1 bg-primary hover:bg-primary-dark active:scale-[0.98] text-white h-11 rounded-xl text-sm font-bold shadow-glow transition-all flex items-center justify-center gap-2 border border-white/10">
-                        <span class="material-symbols-rounded text-[18px]">refresh</span>
-                        <span>Retry Connection</span>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 4: Thumbnail AI -->
-        <section class="bg-card-gradient rounded-2xl border border-white/5 overflow-hidden shadow-3d group hover:border-white/10 transition-colors">
-            <div class="px-5 pt-4 pb-2 flex justify-between items-center border-b border-white/5">
-                <div class="flex items-center gap-3">
-                    <div class="size-9 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-500 shadow-inner">
-                        <span class="material-symbols-rounded text-[20px]">image</span>
-                    </div>
-                    <h3 class="text-white font-display font-bold text-sm tracking-wide">Thumbnail AI</h3>
-                </div>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 text-gray-400 border border-white/5">
-                    <span class="size-1.5 rounded-full bg-gray-600"></span>
-                    <span class="text-[10px] uppercase font-bold tracking-wider">Empty</span>
-                </span>
-            </div>
-            
-            <div class="p-5 space-y-4">
-                <div class="flex flex-col gap-2">
-                    <div class="flex justify-between items-center pl-1 pr-1">
-                        <label class="text-gray-500 text-[10px] font-bold uppercase tracking-widest">Midjourney / Dall-E</label>
-                        <button class="text-[10px] text-primary hover:text-white transition-colors font-bold flex items-center gap-1">
-                            <span class="material-symbols-rounded text-[12px]">content_paste</span> PASTE
-                        </button>
-                    </div>
-                    <div class="relative flex w-full items-center rounded-xl bg-[#0a0a0a] border border-white/10 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 focus-within:shadow-glow transition-all shadow-inner-slot">
-                        <span class="material-symbols-rounded text-gray-600 absolute left-3 text-lg">key</span>
-                        <input class="flex-1 w-full bg-transparent border-none text-white placeholder:text-gray-700 focus:ring-0 p-3.5 pl-10 font-mono text-sm" placeholder="Enter API Key" type="text" value=""/>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button class="flex-1 bg-surface-highlight border border-white/10 hover:bg-white/10 active:scale-[0.98] text-gray-300 h-11 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
-                        <span>Save & Test</span>
-                    </button>
-                </div>
-            </div>
-        </section>
+        <!-- API Key List Container (This is where JS will add keys) -->
+        <div id="api-key-list" class="space-y-4">
+            <!-- API Key forms will be dynamically inserted here -->
+        </div>
 
     </main>
 
-    <!-- Footer Note -->
-    <footer class="p-8 pt-0 text-center">
-        <div class="flex flex-col items-center justify-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
-            <div class="size-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
-                 <span class="material-symbols-rounded text-gray-400 text-[20px]">lock_clock</span>
-            </div>
-            <p class="text-[10px] text-gray-500 font-medium uppercase tracking-widest">
-                End-to-End Encrypted Environment
-            </p>
-        </div>
-    </footer>
+    <!-- Floating Action Buttons -->
+    <div class="fixed bottom-24 right-4 max-w-[calc(100%-2rem)] w-full mx-auto md:max-w-md md:right-1/2 md:translate-x-1/2 z-50 flex items-center justify-end gap-3 px-5">
+         <button onclick="addNewApiKeyForm()" class="size-14 bg-white/10 backdrop-blur-lg border border-white/10 rounded-2xl shadow-lg flex items-center justify-center text-white active:scale-95 transition-transform">
+            <span class="material-symbols-rounded text-3xl">add</span>
+        </button>
+        <button onclick="saveAllApiKeys()" class="h-14 flex-1 bg-btn-gradient rounded-2xl text-white font-semibold text-sm shadow-glow flex items-center justify-center gap-2 active:scale-[0.98] transition-all border-t border-white/20">
+            <span class="material-symbols-rounded">save</span>
+            Save All Changes
+        </button>
+    </div>
 
     </div>
 </div>
@@ -1599,7 +1455,7 @@
         <div class="py-10 flex items-center justify-center gap-6 relative">
             <!-- Connecting Line -->
             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-[2px] bg-gradient-to-r from-white/10 via-primary to-white/10 z-0"></div>
-            
+
             <!-- App Logo -->
             <div class="relative size-20 rounded-2xl bg-[#121212] border border-white/10 flex items-center justify-center shadow-3d z-10">
                 <span class="material-symbols-rounded text-white text-4xl">smart_toy</span>
@@ -1629,7 +1485,7 @@
             <div class="flex items-center justify-between text-[10px] uppercase tracking-widest font-bold text-gray-500 mb-2 pl-1">
                 Access Permissions
             </div>
-            
+
             <!-- Permission 1 -->
             <div class="flex items-start gap-4 p-4 rounded-2xl bg-card-dark border border-white/5 hover:border-white/10 transition-colors">
                 <div class="flex items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0 size-10 mt-0.5">
@@ -1657,7 +1513,7 @@
 
         <!-- Main Action Area -->
         <div class="mt-auto flex flex-col gap-5">
-            
+
             <!-- Trust Badge -->
             <div class="flex items-center justify-center gap-2 text-gray-500 text-[10px] font-medium uppercase tracking-wider bg-white/5 py-2 rounded-lg border border-white/5">
                 <span class="material-symbols-rounded text-sm">lock</span>
@@ -1683,7 +1539,7 @@
             <div class="bg-card-dark rounded-2xl p-5 shadow-3d border border-white/10">
                 <div class="flex items-center gap-4 mb-5">
                     <div class="size-14 rounded-full p-[2px] bg-gradient-primary relative">
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiyv5N8Wi7ZXtk2cSTf-ibAAuZriYF9VWYwkUcQ0NezFNBn0VovKp83Odr8FWgdNIYtOrBZ0I4BhtERDYgGw2JFGV9TvSkIEnyM86e8OoVKhy5FvYVf0--LaZ2AWpv5j_zcgqitqHkKMZygrz_mAV2PvImvJe1VoksbWWY103pcUsu3zkkkbvpuySTmtTb6y5AhWRTNTXBEDb7Epqe7tkK0xlsrSQU2v7ZzimtmcLfGBqGdFvN96h_Bzmp6NO8jbkEjBhTbGfhGrZB" class="rounded-full size-full object-cover border-2 border-black" alt="Avatar">
+                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&h=100" class="rounded-full size-full object-cover border-2 border-black" alt="Avatar">
                         <div class="absolute bottom-0 right-0 size-3.5 bg-green-500 rounded-full border-2 border-black"></div>
                     </div>
                     <div>
@@ -1727,7 +1583,7 @@
         <span class="material-symbols-rounded filled">home</span>
         <span class="active-indicator absolute -bottom-1 w-1 h-1 bg-primary rounded-full"></span>
     </button>
-    
+
     <!-- Analytics Button (Linked to New Code) -->
     <button id="nav-analytics" onclick="switchView('analytics')" class="flex-1 flex flex-col items-center justify-center gap-1 h-full text-gray-500 hover:text-white transition-colors relative group">
         <span class="material-symbols-rounded">analytics</span>
@@ -1746,7 +1602,7 @@
         <span class="material-symbols-rounded">handyman</span>
         <span class="active-indicator absolute -bottom-1 w-1 h-1 bg-primary rounded-full opacity-0"></span>
     </button>
-    
+
     <!-- Profile/Setup Button -->
     <button id="nav-setup" onclick="switchView('setup')" class="flex-1 flex flex-col items-center justify-center gap-1 h-full text-gray-500 hover:text-white transition-colors relative group">
         <span class="material-symbols-rounded">person</span>
@@ -1758,7 +1614,8 @@
 <!-- JAVASCRIPT LOGIC (THE BRAIN)                   -->
 <!-- ============================================== -->
 <script>
-    // --- 1. VIEW SWITCHING LOGIC ---
+    // --- 1. VIEW SWITCHING LOGIC (UNCHANGED) ---
+    // This function is perfect as it is. It correctly handles showing and hiding different sections of the app.
     function switchView(viewName) {
         // 1. Hide all views
         const views = document.querySelectorAll('.view-section');
@@ -1811,65 +1668,147 @@
         }
     }
 
-    // --- 2. REAL AI FUNCTIONALITY ---
-    
-    // Check if key is already saved when page loads
+    // --- 2. DYNAMIC API VAULT LOGIC (THE MAJOR UPGRADE) ---
+
+    // This function runs when the page loads to display any saved keys.
     window.onload = function() {
-        const savedKey = localStorage.getItem('openai_key');
-        if(savedKey) {
-            const input = document.getElementById('api-key-input');
-            if(input) {
-                input.value = "sk-xxxxxxxxxxxxxxxxxxxxxxxx"; // Masked value
-                input.setAttribute('data-real-value', savedKey); 
-                // Don't alert on load to keep it clean
-                console.log("API Key loaded from local storage");
-            }
-        }
+        renderApiKeys();
     };
 
-    // Function to SAVE the API Key
-    function saveApiKey() {
-        const input = document.getElementById('api-key-input');
-        const key = input.value;
+    // Reads all keys from localStorage and displays them on the screen.
+    function renderApiKeys() {
+        const apiKeyList = document.getElementById('api-key-list');
+        apiKeyList.innerHTML = ''; // Clear the list first
+        const savedKeys = JSON.parse(localStorage.getItem('ytboost_api_keys')) || [];
 
-        if (key.startsWith('sk-')) {
-            localStorage.setItem('openai_key', key);
-            input.setAttribute('data-real-value', key);
-            input.value = "sk-xxxxxxxxxxxxxxxxxxxxxxxx"; // Mask immediately
-            alert("✅ API Key Saved Securely! You can now generate scripts.");
-        } else if (input.getAttribute('data-real-value')) {
-             alert("✅ Key is already saved and active.");
+        if (savedKeys.length === 0) {
+            // Show a helpful message if no keys are added yet
+            apiKeyList.innerHTML = `<div class="text-center text-gray-500 p-8 bg-card-dark rounded-2xl border border-dashed border-white/10">
+                <span class="material-symbols-rounded text-4xl mb-2">key</span>
+                <p class="font-bold">Your API Vault is empty.</p>
+                <p class="text-xs">Click the "Add" button below to add your first API Key.</p>
+            </div>`;
         } else {
-            alert("❌ Invalid Key! OpenAI keys start with 'sk-'. Please check.");
+            savedKeys.forEach(keyData => {
+                const keyForm = createApiKeyForm(keyData.service, keyData.key);
+                apiKeyList.appendChild(keyForm);
+            });
         }
     }
 
-    // Function to GENERATE Script using OpenAI
+    // Creates the HTML for a single API key input form.
+    function createApiKeyForm(service = 'OpenAI', key = '') {
+        const uniqueId = `key-${Date.now()}-${Math.random()}`;
+        const container = document.createElement('div');
+        container.className = 'api-key-form bg-card-gradient rounded-2xl border border-white/5 overflow-hidden shadow-3d p-4 space-y-3';
+        
+        container.innerHTML = `
+            <div class="flex justify-between items-center">
+                <select class="api-key-service bg-transparent text-white font-bold border-0 focus:ring-0 p-0">
+                    <option ${service === 'OpenAI' ? 'selected' : ''}>OpenAI</option>
+                    <option ${service === 'Google Gemini' ? 'selected' : ''}>Google Gemini</option>
+                    <option ${service === 'YouTube' ? 'selected' : ''}>YouTube</option>
+                    <option ${service === 'ElevenLabs' ? 'selected' : ''}>ElevenLabs</option>
+                    <option ${service === 'Pexels' ? 'selected' : ''}>Pexels</option>
+                    <option ${service === 'Other' ? 'selected' : ''}>Other</option>
+                </select>
+                <button onclick="deleteApiKey(this)" class="size-8 flex items-center justify-center rounded-full bg-white/5 text-gray-400 hover:bg-primary hover:text-white transition-colors">
+                    <span class="material-symbols-rounded text-lg">delete</span>
+                </button>
+            </div>
+            <div class="relative flex w-full items-center">
+                <span class="material-symbols-rounded text-gray-600 absolute left-3 text-lg">key</span>
+                <input
+                    class="api-key-value flex-1 w-full bg-[#0a0a0a] border border-white/10 rounded-xl text-white placeholder:text-gray-700 focus:ring-1 focus:ring-primary focus:border-primary p-3.5 pl-10 font-mono text-sm"
+                    placeholder="Enter API Key here..."
+                    type="password"
+                    value="${key}"
+                />
+            </div>
+        `;
+        return container;
+    }
+
+    // Adds a new, empty API key form to the list.
+    function addNewApiKeyForm() {
+        const apiKeyList = document.getElementById('api-key-list');
+        // If the placeholder message is there, remove it first.
+        if (apiKeyList.querySelector('.text-center')) {
+            apiKeyList.innerHTML = '';
+        }
+        const newForm = createApiKeyForm(); // Create with default values
+        apiKeyList.appendChild(newForm);
+    }
+    
+    // Removes an API key form from the list.
+    function deleteApiKey(buttonElement) {
+        // Find the parent form container and remove it
+        buttonElement.closest('.api-key-form').remove();
+        // Check if the list is now empty and show the placeholder message if it is.
+        const apiKeyList = document.getElementById('api-key-list');
+        if (apiKeyList.children.length === 0) {
+             renderApiKeys(); // This will show the "empty" message
+        }
+    }
+
+    // Gathers all data from the forms on screen and saves it to localStorage.
+    function saveAllApiKeys() {
+        const forms = document.querySelectorAll('.api-key-form');
+        const keysToSave = [];
+
+        forms.forEach(form => {
+            const service = form.querySelector('.api-key-service').value;
+            const key = form.querySelector('.api-key-value').value;
+            if (key) { // Only save if a key is entered
+                keysToSave.push({ service, key });
+            }
+        });
+
+        localStorage.setItem('ytboost_api_keys', JSON.stringify(keysToSave));
+        alert(`✅ ${keysToSave.length} API Key(s) Saved Securely!`);
+        
+        // Optional: Re-render to ensure consistency, especially if some empty keys were removed.
+        renderApiKeys();
+    }
+
+
+    // --- 3. SCRIPT GENERATION LOGIC (UPGRADED) ---
+    // This function now intelligently finds the correct API key.
     async function generateScriptReal() {
         const topic = document.getElementById('video-topic').value;
-        const apiKey = localStorage.getItem('openai_key');
         const outputBox = document.getElementById('ai-output-box');
         const btnText = document.getElementById('gen-btn-text');
 
+        // Step 1: Get the required API key from our new system.
+        const savedKeys = JSON.parse(localStorage.getItem('ytboost_api_keys')) || [];
+        const openAIKeyData = savedKeys.find(k => k.service === 'OpenAI');
+
         // Validation
-        if (!topic) { alert("Please enter a topic first!"); return; }
-        if (!apiKey) { alert("⚠️ API Key Missing! Go to 'Tools' (Hammer Icon) -> 'API Vault' and save your OpenAI Key."); return; }
+        if (!topic) {
+            alert("Please enter a video topic first!");
+            return;
+        }
+        if (!openAIKeyData || !openAIKeyData.key) {
+            alert("⚠️ OpenAI API Key Missing! Go to 'Tools' (Hammer Icon) -> 'API Vault' and add your OpenAI key.");
+            switchView('tools'); // Take user to the right place
+            return;
+        }
 
         // UI Update (Loading State)
         btnText.innerText = "Thinking...";
         outputBox.classList.remove('hidden');
         outputBox.innerText = "Connecting to AI... Please wait...";
 
-        // Real API Call to OpenAI
+        // Real API Call to OpenAI (This part remains the same)
         try {
             const response = await fetch('https://api.openai.com/v1/chat/completions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
+                    'Authorization': `Bearer ${openAIKeyData.key}` // Use the key we found
                 },
                 body: JSON.stringify({
-                    model: "gpt-3.5-turbo", 
+                    model: "gpt-3.5-turbo",
                     messages: [{
                         role: "user",
                         content: `Write a short, viral YouTube video script for the topic: "${topic}". \n\nFormat:\n1. Hook (0-5s)\n2. Value/Content\n3. Call to Action.`
@@ -1892,7 +1831,7 @@
             console.error(error);
             outputBox.innerText = "Error: " + error.message;
             btnText.innerText = "Retry";
-            alert("Failed to generate. Check your API Key or Quota.");
+            alert("Failed to generate. Check your API Key, your internet connection, or OpenAI's status.");
         }
     }
 </script>
